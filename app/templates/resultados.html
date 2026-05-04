@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="resultados">
+    <div class="section-container">
+
+        <h2>Resultados para "{{ servicio }}" en "{{ zona }}"</h2>
+
+        {% if resultados %}
+            <div class="resultados-lista">
+                {% for r in resultados %}
+                    <div class="resultado-card">
+                        <h3>{{ r["nombre"] }}</h3>
+                        <p><strong>Servicio:</strong> {{ r["servicio"] }}</p>
+                        <p><strong>Zona:</strong> {{ r["zona"] }}</p>
+                        <p><strong>Teléfono:</strong> {{ r["telefono"] }}</p>
+                        <p>{{ r["descripcion"] }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No se encontraron profesionales para esa búsqueda.</p>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

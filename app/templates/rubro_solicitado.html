@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <div class="form-card">
+            <h2>Solicitud recibida</h2>
+
+            <p>
+                Estamos trabajando para enlistar tu rubro o actividad:
+                <strong>{{ nombre_rubro }}</strong>.
+            </p>
+
+            <p>
+                ¿Querés recibir una notificación cuando esté lista?
+            </p>
+
+            <p>
+                Solicitudes actuales para este rubro: <strong>{{ cantidad }}</strong>/10
+            </p>
+
+            {% if cantidad >= 10 %}
+                <p class="admin-alert">
+                    Este rubro alcanzó el mínimo de solicitudes. Se notificará al administrador.
+                </p>
+            {% endif %}
+
+            <a href="/" class="volver-btn">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

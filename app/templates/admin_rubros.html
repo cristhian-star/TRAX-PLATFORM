@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container">
+    <h2>Panel de solicitudes de rubros</h2>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Rubro</th>
+                <th>Solicitudes</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in rubros %}
+            <tr>
+                <td>{{ r["nombre_rubro"] }}</td>
+                <td>{{ r["total"] }}</td>
+                <td>{{ r["estado"] }}</td>
+                <td>
+                    {% if r["total"] >= 10 %}
+                        <button>Aprobar rubro</button>
+                    {% else %}
+                        <span>Esperando</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+{% endblock %}

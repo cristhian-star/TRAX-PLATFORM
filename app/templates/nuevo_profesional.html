@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Registrar profesional</h2>
+
+        <form action="/profesionales/crear" method="POST" class="form-card">
+
+            <input type="text" name="nombre" placeholder="Nombre o empresa" required>
+
+            <select name="servicio" id="servicio" required>
+            <option value="">Seleccionar servicio</option>
+            <option>Refrigeración A/C</option>
+            <option>Electricidad</option>
+            <option>Herrería</option>
+            <option>Plomería</option>
+            <option>Gas domiciliario</option>
+             <option value="otro">Otro rubro / actividad</option>
+            </select>
+
+        <div id="nuevo-rubro-box" class="nuevo-rubro-box">
+            <h3>No encontraste tu rubro</h3>
+
+            <input type="text" name="nombre_rubro" placeholder="Nombre del rubro o actividad">
+
+            <textarea name="descripcion_rubro" placeholder="Describí brevemente tu actividad"></textarea>
+
+            <input type="email" name="email_notificacion" placeholder="Email para recibir notificación">
+
+            <button type="submit" formaction="/rubros/solicitar">
+        Solicitar alta de rubro
+             </button>
+        </div>
+
+            <input type="text" name="zona" placeholder="Zona o localidad" required>
+
+            <input type="text" name="telefono" placeholder="Teléfono">
+
+            <textarea name="descripcion" placeholder="Descripción del servicio"></textarea>
+
+            <button type="submit">Guardar profesional</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
