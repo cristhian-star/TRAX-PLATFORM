@@ -2,113 +2,121 @@
 
 {% block content %}
 
-<section class="hero">
-    <div class="hero-overlay">
-        <div class="hero-content">
-            <p class="hero-subtitle">Servicios técnicos y oficios cerca tuyo</p>
-            <h1>Encontrá el profesional ideal para cada trabajo</h1>
+<main>
+    <section class="startup-hero">
+        <div class="hero-glow glow-one"></div>
+        <div class="hero-glow glow-two"></div>
 
-            <div class="segmentador">
-                <button class="segment-btn active">Contratación</button>
-                <button class="segment-btn">Presupuesto</button>
-                <button class="segment-btn">Emergencia</button>
-                <button class="segment-btn">Propuesta</button>
-            </div>
- <form action="/buscar" method="GET" class="search-bar">
+        <div class="shell hero-layout">
+            <div class="hero-content">
+                <span class="signal">TRAX network beta</span>
+                <h1>Contrata talento tecnico confiable en minutos, no en dias.</h1>
+                <p>
+                    Una experiencia tipo startup marketplace para descubrir profesionales,
+                    comparar senales de confianza y activar contacto directo.
+                </p>
 
-    <select name="servicio" class="search-select">
-        <option>Refrigeración A/C</option>
-        <option>Electricidad</option>
-        <option>Herrería</option>
-        <option>Plomería</option>
-        <option>Gas domiciliario</option>
-    </select>
+                <form action="/buscar" method="GET" class="search-strip" aria-label="Buscar servicios">
+                    <label>
+                        <span>Que necesitas</span>
+                        <select name="servicio">
+                            <option value="">Cualquier servicio</option>
+                            <option>Electricidad</option>
+                            <option>Refrigeracion A/C</option>
+                            <option>Plomeria</option>
+                            <option>Herreria</option>
+                            <option>Gas domiciliario</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Donde</span>
+                        <input type="text" name="zona" placeholder="Zona, ciudad o barrio">
+                    </label>
+                    <button type="submit">Buscar pro</button>
+                </form>
 
-    <input type="text" name="zona" class="search-input" placeholder="Ingresá zona">
-
-    <button type="submit" class="search-button">Buscar</button>
-
-</form>
-            
-
-            <div class="ultimas-busquedas">
-                <span class="label-ultimas">Últimas búsquedas:</span>
-                <span class="search-tag">Electricista en Caballito</span>
-                <span class="search-tag">Refrigeración en Palermo</span>
-                <span class="search-tag">Plomería urgente en Quilmes</span>
-            </div>
-
-            <div class="extra-buttons-wrapper">
-                <span class="buscar-por-label">Buscar por:</span>
-                <div class="extra-buttons">
-                    <button class="extra-btn">Nombre o profesional</button>
-                    <button class="extra-btn">Mapa / Zona</button>
-                    <button class="extra-btn">Código anunciante</button>
+                <div class="category-pills" aria-label="Categorias populares">
+                    <a href="/buscar?servicio=Electricidad&zona=">Electricidad</a>
+                    <a href="/buscar?servicio=Refrigeracion%20A/C&zona=">A/C</a>
+                    <a href="/buscar?servicio=Plomeria&zona=">Plomeria</a>
+                    <a href="/buscar?servicio=Herreria&zona=">Herreria</a>
+                    <a href="/buscar?servicio=Gas%20domiciliario&zona=">Gas</a>
                 </div>
             </div>
+
+            <aside class="hero-dashboard" aria-label="Indicadores del marketplace">
+                <div class="dashboard-card live-card">
+                    <span class="pulse"></span>
+                    <small>Oferta activa</small>
+                    <strong>+180 pros</strong>
+                    <p>con disponibilidad publicada esta semana</p>
+                </div>
+                <div class="dashboard-grid">
+                    <div>
+                        <strong>4.8</strong>
+                        <span>rating promedio</span>
+                    </div>
+                    <div>
+                        <strong>14 min</strong>
+                        <span>respuesta media</span>
+                    </div>
+                </div>
+                <div class="mini-provider">
+                    <div class="avatar">FC</div>
+                    <div>
+                        <strong>Frio Central</strong>
+                        <span>Top pro en Caballito</span>
+                    </div>
+                    <em>Online</em>
+                </div>
+            </aside>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="services">
-    <div class="section-container">
-        <h2>Servicios más buscados</h2>
-
-        <div class="services-grid">
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Herrería</h3>
+    <section class="trust-band">
+        <div class="shell trust-grid">
+            <div>
+                <span class="kicker">Por que convierte</span>
+                <h2>Senales claras antes de tocar el boton de contacto.</h2>
             </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Electricidad</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Plomería</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Gas domiciliario</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Refrigeración A/C</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Soldadura</h3>
-            </div>
+            <article>
+                <strong>Perfiles verificados</strong>
+                <p>Badges, zonas, experiencia, reputacion y tiempos de respuesta visibles.</p>
+            </article>
+            <article>
+                <strong>Busqueda accionable</strong>
+                <p>Filtros simples, categorias rapidas y CTAs directos a WhatsApp o llamada.</p>
+            </article>
+            <article>
+                <strong>Oferta premium</strong>
+                <p>Promoted cards, portfolio visual y pricing de referencia para decidir rapido.</p>
+            </article>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="companies">
-    <div class="section-container">
-        <h2>Empresas que trabajan con nosotros</h2>
-        <div class="companies-box">
-            <div class="company-item">Empresa 1</div>
-            <div class="company-item">Empresa 2</div>
-            <div class="company-item">Empresa 3</div>
-            <div class="company-item">Empresa 4</div>
+    <section class="home-market-preview">
+        <div class="shell section-head">
+            <span class="kicker">Marketplace destacado</span>
+            <h2>Profesionales listos para trabajos reales.</h2>
         </div>
-    </div>
-</section>
-
-<section class="news">
-    <div class="section-container">
-        <h2>Novedades</h2>
-        <div class="news-grid">
-            <div class="news-card">Novedad 1</div>
-            <div class="news-card">Novedad 2</div>
-            <div class="news-card">Novedad 3</div>
+        <div class="shell preview-grid">
+            <a href="/buscar?servicio=Electricidad&zona=Palermo" class="preview-card hot">
+                <span>Top rated</span>
+                <strong>Electricidad premium</strong>
+                <small>Palermo, Belgrano, Colegiales</small>
+            </a>
+            <a href="/buscar?servicio=Refrigeracion%20A/C&zona=Caballito" class="preview-card">
+                <span>Fast response</span>
+                <strong>Refrigeracion A/C</strong>
+                <small>Instalacion y mantenimiento</small>
+            </a>
+            <a href="/buscar?servicio=Plomeria&zona=Flores" class="preview-card">
+                <span>24h</span>
+                <strong>Plomeria urgente</strong>
+                <small>Perdidas, sanitarios y obra</small>
+            </a>
         </div>
-    </div>
-</section>
+    </section>
+</main>
 
 {% endblock %}

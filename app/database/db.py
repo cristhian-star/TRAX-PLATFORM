@@ -118,3 +118,16 @@ def solicitar_rubro(nombre_rubro, descripcion, email_notificacion):
     conn.close()
 
     return cantidad
+def obtener_profesional_por_id(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM profesionales
+        WHERE id = ?
+    """, (id,))
+
+    profesional = cursor.fetchone()
+    conn.close()
+
+    return profesional

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set pro = profesional|default({"nombre": "Voltix Pro Services", "servicio": "Electricidad", "zona": "Palermo", "telefono": "1122334455", "descripcion": "Equipo tecnico para instalaciones electricas, tableros, mantenimiento y urgencias con garantia."}, true) %}
+{% set nombre = pro["nombre"]|default("Voltix Pro Services", true) %}
+{% set servicio = pro["servicio"]|default("Electricidad", true) %}
+{% set zona = pro["zona"]|default("Palermo", true) %}
+{% set telefono = pro["telefono"]|default("1122334455", true) %}
+{% set descripcion = pro["descripcion"]|default("Equipo tecnico para instalaciones electricas, tableros, mantenimiento y urgencias con garantia.", true) %}
+
+<main class="profile-screen">
+    <section class="profile-hero">
+        <div class="shell profile-grid">
+            <div class="profile-gallery">
+                <div class="gallery-feature"></div>
+                <div class="gallery-mini">
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <aside class="profile-summary">
+                <span class="trust-badge cyan">Top 1% provider</span>
+                <h1>{{ nombre }}</h1>
+                <p>{{ descripcion }}</p>
+                <div class="social-proof">
+                    <span><strong>4.9</strong> rating</span>
+                    <span><strong>420+</strong> trabajos</span>
+                    <span><strong>12 min</strong> respuesta</span>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section class="shell profile-content">
+        <div class="profile-main">
+            <section class="profile-block brand-block">
+                <div class="logo-orb">VP</div>
+                <div>
+                    <span class="kicker">Premium branding</span>
+                    <h2>{{ servicio }} para clientes que necesitan claridad, velocidad y confianza.</h2>
+                    <p>
+                        Trabajamos en {{ zona }} y zonas cercanas. Priorizamos diagnostico claro,
+                        tiempos precisos, materiales certificados y comunicacion directa durante todo el servicio.
+                    </p>
+                </div>
+            </section>
+
+            <section class="profile-block">
+                <div class="section-title">
+                    <span class="kicker">Servicios y pricing</span>
+                    <h2>Opciones listas para cotizar.</h2>
+                </div>
+                <div class="pricing-cards">
+                    <article>
+                        <strong>Visita tecnica</strong>
+                        <span>Desde $18.000</span>
+                        <p>Diagnostico, relevamiento y presupuesto.</p>
+                    </article>
+                    <article>
+                        <strong>Instalacion completa</strong>
+                        <span>Desde $45.000</span>
+                        <p>Tableros, circuitos, protecciones y prueba final.</p>
+                    </article>
+                    <article>
+                        <strong>Urgencia prioritaria</strong>
+                        <span>Consultar</span>
+                        <p>Respuesta rapida segun zona y franja horaria.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="profile-block">
+                <div class="section-title">
+                    <span class="kicker">Work portfolio</span>
+                    <h2>Trabajos realizados</h2>
+                </div>
+                <div class="portfolio">
+                    <article>
+                        <div class="work-img one"></div>
+                        <strong>Tablero comercial</strong>
+                        <p>Rediseno y normalizacion por sectores.</p>
+                    </article>
+                    <article>
+                        <div class="work-img two"></div>
+                        <strong>Obra residencial</strong>
+                        <p>Cableado completo y puesta a tierra.</p>
+                    </article>
+                    <article>
+                        <div class="work-img three"></div>
+                        <strong>Mantenimiento</strong>
+                        <p>Plan preventivo para edificio chico.</p>
+                    </article>
+                </div>
+            </section>
+        </div>
+
+        <aside class="contact-panel">
+            <div class="contact-card">
+                <span class="signal">Online ahora</span>
+                <h2>Contactar proveedor</h2>
+                <a class="btn whatsapp" href="https://wa.me/{{ telefono }}" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a class="btn orange" href="tel:{{ telefono }}">Llamar</a>
+                <a class="btn secondary" href="mailto:hola@trax.local">Enviar consulta</a>
+                <div class="social-links">
+                    <a href="/resultados">LinkedIn</a>
+                    <a href="/resultados">Instagram</a>
+                    <a href="/">Web</a>
+                </div>
+            </div>
+            <div class="map-card small">
+                <span>Coverage</span>
+                <strong>{{ zona }} y zonas cercanas</strong>
+            </div>
+        </aside>
+    </section>
+</main>
+
+{% endblock %}
