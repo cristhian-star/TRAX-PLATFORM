@@ -2,111 +2,114 @@
 
 {% block content %}
 
-<section class="hero">
-    <div class="hero-overlay">
-        <div class="hero-content">
-            <p class="hero-subtitle">Servicios técnicos y oficios cerca tuyo</p>
-            <h1>Encontrá el profesional ideal para cada trabajo</h1>
+<section class="home-hero">
+    <div class="section-container hero-grid">
+        <div class="hero-copy">
+            <span class="eyebrow">Marketplace verificado de servicios</span>
+            <h1>Contrata profesionales tecnicos con respaldo, precio claro y respuesta rapida.</h1>
+            <p>
+                TRAX conecta hogares, comercios e industrias con especialistas disponibles por zona,
+                rubro y modalidad de servicio.
+            </p>
 
-            <div class="segmentador">
-                <button class="segment-btn active">Contratación</button>
-                <button class="segment-btn">Presupuesto</button>
-                <button class="segment-btn">Emergencia</button>
-                <button class="segment-btn">Propuesta</button>
+            <form action="/buscar" method="GET" class="home-search" aria-label="Buscar profesionales">
+                <label>
+                    <span>Servicio</span>
+                    <select name="servicio">
+                        <option value="">Todos los servicios</option>
+                        <option>Refrigeracion A/C</option>
+                        <option>Electricidad</option>
+                        <option>Herreria</option>
+                        <option>Plomeria</option>
+                        <option>Gas domiciliario</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Zona</span>
+                    <input type="text" name="zona" placeholder="Barrio, localidad o ciudad">
+                </label>
+                <button type="submit">Buscar</button>
+            </form>
+
+            <div class="service-segments" aria-label="Tipos de servicio">
+                <button class="segment-btn active" type="button">Instalacion</button>
+                <button class="segment-btn" type="button">Mantenimiento</button>
+                <button class="segment-btn" type="button">Urgencias</button>
+                <button class="segment-btn" type="button">Obra</button>
             </div>
- <form action="/buscar" method="GET" class="search-bar">
+        </div>
 
-    <select name="servicio" class="search-select">
-        <option>Refrigeración A/C</option>
-        <option>Electricidad</option>
-        <option>Herrería</option>
-        <option>Plomería</option>
-        <option>Gas domiciliario</option>
-    </select>
-
-    <input type="text" name="zona" class="search-input" placeholder="Ingresá zona">
-
-    <button type="submit" class="search-button">Buscar</button>
-
-</form>
-            
-
-            <div class="ultimas-busquedas">
-                <span class="label-ultimas">Últimas búsquedas:</span>
-                <span class="search-tag">Electricista en Caballito</span>
-                <span class="search-tag">Refrigeración en Palermo</span>
-                <span class="search-tag">Plomería urgente en Quilmes</span>
+        <aside class="hero-panel" aria-label="Resumen de confianza">
+            <div class="trust-card main">
+                <span class="status-dot"></span>
+                <p>Profesionales activos</p>
+                <strong>+240</strong>
+                <small>con perfiles, rubros y zonas visibles</small>
             </div>
-
-            <div class="extra-buttons-wrapper">
-                <span class="buscar-por-label">Buscar por:</span>
-                <div class="extra-buttons">
-                    <button class="extra-btn">Nombre o profesional</button>
-                    <button class="extra-btn">Mapa / Zona</button>
-                    <button class="extra-btn">Código anunciante</button>
+            <div class="trust-stack">
+                <div class="trust-card">
+                    <p>Respuesta promedio</p>
+                    <strong>18 min</strong>
+                </div>
+                <div class="trust-card">
+                    <p>Servicios verificados</p>
+                    <strong>92%</strong>
                 </div>
             </div>
+            <div class="market-note">
+                <strong>TRAX Match</strong>
+                <span>Ordena resultados por disponibilidad, cercania y reputacion.</span>
+            </div>
+        </aside>
+    </div>
+</section>
+
+<section class="category-strip">
+    <div class="section-container">
+        <div class="section-heading">
+            <span>Rubros principales</span>
+            <h2>Busca como en un marketplace profesional, decide con datos claros.</h2>
+        </div>
+        <div class="category-grid">
+            <a href="/buscar?servicio=Electricidad&zona=" class="category-card">
+                <span>01</span>
+                <strong>Electricidad</strong>
+                <small>Tableros, instalaciones, urgencias</small>
+            </a>
+            <a href="/buscar?servicio=Refrigeracion%20A/C&zona=" class="category-card">
+                <span>02</span>
+                <strong>Refrigeracion A/C</strong>
+                <small>Equipos split, carga, mantenimiento</small>
+            </a>
+            <a href="/buscar?servicio=Plomeria&zona=" class="category-card">
+                <span>03</span>
+                <strong>Plomeria</strong>
+                <small>Perdidas, sanitarios, instalaciones</small>
+            </a>
+            <a href="/buscar?servicio=Herreria&zona=" class="category-card">
+                <span>04</span>
+                <strong>Herreria</strong>
+                <small>Portones, rejas, estructuras</small>
+            </a>
         </div>
     </div>
 </section>
 
-<section class="services">
+<section class="marketplace-proof">
     <div class="section-container">
-        <h2>Servicios más buscados</h2>
-
-        <div class="services-grid">
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Herrería</h3>
+        <div class="proof-grid">
+            <div>
+                <span class="eyebrow">Confianza operativa</span>
+                <h2>Una experiencia limpia para comparar, contactar y reservar.</h2>
             </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Electricidad</h3>
+            <div class="proof-item">
+                <strong>Perfiles completos</strong>
+                <p>Marca, experiencia, zonas de cobertura, trabajos realizados y contacto directo.</p>
             </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Plomería</h3>
+            <div class="proof-item">
+                <strong>Senales de calidad</strong>
+                <p>Badges de verificacion, respuesta, disponibilidad y precios de referencia.</p>
             </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Gas domiciliario</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Refrigeración A/C</h3>
-            </div>
-
-            <div class="service-card">
-                <div class="service-image placeholder">Imagen</div>
-                <h3>Soldadura</h3>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="companies">
-    <div class="section-container">
-        <h2>Empresas que trabajan con nosotros</h2>
-        <div class="companies-box">
-            <div class="company-item">Empresa 1</div>
-            <div class="company-item">Empresa 2</div>
-            <div class="company-item">Empresa 3</div>
-            <div class="company-item">Empresa 4</div>
-        </div>
-    </div>
-</section>
-
-<section class="news">
-    <div class="section-container">
-        <h2>Novedades</h2>
-        <div class="news-grid">
-            <div class="news-card">Novedad 1</div>
-            <div class="news-card">Novedad 2</div>
-            <div class="news-card">Novedad 3</div>
         </div>
     </div>
 </section>

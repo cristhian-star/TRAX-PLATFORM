@@ -2,27 +2,117 @@
 
 {% block content %}
 
-<section class="resultados">
+{% set fallback_profesionales = [
+    {"nombre": "TRAX Electricidad Norte", "servicio": "Electricidad", "zona": "Palermo", "telefono": "1122334455", "descripcion": "Instalaciones, tableros y mantenimiento electrico para hogares y locales."},
+    {"nombre": "Frio Urbano Service", "servicio": "Refrigeracion A/C", "zona": "Caballito", "telefono": "1133445566", "descripcion": "Instalacion y reparacion de aire acondicionado con visita programada."},
+    {"nombre": "Plomeria Express BA", "servicio": "Plomeria", "zona": "Flores", "telefono": "1155667788", "descripcion": "Urgencias, deteccion de perdidas y mantenimiento sanitario."}
+] %}
+{% set profesionales = resultados if resultados is defined and resultados else fallback_profesionales %}
+
+<section class="listing-page">
     <div class="section-container">
+        <div class="listing-title">
+            <span class="eyebrow">Resultados profesionales</span>
+            <h1>{{ servicio or "Servicios tecnicos" }}{% if zona %} en {{ zona }}{% endif %}</h1>
+            <p>Compara perfiles verificados, precios de referencia y disponibilidad antes de contactar.</p>
+        </div>
 
-        <h2>Resultados para "{{ servicio }}" en "{{ zona }}"</h2>
+        <form action="/buscar" method="GET" class="filters-bar">
+            <label>
+                <span>Servicio</span>
+                <select name="servicio">
+                    <option value="">Todos</option>
+                    <option {% if servicio == "Electricidad" %}selected{% endif %}>Electricidad</option>
+                    <option {% if servicio == "Refrigeracion A/C" %}selected{% endif %}>Refrigeracion A/C</option>
+                    <option {% if servicio == "Plomeria" %}selected{% endif %}>Plomeria</option>
+                    <option {% if servicio == "Herreria" %}selected{% endif %}>Herreria</option>
+                    <option {% if servicio == "Gas domiciliario" %}selected{% endif %}>Gas domiciliario</option>
+                </select>
+            </label>
+            <label>
+                <span>Zona</span>
+                <input name="zona" value="{{ zona or '' }}" placeholder="Ciudad o barrio">
+            </label>
+            <label>
+                <span>Disponibilidad</span>
+                <select name="disponibilidad">
+                    <option>Hoy</option>
+                    <option>Esta semana</option>
+                    <option>Urgencias 24h</option>
+                </select>
+            </label>
+            <label>
+                <span>Ordenar</span>
+                <select name="orden">
+                    <option>Relevancia</option>
+                    <option>Mejor precio</option>
+                    <option>Mas experiencia</option>
+                </select>
+            </label>
+            <button type="submit">Actualizar</button>
+        </form>
 
-        {% if resultados %}
-            <div class="resultados-lista">
-                {% for r in resultados %}
-                    <div class="resultado-card">
-                        <h3>{{ r["nombre"] }}</h3>
-                        <p><strong>Servicio:</strong> {{ r["servicio"] }}</p>
-                        <p><strong>Zona:</strong> {{ r["zona"] }}</p>
-                        <p><strong>Teléfono:</strong> {{ r["telefono"] }}</p>
-                        <p>{{ r["descripcion"] }}</p>
+        <div class="market-layout">
+            <main class="professional-list">
+                {% for r in profesionales %}
+                <article class="professional-card">
+                    <div class="pro-cover cover-{{ loop.index }}"></div>
+                    <div class="pro-content">
+                        <div class="pro-heading">
+                            <div>
+                                <span class="verified-badge">Verificado</span>
+                                <h2>{{ r["nombre"] }}</h2>
+                                <p class="pro-category">{{ r["servicio"] }}</p>
+                            </div>
+                            <button class="favorite-btn" type="button" aria-label="Guardar profesional">♡</button>
+                        </div>
+                        <p class="pro-description">{{ r["descripcion"] }}</p>
+                        <div class="pro-meta">
+                            <span>{{ r["zona"] }}</span>
+                            <span>+7 anos de experiencia</span>
+                            <span>Desde $18.000</span>
+                        </div>
+                        <div class="service-badges">
+                            <span>Factura</span>
+                            <span>Garantia</span>
+                            <span>Visita tecnica</span>
+                        </div>
+                        <div class="card-actions">
+                            <a class="btn whatsapp" href="https://wa.me/{{ r['telefono'] }}" target="_blank" rel="noreferrer">WhatsApp</a>
+                            <a class="btn outline" href="tel:{{ r['telefono'] }}">Contactar</a>
+                            <a class="btn primary" href="#">Ver perfil</a>
+                        </div>
                     </div>
+                </article>
                 {% endfor %}
-            </div>
-        {% else %}
-            <p>No se encontraron profesionales para esa búsqueda.</p>
-        {% endif %}
+            </main>
 
+            <aside class="listing-sidebar">
+                <div class="map-widget">
+                    <span>Mapa</span>
+                    <strong>Profesionales cerca de tu zona</strong>
+                    <p>Vista estimada de cobertura y disponibilidad.</p>
+                </div>
+                <div class="sidebar-card">
+                    <span class="eyebrow">Patrocinado</span>
+                    <h3>TRAX Empresas</h3>
+                    <p>Planes premium para aparecer primero en busquedas de alto valor.</p>
+                    <a href="/profesionales/nuevo">Publicar servicio</a>
+                </div>
+                <div class="sidebar-card compact">
+                    <h3>Destacados</h3>
+                    <p>Frio Urbano Service</p>
+                    <p>TRAX Electricidad Norte</p>
+                    <p>Obras Integrales Sur</p>
+                </div>
+            </aside>
+        </div>
+
+        {% if resultados is defined and not resultados %}
+            <div class="empty-note">
+                No encontramos coincidencias exactas. Te mostramos profesionales sugeridos para ampliar la busqueda.
+            </div>
+        {% endif %}
     </div>
 </section>
 

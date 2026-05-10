@@ -3,37 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRAX</title>
-
+    <title>TRAX Marketplace</title>
     <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-
     <header class="navbar">
-        <div class="nav-left">
+        <a href="/" class="nav-left" aria-label="TRAX inicio">
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TRAX Logo" class="logo-img">
             <span class="logo-text">TRAX</span>
-        </div>
+        </a>
 
-        <nav class="nav-center">
-            <a href="#">TRAX PRO</a>
-            <a href="#">TRAX ACADEMY</a>
-            <a href="#">TRAX TOOLS</a>
+        <nav class="nav-center" aria-label="Navegacion principal">
+            <a href="/buscar?servicio=&zona=">Profesionales</a>
+            <a href="/profesionales/nuevo">Publicar servicio</a>
+            <a href="#">TRAX Pro</a>
         </nav>
 
         <div class="nav-right">
             <a href="#" class="login-link">Ingresar</a>
-            <a href="#" class="register-btn">Registrarse</a>
+            <a href="/profesionales/nuevo" class="register-btn">Sumar empresa</a>
         </div>
     </header>
 
     {% block content %}{% endblock %}
 
     <footer class="footer">
-        <p>© 2026 TRAX Platform. Todos los derechos reservados.</p>
+        <p>© 2026 TRAX Platform. Marketplace profesional para servicios tecnicos.</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
