@@ -516,3 +516,296 @@ body {
 .admin-table th {
     background: #f4f4f4;
 }
+.resultados-page {
+    padding: 30px;
+}
+
+/* FILTROS */
+.filtros-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.filtros-bar input,
+.filtros-bar select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* LAYOUT */
+.layout-resultados {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+}
+
+/* CARDS */
+.card-profesional {
+    display: flex;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.card-img img {
+    width: 180px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-info {
+    padding: 16px;
+}
+
+.rubro {
+    font-weight: bold;
+    color: #ff5a1f;
+}
+
+.zona {
+    color: #777;
+}
+
+.acciones {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-primary {
+    background: #ff5a1f;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.btn-outline {
+    border: 1px solid #ff5a1f;
+    background: white;
+    color: #ff5a1f;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.btn-wsp {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* SIDEBAR */
+.box {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.mapa-placeholder {
+    height: 150px;
+    background: #eee;
+}
+
+.mini-card {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.perfil-page {
+    background: #f7f7f7;
+    padding: 30px;
+}
+
+.perfil-layout {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+}
+
+.perfil-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.perfil-galeria {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+.foto-principal {
+    height: 420px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.miniaturas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+}
+
+.miniaturas div {
+    height: 120px;
+    background: #ececec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.perfil-info,
+.perfil-mapa,
+.perfil-trabajos,
+.perfil-redes,
+.contacto-card,
+.trabaja-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+}
+
+.perfil-rubro {
+    color: #ff5a1f;
+    font-weight: 800;
+    margin: 0 0 8px;
+}
+
+.perfil-info h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.perfil-zona {
+    color: #666;
+}
+
+.perfil-precio {
+    margin: 18px 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+}
+
+.perfil-descripcion {
+    line-height: 1.6;
+}
+
+.mapa-radio {
+    height: 260px;
+    background: #e8e8e8;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.trabajos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.trabajo-card {
+    border: 1px solid #eee;
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.trabajo-card a,
+.redes-links a,
+.trabaja-card a {
+    color: #ff5a1f;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.redes-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.perfil-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contacto-card {
+    position: sticky;
+    top: 95px;
+}
+
+.contacto-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contacto-card input,
+.contacto-card textarea {
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.contacto-card textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.check-line {
+    font-size: 13px;
+    color: #555;
+}
+
+.btn-contactar {
+    background: #ff5a1f;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .perfil-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .contacto-card {
+        position: static;
+    }
+
+    .trabajos-grid {
+        grid-template-columns: 1fr;
+    }
+}

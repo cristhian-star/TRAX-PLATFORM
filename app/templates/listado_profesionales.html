@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="resultados-page">
+
+    <!-- 🔎 FILTROS -->
+    <div class="filtros-bar">
+
+        <input type="text" placeholder="Zona" value="{{ zona }}">
+        
+        <select>
+            <option>{{ servicio or "Rubro" }}</option>
+            <option>Electricidad</option>
+            <option>Plomería</option>
+            <option>Herrería</option>
+        </select>
+
+        <select>
+            <option>Disponibilidad</option>
+            <option>Urgente</option>
+            <option>Programado</option>
+        </select>
+
+        <button>Buscar</button>
+    </div>
+
+    <div class="layout-resultados">
+
+        <!-- 🧾 LISTADO -->
+        <div class="col-principal">
+
+            {% for p in resultados %}
+            <div class="card-profesional">
+
+                <div class="card-img">
+                    <img src="{{ url_for('static', filename='img/placeholder.jpg') }}">
+                </div>
+
+                <div class="card-info">
+                    <h3>{{ p["nombre"] }}</h3>
+
+                    <p class="rubro">{{ p["servicio"] }}</p>
+                    <p class="zona">{{ p["zona"] }}</p>
+
+                    <p class="descripcion">
+                        {{ p["descripcion"] }}
+                    </p>
+
+                    <div class="acciones">
+                        <a href="/profesional/{{ p['id'] }}" class="btn-outline">Ver perfil</a>
+                        <button class="btn-wsp">WhatsApp</button>
+                        <button class="btn-primary">Contactar</button>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- 📍 SIDEBAR -->
+        <div class="col-sidebar">
+
+            <div class="box">
+                <h4>Mapa</h4>
+                <div class="mapa-placeholder">Mapa próximamente</div>
+            </div>
+
+            <div class="box">
+                <h4>Destacados</h4>
+                <div class="mini-card">Profesional destacado</div>
+                <div class="mini-card">Profesional destacado</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="perfil-page">
+
+    <div class="perfil-layout">
+
+        <main class="perfil-main">
+
+            <div class="perfil-galeria">
+                <div class="foto-principal">
+                    <span>Imagen principal del trabajo</span>
+                </div>
+
+                <div class="miniaturas">
+                    <div>Foto</div>
+                    <div>Video</div>
+                    <div>Portada</div>
+                </div>
+            </div>
+
+            <div class="perfil-info">
+                <p class="perfil-rubro">{{ profesional["servicio"] }}</p>
+                <h1>{{ profesional["nombre"] }}</h1>
+                <p class="perfil-zona">{{ profesional["zona"] }}</p>
+
+                <div class="perfil-precio">
+                    Cotización personalizada según trabajo
+                </div>
+
+                <p class="perfil-descripcion">
+                    {{ profesional["descripcion"] }}
+                </p>
+            </div>
+
+            <div class="perfil-mapa">
+                <h2>Zona de trabajo</h2>
+                <p>Área aproximada donde el profesional presta servicios.</p>
+                <div class="mapa-radio">
+                    Mapa con radio de cobertura próximamente
+                </div>
+            </div>
+
+            <div class="perfil-trabajos">
+                <h2>Trabajos realizados</h2>
+
+                <div class="trabajos-grid">
+                    <div class="trabajo-card">
+                        <h3>Trabajo anterior</h3>
+                        <p>Link a Drive / video / fotos del trabajo.</p>
+                        <a href="#" target="_blank">Ver material</a>
+                    </div>
+
+                    <div class="trabajo-card">
+                        <h3>Último trabajo</h3>
+                        <p>Material ilustrativo del profesional.</p>
+                        <a href="#" target="_blank">Ver material</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perfil-redes">
+                <h2>Redes sociales</h2>
+
+                <div class="redes-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">Facebook / Meta</a>
+                    <a href="#">TikTok</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="perfil-sidebar">
+
+            <div class="contacto-card">
+                <h2>Contactar al profesional</h2>
+
+                <form>
+                    <input type="text" placeholder="Nombre">
+                    <input type="email" placeholder="Email">
+                    <input type="text" placeholder="Teléfono">
+
+                    <textarea>Hola, quiero consultar por tus servicios en TRAX.</textarea>
+
+                    <label class="check-line">
+                        <input type="checkbox" checked>
+                        Acepto términos y condiciones
+                    </label>
+
+                    <button type="button" class="btn-contactar">Contactar</button>
+                    <button type="button" class="btn-whatsapp">Contactar por WhatsApp</button>
+                </form>
+            </div>
+
+            <div class="trabaja-card">
+                <h3>¿Sos profesional?</h3>
+                <p>Sumate a TRAX y publicá tus servicios.</p>
+                <a href="/profesionales/nuevo">Trabajá con nosotros</a>
+            </div>
+
+        </aside>
+
+    </div>
+
+</section>
+
+{% endblock %}

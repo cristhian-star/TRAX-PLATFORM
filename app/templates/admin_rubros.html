@@ -23,7 +23,9 @@
                 <td>{{ r["estado"] }}</td>
                 <td>
                     {% if r["total"] >= 10 %}
-                        <button>Aprobar rubro</button>
+                     <form action="/admin/rubros/aprobar/{{ r['nombre_rubro'] }}" method="POST">
+                        <button type="submit">Aprobar rubro</button>
+                    </form>
                     {% else %}
                         <span>Esperando</span>
                     {% endif %}

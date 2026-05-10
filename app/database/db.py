@@ -13,6 +13,15 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS rubros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL UNIQUE,
+        descripcion TEXT,
+        estado TEXT DEFAULT 'ACTIVO'
+    )
+""")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS profesionales (
@@ -66,6 +75,17 @@ def insertar_datos_demo():
 def buscar_profesionales(servicio, zona):
     conn = get_connection()
     cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT * FROM profesionales
+        WHERE servicio LIKE ?
+        AND zona LIKE ?
+    """, (f"%{servicio}%", f"%{zona}%"))
+
+    resultados = cursor.fetchall()
+    conn.close()
+
+    return resultados
 
 def crear_profesional(nombre, servicio, zona, telefono, descripcion):
     conn = get_connection()
@@ -79,16 +99,7 @@ def crear_profesional(nombre, servicio, zona, telefono, descripcion):
     conn.commit()
     conn.close()
 
-    cursor.execute("""
-        SELECT * FROM profesionales
-        WHERE servicio LIKE ?
-        AND zona LIKE ?
-    """, (f"%{servicio}%", f"%{zona}%"))
 
-    resultados = cursor.fetchall()
-    conn.close()
-
-    return resultados
 def solicitar_rubro(nombre_rubro, descripcion, email_notificacion):
     conn = get_connection()
     cursor = conn.cursor()
@@ -118,3 +129,49 @@ def solicitar_rubro(nombre_rubro, descripcion, email_notificacion):
     conn.close()
 
     return cantidad
+def aprobar_rubro(nombre_rubro):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT OR IGNORE INTO rubros (nombre, descripcion, estado)
+        VALUES (?, ?, ?)
+    """, (nombre_rubro, "Rubro aprobado por solicitudes de usuarios", "ACTIVO"))
+
+    cursor.execute("""
+        UPDATE solicitudes_rubros
+        SET estado = 'APROBADO'
+        WHERE LOWER(nombre_rubro) = LOWER(?)
+    """, (nombre_rubro,))
+
+    conn.commit()
+    conn.close()
+
+
+def obtener_rubros_activos():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM rubros
+        WHERE estado = 'ACTIVO'
+        ORDER BY nombre ASC
+    """)
+
+    rubros = cursor.fetchall()
+    conn.close()
+
+    return rubros
+def obtener_profesional_por_id(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM profesionales
+        WHERE id = ?
+    """, (id,))
+
+    profesional = cursor.fetchone()
+    conn.close()
+
+    return profesional
