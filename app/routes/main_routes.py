@@ -49,6 +49,11 @@ def listado_profesionales():
     )
 
 
+@main.route("/mercados")
+def mercados():
+    return render_template("mercados.html")
+
+
 @main.route("/profesional/<int:id>")
 def perfil_profesional(id):
     profesional = get_professional_by_id(id)

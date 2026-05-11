@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <form action="/register" method="POST" class="form-card">
+            <h2>Crear cuenta</h2>
+
+            {% if error %}
+                <p class="form-alert">{{ error }}</p>
+            {% endif %}
+
+            <input type="text" name="nombre" placeholder="Nombre completo" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+
+            <select name="rol">
+                <option value="CLIENTE">Cliente</option>
+                <option value="PROFESIONAL">Profesional</option>
+            </select>
+
+            <button type="submit">Registrarme</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

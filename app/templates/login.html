@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <form action="/login" method="POST" class="form-card">
+            <h2>Ingresar</h2>
+
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+
+            <button type="submit">Ingresar</button>
+            <p class="form-helper">¿No tenés cuenta? <a href="/register">Registrate</a></p>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

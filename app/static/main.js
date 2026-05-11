@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const segmentButtons = document.querySelectorAll(".segment-btn");
+
+    segmentButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            segmentButtons.forEach((item) => item.classList.remove("active"));
+            button.classList.add("active");
+        });
+    });
+
     const saveButtons = document.querySelectorAll(".save-btn");
 
     saveButtons.forEach((button) => {

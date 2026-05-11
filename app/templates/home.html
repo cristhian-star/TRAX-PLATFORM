@@ -7,18 +7,25 @@
         <div class="hero-glow glow-one"></div>
         <div class="hero-glow glow-two"></div>
 
-        <div class="shell hero-layout">
-            <div class="hero-content">
+        <div class="shell hero-layout hero-layout-centered">
+            <div class="hero-content hero-content-centered">
                 <span class="signal">TRAX network beta</span>
                 <h1>Contrata talento tecnico confiable en minutos, no en dias.</h1>
                 <p>
-                    Una experiencia tipo startup marketplace para descubrir profesionales,
-                    comparar senales de confianza y activar contacto directo.
+                    Encontra profesionales y empresas por servicio, zona o identificador,
+                    con una experiencia rapida, clara y preparada para contratar mejor.
                 </p>
 
-                <form action="/buscar" method="GET" class="search-strip" aria-label="Buscar servicios">
+                <div class="hero-segments" aria-label="Tipo de busqueda">
+                    <button class="segment-btn active" type="button">Contratación</button>
+                    <button class="segment-btn" type="button">Presupuestos</button>
+                    <button class="segment-btn" type="button">Emergencias</button>
+                    <button class="segment-btn" type="button">Propuestas</button>
+                </div>
+
+                <form action="/buscar" method="GET" class="search-strip centered-search" aria-label="Buscar servicios">
                     <label>
-                        <span>Que necesitas</span>
+                        <span>Servicio</span>
                         <select name="servicio">
                             <option value="">Cualquier servicio</option>
                             <option>Electricidad</option>
@@ -29,47 +36,18 @@
                         </select>
                     </label>
                     <label>
-                        <span>Donde</span>
+                        <span>Zona</span>
                         <input type="text" name="zona" placeholder="Zona, ciudad o barrio">
                     </label>
-                    <button type="submit">Buscar pro</button>
+                    <button type="submit">Buscar</button>
                 </form>
 
-                <div class="category-pills" aria-label="Categorias populares">
-                    <a href="/buscar?servicio=Electricidad&zona=">Electricidad</a>
-                    <a href="/buscar?servicio=Refrigeracion%20A/C&zona=">A/C</a>
-                    <a href="/buscar?servicio=Plomeria&zona=">Plomeria</a>
-                    <a href="/buscar?servicio=Herreria&zona=">Herreria</a>
-                    <a href="/buscar?servicio=Gas%20domiciliario&zona=">Gas</a>
+                <div class="quick-actions" aria-label="Acciones rapidas de busqueda">
+                    <a href="/buscar?servicio=&zona=">Buscar por nombre de empresa o profesional</a>
+                    <a href="/resultados">Buscar por zona / mapa</a>
+                    <a href="/resultados">Buscar por codigo de anunciante</a>
                 </div>
             </div>
-
-            <aside class="hero-dashboard" aria-label="Indicadores del marketplace">
-                <div class="dashboard-card live-card">
-                    <span class="pulse"></span>
-                    <small>Oferta activa</small>
-                    <strong>+180 pros</strong>
-                    <p>con disponibilidad publicada esta semana</p>
-                </div>
-                <div class="dashboard-grid">
-                    <div>
-                        <strong>4.8</strong>
-                        <span>rating promedio</span>
-                    </div>
-                    <div>
-                        <strong>14 min</strong>
-                        <span>respuesta media</span>
-                    </div>
-                </div>
-                <div class="mini-provider">
-                    <div class="avatar">FC</div>
-                    <div>
-                        <strong>Frio Central</strong>
-                        <span>Top pro en Caballito</span>
-                    </div>
-                    <em>Online</em>
-                </div>
-            </aside>
         </div>
     </section>
 

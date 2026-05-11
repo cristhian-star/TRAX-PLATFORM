@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="markets-screen">
+    <section class="markets-hero">
+        <div class="shell markets-hero-grid">
+            <div>
+                <span class="signal">Market intelligence publico</span>
+                <h1>Mercados y precios</h1>
+                <p>
+                    Una vista estimada del movimiento de servicios tecnicos en TRAX:
+                    precios de referencia, demanda por categoria y tendencias de urgencia.
+                </p>
+            </div>
+            <aside class="markets-note">
+                <strong>Datos mock por ahora</strong>
+                <span>Estos indicadores son placeholders estimados para validar la experiencia. No usan APIs externas ni datos reales todavia.</span>
+            </aside>
+        </div>
+    </section>
+
+    <section class="shell markets-content">
+        <div class="market-indicators">
+            <article>
+                <span>Ticket promedio</span>
+                <strong>$32.400</strong>
+                <small>servicios tecnicos generales</small>
+            </article>
+            <article>
+                <span>Rango habitual</span>
+                <strong>$18k-$65k</strong>
+                <small>segun categoria y urgencia</small>
+            </article>
+            <article>
+                <span>Demanda activa</span>
+                <strong>1.284</strong>
+                <small>consultas estimadas este mes</small>
+            </article>
+            <article>
+                <span>Urgencias</span>
+                <strong>+23%</strong>
+                <small>variacion mock semanal</small>
+            </article>
+        </div>
+
+        <div class="markets-grid">
+            <section class="market-panel wide">
+                <div class="panel-title">
+                    <span class="kicker">Price summary</span>
+                    <h2>Resumen de precios por servicio</h2>
+                    <p>Rangos estimados para orientar decisiones iniciales antes de pedir cotizacion.</p>
+                </div>
+                <div class="price-range-table">
+                    <div class="range-row">
+                        <strong>Electricidad</strong>
+                        <span>Visita / tablero / instalacion</span>
+                        <em>$18.000 - $82.000</em>
+                    </div>
+                    <div class="range-row">
+                        <strong>Refrigeracion A/C</strong>
+                        <span>Service / instalacion / carga</span>
+                        <em>$22.000 - $95.000</em>
+                    </div>
+                    <div class="range-row">
+                        <strong>Plomeria</strong>
+                        <span>Perdidas / sanitarios / urgencias</span>
+                        <em>$16.000 - $70.000</em>
+                    </div>
+                    <div class="range-row">
+                        <strong>Gas domiciliario</strong>
+                        <span>Revision / conexion / reparacion</span>
+                        <em>$24.000 - $110.000</em>
+                    </div>
+                </div>
+            </section>
+
+            <section class="market-panel wide">
+                <div class="panel-title">
+                    <span class="kicker">Price fluctuation</span>
+                    <h2>Fluctuacion estimada de precios</h2>
+                    <p>Placeholder visual para una futura serie temporal de precios por semana.</p>
+                </div>
+                <div class="chart-placeholder trend-chart" aria-label="Grafico placeholder de fluctuacion de precios">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </section>
+
+            <section class="market-panel">
+                <div class="panel-title">
+                    <span class="kicker">Demand indicators</span>
+                    <h2>Demanda por categoria</h2>
+                </div>
+                <div class="category-demand">
+                    <div><strong>Electricidad</strong><span style="--value: 86%"></span><small>Alta intencion</small></div>
+                    <div><strong>Refrigeracion</strong><span style="--value: 74%"></span><small>Estacional</small></div>
+                    <div><strong>Plomeria</strong><span style="--value: 66%"></span><small>Urgencias frecuentes</small></div>
+                    <div><strong>Herreria</strong><span style="--value: 48%"></span><small>Proyectos planificados</small></div>
+                </div>
+            </section>
+
+            <section class="market-panel">
+                <div class="panel-title">
+                    <span class="kicker">Most requested</span>
+                    <h2>Categorias mas pedidas</h2>
+                </div>
+                <ol class="requested-list">
+                    <li><strong>Electricidad domiciliaria</strong><span>31% de consultas mock</span></li>
+                    <li><strong>Refrigeracion A/C</strong><span>24% de consultas mock</span></li>
+                    <li><strong>Plomeria urgente</strong><span>19% de consultas mock</span></li>
+                    <li><strong>Gas matriculado</strong><span>14% de consultas mock</span></li>
+                </ol>
+            </section>
+
+            <section class="market-panel">
+                <div class="panel-title">
+                    <span class="kicker">Emergency services</span>
+                    <h2>Tendencias de urgencia</h2>
+                </div>
+                <div class="emergency-grid">
+                    <article>
+                        <strong>24h</strong>
+                        <span>Mayor conversion mobile</span>
+                    </article>
+                    <article>
+                        <strong>18 min</strong>
+                        <span>Respuesta esperada</span>
+                    </article>
+                    <article>
+                        <strong>+34%</strong>
+                        <span>Busqueda fuera de horario</span>
+                    </article>
+                </div>
+            </section>
+
+            <section class="market-panel">
+                <div class="panel-title">
+                    <span class="kicker">Service trends</span>
+                    <h2>Tendencias de servicios</h2>
+                </div>
+                <div class="trend-list">
+                    <p><strong>A/C preventivo</strong><span>Sube antes de temporada alta</span></p>
+                    <p><strong>Urgencias 24h</strong><span>Alta conversion en mobile</span></p>
+                    <p><strong>Instalaciones completas</strong><span>Ticket promedio creciente</span></p>
+                </div>
+            </section>
+
+            <section class="market-panel wide">
+                <div class="panel-title">
+                    <span class="kicker">Future module</span>
+                    <h2>Mapa de calor de demanda</h2>
+                    <p>Bloque reservado para cruzar zona, categoria, disponibilidad y precio estimado.</p>
+                </div>
+                <div class="heatmap-placeholder" aria-label="Placeholder de mapa de calor">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </section>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

@@ -19,6 +19,9 @@ def create_app():
     from app.routes.main_routes import main
     app.register_blueprint(main)
     
+    from app.routes.auth_routes import auth
+    app.register_blueprint(auth)
+    
     from app.models.user import User
     from app.models.professional import Professional
     
