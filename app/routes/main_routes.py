@@ -4,12 +4,12 @@ from app.services.category_service import (
     get_category_requests_summary,
     approve_category
 )
-from flask import Blueprint, render_template, request
 from app.services.professional_service import (
     create_professional,
     search_professionals,
     get_professional_by_id
 )
+from app.utils.decorators import role_required
 
 main = Blueprint("main", __name__)
 
@@ -52,6 +52,24 @@ def listado_profesionales():
 @main.route("/mercados")
 def mercados():
     return render_template("mercados.html")
+
+
+@main.route("/profesional/dashboard")
+@role_required("PROFESIONAL")
+def profesional_dashboard():
+    return render_template("profesional_dashboard.html")
+
+
+@main.route("/cliente/dashboard")
+@role_required("CLIENTE")
+def cliente_dashboard():
+    return render_template("cliente_dashboard.html")
+
+
+@main.route("/admin/dashboard")
+@role_required("SUPER_ADMIN")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
 
 
 @main.route("/profesional/<int:id>")
@@ -105,11 +123,13 @@ def guardar_solicitud_rubro():
 
 
 @main.route("/admin/rubros")
+@role_required("SUPER_ADMIN")
 def admin_rubros():
     rubros = get_category_requests_summary()
     return render_template("admin_rubros.html", rubros=rubros)
 
 @main.route("/admin/rubros/aprobar/<nombre_rubro>", methods=["POST"])
+@role_required("SUPER_ADMIN")
 def admin_aprobar_rubro(nombre_rubro):
     approve_category(nombre_rubro)
     return redirect("/admin/rubros")

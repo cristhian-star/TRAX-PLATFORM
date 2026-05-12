@@ -27,6 +27,10 @@ def create_app():
     
     from app.models.category import Category
     from app.models.category_request import CategoryRequest
+    from app.models.contract_request import ContractRequest
+    from app.models.budget_request import BudgetRequest
+    from app.models.emergency_request import EmergencyRequest
+    from app.models.proposal_request import ProposalRequest
 
     with app.app_context():
         db.create_all()

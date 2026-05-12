@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="role-dashboard">
+    <section class="dashboard-hero">
+        <div class="shell dashboard-hero-grid">
+            <div>
+                <span class="signal">Cuenta cliente</span>
+                <h1>Dashboard de cliente</h1>
+                <p>Un centro simple para seguir solicitudes, profesionales guardados y actividad reciente.</p>
+            </div>
+            <aside class="dashboard-status-card">
+                <span>Estado</span>
+                <strong>Activo</strong>
+                <small>Perfil listo para contratar servicios en TRAX.</small>
+            </aside>
+        </div>
+    </section>
+
+    <section class="shell dashboard-content">
+        <div class="dashboard-metrics">
+            <article>
+                <span>Solicitudes abiertas</span>
+                <strong>0</strong>
+                <small>Pedidos pendientes de cotizacion</small>
+            </article>
+            <article>
+                <span>Profesionales guardados</span>
+                <strong>0</strong>
+                <small>Favoritos para consultar despues</small>
+            </article>
+            <article>
+                <span>Contrataciones</span>
+                <strong>0</strong>
+                <small>Historial futuro de servicios</small>
+            </article>
+        </div>
+
+        <div class="dashboard-card-grid">
+            <article>
+                <span class="kicker">Proximamente</span>
+                <h2>Mis solicitudes</h2>
+                <p>Seguimiento de pedidos, presupuestos recibidos y estado de cada consulta.</p>
+            </article>
+            <article>
+                <span class="kicker">Proximamente</span>
+                <h2>Profesionales favoritos</h2>
+                <p>Acceso rapido a perfiles guardados, zonas de cobertura y datos de contacto.</p>
+            </article>
+            <article>
+                <span class="kicker">Proximamente</span>
+                <h2>Historial de servicios</h2>
+                <p>Registro de trabajos realizados, comprobantes y futuras recomendaciones.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

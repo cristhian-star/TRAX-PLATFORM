@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="role-dashboard">
+    <section class="dashboard-hero">
+        <div class="shell dashboard-hero-grid">
+            <div>
+                <span class="signal">Administracion TRAX</span>
+                <h1>Dashboard admin</h1>
+                <p>Panel base para supervisar usuarios, rubros, actividad y configuracion operativa.</p>
+            </div>
+            <aside class="dashboard-status-card">
+                <span>Acceso</span>
+                <strong>SUPER_ADMIN</strong>
+                <small>Vista protegida para administracion de plataforma.</small>
+            </aside>
+        </div>
+    </section>
+
+    <section class="shell dashboard-content">
+        <div class="dashboard-metrics">
+            <article>
+                <span>Rubros pendientes</span>
+                <strong>-</strong>
+                <small>Solicitudes por revisar</small>
+            </article>
+            <article>
+                <span>Usuarios</span>
+                <strong>-</strong>
+                <small>Clientes y profesionales registrados</small>
+            </article>
+            <article>
+                <span>Alertas</span>
+                <strong>0</strong>
+                <small>Eventos operativos destacados</small>
+            </article>
+        </div>
+
+        <div class="dashboard-card-grid">
+            <article>
+                <span class="kicker">Disponible</span>
+                <h2>Solicitudes de rubros</h2>
+                <p>Revision y aprobacion de rubros solicitados por la comunidad.</p>
+                <a class="dashboard-link" href="/admin/rubros">Abrir panel</a>
+            </article>
+            <article>
+                <span class="kicker">Proximamente</span>
+                <h2>Gestion de usuarios</h2>
+                <p>Modulo futuro para revisar cuentas, roles, actividad y estado de perfiles.</p>
+            </article>
+            <article>
+                <span class="kicker">Proximamente</span>
+                <h2>Configuracion</h2>
+                <p>Controles reservados para reglas del marketplace, categorias y parametros.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+{% endblock %}
