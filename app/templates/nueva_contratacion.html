@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Nueva contratacion</h2>
+        <p class="form-helper">Crea una solicitud directa para contratar un profesional.</p>
+
+        {% if created %}
+            <p class="form-alert">Contratacion creada correctamente.</p>
+        {% endif %}
+
+        <form action="/contratacion/nueva" method="POST" class="form-card">
+            <input type="number" name="professional_id" placeholder="ID del profesional" required>
+
+            <input type="text" name="servicio" placeholder="Servicio requerido" required>
+
+            <textarea name="descripcion" placeholder="Descripcion del trabajo"></textarea>
+
+            <input type="number" step="0.01" name="precio_acordado" placeholder="Precio acordado">
+
+            <input type="datetime-local" name="fecha_inicio" aria-label="Fecha de inicio">
+
+            <input type="datetime-local" name="fecha_fin" aria-label="Fecha de finalizacion">
+
+            <button type="submit">Crear contratacion</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

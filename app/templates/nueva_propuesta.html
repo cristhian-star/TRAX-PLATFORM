@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Nueva propuesta</h2>
+        <p class="form-helper">Publica una necesidad para recibir propuestas de profesionales.</p>
+
+        {% if created %}
+            <p class="form-alert">Propuesta creada correctamente.</p>
+        {% endif %}
+
+        <form action="/propuestas/nueva" method="POST" class="form-card">
+            <input type="text" name="categoria" placeholder="Categoria o rubro" required>
+
+            <textarea name="descripcion" placeholder="Describe el proyecto o necesidad" required></textarea>
+
+            <input type="number" step="0.01" name="presupuesto_estimado" placeholder="Presupuesto estimado">
+
+            <input type="datetime-local" name="fecha_limite" aria-label="Fecha limite">
+
+            <button type="submit">Crear propuesta</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

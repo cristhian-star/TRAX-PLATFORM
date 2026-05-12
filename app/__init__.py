@@ -21,6 +21,9 @@ def create_app():
     
     from app.routes.auth_routes import auth
     app.register_blueprint(auth)
+
+    from app.routes.operation_routes import operations
+    app.register_blueprint(operations)
     
     from app.models.user import User
     from app.models.professional import Professional

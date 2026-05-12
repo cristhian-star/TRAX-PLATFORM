@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Nuevo presupuesto</h2>
+        <p class="form-helper">Solicita cotizaciones para comparar opciones antes de contratar.</p>
+
+        {% if created %}
+            <p class="form-alert">Solicitud de presupuesto creada correctamente.</p>
+        {% endif %}
+
+        <form action="/presupuestos/nuevo" method="POST" class="form-card">
+            <input type="text" name="categoria" placeholder="Categoria o rubro" required>
+
+            <input type="text" name="zona" placeholder="Zona o localidad" required>
+
+            <textarea name="descripcion" placeholder="Describe lo que necesitas" required></textarea>
+
+            <button type="submit">Crear presupuesto</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
