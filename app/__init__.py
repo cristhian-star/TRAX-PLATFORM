@@ -34,6 +34,10 @@ def create_app():
     from app.models.budget_request import BudgetRequest
     from app.models.emergency_request import EmergencyRequest
     from app.models.proposal_request import ProposalRequest
+    from app.models.verification_request import VerificationRequest
+    from app.models.review import Review
+    from app.models.abuse_report import AbuseReport
+    from app.models.terms_acceptance import TermsAcceptance
 
     with app.app_context():
         db.create_all()
