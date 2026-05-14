@@ -834,6 +834,62 @@ textarea {
     border-color: rgba(255, 90, 31, 0.35);
 }
 
+
+.rating-summary,
+.profile-rating-highlight {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.rating-summary {
+    margin: 10px 0 8px;
+}
+
+.profile-rating-highlight {
+    margin: 10px 0 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: var(--soft);
+}
+
+.rating-stars {
+    display: inline-flex;
+    gap: 3px;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.profile-rating-highlight .rating-stars {
+    font-size: 26px;
+}
+
+.star {
+    display: inline-block;
+}
+
+.rating-work .star-filled {
+    color: #94a3b8;
+}
+
+.rating-work .star-empty {
+    color: #d7dee8;
+}
+
+.rating-pro .star-filled {
+    color: #f59e0b;
+}
+
+.rating-pro .star-empty {
+    color: #fde7b2;
+}
+
+.rating-label {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 900;
+}
 .provider-metrics {
     margin: 16px 0;
 }

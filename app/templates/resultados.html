@@ -52,6 +52,8 @@
                 {% set profile_id = r["id"]|default(loop.index, true) %}
                 {% set phone = r["telefono"]|default("1122334455", true) %}
                 {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
+                {% set rating = professional_ratings.get(profile_id, {"average": none, "count": 0}) if professional_ratings is defined else {"average": none, "count": 0} %}
+                {% set filled_stars = (rating.average|round(0, "common")|int) if rating.average else 0 %}
                 <article class="provider-card {% if loop.first %}promoted{% endif %}">
                     <div class="provider-media media-{{ loop.index }}">
                         {% if loop.first %}<span>Promoted</span>{% endif %}
@@ -68,6 +70,16 @@
                                 <p>{{ r["servicio"] }} / {{ r["zona"] }}</p>
                             </div>
                             <button class="save-btn" type="button" aria-label="Guardar profesional">&hearts;</button>
+                        </div>
+                        <div class="rating-summary {{ 'rating-pro' if badges.pro else 'rating-work' }}">
+                            <div class="rating-stars" aria-label="Rating {{ rating.average or 0 }} de 5">
+                                {% for star in range(1, 6) %}
+                                    <span class="star {{ 'star-filled' if star <= filled_stars else 'star-empty' }}">&#9733;</span>
+                                {% endfor %}
+                            </div>
+                            <span class="rating-label">
+                                {% if rating.average %}{{ rating.average }} / 5{% else %}Sin calificaciones{% endif %}
+                            </span>
                         </div>
                         <p class="provider-copy">{{ r["descripcion"] }}</p>
                         <div class="provider-metrics">

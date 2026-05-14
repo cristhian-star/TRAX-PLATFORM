@@ -56,6 +56,25 @@ def _get_professional_badges(professional):
     }
 
 
+
+
+def _get_professional_rating(professional_id):
+    reviews = get_professional_reviews(professional_id)
+
+    return {
+        "average": get_professional_average_rating(professional_id),
+        "count": len(reviews),
+    }
+
+
+def _get_professionals_ratings(professionals):
+    return {
+        _entity_value(professional, "id", index): _get_professional_rating(
+            _entity_value(professional, "id", index)
+        )
+        for index, professional in enumerate(professionals, start=1)
+    }
+
 def _get_professionals_badges(professionals):
     return {
         _entity_value(professional, "id", index): _get_professional_badges(professional)
@@ -83,7 +102,8 @@ def buscar():
         resultados=resultados,
         servicio=servicio,
         zona=zona,
-        professional_badges=_get_professionals_badges(resultados)
+        professional_badges=_get_professionals_badges(resultados),
+        professional_ratings=_get_professionals_ratings(resultados)
     )
 
 
@@ -99,7 +119,8 @@ def listado_profesionales():
         resultados=resultados,
         servicio=servicio,
         zona=zona,
-        professional_badges=_get_professionals_badges(resultados)
+        professional_badges=_get_professionals_badges(resultados),
+        professional_ratings=_get_professionals_ratings(resultados)
     )
 
 
@@ -183,7 +204,8 @@ def perfil_profesional(id):
         profesional=profesional,
         profile_badges=_get_professional_badges(profesional),
         reviews=get_professional_reviews(id),
-        average_rating=get_professional_average_rating(id)
+        average_rating=get_professional_average_rating(id),
+        review_count=len(get_professional_reviews(id))
     )
 
 
