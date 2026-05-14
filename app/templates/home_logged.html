@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set user_role = session.get("user_role", "CLIENTE") %}
+{% if user_role == "SUPER_ADMIN" %}
+    {% set dashboard_url = "/admin/dashboard" %}
+{% elif user_role == "PROFESIONAL" %}
+    {% set dashboard_url = "/profesional/dashboard" %}
+{% else %}
+    {% set dashboard_url = "/cliente/dashboard" %}
+{% endif %}
+
+<main class="logged-home">
+    <section class="logged-hero">
+        <div class="shell logged-hero-grid">
+            <div>
+                <span class="signal">TRAX workspace</span>
+                <h1>Hola, {{ session.get("user_name", "usuario") }}.</h1>
+                <p>Tu centro operativo para contratar, cotizar, resolver urgencias y seguir actividad dentro del marketplace.</p>
+            </div>
+            <aside class="logged-profile-card">
+                <span>Sesion activa</span>
+                <strong>{{ session.get("user_name", "Usuario TRAX") }}</strong>
+                <small>{{ user_role }}</small>
+            </aside>
+        </div>
+    </section>
+
+    <section class="shell logged-home-layout">
+        <div class="logged-main-column">
+            <section class="quick-access-panel">
+                <div class="panel-title compact-title">
+                    <span class="kicker">Accesos rapidos</span>
+                    <h2>Que queres hacer ahora</h2>
+                </div>
+
+                <div class="logged-action-grid">
+                    <a href="/contratacion/nueva">
+                        <strong>Contratar</strong>
+                        <span>Inicia una contratacion directa con un profesional.</span>
+                    </a>
+                    <a href="/presupuestos/nuevo">
+                        <strong>Pedir presupuesto</strong>
+                        <span>Compara cotizaciones antes de avanzar.</span>
+                    </a>
+                    <a href="/emergencias/nueva">
+                        <strong>Emergencias</strong>
+                        <span>Abre una solicitud urgente cuando el tiempo importa.</span>
+                    </a>
+                    <a href="/propuestas/nueva">
+                        <strong>Crear propuesta</strong>
+                        <span>Publica una necesidad y recibe respuestas.</span>
+                    </a>
+                    <a href="/buscar?servicio=&zona=">
+                        <strong>Buscar profesionales</strong>
+                        <span>Explora perfiles, zonas y servicios disponibles.</span>
+                    </a>
+                    <a href="/mercados">
+                        <strong>Ver mercados</strong>
+                        <span>Consulta tendencias y referencias del marketplace.</span>
+                    </a>
+                    <a href="{{ dashboard_url }}" class="primary-action-card">
+                        <strong>Mi dashboard</strong>
+                        <span>Entra a tu panel segun tu rol actual.</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="feed-panel">
+                <div class="panel-title compact-title">
+                    <span class="kicker">Novedades</span>
+                    <h2>Noticias para tu red</h2>
+                </div>
+
+                <article class="feed-item">
+                    <strong>Nuevos flujos operativos disponibles</strong>
+                    <p>Contrataciones, presupuestos, emergencias y propuestas ya tienen formularios base para operar.</p>
+                </article>
+                <article class="feed-item">
+                    <strong>Confianza y reputacion en desarrollo</strong>
+                    <p>TRAX esta preparando verificacion, reviews y senales de reputacion para mejorar cada decision.</p>
+                </article>
+                <article class="feed-item">
+                    <strong>Mercados con indicadores iniciales</strong>
+                    <p>La vista de mercados suma placeholders para precios, demanda y tendencias por categoria.</p>
+                </article>
+            </section>
+        </div>
+
+        <aside class="activity-panel">
+            <div class="panel-title compact-title">
+                <span class="kicker">Actividad</span>
+                <h2>Reciente</h2>
+            </div>
+
+            <div class="activity-list">
+                <p><strong>Sin actividad nueva</strong><span>Cuando generes solicitudes, van a aparecer aca.</span></p>
+                <p><strong>Perfil listo</strong><span>Tu sesion esta activa para usar herramientas TRAX.</span></p>
+                <p><strong>Proximamente</strong><span>Alertas, mensajes y estados de solicitudes.</span></p>
+            </div>
+        </aside>
+    </section>
+</main>
+
+{% endblock %}

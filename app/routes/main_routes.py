@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, session
 from app.services.category_service import (
     request_category,
     get_category_requests_summary,
@@ -16,6 +16,9 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
+    if session.get("user_id"):
+        return render_template("home_logged.html")
+
     return render_template("home.html")
 
 
