@@ -38,6 +38,8 @@ def create_app():
     from app.models.review import Review
     from app.models.abuse_report import AbuseReport
     from app.models.terms_acceptance import TermsAcceptance
+    from app.models.subscription import Subscription
+    from app.models.reputation_event import ReputationEvent
 
     with app.app_context():
         db.create_all()
