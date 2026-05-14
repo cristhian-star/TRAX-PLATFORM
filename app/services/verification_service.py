@@ -36,6 +36,15 @@ def get_pending_verifications():
     )
 
 
+def has_approved_verification(user_id):
+    return (
+        VerificationRequest.query
+        .filter_by(user_id=user_id, estado="APROBADO")
+        .first()
+        is not None
+    )
+
+
 def update_verification_status(
     verification_request_id,
     estado,
