@@ -2236,3 +2236,116 @@ textarea {
         text-align: center;
     }
 }
+.admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0 26px;
+}
+
+.admin-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 15px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--navy);
+    font-weight: 900;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.admin-nav a:hover {
+    border-color: rgba(255, 90, 31, 0.36);
+    color: var(--orange);
+}
+
+.admin-hub-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.admin-management-screen {
+    padding: 56px 0 70px;
+}
+
+.admin-management-screen h2 {
+    margin: 8px 0 24px;
+    color: var(--navy);
+    font-size: 38px;
+}
+
+.admin-users-table td {
+    vertical-align: middle;
+}
+
+.user-role-pill,
+.user-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 86px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.user-role-pill {
+    background: var(--soft);
+    color: var(--navy);
+}
+
+.user-status-pill.is-active {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.user-status-pill.is-muted {
+    background: #f8fafc;
+    color: var(--muted);
+}
+
+.admin-placeholder-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.admin-placeholder-actions button {
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--navy);
+    font-weight: 900;
+    cursor: default;
+}
+
+@media (max-width: 1080px) {
+    .admin-hub-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .admin-nav a {
+        flex: 1 1 150px;
+    }
+
+    .admin-hub-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .admin-placeholder-actions {
+        grid-template-columns: 1fr;
+    }
+}

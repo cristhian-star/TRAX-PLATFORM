@@ -7,8 +7,8 @@
         <div class="shell dashboard-hero-grid">
             <div>
                 <span class="signal">Administracion TRAX</span>
-                <h1>Dashboard admin</h1>
-                <p>Panel base para supervisar usuarios, rubros, actividad y configuracion operativa.</p>
+                <h1>Super Admin Hub</h1>
+                <p>Centro de control para moderacion, usuarios, rubros y supervision general del marketplace.</p>
             </div>
             <aside class="dashboard-status-card">
                 <span>Acceso</span>
@@ -19,40 +19,63 @@
     </section>
 
     <section class="shell dashboard-content">
+        <nav class="admin-nav" aria-label="Navegacion admin">
+            <a href="/admin/dashboard">Hub admin</a>
+            <a href="/admin/moderacion">Moderacion</a>
+            <a href="/admin/usuarios">Usuarios</a>
+            <a href="/admin/rubros">Rubros</a>
+            <a href="/mercados">Mercados</a>
+            <a href="/">Volver al sitio</a>
+        </nav>
+
         <div class="dashboard-metrics">
             <article>
-                <span>Rubros pendientes</span>
-                <strong>-</strong>
-                <small>Solicitudes por revisar</small>
+                <span>Trust Console</span>
+                <strong>Activa</strong>
+                <small>Denuncias y verificaciones pendientes.</small>
             </article>
             <article>
-                <span>Usuarios</span>
-                <strong>-</strong>
-                <small>Clientes y profesionales registrados</small>
+                <span>Gestion de usuarios</span>
+                <strong>Base</strong>
+                <small>Vista central con rol, reputacion y estados.</small>
             </article>
             <article>
-                <span>Alertas</span>
-                <strong>0</strong>
-                <small>Eventos operativos destacados</small>
+                <span>Marketplace</span>
+                <strong>Online</strong>
+                <small>Acceso rapido a rubros y mercados.</small>
             </article>
         </div>
 
-        <div class="dashboard-card-grid">
+        <div class="dashboard-card-grid admin-hub-grid">
             <article>
-                <span class="kicker">Disponible</span>
-                <h2>Solicitudes de rubros</h2>
-                <p>Revision y aprobacion de rubros solicitados por la comunidad.</p>
-                <a class="dashboard-link" href="/admin/rubros">Abrir panel</a>
+                <span class="kicker">Trust</span>
+                <h2>Moderacion / Trust Console</h2>
+                <p>Revisar denuncias abiertas y solicitudes de verificacion.</p>
+                <a class="dashboard-link" href="/admin/moderacion">Abrir moderacion</a>
             </article>
             <article>
-                <span class="kicker">Proximamente</span>
+                <span class="kicker">Usuarios</span>
                 <h2>Gestion de usuarios</h2>
-                <p>Modulo futuro para revisar cuentas, roles, actividad y estado de perfiles.</p>
+                <p>Consultar cuentas, roles, reputacion y estado PRO o verificado.</p>
+                <a class="dashboard-link" href="/admin/usuarios">Abrir usuarios</a>
             </article>
             <article>
-                <span class="kicker">Proximamente</span>
-                <h2>Configuracion</h2>
-                <p>Controles reservados para reglas del marketplace, categorias y parametros.</p>
+                <span class="kicker">Rubros</span>
+                <h2>Rubros</h2>
+                <p>Supervisar solicitudes y aprobaciones de nuevas categorias.</p>
+                <a class="dashboard-link" href="/admin/rubros">Abrir rubros</a>
+            </article>
+            <article>
+                <span class="kicker">Mercados</span>
+                <h2>Mercados</h2>
+                <p>Ir a la vista publica de mercados para revisar la experiencia.</p>
+                <a class="dashboard-link" href="/mercados">Ver mercados</a>
+            </article>
+            <article>
+                <span class="kicker">Sitio</span>
+                <h2>Volver al sitio</h2>
+                <p>Salir del hub administrativo y regresar a la experiencia principal.</p>
+                <a class="dashboard-link" href="/">Ir al home</a>
             </article>
         </div>
     </section>

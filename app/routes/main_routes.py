@@ -15,6 +15,7 @@ from app.services.professional_service import (
     get_professional_by_id
 )
 from app.utils.decorators import login_required, role_required
+from app.models.user import User
 from app.services.subscription_service import has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
     create_verification_request,
@@ -90,6 +91,24 @@ def _get_professionals_badges(professionals):
         _entity_value(professional, "id", index): _get_professional_badges(professional)
         for index, professional in enumerate(professionals, start=1)
     }
+
+
+
+def _get_admin_user_rows():
+    users = User.query.order_by(User.id.asc()).all()
+
+    return [
+        {
+            "id": user.id,
+            "nombre": user.nombre,
+            "email": user.email,
+            "rol": user.rol,
+            "reputation_score": get_user_reputation_score(user.id),
+            "is_pro": has_pro_access(user.id),
+            "is_verified": has_approved_verification(user.id),
+        }
+        for user in users
+    ]
 
 
 @main.route("/")
@@ -339,6 +358,15 @@ def guardar_solicitud_rubro():
     )
 
 
+
+
+@main.route("/admin/usuarios")
+@role_required("SUPER_ADMIN")
+def admin_usuarios():
+    return render_template(
+        "admin_usuarios.html",
+        usuarios=_get_admin_user_rows()
+    )
 
 @main.route("/admin/moderacion")
 @role_required("SUPER_ADMIN")
