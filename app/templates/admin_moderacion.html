@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container admin-moderation-screen">
+    <span class="kicker">Moderacion</span>
+    <h2>Panel de confianza y seguridad</h2>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Denuncias abiertas</span>
+            <h3>Reportes de usuarios</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Reporter</th>
+                    <th>Reported</th>
+                    <th>Motivo</th>
+                    <th>Descripcion</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                <tr>
+                    <td>{{ reporte.reporter_id }}</td>
+                    <td>{{ reporte.reported_user_id }}</td>
+                    <td>{{ reporte.motivo }}</td>
+                    <td>{{ reporte.descripcion or "-" }}</td>
+                    <td>{{ reporte.created_at.strftime("%Y-%m-%d") if reporte.created_at else "-" }}</td>
+                    <td>{{ reporte.estado }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/reportes/{{ reporte.id }}/resolver" method="POST">
+                            <button type="submit">Resolver</button>
+                        </form>
+                        <form action="/admin/reportes/{{ reporte.id }}/descartar" method="POST">
+                            <button type="submit">Descartar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No hay denuncias abiertas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Verificaciones pendientes</span>
+            <h3>Solicitudes de validacion</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Tipo usuario</th>
+                    <th>Documentos</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for verificacion in verificaciones %}
+                <tr>
+                    <td>{{ verificacion.user_id }}</td>
+                    <td>{{ verificacion.tipo_usuario }}</td>
+                    <td>
+                        <div class="document-list">
+                            <span>DNI: {{ verificacion.documento_identidad or "-" }}</span>
+                            <span>Certificado: {{ verificacion.certificado_oficio or "-" }}</span>
+                            <span>Titulo: {{ verificacion.titulo_profesional or "-" }}</span>
+                            <span>Material: {{ verificacion.material_probatorio or "-" }}</span>
+                        </div>
+                    </td>
+                    <td>{{ verificacion.estado }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/aprobar" method="POST">
+                            <button type="submit">Aprobar</button>
+                        </form>
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/observar" method="POST">
+                            <button type="submit">Observar</button>
+                        </form>
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/rechazar" method="POST">
+                            <button type="submit">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No hay verificaciones pendientes.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</section>
+
+{% endblock %}

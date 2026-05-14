@@ -1,5 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, session
-from app.services.abuse_report_service import create_abuse_report
+from app.services.abuse_report_service import (
+    create_abuse_report,
+    get_open_reports,
+    update_report_status
+)
 from app.services.category_service import (
     request_category,
     get_category_requests_summary,
@@ -12,7 +16,11 @@ from app.services.professional_service import (
 )
 from app.utils.decorators import login_required, role_required
 from app.services.subscription_service import has_pro_access
-from app.services.verification_service import has_approved_verification
+from app.services.verification_service import (
+    get_pending_verifications,
+    has_approved_verification,
+    update_verification_status
+)
 from app.services.reputation_service import add_reputation_event, get_user_reputation_score
 from app.services.review_service import (
     create_review,
@@ -272,6 +280,51 @@ def guardar_solicitud_rubro():
         cantidad=cantidad
     )
 
+
+
+@main.route("/admin/moderacion")
+@role_required("SUPER_ADMIN")
+def admin_moderacion():
+    return render_template(
+        "admin_moderacion.html",
+        reportes=get_open_reports(),
+        verificaciones=get_pending_verifications()
+    )
+
+
+@main.route("/admin/reportes/<int:id>/resolver", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_resolver_reporte(id):
+    update_report_status(id, "RESUELTO", reviewed_by=session.get("user_id"))
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/reportes/<int:id>/descartar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_descartar_reporte(id):
+    update_report_status(id, "DESCARTADO", reviewed_by=session.get("user_id"))
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/verificaciones/<int:id>/aprobar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_aprobar_verificacion(id):
+    update_verification_status(id, "APROBADO", reviewer_id=session.get("user_id"))
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/verificaciones/<int:id>/observar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_observar_verificacion(id):
+    update_verification_status(id, "OBSERVADO", reviewer_id=session.get("user_id"))
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/verificaciones/<int:id>/rechazar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_rechazar_verificacion(id):
+    update_verification_status(id, "RECHAZADO", reviewer_id=session.get("user_id"))
+    return redirect("/admin/moderacion")
 
 @main.route("/admin/rubros")
 @role_required("SUPER_ADMIN")

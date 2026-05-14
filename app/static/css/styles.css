@@ -1623,6 +1623,58 @@ textarea {
     color: var(--muted);
     line-height: 1.6;
 }
+
+.admin-moderation-screen {
+    padding: 56px 0 70px;
+}
+
+.admin-moderation-screen h2 {
+    margin: 8px 0 24px;
+    color: var(--navy);
+    font-size: 38px;
+}
+
+.moderation-section {
+    margin-top: 26px;
+}
+
+.moderation-section h3 {
+    margin: 6px 0 0;
+    color: var(--navy);
+    font-size: 24px;
+}
+
+.moderation-table td {
+    vertical-align: top;
+}
+
+.moderation-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.moderation-actions form {
+    margin: 0;
+}
+
+.moderation-actions button {
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.document-list {
+    display: grid;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: left;
+}
 .footer {
     display: flex;
     justify-content: center;
