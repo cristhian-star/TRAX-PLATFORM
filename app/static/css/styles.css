@@ -1522,6 +1522,33 @@ textarea {
         padding: 42px 0 24px;
     }
 }
+
+.profile-reviews .section-title {
+    align-items: center;
+}
+
+.review-list {
+    display: grid;
+    gap: 14px;
+}
+
+.review-list article {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--soft);
+}
+
+.review-list strong {
+    color: var(--navy);
+    font-size: 20px;
+}
+
+.review-list p,
+.empty-reviews {
+    color: var(--muted);
+    line-height: 1.6;
+}
 .footer {
     display: flex;
     justify-content: center;

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set nombre = profesional["nombre"]|default("Profesional TRAX", true) %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Dejar resena</h2>
+        <p class="form-helper">Tu opinion ayuda a otros clientes a contratar con mas confianza.</p>
+
+        <form action="/profesional/{{ professional_id }}/review" method="POST" class="form-card">
+            <input type="text" value="{{ nombre }}" disabled>
+
+            <select name="rating" required>
+                <option value="">Rating</option>
+                <option value="5">5 - Excelente</option>
+                <option value="4">4 - Muy bueno</option>
+                <option value="3">3 - Correcto</option>
+                <option value="2">2 - Regular</option>
+                <option value="1">1 - Malo</option>
+            </select>
+
+            <textarea name="comentario" placeholder="Conta como fue tu experiencia"></textarea>
+
+            <button type="submit">Publicar resena</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

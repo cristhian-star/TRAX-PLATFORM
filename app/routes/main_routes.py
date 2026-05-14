@@ -9,10 +9,15 @@ from app.services.professional_service import (
     search_professionals,
     get_professional_by_id
 )
-from app.utils.decorators import role_required
+from app.utils.decorators import login_required, role_required
 from app.services.subscription_service import has_pro_access
 from app.services.verification_service import has_approved_verification
-from app.services.reputation_service import get_user_reputation_score
+from app.services.reputation_service import add_reputation_event, get_user_reputation_score
+from app.services.review_service import (
+    create_review,
+    get_professional_average_rating,
+    get_professional_reviews
+)
 
 main = Blueprint("main", __name__)
 
@@ -121,6 +126,51 @@ def admin_dashboard():
     return render_template("admin_dashboard.html")
 
 
+
+@main.route("/profesional/<int:id>/review", methods=["GET", "POST"])
+@login_required
+def crear_review(id):
+    profesional = get_professional_by_id(id)
+
+    if profesional is None:
+        return "Profesional no encontrado", 404
+
+    if request.method == "POST":
+        rating = int(request.form.get("rating", 0))
+        comentario = request.form.get("comentario")
+
+        create_review(
+            cliente_id=session["user_id"],
+            professional_id=id,
+            rating=rating,
+            comentario=comentario
+        )
+
+        professional_user_id = _professional_user_id(profesional)
+
+        if rating >= 4:
+            add_reputation_event(
+                professional_user_id,
+                "REVIEW_POSITIVA",
+                10,
+                "Review positiva recibida"
+            )
+        elif rating <= 2:
+            add_reputation_event(
+                professional_user_id,
+                "REVIEW_NEGATIVA",
+                -5,
+                "Review negativa recibida"
+            )
+
+        return redirect(f"/profesional/{id}")
+
+    return render_template(
+        "crear_review.html",
+        profesional=profesional,
+        professional_id=id
+    )
+
 @main.route("/profesional/<int:id>")
 def perfil_profesional(id):
     profesional = get_professional_by_id(id)
@@ -131,7 +181,9 @@ def perfil_profesional(id):
     return render_template(
         "perfil_profesional.html",
         profesional=profesional,
-        profile_badges=_get_professional_badges(profesional)
+        profile_badges=_get_professional_badges(profesional),
+        reviews=get_professional_reviews(id),
+        average_rating=get_professional_average_rating(id)
     )
 
 

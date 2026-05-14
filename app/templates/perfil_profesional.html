@@ -30,7 +30,7 @@
                 <h1>{{ nombre }}</h1>
                 <p>{{ descripcion }}</p>
                 <div class="social-proof">
-                    <span><strong>{{ badges.reputation_score }}</strong> reputacion</span>
+                    <span><strong>{{ average_rating or "-" }}</strong> rating</span>
                     <span><strong>420+</strong> trabajos</span>
                     <span><strong>12 min</strong> respuesta</span>
                 </div>
@@ -98,6 +98,26 @@
                         <p>Plan preventivo para edificio chico.</p>
                     </article>
                 </div>
+            </section>
+            <section class="profile-block profile-reviews">
+                <div class="section-title">
+                    <span class="kicker">Resenas</span>
+                    <h2>Experiencias de clientes</h2>
+                    <a class="btn secondary" href="/profesional/{{ pro.id }}/review">Dejar resena</a>
+                </div>
+
+                {% if reviews %}
+                    <div class="review-list">
+                        {% for review in reviews %}
+                        <article>
+                            <strong>{{ review.rating }}/5</strong>
+                            <p>{{ review.comentario or "Sin comentario adicional." }}</p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-reviews">Este profesional todavia no tiene resenas visibles.</p>
+                {% endif %}
             </section>
         </div>
 
