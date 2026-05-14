@@ -6,7 +6,7 @@ from app.services.budget_service import create_budget_request
 from app.services.contract_service import create_contract
 from app.services.emergency_service import create_emergency_request
 from app.services.proposal_service import create_proposal_request
-from app.utils.decorators import login_required
+from app.utils.decorators import login_required, pro_required, verified_required
 
 operations = Blueprint("operations", __name__)
 
@@ -65,6 +65,8 @@ def nuevo_presupuesto():
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
 @login_required
+@pro_required
+@verified_required
 def nueva_emergencia():
     if request.method == "POST":
         emergency_request = create_emergency_request(
@@ -82,6 +84,7 @@ def nueva_emergencia():
 
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
 @login_required
+@pro_required
 def nueva_propuesta():
     if request.method == "POST":
         proposal_request = create_proposal_request(
