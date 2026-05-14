@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set nombre = profesional["nombre"]|default("Usuario TRAX", true) %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Reportar usuario</h2>
+        <p class="form-helper">Usa este formulario para avisar al equipo TRAX sobre una situacion que requiere revision.</p>
+
+        <form action="/reportar/usuario/{{ reported_user_id }}" method="POST" class="form-card">
+            <input type="text" value="{{ nombre }}" disabled>
+
+            <select name="motivo" required>
+                <option value="">Motivo del reporte</option>
+                <option value="FRAUDE">Fraude</option>
+                <option value="INCUMPLIMIENTO">Incumplimiento</option>
+                <option value="MALA_PRAXIS">Mala praxis</option>
+                <option value="LENGUAJE_INAPROPIADO">Lenguaje inapropiado</option>
+                <option value="IDENTIDAD_SOSPECHOSA">Identidad sospechosa</option>
+                <option value="SPAM">Spam</option>
+                <option value="OTRO">Otro</option>
+            </select>
+
+            <textarea name="descripcion" placeholder="Describe brevemente que ocurrio" required></textarea>
+
+            <button type="submit">Enviar reporte</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

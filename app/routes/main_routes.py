@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, session
+from app.services.abuse_report_service import create_abuse_report
 from app.services.category_service import (
     request_category,
     get_category_requests_summary,
@@ -148,6 +149,31 @@ def admin_dashboard():
 
 
 
+
+@main.route("/reportar/usuario/<int:id>", methods=["GET", "POST"])
+@login_required
+def reportar_usuario(id):
+    profesional = get_professional_by_id(id)
+
+    if profesional is None:
+        return "Usuario no encontrado", 404
+
+    if request.method == "POST":
+        create_abuse_report(
+            reporter_id=session["user_id"],
+            reported_user_id=_professional_user_id(profesional),
+            motivo=request.form.get("motivo"),
+            descripcion=request.form.get("descripcion")
+        )
+
+        return redirect(f"/profesional/{id}?reported=1")
+
+    return render_template(
+        "reportar_usuario.html",
+        profesional=profesional,
+        reported_user_id=id
+    )
+
 @main.route("/profesional/<int:id>/review", methods=["GET", "POST"])
 @login_required
 def crear_review(id):
@@ -205,7 +231,8 @@ def perfil_profesional(id):
         profile_badges=_get_professional_badges(profesional),
         reviews=get_professional_reviews(id),
         average_rating=get_professional_average_rating(id),
-        review_count=len(get_professional_reviews(id))
+        review_count=len(get_professional_reviews(id)),
+        report_created=request.args.get("reported") == "1"
     )
 
 

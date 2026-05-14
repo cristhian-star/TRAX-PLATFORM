@@ -929,6 +929,24 @@ textarea {
     color: #fff;
 }
 
+.btn.danger {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.btn.danger:hover {
+    background: #ffe4e6;
+}
+
+.report-created-message {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 850;
+}
+
 .btn.secondary {
     border: 1px solid var(--line);
     background: #fff;
