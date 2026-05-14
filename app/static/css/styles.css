@@ -1684,6 +1684,49 @@ textarea {
     font-size: 13px;
     text-align: left;
 }
+
+.upgrade-summary,
+.upgrade-benefits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 22px;
+}
+
+.upgrade-summary article,
+.upgrade-benefits article {
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: var(--card-shadow);
+}
+
+.upgrade-summary span,
+.upgrade-summary small,
+.upgrade-benefits p {
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.upgrade-summary strong,
+.upgrade-benefits strong {
+    display: block;
+    margin: 8px 0;
+    color: var(--navy);
+    font-size: 24px;
+}
+
+.upgrade-action-card {
+    max-width: none;
+}
+
+@media (max-width: 820px) {
+    .upgrade-summary,
+    .upgrade-benefits {
+        grid-template-columns: 1fr;
+    }
+}
 .footer {
     display: flex;
     justify-content: center;

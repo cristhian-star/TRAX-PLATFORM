@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section pro-upgrade-screen">
+    <div class="section-container">
+        <span class="kicker">TRAX PRO</span>
+        <h2>Pasar a TRAX PRO</h2>
+        <p class="form-helper">Desbloquea mas visibilidad y senales de confianza para competir mejor dentro del marketplace.</p>
+
+        {% if error %}
+            <p class="form-alert">{{ error }}</p>
+        {% endif %}
+
+        <div class="upgrade-summary">
+            <article>
+                <span>Reputacion actual</span>
+                <strong>{{ reputation_score }}</strong>
+                <small>Necesitas 100 puntos o verificacion aprobada.</small>
+            </article>
+            <article>
+                <span>Verificacion</span>
+                <strong>{% if is_verified %}Aprobada{% else %}Pendiente{% endif %}</strong>
+                <small>{% if is_verified %}Cumple requisito MVP.{% else %}Tambien podes solicitar verificacion profesional.{% endif %}</small>
+            </article>
+            <article>
+                <span>Estado</span>
+                <strong>{% if is_pro %}Ya sos PRO{% elif is_eligible %}Elegible{% else %}No elegible{% endif %}</strong>
+                <small>{% if is_eligible %}Tu cuenta puede activar TRAX PRO.{% else %}Segui acumulando reputacion o completa verificacion.{% endif %}</small>
+            </article>
+        </div>
+
+        <div class="upgrade-benefits">
+            <article>
+                <strong>Badge PRO</strong>
+                <p>Tu perfil puede destacar con senales visuales premium.</p>
+            </article>
+            <article>
+                <strong>Mayor confianza</strong>
+                <p>Mejor lectura para clientes que comparan profesionales.</p>
+            </article>
+            <article>
+                <strong>Preparado para promocion</strong>
+                <p>Base para futuras posiciones destacadas y herramientas comerciales.</p>
+            </article>
+        </div>
+
+        <form action="/profesional/pro/upgrade" method="POST" class="form-card upgrade-action-card">
+            {% if is_pro %}
+                <p class="form-helper">Tu cuenta ya tiene acceso TRAX PRO.</p>
+            {% elif is_eligible %}
+                <button type="submit">Activar TRAX PRO</button>
+            {% else %}
+                <button type="submit">Solicitar evaluacion</button>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+{% endblock %}

@@ -15,7 +15,7 @@ from app.services.professional_service import (
     get_professional_by_id
 )
 from app.utils.decorators import login_required, role_required
-from app.services.subscription_service import has_pro_access
+from app.services.subscription_service import has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
     create_verification_request,
     get_pending_verifications,
@@ -140,6 +140,34 @@ def mercados():
 
 
 
+
+@main.route("/profesional/pro/upgrade", methods=["GET", "POST"])
+@login_required
+@role_required("PROFESIONAL")
+def upgrade_pro():
+    user_id = session["user_id"]
+    reputation_score = get_user_reputation_score(user_id)
+    is_verified = has_approved_verification(user_id)
+    is_pro = has_pro_access(user_id)
+    is_eligible = reputation_score >= 100 or is_verified
+    error = None
+
+    if request.method == "POST":
+        if is_eligible:
+            upgrade_to_pro(user_id)
+            return redirect("/profesional/dashboard?pro_upgraded=1")
+
+        error = "Necesitas reputacion minima de 100 puntos o verificacion aprobada para pasar a TRAX PRO."
+
+    return render_template(
+        "solicitar_upgrade_pro.html",
+        reputation_score=reputation_score,
+        is_verified=is_verified,
+        is_pro=is_pro,
+        is_eligible=is_eligible,
+        error=error
+    )
+
 @main.route("/profesional/verificacion/solicitar", methods=["GET", "POST"])
 @login_required
 @role_required("PROFESIONAL")
@@ -168,7 +196,9 @@ def profesional_dashboard():
     return render_template(
         "profesional_dashboard.html",
         verification_requested=request.args.get("verification_requested") == "1",
-        is_verified=has_approved_verification(session.get("user_id"))
+        is_verified=has_approved_verification(session.get("user_id")),
+        is_pro=has_pro_access(session.get("user_id")),
+        pro_upgraded=request.args.get("pro_upgraded") == "1"
     )
 
 

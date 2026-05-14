@@ -20,6 +20,7 @@
 
     <section class="shell dashboard-content">
         {% if verification_requested %}<p class="dashboard-alert">Solicitud de verificacion enviada. El equipo TRAX la revisara.</p>{% endif %}
+        {% if pro_upgraded %}<p class="dashboard-alert">TRAX PRO activado correctamente.</p>{% endif %}
         <div class="dashboard-metrics">
             <article>
                 <span>Consultas recibidas</span>
@@ -39,6 +40,14 @@
         </div>
 
         <div class="dashboard-card-grid">
+            {% if not is_pro %}
+            <article>
+                <span class="kicker">TRAX PRO</span>
+                <h2>Pasar a TRAX PRO</h2>
+                <p>Activa beneficios premium si tenes reputacion suficiente o verificacion aprobada.</p>
+                <a class="dashboard-link" href="/profesional/pro/upgrade">Pasar a TRAX PRO</a>
+            </article>
+            {% endif %}
             <article>
                 <span class="kicker">Confianza</span>
                 <h2>{% if is_verified %}Cuenta verificada{% else %}Solicitar verificacion{% endif %}</h2>
