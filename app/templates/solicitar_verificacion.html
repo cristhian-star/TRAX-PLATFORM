@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section">
+    <div class="section-container">
+        <h2>Solicitar verificacion</h2>
+        <p class="form-helper">Carga referencias o enlaces para que TRAX pueda revisar tu identidad profesional. Por ahora no hay upload real de archivos.</p>
+
+        {% if is_verified %}
+            <p class="form-alert">Tu cuenta ya figura como verificada.</p>
+        {% endif %}
+
+        <form action="/profesional/verificacion/solicitar" method="POST" class="form-card">
+            <select name="tipo_usuario" required>
+                <option value="">Tipo de usuario</option>
+                <option value="PROFESIONAL">Profesional</option>
+                <option value="EMPRESA">Empresa</option>
+            </select>
+
+            <input type="text" name="documento_identidad" placeholder="Documento de identidad o enlace">
+
+            <input type="text" name="certificado_oficio" placeholder="Certificado de oficio o enlace">
+
+            <input type="text" name="titulo_profesional" placeholder="Titulo profesional o enlace">
+
+            <textarea name="material_probatorio" placeholder="Links a Drive, portfolio, matriculas o material probatorio"></textarea>
+
+            <textarea name="observaciones" placeholder="Observaciones para el equipo de revision"></textarea>
+
+            <button type="submit">Enviar solicitud</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

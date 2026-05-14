@@ -10,7 +10,8 @@ def create_verification_request(
     documento_identidad=None,
     certificado_oficio=None,
     titulo_profesional=None,
-    material_probatorio=None
+    material_probatorio=None,
+    observaciones=None
 ):
     verification_request = VerificationRequest(
         user_id=user_id,
@@ -18,7 +19,8 @@ def create_verification_request(
         documento_identidad=documento_identidad,
         certificado_oficio=certificado_oficio,
         titulo_profesional=titulo_profesional,
-        material_probatorio=material_probatorio
+        material_probatorio=material_probatorio,
+        observaciones=observaciones
     )
 
     db.session.add(verification_request)

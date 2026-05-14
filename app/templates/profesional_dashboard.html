@@ -19,6 +19,7 @@
     </section>
 
     <section class="shell dashboard-content">
+        {% if verification_requested %}<p class="dashboard-alert">Solicitud de verificacion enviada. El equipo TRAX la revisara.</p>{% endif %}
         <div class="dashboard-metrics">
             <article>
                 <span>Consultas recibidas</span>
@@ -38,6 +39,12 @@
         </div>
 
         <div class="dashboard-card-grid">
+            <article>
+                <span class="kicker">Confianza</span>
+                <h2>{% if is_verified %}Cuenta verificada{% else %}Solicitar verificacion{% endif %}</h2>
+                <p>{% if is_verified %}Tu perfil ya puede mostrar el badge VERIFICADO.{% else %}Envia documentos, certificados o links para activar el badge VERIFICADO.{% endif %}</p>
+                <a class="dashboard-link" href="/profesional/verificacion/solicitar">Solicitar verificacion</a>
+            </article>
             <article>
                 <span class="kicker">Proximamente</span>
                 <h2>Mi perfil TRAX</h2>

@@ -17,6 +17,7 @@ from app.services.professional_service import (
 from app.utils.decorators import login_required, role_required
 from app.services.subscription_service import has_pro_access
 from app.services.verification_service import (
+    create_verification_request,
     get_pending_verifications,
     has_approved_verification,
     update_verification_status
@@ -138,10 +139,37 @@ def mercados():
     return render_template("mercados.html")
 
 
+
+@main.route("/profesional/verificacion/solicitar", methods=["GET", "POST"])
+@login_required
+@role_required("PROFESIONAL")
+def solicitar_verificacion():
+    if request.method == "POST":
+        create_verification_request(
+            user_id=session["user_id"],
+            tipo_usuario=request.form.get("tipo_usuario"),
+            documento_identidad=request.form.get("documento_identidad"),
+            certificado_oficio=request.form.get("certificado_oficio"),
+            titulo_profesional=request.form.get("titulo_profesional"),
+            material_probatorio=request.form.get("material_probatorio"),
+            observaciones=request.form.get("observaciones")
+        )
+
+        return redirect("/profesional/dashboard?verification_requested=1")
+
+    return render_template(
+        "solicitar_verificacion.html",
+        is_verified=has_approved_verification(session.get("user_id"))
+    )
+
 @main.route("/profesional/dashboard")
 @role_required("PROFESIONAL")
 def profesional_dashboard():
-    return render_template("profesional_dashboard.html")
+    return render_template(
+        "profesional_dashboard.html",
+        verification_requested=request.args.get("verification_requested") == "1",
+        is_verified=has_approved_verification(session.get("user_id"))
+    )
 
 
 @main.route("/cliente/dashboard")
