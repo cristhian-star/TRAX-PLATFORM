@@ -51,6 +51,7 @@
                 {% for r in profesionales %}
                 {% set profile_id = r["id"]|default(loop.index, true) %}
                 {% set phone = r["telefono"]|default("1122334455", true) %}
+                {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
                 <article class="provider-card {% if loop.first %}promoted{% endif %}">
                     <div class="provider-media media-{{ loop.index }}">
                         {% if loop.first %}<span>Promoted</span>{% endif %}
@@ -59,8 +60,9 @@
                         <div class="provider-top">
                             <div>
                                 <div class="badge-row">
-                                    <span class="trust-badge">Verified</span>
-                                    <span class="trust-badge cyan">Fast reply</span>
+                                    <span class="trust-badge work">WORK</span>
+                                    {% if badges.pro %}<span class="trust-badge pro">PRO</span>{% endif %}
+                                    {% if badges.verified %}<span class="trust-badge verified">VERIFICADO</span>{% endif %}
                                 </div>
                                 <h2>{{ r["nombre"] }}</h2>
                                 <p>{{ r["servicio"] }} / {{ r["zona"] }}</p>
@@ -69,7 +71,7 @@
                         </div>
                         <p class="provider-copy">{{ r["descripcion"] }}</p>
                         <div class="provider-metrics">
-                            <span><strong>4.9</strong> rating</span>
+                            <span><strong>{{ badges.reputation_score }}</strong> reputacion</span>
                             <span><strong>12 min</strong> respuesta</span>
                             <span><strong>$18k+</strong> desde</span>
                         </div>

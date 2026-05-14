@@ -785,6 +785,25 @@ textarea {
     font-weight: 950;
 }
 
+.trust-badge.work {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.trust-badge.pro {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.trust-badge.verified {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.profile-badge-row {
+    margin-bottom: 12px;
+}
+
 .trust-badge.cyan {
     background: #ecfeff;
     color: #0e7490;

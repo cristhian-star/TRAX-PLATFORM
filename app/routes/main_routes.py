@@ -10,8 +10,52 @@ from app.services.professional_service import (
     get_professional_by_id
 )
 from app.utils.decorators import role_required
+from app.services.subscription_service import has_pro_access
+from app.services.verification_service import has_approved_verification
+from app.services.reputation_service import get_user_reputation_score
 
 main = Blueprint("main", __name__)
+
+
+def _entity_value(entity, key, default=None):
+    if isinstance(entity, dict):
+        return entity.get(key, default)
+
+    return getattr(entity, key, default)
+
+
+def _professional_user_id(professional):
+    return _entity_value(
+        professional,
+        "user_id",
+        _entity_value(professional, "id")
+    )
+
+
+def _get_professional_badges(professional):
+    user_id = _professional_user_id(professional)
+
+    if not user_id:
+        return {
+            "work": True,
+            "pro": False,
+            "verified": False,
+            "reputation_score": 0,
+        }
+
+    return {
+        "work": True,
+        "pro": has_pro_access(user_id),
+        "verified": has_approved_verification(user_id),
+        "reputation_score": get_user_reputation_score(user_id),
+    }
+
+
+def _get_professionals_badges(professionals):
+    return {
+        _entity_value(professional, "id", index): _get_professional_badges(professional)
+        for index, professional in enumerate(professionals, start=1)
+    }
 
 
 @main.route("/")
@@ -33,7 +77,8 @@ def buscar():
         "resultados.html",
         resultados=resultados,
         servicio=servicio,
-        zona=zona
+        zona=zona,
+        professional_badges=_get_professionals_badges(resultados)
     )
 
 
@@ -48,7 +93,8 @@ def listado_profesionales():
         "listado_profesionales.html",
         resultados=resultados,
         servicio=servicio,
-        zona=zona
+        zona=zona,
+        professional_badges=_get_professionals_badges(resultados)
     )
 
 
@@ -84,7 +130,8 @@ def perfil_profesional(id):
 
     return render_template(
         "perfil_profesional.html",
-        profesional=profesional
+        profesional=profesional,
+        profile_badges=_get_professional_badges(profesional)
     )
 
 

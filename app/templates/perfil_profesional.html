@@ -8,6 +8,7 @@
 {% set zona = pro["zona"]|default("Palermo", true) %}
 {% set telefono = pro["telefono"]|default("1122334455", true) %}
 {% set descripcion = pro["descripcion"]|default("Equipo tecnico para instalaciones electricas, tableros, mantenimiento y urgencias con garantia.", true) %}
+{% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
 
 <main class="profile-screen">
     <section class="profile-hero">
@@ -21,11 +22,15 @@
             </div>
 
             <aside class="profile-summary">
-                <span class="trust-badge cyan">Top 1% provider</span>
+                <div class="badge-row profile-badge-row">
+                    <span class="trust-badge work">WORK</span>
+                    {% if badges.pro %}<span class="trust-badge pro">PRO</span>{% endif %}
+                    {% if badges.verified %}<span class="trust-badge verified">VERIFICADO</span>{% endif %}
+                </div>
                 <h1>{{ nombre }}</h1>
                 <p>{{ descripcion }}</p>
                 <div class="social-proof">
-                    <span><strong>4.9</strong> rating</span>
+                    <span><strong>{{ badges.reputation_score }}</strong> reputacion</span>
                     <span><strong>420+</strong> trabajos</span>
                     <span><strong>12 min</strong> respuesta</span>
                 </div>
