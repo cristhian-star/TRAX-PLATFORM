@@ -41,11 +41,7 @@ def _entity_value(entity, key, default=None):
 
 
 def _professional_user_id(professional):
-    return _entity_value(
-        professional,
-        "user_id",
-        _entity_value(professional, "id")
-    )
+    return _entity_value(professional, "user_id")
 
 
 def _get_professional_badges(professional):
@@ -244,9 +240,17 @@ def reportar_usuario(id):
         return "Usuario no encontrado", 404
 
     if request.method == "POST":
+        professional_user_id = _professional_user_id(profesional)
+
+        if not professional_user_id:
+            return "Perfil profesional sin propietario asociado", 409
+
+        if professional_user_id == session["user_id"]:
+            return "No podes reportarte a vos mismo", 400
+
         create_abuse_report(
             reporter_id=session["user_id"],
-            reported_user_id=_professional_user_id(profesional),
+            reported_user_id=professional_user_id,
             motivo=request.form.get("motivo"),
             descripcion=request.form.get("descripcion")
         )
@@ -268,6 +272,14 @@ def crear_review(id):
         return "Profesional no encontrado", 404
 
     if request.method == "POST":
+        professional_user_id = _professional_user_id(profesional)
+
+        if not professional_user_id:
+            return "Perfil profesional sin propietario asociado", 409
+
+        if professional_user_id == session["user_id"]:
+            return "No podes reseñar tu propio perfil", 400
+
         rating = int(request.form.get("rating", 0))
         comentario = request.form.get("comentario")
 
@@ -277,8 +289,6 @@ def crear_review(id):
             rating=rating,
             comentario=comentario
         )
-
-        professional_user_id = _professional_user_id(profesional)
 
         if rating >= 4:
             add_reputation_event(
