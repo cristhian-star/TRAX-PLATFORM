@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -8,7 +9,10 @@ def create_app():
     app = Flask(__name__)
 
     # Config
-    app.config["SECRET_KEY"] = "trax_secret_key"
+    app.config["SECRET_KEY"] = os.environ.get(
+        "SECRET_KEY",
+        "dev-only-insecure-secret-key"
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trax.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
