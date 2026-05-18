@@ -34,7 +34,10 @@
                     <strong>{{ session.get("user_name") }}</strong>
                     <span>{{ session.get("user_role") }}</span>
                 </div>
-                <a href="/logout" class="ghost-link">Salir</a>
+                <form action="/logout" method="POST" class="logout-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="ghost-link">Salir</button>
+                </form>
             {% else %}
                 <a href="/login" class="ghost-link">Ingresar</a>
                 <a href="/register" class="nav-cta">Registrarse</a>

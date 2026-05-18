@@ -107,6 +107,17 @@ textarea {
     font-weight: 850;
 }
 
+.logout-form {
+    margin: 0;
+}
+
+button.ghost-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
 .session-pill {
     display: grid;
     gap: 2px;
@@ -2130,7 +2141,8 @@ textarea {
         justify-content: stretch;
     }
 
-    body.menu-open .header-actions a {
+    body.menu-open .header-actions a,
+    body.menu-open .header-actions button {
         text-align: center;
     }
 
