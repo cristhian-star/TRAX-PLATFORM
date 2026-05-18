@@ -17,6 +17,7 @@ from app.services.professional_service import (
 from app.utils.decorators import login_required, role_required
 from app import limiter
 from app.models.user import User
+from app.models.review import Review
 from app.services.subscription_service import has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
     create_verification_request,
@@ -281,7 +282,22 @@ def crear_review(id):
         if professional_user_id == session["user_id"]:
             return "No podes reseñar tu propio perfil", 400
 
-        rating = int(request.form.get("rating", 0))
+        try:
+            rating = int(request.form.get("rating", 0))
+        except (TypeError, ValueError):
+            return "Rating invalido", 400
+
+        if rating not in (1, 2, 3, 4, 5):
+            return "Rating invalido", 400
+
+        existing_review = Review.query.filter_by(
+            cliente_id=session["user_id"],
+            professional_id=id
+        ).first()
+
+        if existing_review is not None:
+            return "Ya dejaste una reseña para este profesional", 400
+
         comentario = request.form.get("comentario")
 
         create_review(
