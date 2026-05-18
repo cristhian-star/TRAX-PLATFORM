@@ -2,8 +2,14 @@ from app import db
 from app.models.professional import Professional
 
 
-def create_professional(nombre, servicio, zona, telefono, descripcion):
+def create_professional(user_id, nombre, servicio, zona, telefono, descripcion):
+    existing_professional = Professional.query.filter_by(user_id=user_id).first()
+
+    if existing_professional:
+        return None
+
     professional = Professional(
+        user_id=user_id,
         nombre=nombre,
         servicio=servicio,
         zona=zona,
