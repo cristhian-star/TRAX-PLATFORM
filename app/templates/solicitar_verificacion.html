@@ -12,6 +12,7 @@
         {% endif %}
 
         <form action="/profesional/verificacion/solicitar" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <select name="tipo_usuario" required>
                 <option value="">Tipo de usuario</option>
                 <option value="PROFESIONAL">Profesional</option>

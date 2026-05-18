@@ -5,6 +5,7 @@
 <section class="form-section">
     <div class="section-container">
         <form action="/login" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <h2>Ingresar</h2>
 
             <input type="email" name="email" placeholder="Email" required>

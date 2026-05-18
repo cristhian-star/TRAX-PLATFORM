@@ -12,6 +12,7 @@
         {% endif %}
 
         <form action="/propuestas/nueva" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="categoria" placeholder="Categoria o rubro" required>
 
             <textarea name="descripcion" placeholder="Describe el proyecto o necesidad" required></textarea>

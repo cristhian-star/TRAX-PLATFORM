@@ -46,6 +46,7 @@
         </div>
 
         <form action="/profesional/pro/upgrade" method="POST" class="form-card upgrade-action-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if is_pro %}
                 <p class="form-helper">Tu cuenta ya tiene acceso TRAX PRO.</p>
             {% elif is_eligible %}

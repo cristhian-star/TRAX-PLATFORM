@@ -12,6 +12,7 @@
         {% endif %}
 
         <form action="/contratacion/nueva" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="number" name="professional_id" placeholder="ID del profesional" required>
 
             <input type="text" name="servicio" placeholder="Servicio requerido" required>

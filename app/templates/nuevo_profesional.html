@@ -7,6 +7,7 @@
         <h2>Registrar profesional</h2>
 
         <form action="/profesionales/crear" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <input type="text" name="nombre" placeholder="Nombre o empresa" required>
 

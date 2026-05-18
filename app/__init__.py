@@ -2,10 +2,12 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
 
 load_dotenv()
 
 db = SQLAlchemy()
+csrf = CSRFProtect()
 
 
 def create_app():
@@ -21,6 +23,7 @@ def create_app():
 
     # Inicializar DB
     db.init_app(app)
+    csrf.init_app(app)
 
     # Blueprints
     from app.routes.main_routes import main

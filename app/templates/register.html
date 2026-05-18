@@ -5,6 +5,7 @@
 <section class="form-section">
     <div class="section-container">
         <form action="/register" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <h2>Crear cuenta</h2>
 
             {% if error %}

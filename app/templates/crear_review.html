@@ -10,6 +10,7 @@
         <p class="form-helper">Tu opinion ayuda a otros clientes a contratar con mas confianza.</p>
 
         <form action="/profesional/{{ professional_id }}/review" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" value="{{ nombre }}" disabled>
 
             <select name="rating" required>

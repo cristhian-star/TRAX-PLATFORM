@@ -43,9 +43,11 @@
                     <td>{{ reporte.estado }}</td>
                     <td class="moderation-actions">
                         <form action="/admin/reportes/{{ reporte.id }}/resolver" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit">Resolver</button>
                         </form>
                         <form action="/admin/reportes/{{ reporte.id }}/descartar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit">Descartar</button>
                         </form>
                     </td>
@@ -91,12 +93,15 @@
                     <td>{{ verificacion.estado }}</td>
                     <td class="moderation-actions">
                         <form action="/admin/verificaciones/{{ verificacion.id }}/aprobar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit">Aprobar</button>
                         </form>
                         <form action="/admin/verificaciones/{{ verificacion.id }}/observar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit">Observar</button>
                         </form>
                         <form action="/admin/verificaciones/{{ verificacion.id }}/rechazar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit">Rechazar</button>
                         </form>
                     </td>

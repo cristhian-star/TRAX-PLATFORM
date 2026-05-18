@@ -12,6 +12,7 @@
         {% endif %}
 
         <form action="/presupuestos/nuevo" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="categoria" placeholder="Categoria o rubro" required>
 
             <input type="text" name="zona" placeholder="Zona o localidad" required>
