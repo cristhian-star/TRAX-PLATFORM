@@ -6,6 +6,7 @@ from app.services.budget_service import create_budget_request
 from app.services.contract_service import create_contract
 from app.services.emergency_service import create_emergency_request
 from app.services.proposal_service import create_proposal_request
+from app.services.professional_service import get_professional_by_id
 from app.utils.decorators import login_required, pro_required, verified_required
 
 operations = Blueprint("operations", __name__)
@@ -32,9 +33,27 @@ def _parse_datetime(value):
 @login_required
 def nueva_contratacion():
     if request.method == "POST":
+        professional_id_raw = request.form.get("professional_id")
+
+        try:
+            professional_id = int(professional_id_raw)
+        except (TypeError, ValueError):
+            return "ID de profesional invalido", 400
+
+        professional = get_professional_by_id(professional_id)
+
+        if professional is None:
+            return "Profesional no encontrado", 404
+
+        if professional.user_id is None:
+            return "Perfil profesional sin propietario asociado", 409
+
+        if professional.user_id == session["user_id"]:
+            return "No podes contratar tu propio perfil", 400
+
         contract = create_contract(
             cliente_id=session["user_id"],
-            professional_id=request.form.get("professional_id"),
+            professional_id=professional.id,
             servicio=request.form.get("servicio"),
             descripcion=_empty_to_none(request.form.get("descripcion")),
             precio_acordado=_empty_to_none(request.form.get("precio_acordado")),
