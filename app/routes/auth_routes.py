@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, session
 from app.services.auth_service import register_user, authenticate_user
+from app import limiter
 
 auth = Blueprint("auth", __name__)
 
 
 @auth.route("/register", methods=["GET", "POST"])
+@limiter.limit("3 per hour", methods=["POST"])
 def register():
     if request.method == "POST":
         nombre = request.form.get("nombre")
@@ -26,6 +28,7 @@ def register():
 
 
 @auth.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute; 20 per hour", methods=["POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email")

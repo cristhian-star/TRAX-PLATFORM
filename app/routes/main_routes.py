@@ -15,6 +15,7 @@ from app.services.professional_service import (
     get_professional_by_id
 )
 from app.utils.decorators import login_required, role_required
+from app import limiter
 from app.models.user import User
 from app.services.subscription_service import has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
@@ -362,6 +363,7 @@ def guardar_profesional():
 
 
 @main.route("/rubros/solicitar", methods=["POST"])
+@limiter.limit("5 per hour")
 def guardar_solicitud_rubro():
     nombre_rubro = request.form.get("nombre_rubro")
     descripcion = request.form.get("descripcion_rubro")
