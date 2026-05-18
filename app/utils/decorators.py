@@ -18,10 +18,22 @@ def role_required(*roles):
     def decorator(view_func):
         @wraps(view_func)
         def wrapped_view(*args, **kwargs):
-            if not session.get("user_id"):
+            user_id = session.get("user_id")
+
+            if not user_id:
                 return redirect("/login")
 
-            if session.get("user_role") not in roles:
+            from app.models.user import User
+
+            user = User.query.get(user_id)
+
+            if user is None:
+                session.clear()
+                return redirect("/login")
+
+            session["user_role"] = user.rol
+
+            if user.rol not in roles:
                 abort(403)
 
             return view_func(*args, **kwargs)
