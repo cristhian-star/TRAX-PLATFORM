@@ -5,8 +5,11 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
+    - .:/app
+    - trax_instance:/app/instance
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
+volumes:
+  trax_instance:
