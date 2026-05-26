@@ -1255,6 +1255,49 @@ button.ghost-link {
     font-weight: 850;
 }
 
+.onboarding-form label {
+    display: grid;
+    gap: 8px;
+    color: var(--navy);
+    font-weight: 850;
+}
+
+.evidence-panel {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--soft);
+}
+
+.evidence-panel p {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 750;
+}
+
+.evidence-item {
+    display: grid;
+    gap: 8px;
+}
+
+.checkbox-row {
+    display: flex !important;
+    grid-template-columns: none !important;
+    align-items: center;
+    gap: 10px !important;
+}
+
+.checkbox-row input {
+    width: 18px;
+    height: 18px;
+}
+
+.evidence-detail[hidden] {
+    display: none;
+}
+
 .nuevo-rubro-box {
     display: none;
     flex-direction: column;

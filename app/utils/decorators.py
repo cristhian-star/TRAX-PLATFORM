@@ -77,3 +77,23 @@ def verified_required(view_func):
         return view_func(*args, **kwargs)
 
     return wrapped_view
+
+
+def profile_complete_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        user_id = session.get("user_id")
+
+        if not user_id:
+            return redirect("/login")
+
+        from app.models.professional import Professional
+
+        professional = Professional.query.filter_by(user_id=user_id).first()
+
+        if professional is None or not professional.perfil_completo:
+            return redirect("/profesional/perfil/completar")
+
+        return view_func(*args, **kwargs)
+
+    return wrapped_view

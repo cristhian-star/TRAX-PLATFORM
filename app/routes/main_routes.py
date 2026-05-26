@@ -11,15 +11,18 @@ from app.services.category_service import (
 )
 from app.services.professional_service import (
     create_professional,
+    complete_professional_profile,
+    get_professional_by_user_id,
     search_professionals,
     get_professional_by_id
 )
-from app.utils.decorators import login_required, role_required
+from app.utils.decorators import login_required, profile_complete_required, role_required
 from app import limiter
 from app.models.user import User
 from app.models.review import Review
 from app.services.subscription_service import has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
+    create_or_update_professional_verification_request,
     create_verification_request,
     get_pending_verifications,
     has_approved_verification,
@@ -33,6 +36,48 @@ from app.services.review_service import (
 )
 
 main = Blueprint("main", __name__)
+
+
+EVIDENCE_OPTIONS = (
+    ("fotos_trabajando", "Fotos del profesional ejecutando su profesion", "Link a fotos del profesional trabajando"),
+    ("videos_trabajando", "Videos del profesional ejecutando su profesion", "Link a video o carpeta de Drive"),
+    ("fotos_certificados", "Fotos de certificados", "Link a carpeta o archivo de certificados"),
+    ("matricula_profesional", "Matricula profesional si posee", "Numero, link o referencia de matricula"),
+    ("titulo_tecnico", "Titulo tecnico", "Link o referencia de titulo tecnico"),
+    ("titulo_universitario", "Titulo universitario o de grado", "Link o referencia de titulo universitario"),
+    ("material_adicional", "Material probatorio adicional", "Link externo, Drive o referencia adicional"),
+)
+
+
+def _empty_to_none(value):
+    if value is None:
+        return None
+
+    value = value.strip()
+    return value or None
+
+
+def _parse_optional_int(value):
+    value = _empty_to_none(value)
+
+    if value is None:
+        return None
+
+    return int(value)
+
+
+def _build_evidence_text(form):
+    selected_options = set(form.getlist("evidencia_opciones"))
+    evidence_lines = []
+
+    for key, label, _placeholder in EVIDENCE_OPTIONS:
+        if key not in selected_options:
+            continue
+
+        detail = _empty_to_none(form.get(f"evidencia_{key}")) or "Sin detalle informado"
+        evidence_lines.append(f"{label}: {detail}")
+
+    return "\n".join(evidence_lines) or None
 
 
 def _entity_value(entity, key, default=None):
@@ -161,6 +206,7 @@ def mercados():
 @main.route("/profesional/pro/upgrade", methods=["GET", "POST"])
 @login_required
 @role_required("PROFESIONAL")
+@profile_complete_required
 def upgrade_pro():
     user_id = session["user_id"]
     reputation_score = get_user_reputation_score(user_id)
@@ -183,6 +229,59 @@ def upgrade_pro():
         is_pro=is_pro,
         is_eligible=is_eligible,
         error=error
+    )
+
+@main.route("/profesional/perfil/completar", methods=["GET", "POST"])
+@login_required
+@role_required("PROFESIONAL")
+def completar_perfil_profesional():
+    user_id = session["user_id"]
+    professional = get_professional_by_user_id(user_id)
+
+    if request.method == "POST":
+        especialidad = _empty_to_none(request.form.get("especialidad"))
+
+        if not especialidad:
+            return "Especialidad requerida", 400
+
+        try:
+            anios_experiencia = _parse_optional_int(request.form.get("anios_experiencia"))
+        except ValueError:
+            return "Anios de experiencia invalidos", 400
+
+        evidence_text = _build_evidence_text(request.form)
+        certificaciones_text = _empty_to_none(request.form.get("certificaciones_text"))
+        portfolio_urls = _empty_to_none(request.form.get("portfolio_urls"))
+
+        professional = complete_professional_profile(
+            user_id=user_id,
+            nombre=session.get("user_name", "Profesional TRAX"),
+            especialidad=especialidad,
+            anios_experiencia=anios_experiencia,
+            tipo_credencial=_empty_to_none(request.form.get("tipo_credencial")),
+            numero_credencial=_empty_to_none(request.form.get("numero_credencial")),
+            certificaciones_text=certificaciones_text,
+            portfolio_urls=portfolio_urls,
+        )
+
+        create_or_update_professional_verification_request(
+            user_id=user_id,
+            certificado_oficio=certificaciones_text,
+            titulo_profesional=_empty_to_none(request.form.get("tipo_credencial")),
+            material_probatorio=evidence_text or portfolio_urls,
+            observaciones=(
+                f"Especialidad: {professional.especialidad}\n"
+                f"Anios de experiencia: {professional.anios_experiencia or 0}\n"
+                f"Portfolio: {professional.portfolio_urls or 'No informado'}"
+            )
+        )
+
+        return redirect("/profesional/dashboard?profile_completed=1")
+
+    return render_template(
+        "completar_perfil_profesional.html",
+        professional=professional,
+        evidence_options=EVIDENCE_OPTIONS
     )
 
 @main.route("/profesional/verificacion/solicitar", methods=["GET", "POST"])
@@ -210,9 +309,14 @@ def solicitar_verificacion():
 @main.route("/profesional/dashboard")
 @role_required("PROFESIONAL")
 def profesional_dashboard():
+    professional = get_professional_by_user_id(session.get("user_id"))
+
     return render_template(
         "profesional_dashboard.html",
         verification_requested=request.args.get("verification_requested") == "1",
+        profile_completed=request.args.get("profile_completed") == "1",
+        professional=professional,
+        is_profile_complete=bool(professional and professional.perfil_completo),
         is_verified=has_approved_verification(session.get("user_id")),
         is_pro=has_pro_access(session.get("user_id")),
         pro_upgraded=request.args.get("pro_upgraded") == "1"

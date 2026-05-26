@@ -12,14 +12,15 @@
             </div>
             <aside class="dashboard-status-card">
                 <span>Perfil</span>
-                <strong>En preparacion</strong>
-                <small>Modulo reservado para completar datos, servicios y zonas.</small>
+                <strong>{% if is_profile_complete %}Pendiente de revision{% else %}Incompleto{% endif %}</strong>
+                <small>{% if is_profile_complete %}Tu perfil profesional ya fue enviado para revision.{% else %}Completa tu identidad profesional para operar plenamente.{% endif %}</small>
             </aside>
         </div>
     </section>
 
     <section class="shell dashboard-content">
         {% if verification_requested %}<p class="dashboard-alert">Solicitud de verificacion enviada. El equipo TRAX la revisara.</p>{% endif %}
+        {% if profile_completed %}<p class="dashboard-alert">Perfil profesional enviado a revision.</p>{% endif %}
         {% if pro_upgraded %}<p class="dashboard-alert">TRAX PRO activado correctamente.</p>{% endif %}
         <div class="dashboard-metrics">
             <article>
@@ -55,9 +56,10 @@
                 <a class="dashboard-link" href="/profesional/verificacion/solicitar">Solicitar verificacion</a>
             </article>
             <article>
-                <span class="kicker">Proximamente</span>
-                <h2>Mi perfil TRAX</h2>
-                <p>Editor para descripcion, telefono, portfolio, rubros y zonas de cobertura.</p>
+                <span class="kicker">Onboarding</span>
+                <h2>{% if is_profile_complete %}Perfil profesional enviado{% else %}Completar perfil profesional{% endif %}</h2>
+                <p>{% if is_profile_complete %}Estado: {{ professional.estado_perfil if professional else "PENDIENTE_VERIFICACION" }}.{% else %}Carga especialidad, credenciales y evidencias minimas de tu oficio.{% endif %}</p>
+                <a class="dashboard-link" href="/profesional/perfil/completar">Completar perfil</a>
             </article>
             <article>
                 <span class="kicker">Proximamente</span>

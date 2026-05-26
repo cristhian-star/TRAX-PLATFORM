@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="form-section professional-onboarding">
+    <div class="section-container">
+        <h2>Completar perfil profesional</h2>
+        <p class="form-helper">Antes de operar plenamente en TRAX necesitamos datos basicos de tu oficio y evidencia minima para revisar tu perfil.</p>
+
+        <form action="/profesional/perfil/completar" method="POST" class="form-card onboarding-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <label>
+                Especialidad u oficio
+                <input type="text" name="especialidad" placeholder="Ej: Electricista matriculado" value="{{ professional.especialidad if professional and professional.especialidad else '' }}" required>
+            </label>
+
+            <label>
+                Anios de experiencia
+                <input type="number" name="anios_experiencia" min="0" max="80" placeholder="Ej: 8" value="{{ professional.anios_experiencia if professional and professional.anios_experiencia is not none else '' }}">
+            </label>
+
+            <label>
+                Tipo de credencial
+                {% set current_credential = professional.tipo_credencial if professional else '' %}
+                <select name="tipo_credencial">
+                    <option value="">Sin credencial formal</option>
+                    <option value="MATRICULA" {% if current_credential == "MATRICULA" %}selected{% endif %}>Matricula profesional</option>
+                    <option value="CERTIFICADO_OFICIO" {% if current_credential == "CERTIFICADO_OFICIO" %}selected{% endif %}>Certificado de oficio</option>
+                    <option value="TITULO_TECNICO" {% if current_credential == "TITULO_TECNICO" %}selected{% endif %}>Titulo tecnico</option>
+                    <option value="TITULO_UNIVERSITARIO" {% if current_credential == "TITULO_UNIVERSITARIO" %}selected{% endif %}>Titulo universitario</option>
+                    <option value="OTRO" {% if current_credential == "OTRO" %}selected{% endif %}>Otro</option>
+                </select>
+            </label>
+
+            <label>
+                Numero de credencial si aplica
+                <input type="text" name="numero_credencial" placeholder="Numero, codigo o referencia" value="{{ professional.numero_credencial if professional and professional.numero_credencial else '' }}">
+            </label>
+
+            <label>
+                Certificaciones o formacion
+                <textarea name="certificaciones_text" placeholder="Cursos, certificados, instituciones o formacion relevante">{{ professional.certificaciones_text if professional and professional.certificaciones_text else '' }}</textarea>
+            </label>
+
+            <label>
+                Portfolio / trabajos realizados
+                <textarea name="portfolio_urls" placeholder="Links a Drive, redes, web, fotos o trabajos realizados">{{ professional.portfolio_urls if professional and professional.portfolio_urls else '' }}</textarea>
+            </label>
+
+            <div class="evidence-panel">
+                <strong>Validacion profesional</strong>
+                <p>Marca las evidencias que podes aportar. No subas archivos aca: pega links o referencias.</p>
+
+                {% for key, label, placeholder in evidence_options %}
+                    <div class="evidence-item">
+                        <label class="checkbox-row">
+                            <input type="checkbox" name="evidencia_opciones" value="{{ key }}" data-evidence-toggle="{{ key }}">
+                            <span>{{ label }}</span>
+                        </label>
+                        <div class="evidence-detail" data-evidence-detail="{{ key }}">
+                            <input type="text" name="evidencia_{{ key }}" placeholder="{{ placeholder }}">
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Enviar perfil a revision</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

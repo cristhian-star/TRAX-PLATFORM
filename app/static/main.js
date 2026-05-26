@@ -26,6 +26,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const evidenceToggles = document.querySelectorAll("[data-evidence-toggle]");
+
+    evidenceToggles.forEach((toggle) => {
+        const target = document.querySelector(`[data-evidence-detail="${toggle.dataset.evidenceToggle}"]`);
+
+        if (!target) {
+            return;
+        }
+
+        const syncEvidenceDetail = () => {
+            target.hidden = !toggle.checked;
+        };
+
+        syncEvidenceDetail();
+        toggle.addEventListener("change", syncEvidenceDetail);
+    });
+
     const smartFilters = document.querySelector(".smart-filters");
 
     if (smartFilters) {
