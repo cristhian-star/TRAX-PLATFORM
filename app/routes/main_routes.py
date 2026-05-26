@@ -39,6 +39,7 @@ from app.services.user_service import (
     update_user_role,
 )
 from app.services.review_service import (
+    can_user_review_professional,
     create_review,
     get_professional_average_rating,
     get_professional_reviews
@@ -424,6 +425,9 @@ def crear_review(id):
     if profesional is None:
         return "Profesional no encontrado", 404
 
+    if not can_user_review_professional(session["user_id"], id):
+        return "Solo podes dejar una resena con una contratacion confirmada o cerrada", 403
+
     if request.method == "POST":
         professional_user_id = _professional_user_id(profesional)
 
@@ -488,13 +492,25 @@ def perfil_profesional(id):
     if profesional is None:
         return "Profesional no encontrado", 404
 
+    reviews = get_professional_reviews(id)
+    can_review = False
+    if session.get("user_id"):
+        can_review = (
+            can_user_review_professional(session["user_id"], id)
+            and Review.query.filter_by(
+                cliente_id=session["user_id"],
+                professional_id=id
+            ).first() is None
+        )
+
     return render_template(
         "perfil_profesional.html",
         profesional=profesional,
         profile_badges=_get_professional_badges(profesional),
-        reviews=get_professional_reviews(id),
+        reviews=reviews,
         average_rating=get_professional_average_rating(id),
-        review_count=len(get_professional_reviews(id)),
+        review_count=len(reviews),
+        can_review=can_review,
         report_created=request.args.get("reported") == "1"
     )
 

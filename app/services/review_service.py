@@ -1,5 +1,28 @@
 from app import db
+from app.models.contract_request import ContractRequest
+from app.models.professional import Professional
 from app.models.review import Review
+
+
+def can_user_review_professional(cliente_id, professional_id):
+    professional = Professional.query.get(professional_id)
+
+    if professional is None or professional.user_id is None:
+        return False
+
+    if cliente_id == professional.user_id:
+        return False
+
+    return (
+        ContractRequest.query
+        .filter(
+            ContractRequest.cliente_id == cliente_id,
+            ContractRequest.professional_id == professional.id,
+            ContractRequest.estado.in_(("CONFIRMADA", "CERRADA")),
+        )
+        .first()
+        is not None
+    )
 
 
 def create_review(cliente_id, professional_id, rating, comentario=None):

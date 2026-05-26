@@ -116,7 +116,9 @@
                 <div class="section-title">
                     <span class="kicker">Resenas</span>
                     <h2>Experiencias de clientes</h2>
+                    {% if can_review %}
                     <a class="btn secondary" href="/profesional/{{ pro.id }}/review">Dejar resena</a>
+                    {% endif %}
                 </div>
 
                 {% if reviews %}
