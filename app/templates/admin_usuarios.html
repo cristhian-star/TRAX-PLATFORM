@@ -19,9 +19,9 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
+                <th>Usuario</th>
                 <th>Rol</th>
+                <th>Estado</th>
                 <th>Reputacion</th>
                 <th>PRO</th>
                 <th>Verificado</th>
@@ -32,9 +32,15 @@
             {% for usuario in usuarios %}
             <tr>
                 <td>{{ usuario.id }}</td>
-                <td>{{ usuario.nombre }}</td>
-                <td>{{ usuario.email }}</td>
+                <td>
+                    <strong>{{ usuario.nombre }}</strong>
+                    <small class="admin-user-email">{{ usuario.email }}</small>
+                </td>
                 <td><span class="user-role-pill">{{ usuario.rol }}</span></td>
+                <td>
+                    <span class="user-status-pill {{ 'is-active' if usuario.is_active else 'is-blocked' }}">{{ usuario.estado }}</span>
+                    {% if usuario.motivo_estado %}<small class="admin-status-reason">{{ usuario.motivo_estado }}</small>{% endif %}
+                </td>
                 <td>{{ usuario.reputation_score }}</td>
                 <td>
                     <span class="user-status-pill {{ 'is-active' if usuario.is_pro else 'is-muted' }}">
@@ -47,11 +53,56 @@
                     </span>
                 </td>
                 <td>
-                    <div class="admin-placeholder-actions">
-                        <button type="button">Ver detalle</button>
-                        <button type="button">Cambiar rol</button>
-                        <button type="button">Suspender</button>
-                        <button type="button">Ver actividad</button>
+                    <div class="admin-user-actions">
+                        <div class="admin-action-group">
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/cliente" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Cliente</button>
+                            </form>
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/profesional" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Profesional</button>
+                            </form>
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/super-admin" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Super Admin</button>
+                            </form>
+                        </div>
+                        <div class="admin-status-actions">
+                            {% if usuario.is_active %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/suspender" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input class="admin-reason-input" type="text" name="motivo" placeholder="Motivo de suspension">
+                                <button type="submit" class="danger">Suspender</button>
+                            </form>
+                            {% endif %}
+                            {% if usuario.estado != "BANEADO" %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/banear" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input class="admin-reason-input" type="text" name="motivo" placeholder="Motivo de baneo">
+                                <button type="submit" class="danger">Banear</button>
+                            </form>
+                            {% endif %}
+                            {% if not usuario.is_active %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/reactivar" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Reactivar</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <div class="admin-action-group">
+                            {% if usuario.is_pro %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/quitar-pro" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Quitar PRO</button>
+                            </form>
+                            {% else %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/activar-pro" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Activar PRO</button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </td>
             </tr>

@@ -20,7 +20,7 @@ from app.utils.decorators import login_required, profile_complete_required, role
 from app import limiter
 from app.models.user import User
 from app.models.review import Review
-from app.services.subscription_service import has_pro_access, upgrade_to_pro
+from app.services.subscription_service import cancel_subscription, has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
     create_or_update_professional_verification_request,
     create_verification_request,
@@ -29,6 +29,14 @@ from app.services.verification_service import (
     update_verification_status
 )
 from app.services.reputation_service import add_reputation_event, get_user_reputation_score
+from app.services.user_service import (
+    ban_user,
+    get_all_users,
+    is_user_active,
+    reactivate_user,
+    suspend_user,
+    update_user_role,
+)
 from app.services.review_service import (
     create_review,
     get_professional_average_rating,
@@ -138,7 +146,7 @@ def _get_professionals_badges(professionals):
 
 
 def _get_admin_user_rows():
-    users = User.query.order_by(User.id.asc()).all()
+    users = get_all_users()
 
     return [
         {
@@ -146,12 +154,33 @@ def _get_admin_user_rows():
             "nombre": user.nombre,
             "email": user.email,
             "rol": user.rol,
+            "estado": user.estado,
+            "motivo_estado": user.motivo_estado,
+            "is_active": is_user_active(user),
             "reputation_score": get_user_reputation_score(user.id),
             "is_pro": has_pro_access(user.id),
             "is_verified": has_approved_verification(user.id),
         }
         for user in users
     ]
+
+
+def _update_admin_user_role(user_id, new_role):
+    target_user = User.query.get(user_id)
+
+    if target_user is None:
+        return "Usuario no encontrado", 404
+
+    if (
+        target_user.id == session.get("user_id")
+        and target_user.rol == "SUPER_ADMIN"
+        and new_role != "SUPER_ADMIN"
+        and User.query.filter_by(rol="SUPER_ADMIN", estado="ACTIVO").count() <= 1
+    ):
+        return "No podes degradar al unico SUPER_ADMIN activo", 400
+
+    update_user_role(user_id, new_role)
+    return redirect("/admin/usuarios")
 
 
 @main.route("/")
@@ -511,6 +540,77 @@ def admin_usuarios():
         "admin_usuarios.html",
         usuarios=_get_admin_user_rows()
     )
+
+@main.route("/admin/usuarios/<int:id>/rol/cliente", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_rol_cliente(id):
+    return _update_admin_user_role(id, "CLIENTE")
+
+
+@main.route("/admin/usuarios/<int:id>/rol/profesional", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_rol_profesional(id):
+    return _update_admin_user_role(id, "PROFESIONAL")
+
+
+@main.route("/admin/usuarios/<int:id>/rol/super-admin", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_rol_super_admin(id):
+    return _update_admin_user_role(id, "SUPER_ADMIN")
+
+
+@main.route("/admin/usuarios/<int:id>/suspender", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_suspender(id):
+    if id == session.get("user_id"):
+        return "No podes suspender tu propia cuenta", 400
+
+    if suspend_user(id, request.form.get("motivo", "")) is None:
+        return "Usuario no encontrado", 404
+
+    return redirect("/admin/usuarios")
+
+
+@main.route("/admin/usuarios/<int:id>/reactivar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_reactivar(id):
+    if reactivate_user(id) is None:
+        return "Usuario no encontrado", 404
+
+    return redirect("/admin/usuarios")
+
+
+@main.route("/admin/usuarios/<int:id>/banear", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_banear(id):
+    if id == session.get("user_id"):
+        return "No podes banear tu propia cuenta", 400
+
+    if ban_user(id, request.form.get("motivo", "")) is None:
+        return "Usuario no encontrado", 404
+
+    return redirect("/admin/usuarios")
+
+
+@main.route("/admin/usuarios/<int:id>/activar-pro", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_activar_pro(id):
+    if User.query.get(id) is None:
+        return "Usuario no encontrado", 404
+
+    upgrade_to_pro(id)
+    return redirect("/admin/usuarios")
+
+
+@main.route("/admin/usuarios/<int:id>/quitar-pro", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_usuario_quitar_pro(id):
+    if User.query.get(id) is None:
+        return "Usuario no encontrado", 404
+
+    cancel_subscription(id)
+    return redirect("/admin/usuarios")
+
 
 @main.route("/admin/moderacion")
 @role_required("SUPER_ADMIN")

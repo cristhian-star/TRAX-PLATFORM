@@ -6,7 +6,18 @@ from flask import abort, redirect, session
 def login_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
-        if not session.get("user_id"):
+        user_id = session.get("user_id")
+
+        if not user_id:
+            return redirect("/login")
+
+        from app.models.user import User
+        from app.services.user_service import is_user_active
+
+        user = User.query.get(user_id)
+
+        if not is_user_active(user):
+            session.clear()
             return redirect("/login")
 
         return view_func(*args, **kwargs)
@@ -24,10 +35,11 @@ def role_required(*roles):
                 return redirect("/login")
 
             from app.models.user import User
+            from app.services.user_service import is_user_active
 
             user = User.query.get(user_id)
 
-            if user is None:
+            if not is_user_active(user):
                 session.clear()
                 return redirect("/login")
 
