@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, session
+from app.services.audit_service import create_audit_log, get_recent_audit_logs
 from app.services.abuse_report_service import (
     create_abuse_report,
     get_open_reports,
@@ -165,6 +166,17 @@ def _get_admin_user_rows():
     ]
 
 
+def _audit_admin_action(action, target_user_id=None, description=""):
+    create_audit_log(
+        actor_user_id=session["user_id"],
+        action=action,
+        target_user_id=target_user_id,
+        description=description,
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+    )
+
+
 def _update_admin_user_role(user_id, new_role):
     target_user = User.query.get(user_id)
 
@@ -179,7 +191,13 @@ def _update_admin_user_role(user_id, new_role):
     ):
         return "No podes degradar al unico SUPER_ADMIN activo", 400
 
+    previous_role = target_user.rol
     update_user_role(user_id, new_role)
+    _audit_admin_action(
+        "USER_ROLE_CHANGED",
+        target_user_id=user_id,
+        description=f"Rol actualizado de {previous_role} a {new_role}.",
+    )
     return redirect("/admin/usuarios")
 
 
@@ -565,9 +583,11 @@ def admin_usuario_suspender(id):
     if id == session.get("user_id"):
         return "No podes suspender tu propia cuenta", 400
 
-    if suspend_user(id, request.form.get("motivo", "")) is None:
+    motivo = request.form.get("motivo", "")
+    if suspend_user(id, motivo) is None:
         return "Usuario no encontrado", 404
 
+    _audit_admin_action("USER_SUSPENDED", id, motivo or "Cuenta suspendida por administracion.")
     return redirect("/admin/usuarios")
 
 
@@ -577,6 +597,7 @@ def admin_usuario_reactivar(id):
     if reactivate_user(id) is None:
         return "Usuario no encontrado", 404
 
+    _audit_admin_action("USER_REACTIVATED", id, "Cuenta reactivada por administracion.")
     return redirect("/admin/usuarios")
 
 
@@ -586,9 +607,11 @@ def admin_usuario_banear(id):
     if id == session.get("user_id"):
         return "No podes banear tu propia cuenta", 400
 
-    if ban_user(id, request.form.get("motivo", "")) is None:
+    motivo = request.form.get("motivo", "")
+    if ban_user(id, motivo) is None:
         return "Usuario no encontrado", 404
 
+    _audit_admin_action("USER_BANNED", id, motivo or "Cuenta baneada por administracion.")
     return redirect("/admin/usuarios")
 
 
@@ -599,6 +622,7 @@ def admin_usuario_activar_pro(id):
         return "Usuario no encontrado", 404
 
     upgrade_to_pro(id)
+    _audit_admin_action("USER_PRO_ACTIVATED", id, "Acceso TRAX PRO activado.")
     return redirect("/admin/usuarios")
 
 
@@ -608,8 +632,16 @@ def admin_usuario_quitar_pro(id):
     if User.query.get(id) is None:
         return "Usuario no encontrado", 404
 
-    cancel_subscription(id)
+    subscription = cancel_subscription(id)
+    if subscription is not None:
+        _audit_admin_action("USER_PRO_REMOVED", id, "Acceso TRAX PRO removido.")
     return redirect("/admin/usuarios")
+
+
+@main.route("/admin/auditoria")
+@role_required("SUPER_ADMIN")
+def admin_auditoria():
+    return render_template("admin_auditoria.html", audit_logs=get_recent_audit_logs())
 
 
 @main.route("/admin/moderacion")
@@ -625,35 +657,45 @@ def admin_moderacion():
 @main.route("/admin/reportes/<int:id>/resolver", methods=["POST"])
 @role_required("SUPER_ADMIN")
 def admin_resolver_reporte(id):
-    update_report_status(id, "RESUELTO", reviewed_by=session.get("user_id"))
+    report = update_report_status(id, "RESUELTO", reviewed_by=session.get("user_id"))
+    if report is not None:
+        _audit_admin_action("REPORT_RESOLVED", report.reported_user_id, f"Reporte #{id} resuelto.")
     return redirect("/admin/moderacion")
 
 
 @main.route("/admin/reportes/<int:id>/descartar", methods=["POST"])
 @role_required("SUPER_ADMIN")
 def admin_descartar_reporte(id):
-    update_report_status(id, "DESCARTADO", reviewed_by=session.get("user_id"))
+    report = update_report_status(id, "DESCARTADO", reviewed_by=session.get("user_id"))
+    if report is not None:
+        _audit_admin_action("REPORT_DISCARDED", report.reported_user_id, f"Reporte #{id} descartado.")
     return redirect("/admin/moderacion")
 
 
 @main.route("/admin/verificaciones/<int:id>/aprobar", methods=["POST"])
 @role_required("SUPER_ADMIN")
 def admin_aprobar_verificacion(id):
-    update_verification_status(id, "APROBADO", reviewer_id=session.get("user_id"))
+    verification = update_verification_status(id, "APROBADO", reviewer_id=session.get("user_id"))
+    if verification is not None:
+        _audit_admin_action("VERIFICATION_APPROVED", verification.user_id, f"Verificacion #{id} aprobada.")
     return redirect("/admin/moderacion")
 
 
 @main.route("/admin/verificaciones/<int:id>/observar", methods=["POST"])
 @role_required("SUPER_ADMIN")
 def admin_observar_verificacion(id):
-    update_verification_status(id, "OBSERVADO", reviewer_id=session.get("user_id"))
+    verification = update_verification_status(id, "OBSERVADO", reviewer_id=session.get("user_id"))
+    if verification is not None:
+        _audit_admin_action("VERIFICATION_OBSERVED", verification.user_id, f"Verificacion #{id} observada.")
     return redirect("/admin/moderacion")
 
 
 @main.route("/admin/verificaciones/<int:id>/rechazar", methods=["POST"])
 @role_required("SUPER_ADMIN")
 def admin_rechazar_verificacion(id):
-    update_verification_status(id, "RECHAZADO", reviewer_id=session.get("user_id"))
+    verification = update_verification_status(id, "RECHAZADO", reviewer_id=session.get("user_id"))
+    if verification is not None:
+        _audit_admin_action("VERIFICATION_REJECTED", verification.user_id, f"Verificacion #{id} rechazada.")
     return redirect("/admin/moderacion")
 
 @main.route("/admin/rubros")

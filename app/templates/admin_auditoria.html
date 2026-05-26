@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container admin-management-screen">
+    <span class="kicker">Administracion</span>
+    <h2>Auditoria</h2>
+
+    <nav class="admin-nav" aria-label="Navegacion admin">
+        <a href="/admin/dashboard">Hub admin</a>
+        <a href="/admin/moderacion">Moderacion</a>
+        <a href="/admin/usuarios">Usuarios</a>
+        <a href="/admin/auditoria">Auditoria</a>
+        <a href="/admin/rubros">Rubros</a>
+        <a href="/">Volver al sitio</a>
+    </nav>
+
+    <table class="admin-table admin-audit-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Actor</th>
+                <th>Target</th>
+                <th>Accion</th>
+                <th>Descripcion</th>
+                <th>IP</th>
+                <th>User agent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in audit_logs %}
+            <tr>
+                <td>{{ log.created_at.strftime("%d/%m/%Y %H:%M") }}</td>
+                <td>#{{ log.actor_user_id }}</td>
+                <td>{% if log.target_user_id %}#{{ log.target_user_id }}{% else %}-{% endif %}</td>
+                <td><span class="user-role-pill">{{ log.action }}</span></td>
+                <td>{{ log.description or "-" }}</td>
+                <td>{{ log.ip_address or "-" }}</td>
+                <td class="audit-user-agent">{{ log.user_agent or "-" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">Todavia no hay acciones registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+{% endblock %}

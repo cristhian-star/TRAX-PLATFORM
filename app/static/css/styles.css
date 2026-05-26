@@ -2470,3 +2470,13 @@ button.ghost-link {
         grid-template-columns: 1fr;
     }
 }
+
+.admin-audit-table .user-role-pill {
+    white-space: nowrap;
+}
+
+.audit-user-agent {
+    max-width: 300px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}

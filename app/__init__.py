@@ -60,6 +60,7 @@ def create_app():
     from app.models.terms_acceptance import TermsAcceptance
     from app.models.subscription import Subscription
     from app.models.reputation_event import ReputationEvent
+    from app.models.audit_log import AuditLog
 
     with app.app_context():
         db.create_all()
