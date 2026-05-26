@@ -502,6 +502,9 @@ def perfil_profesional(id):
 @main.route("/profesionales/nuevo", methods=["GET"])
 @login_required
 def nuevo_profesional():
+    if get_professional_by_user_id(session["user_id"]):
+        return redirect("/profesional/perfil/completar")
+
     return render_template("nuevo_profesional.html")
 
 
@@ -524,7 +527,7 @@ def guardar_profesional():
     )
 
     if professional is None:
-        return "Ya tenes un perfil profesional", 400
+        return redirect("/profesional/perfil/completar")
 
     return "Profesional creado correctamente"
 

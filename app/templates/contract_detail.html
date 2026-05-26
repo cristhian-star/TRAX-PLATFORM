@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container contract-detail-screen">
+    <span class="kicker">Contratacion</span>
+    <h2>Solicitud #{{ contract.id }}</h2>
+
+    <div class="contract-summary">
+        <div>
+            <span>Estado</span>
+            <strong class="contract-state">{{ contract.estado }}</strong>
+        </div>
+        <div>
+            <span>Cliente</span>
+            <strong>{{ client_user.nombre if client_user else "Usuario" }} <small>#{{ contract.cliente_id }}</small></strong>
+        </div>
+        <div>
+            <span>Profesional</span>
+            <strong>{% if professional_user %}{{ professional_user.nombre }} <small>#{{ professional_user.id }}</small>{% elif contract.professional_user_id %}#{{ contract.professional_user_id }}{% else %}Sin asignar{% endif %}</strong>
+        </div>
+        <div>
+            <span>Servicio</span>
+            <strong>{{ contract.servicio }}</strong>
+        </div>
+    </div>
+
+    <section class="contract-panel">
+        <h3>Detalle</h3>
+        <p>{{ contract.descripcion or "Sin descripcion adicional." }}</p>
+        {% if contract.precio_acordado %}<p><strong>Precio acordado:</strong> {{ contract.precio_acordado }}</p>{% endif %}
+    </section>
+
+    <section class="contract-panel">
+        <h3>Timeline</h3>
+        <ol class="contract-timeline">
+            <li class="is-complete"><strong>Creada</strong><span>{{ contract.fecha_creacion.strftime("%d/%m/%Y %H:%M") }}</span></li>
+            {% if contract.accepted_at %}<li class="is-complete"><strong>Aceptada</strong><span>{{ contract.accepted_at.strftime("%d/%m/%Y %H:%M") }}</span></li>{% endif %}
+            {% if contract.started_at %}<li class="is-complete"><strong>En progreso</strong><span>{{ contract.started_at.strftime("%d/%m/%Y %H:%M") }}</span></li>{% endif %}
+            {% if contract.completed_at %}<li class="is-complete"><strong>Completada</strong><span>{{ contract.completed_at.strftime("%d/%m/%Y %H:%M") }}</span></li>{% endif %}
+            {% if contract.confirmed_at %}<li class="is-complete"><strong>Confirmada</strong><span>{{ contract.confirmed_at.strftime("%d/%m/%Y %H:%M") }}</span></li>{% endif %}
+            {% if contract.cancelled_at %}<li class="is-cancelled"><strong>Cancelada</strong><span>{{ contract.cancelled_at.strftime("%d/%m/%Y %H:%M") }}</span></li>{% endif %}
+            {% if contract.estado == "RECHAZADA" %}<li class="is-cancelled"><strong>Rechazada</strong></li>{% endif %}
+        </ol>
+    </section>
+
+    <section class="contract-actions" aria-label="Acciones de contratacion">
+        {% if is_professional and contract.estado == "CREADA" %}
+        <form action="/contratacion/{{ contract.id }}/aceptar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Aceptar</button>
+        </form>
+        <form action="/contratacion/{{ contract.id }}/rechazar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="secondary-action" type="submit">Rechazar</button>
+        </form>
+        {% endif %}
+        {% if is_professional and contract.estado == "ACEPTADA" %}
+        <form action="/contratacion/{{ contract.id }}/iniciar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Iniciar trabajo</button>
+        </form>
+        {% endif %}
+        {% if is_professional and contract.estado == "EN_PROGRESO" %}
+        <form action="/contratacion/{{ contract.id }}/completar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Marcar completada</button>
+        </form>
+        {% endif %}
+        {% if is_client and contract.estado == "COMPLETADA" %}
+        <form action="/contratacion/{{ contract.id }}/confirmar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Confirmar finalizacion</button>
+        </form>
+        {% endif %}
+        {% if is_client and contract.estado in ("CREADA", "ACEPTADA", "EN_PROGRESO") %}
+        <form action="/contratacion/{{ contract.id }}/cancelar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="secondary-action" type="submit">Cancelar</button>
+        </form>
+        {% endif %}
+    </section>
+</section>
+
+{% endblock %}
