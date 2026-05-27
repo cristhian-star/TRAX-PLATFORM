@@ -14,3 +14,4 @@ typing_extensions==4.15.0
 Werkzeug==3.1.7
 python-dotenv==1.2.1
 Alembic==1.15.2
+psycopg2-binary==2.9.10

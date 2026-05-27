@@ -22,7 +22,10 @@ def create_app(initialize_schema=True):
         "SECRET_KEY",
         "dev-only-insecure-secret-key"
     )
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trax.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL",
+        "sqlite:///trax.db"
+    )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SECURE"] = os.environ.get("FLASK_ENV") == "production"

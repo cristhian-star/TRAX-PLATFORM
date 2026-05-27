@@ -1,15 +1,38 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: trax-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=trax_db
+      - POSTGRES_USER=trax_user
+      - POSTGRES_PASSWORD=trax_password
+    volumes:
+      - trax_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trax_user -d trax_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   trax-web:
     build: .
     container_name: trax-platform
     ports:
       - "5000:5000"
     volumes:
-    - .:/app
-    - trax_instance:/app/instance
+      - .:/app
+      - trax_instance:/app/instance
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=postgresql+psycopg2://trax_user:trax_password@postgres:5432/trax_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   trax_instance:
+  trax_postgres_data:

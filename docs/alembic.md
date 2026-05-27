@@ -4,10 +4,10 @@
 
 Alembic es el sistema oficial de migraciones para el schema SQLAlchemy de TRAX. Permite versionar cambios de estructura, aplicarlos de forma ordenada y preparar una futura transicion desde SQLite DEV hacia PostgreSQL.
 
-La aplicacion sigue usando SQLite por ahora:
+La aplicacion selecciona la base mediante configuracion:
 
-- desarrollo local: `instance/trax.db`
-- Docker: `/app/instance/trax.db`
+- desarrollo local sin `DATABASE_URL`: SQLite en `instance/trax.db`;
+- Docker Compose DEV: PostgreSQL mediante `DATABASE_URL`.
 
 Alembic obtiene la URI desde `create_app().config["SQLALCHEMY_DATABASE_URI"]`; no se configura una ruta de base hardcodeada en `migrations/env.py`.
 
@@ -51,16 +51,16 @@ Revisar siempre el archivo generado antes de aplicar `upgrade`, especialmente en
 
 ## Uso en Docker
 
-El volumen Docker mantiene una SQLite distinta de la copia local del host. Ejecutar los comandos dentro del contenedor para afectar `/app/instance/trax.db`:
+Docker Compose DEV configura `trax-web` para usar PostgreSQL. En una base PostgreSQL nueva, aplicar el schema con Alembic:
 
 ```powershell
-docker compose exec trax-web alembic current
-docker compose exec trax-web alembic stamp head
 docker compose exec trax-web alembic upgrade head
+docker compose exec trax-web alembic current
+docker compose exec trax-web alembic history
 ```
 
-Antes de estampar un volumen existente, auditar su schema y conservar una copia de respaldo DEV.
+La SQLite previa y el volumen `trax_instance` se conservan; esta fase no migra sus datos a PostgreSQL.
 
 ## Limites de esta fase
 
-Esta configuracion no migra a PostgreSQL ni reemplaza automaticamente bases SQLite legacy. La baseline registra el modelo actual sin borrar datos. Los backfills de ownership y la limpieza de referencias historicas deben tratarse expl?citamente antes de endurecer constraints o mover datos a produccion.
+Esta configuracion habilita PostgreSQL DEV, pero no migra datos SQLite ni reemplaza automaticamente bases SQLite legacy. La baseline registra el modelo actual sin borrar datos. Los backfills de ownership y la limpieza de referencias historicas deben tratarse explicitamente antes de endurecer constraints o mover datos a produccion.
