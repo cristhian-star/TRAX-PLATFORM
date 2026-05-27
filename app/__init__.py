@@ -14,7 +14,7 @@ csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address)
 
 
-def create_app():
+def create_app(initialize_schema=True):
     app = Flask(__name__)
 
     # Config
@@ -62,8 +62,9 @@ def create_app():
     from app.models.reputation_event import ReputationEvent
     from app.models.audit_log import AuditLog
 
-    with app.app_context():
-        db.create_all()
+    if initialize_schema:
+        with app.app_context():
+            db.create_all()
 
     @app.after_request
     def add_security_headers(response):
