@@ -6,13 +6,23 @@
     <div class="section-container">
         <form action="/login" method="POST" class="form-card">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
             <h2>Ingresar</h2>
+
+            {% if error %}
+                <p class="form-alert">{{ error }}</p>
+            {% endif %}
 
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Contraseña" required>
 
             <button type="submit">Ingresar</button>
-            <p class="form-helper">¿No tenés cuenta? <a href="/register">Registrate</a></p>
+            <p class="form-helper">
+                ¿No tenés cuenta?
+                <a href="/register{% if next_url %}?next={{ next_url|urlencode }}{% endif %}">Registrate</a>
+            </p>
         </form>
     </div>
 </section>

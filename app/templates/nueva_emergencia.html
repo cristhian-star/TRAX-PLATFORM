@@ -11,11 +11,22 @@
             <p class="form-alert">Emergencia creada correctamente.</p>
         {% endif %}
 
+        {% set entry_data = form_data|default({}) %}
         <form action="/emergencias/nueva" method="POST" class="form-card">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="categoria" placeholder="Categoria o rubro" required>
+            <input
+                type="text"
+                name="categoria"
+                value="{{ entry_data.get('categoria', '') }}"
+                placeholder="Categoria o rubro"
+                required>
 
-            <input type="text" name="zona" placeholder="Zona o localidad" required>
+            <input
+                type="text"
+                name="zona"
+                value="{{ entry_data.get('zona', '') }}"
+                placeholder="Zona o localidad"
+                required>
 
             <select name="prioridad" required>
                 <option value="">Prioridad</option>

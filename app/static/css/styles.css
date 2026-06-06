@@ -1224,6 +1224,26 @@ button.ghost-link {
     resize: vertical;
 }
 
+.entry-reference {
+    display: grid;
+    gap: 8px;
+    color: var(--navy);
+    font-weight: 850;
+}
+
+.entry-reference small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.entry-reference input:disabled {
+    color: var(--ink);
+    opacity: 1;
+    cursor: not-allowed;
+}
+
 .form-card button,
 .volver-btn {
     padding: 14px 18px;

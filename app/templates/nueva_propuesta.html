@@ -11,9 +11,29 @@
             <p class="form-alert">Propuesta creada correctamente.</p>
         {% endif %}
 
+        {% set entry_data = form_data|default({}) %}
         <form action="/propuestas/nueva" method="POST" class="form-card">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="categoria" placeholder="Categoria o rubro" required>
+            <input
+                type="text"
+                name="categoria"
+                value="{{ entry_data.get('categoria', '') }}"
+                placeholder="Categoria o rubro"
+                required>
+
+            {% if entry_data.get("ubicacion") %}
+                <label class="entry-reference">
+                    <span>Ubicacion de referencia</span>
+                    <input
+                        type="text"
+                        value="{{ entry_data.get('ubicacion') }}"
+                        disabled
+                        aria-describedby="proposal-location-help">
+                    <small id="proposal-location-help">
+                        Se usa como contexto de entrada y no se guarda en la propuesta actual.
+                    </small>
+                </label>
+            {% endif %}
 
             <textarea name="descripcion" placeholder="Describe el proyecto o necesidad" required></textarea>
 

@@ -40,6 +40,13 @@ def _parse_datetime(value):
     return datetime.fromisoformat(value)
 
 
+def _get_query_prefill(*field_names):
+    return {
+        field_name: _empty_to_none(request.args.get(field_name)) or ""
+        for field_name in field_names
+    }
+
+
 def _audit_contract_action(action, contract, description):
     target_user_id = (
         contract.cliente_id
@@ -226,7 +233,10 @@ def nuevo_presupuesto():
 
         return render_template("nuevo_presupuesto.html", created=budget_request)
 
-    return render_template("nuevo_presupuesto.html")
+    return render_template(
+        "nuevo_presupuesto.html",
+        form_data=_get_query_prefill("categoria", "zona", "descripcion"),
+    )
 
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
@@ -246,7 +256,10 @@ def nueva_emergencia():
 
         return render_template("nueva_emergencia.html", created=emergency_request)
 
-    return render_template("nueva_emergencia.html")
+    return render_template(
+        "nueva_emergencia.html",
+        form_data=_get_query_prefill("categoria", "zona"),
+    )
 
 
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
@@ -265,4 +278,7 @@ def nueva_propuesta():
 
         return render_template("nueva_propuesta.html", created=proposal_request)
 
-    return render_template("nueva_propuesta.html")
+    return render_template(
+        "nueva_propuesta.html",
+        form_data=_get_query_prefill("categoria", "ubicacion"),
+    )

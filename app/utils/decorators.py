@@ -1,6 +1,11 @@
 from functools import wraps
 
-from flask import abort, redirect, session
+from flask import abort, redirect, request, session, url_for
+
+
+def _login_redirect():
+    next_url = request.full_path.rstrip("?")
+    return redirect(url_for("auth.login", next=next_url))
 
 
 def login_required(view_func):
@@ -9,7 +14,7 @@ def login_required(view_func):
         user_id = session.get("user_id")
 
         if not user_id:
-            return redirect("/login")
+            return _login_redirect()
 
         from app.models.user import User
         from app.services.user_service import is_user_active
@@ -32,7 +37,7 @@ def role_required(*roles):
             user_id = session.get("user_id")
 
             if not user_id:
-                return redirect("/login")
+                return _login_redirect()
 
             from app.models.user import User
             from app.services.user_service import is_user_active
@@ -61,7 +66,7 @@ def pro_required(view_func):
         user_id = session.get("user_id")
 
         if not user_id:
-            return redirect("/login")
+            return _login_redirect()
 
         from app.services.subscription_service import has_pro_access
 
@@ -79,7 +84,7 @@ def verified_required(view_func):
         user_id = session.get("user_id")
 
         if not user_id:
-            return redirect("/login")
+            return _login_redirect()
 
         from app.services.verification_service import has_approved_verification
 
@@ -97,7 +102,7 @@ def profile_complete_required(view_func):
         user_id = session.get("user_id")
 
         if not user_id:
-            return redirect("/login")
+            return _login_redirect()
 
         from app.models.professional import Professional
 

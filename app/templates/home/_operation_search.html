@@ -89,7 +89,7 @@
             <h2>Pedi presupuestos para tu trabajo.</h2>
             <p>Describe la necesidad y continua en el flujo de solicitud de TRAX.</p>
         </div>
-        <form action="/presupuestos/nuevo" method="GET" class="operation-search__form">
+        <form action="/presupuestos/nuevo" method="GET" class="operation-search__form operation-search__form--extended">
             <label class="operation-field">
                 <span>Tipo de trabajo</span>
                 <select name="categoria">
@@ -104,6 +104,10 @@
             <label class="operation-field">
                 <span>Zona</span>
                 <input type="text" name="zona" placeholder="Donde se realiza">
+            </label>
+            <label class="operation-field">
+                <span>Descripcion breve</span>
+                <input type="text" name="descripcion" placeholder="Que trabajo necesitas">
             </label>
             <button class="operation-search__submit" type="submit">Solicitar presupuestos</button>
         </form>
@@ -161,7 +165,7 @@
         </div>
         <form action="/propuestas/nueva" method="GET" class="operation-search__form">
             <label class="operation-field">
-                <span>Especialidad</span>
+                <span>Industria o rubro</span>
                 <select name="categoria">
                     <option value="">Cualquier especialidad</option>
                     <option>Electricidad</option>
@@ -172,12 +176,8 @@
                 </select>
             </label>
             <label class="operation-field">
-                <span>Tipo de oportunidad</span>
-                <select name="orden">
-                    <option value="recientes">Mas recientes</option>
-                    <option value="urgentes">Urgentes</option>
-                    <option value="presupuesto">Mejor presupuesto</option>
-                </select>
+                <span>Ubicacion</span>
+                <input type="text" name="ubicacion" placeholder="Ciudad, barrio o zona">
             </label>
             <button class="operation-search__submit operation-search__submit--dark" type="submit">
                 Ver oportunidades

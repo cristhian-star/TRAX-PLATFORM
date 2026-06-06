@@ -525,9 +525,17 @@
         align-items: end;
     }
 
+    .operation-search__form--extended {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .operation-search__submit {
         min-width: 12rem;
         grid-column: auto;
+    }
+
+    .operation-search__form--extended .operation-search__submit {
+        min-width: 0;
     }
 
     .trax-home__pathways,
