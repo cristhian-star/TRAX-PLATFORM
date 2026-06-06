@@ -1,0 +1,181 @@
+/*
+ * TRAX Design System v1
+ *
+ * Foundation tokens only. This file is intentionally not linked from base.html
+ * yet, so it does not alter existing screens.
+ */
+
+:root {
+    color-scheme: light;
+
+    /* Brand */
+    --trax-steel-950: #0b1220;
+    --trax-steel-900: #111c2e;
+    --trax-steel-800: #1c2a3d;
+    --trax-steel-700: #2b3c52;
+    --trax-steel-100: #e8edf3;
+    --trax-steel-50: #f4f7fa;
+
+    --trax-orange-700: #b9380a;
+    --trax-orange-600: #d3440e;
+    --trax-orange-500: #f05a1a;
+    --trax-orange-100: #ffded0;
+    --trax-orange-50: #fff4ed;
+
+    --trax-cyan-700: #087a8c;
+    --trax-cyan-600: #0b8799;
+    --trax-cyan-500: #0ea5b7;
+    --trax-cyan-100: #c8f3f7;
+    --trax-cyan-50: #ecfeff;
+
+    /* Neutrals */
+    --trax-gray-950: #111827;
+    --trax-gray-900: #18212f;
+    --trax-gray-800: #1f2937;
+    --trax-gray-700: #374151;
+    --trax-gray-600: #4b5563;
+    --trax-gray-500: #6b7280;
+    --trax-gray-400: #9ca3af;
+    --trax-gray-300: #d1d5db;
+    --trax-gray-200: #e5e7eb;
+    --trax-gray-100: #f3f4f6;
+    --trax-gray-50: #f8fafc;
+    --trax-white: #ffffff;
+    --trax-black: #000000;
+
+    /* Status */
+    --trax-success-700: #166534;
+    --trax-success-600: #15803d;
+    --trax-success-200: #bbf7d0;
+    --trax-success-50: #f0fdf4;
+
+    --trax-error-700: #912018;
+    --trax-error-600: #b42318;
+    --trax-error-200: #fecdca;
+    --trax-error-50: #fef3f2;
+
+    --trax-warning-700: #93370d;
+    --trax-warning-600: #b54708;
+    --trax-warning-200: #fedf89;
+    --trax-warning-50: #fffaeb;
+
+    --trax-emergency-700: #991b1b;
+    --trax-emergency-600: #c81e1e;
+    --trax-emergency-200: #fecdd3;
+    --trax-emergency-50: #fff1f2;
+
+    /* Semantic colors */
+    --trax-color-brand: var(--trax-steel-900);
+    --trax-color-brand-strong: var(--trax-steel-950);
+    --trax-color-action-primary: var(--trax-orange-600);
+    --trax-color-action-primary-hover: var(--trax-orange-700);
+    --trax-color-info: var(--trax-cyan-700);
+    --trax-color-success: var(--trax-success-600);
+    --trax-color-error: var(--trax-error-600);
+    --trax-color-warning: var(--trax-warning-600);
+    --trax-color-emergency: var(--trax-emergency-600);
+
+    --trax-color-text: var(--trax-gray-950);
+    --trax-color-text-secondary: var(--trax-gray-700);
+    --trax-color-text-muted: var(--trax-gray-600);
+    --trax-color-text-disabled: var(--trax-gray-500);
+    --trax-color-text-inverse: var(--trax-white);
+
+    --trax-color-surface: var(--trax-white);
+    --trax-color-surface-subtle: var(--trax-gray-50);
+    --trax-color-surface-muted: var(--trax-gray-100);
+    --trax-color-surface-inverse: var(--trax-steel-950);
+    --trax-color-border: var(--trax-gray-300);
+    --trax-color-border-subtle: var(--trax-gray-200);
+    --trax-color-focus: var(--trax-cyan-500);
+
+    /* Typography */
+    --trax-font-sans: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --trax-font-size-12: 0.75rem;
+    --trax-font-size-14: 0.875rem;
+    --trax-font-size-16: 1rem;
+    --trax-font-size-18: 1.125rem;
+    --trax-font-size-21: 1.3125rem;
+    --trax-font-size-24: 1.5rem;
+    --trax-font-size-26: 1.625rem;
+    --trax-font-size-32: 2rem;
+    --trax-font-size-36: 2.25rem;
+    --trax-font-size-44: 2.75rem;
+    --trax-font-size-52: 3.25rem;
+    --trax-font-weight-regular: 400;
+    --trax-font-weight-medium: 500;
+    --trax-font-weight-semibold: 650;
+    --trax-font-weight-bold: 700;
+    --trax-font-weight-extrabold: 800;
+    --trax-line-height-tight: 1.12;
+    --trax-line-height-heading: 1.2;
+    --trax-line-height-body: 1.55;
+
+    /* Spacing */
+    --trax-space-1: 0.25rem;
+    --trax-space-2: 0.5rem;
+    --trax-space-3: 0.75rem;
+    --trax-space-4: 1rem;
+    --trax-space-5: 1.25rem;
+    --trax-space-6: 1.5rem;
+    --trax-space-8: 2rem;
+    --trax-space-10: 2.5rem;
+    --trax-space-12: 3rem;
+    --trax-space-16: 4rem;
+    --trax-space-20: 5rem;
+
+    /* Shape */
+    --trax-radius-sm: 0.375rem;
+    --trax-radius-md: 0.625rem;
+    --trax-radius-lg: 1rem;
+    --trax-radius-xl: 1.5rem;
+    --trax-radius-pill: 999px;
+
+    /* Elevation */
+    --trax-shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.08);
+    --trax-shadow-md: 0 8px 24px rgba(11, 18, 32, 0.1);
+    --trax-shadow-lg: 0 20px 48px rgba(11, 18, 32, 0.14);
+
+    /* Controls */
+    --trax-control-height-sm: 2.25rem;
+    --trax-control-height-md: 2.75rem;
+    --trax-control-height-lg: 3.25rem;
+    --trax-control-radius: var(--trax-radius-md);
+    --trax-focus-ring: 0 0 0 3px rgba(14, 165, 183, 0.32);
+
+    /* Layout */
+    --trax-container-sm: 40rem;
+    --trax-container-md: 48rem;
+    --trax-container-lg: 64rem;
+    --trax-container-xl: 75rem;
+    --trax-container-wide: 80rem;
+    --trax-page-gutter: 1rem;
+    --trax-grid-gap: 1rem;
+
+    /* Motion */
+    --trax-duration-fast: 120ms;
+    --trax-duration-base: 180ms;
+    --trax-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (min-width: 48rem) {
+    :root {
+        --trax-page-gutter: 1.5rem;
+        --trax-grid-gap: 1.25rem;
+    }
+}
+
+@media (min-width: 64rem) {
+    :root {
+        --trax-page-gutter: 2rem;
+        --trax-grid-gap: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --trax-duration-fast: 0ms;
+        --trax-duration-base: 0ms;
+    }
+}
