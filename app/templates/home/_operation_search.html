@@ -1,0 +1,188 @@
+<section class="operation-search" aria-label="Operaciones principales">
+    <div class="operation-search__tabs" role="tablist" aria-label="Elegir una operacion">
+        <button
+            class="operation-search__tab is-active"
+            id="operation-tab-contract"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="operation-panel-contract"
+            data-operation-tab="contract">
+            Contratacion
+        </button>
+        <button
+            class="operation-search__tab"
+            id="operation-tab-budget"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="operation-panel-budget"
+            tabindex="-1"
+            data-operation-tab="budget">
+            Presupuestos
+        </button>
+        <button
+            class="operation-search__tab operation-search__tab--emergency"
+            id="operation-tab-emergency"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="operation-panel-emergency"
+            tabindex="-1"
+            data-operation-tab="emergency">
+            Emergencias
+        </button>
+        <button
+            class="operation-search__tab"
+            id="operation-tab-proposal"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="operation-panel-proposal"
+            tabindex="-1"
+            data-operation-tab="proposal">
+            Propuestas
+        </button>
+    </div>
+
+    <div
+        class="operation-search__panel"
+        id="operation-panel-contract"
+        role="tabpanel"
+        aria-labelledby="operation-tab-contract"
+        data-operation-panel="contract">
+        <div class="operation-search__heading">
+            <span>Contratacion directa</span>
+            <h2>¿Que profesional necesitas?</h2>
+            <p>Busca por oficio o especialidad y revisa perfiles antes de contactar.</p>
+        </div>
+        <form action="/buscar" method="GET" class="operation-search__form">
+            <label class="operation-field">
+                <span>Servicio</span>
+                <select name="servicio">
+                    <option value="">Cualquier servicio</option>
+                    <option>Electricidad</option>
+                    <option>Refrigeracion A/C</option>
+                    <option>Plomeria</option>
+                    <option>Herreria</option>
+                    <option>Gas domiciliario</option>
+                </select>
+            </label>
+            <label class="operation-field">
+                <span>Zona</span>
+                <input type="text" name="zona" placeholder="Ciudad, barrio o zona">
+            </label>
+            <button class="operation-search__submit" type="submit">Buscar profesionales</button>
+        </form>
+        <p class="operation-search__help">Podras comparar experiencia, reputacion y disponibilidad.</p>
+    </div>
+
+    <div
+        class="operation-search__panel"
+        id="operation-panel-budget"
+        role="tabpanel"
+        aria-labelledby="operation-tab-budget"
+        data-operation-panel="budget"
+        hidden>
+        <div class="operation-search__heading">
+            <span>Comparar antes de elegir</span>
+            <h2>Pedi presupuestos para tu trabajo.</h2>
+            <p>Describe la necesidad y continua en el flujo de solicitud de TRAX.</p>
+        </div>
+        <form action="/presupuestos/nuevo" method="GET" class="operation-search__form">
+            <label class="operation-field">
+                <span>Tipo de trabajo</span>
+                <select name="categoria">
+                    <option value="">Seleccionar rubro</option>
+                    <option>Electricidad</option>
+                    <option>Refrigeracion A/C</option>
+                    <option>Plomeria</option>
+                    <option>Herreria</option>
+                    <option>Gas domiciliario</option>
+                </select>
+            </label>
+            <label class="operation-field">
+                <span>Zona</span>
+                <input type="text" name="zona" placeholder="Donde se realiza">
+            </label>
+            <button class="operation-search__submit" type="submit">Solicitar presupuestos</button>
+        </form>
+        <p class="operation-search__help">En el siguiente paso podras ampliar el alcance del trabajo.</p>
+    </div>
+
+    <div
+        class="operation-search__panel operation-search__panel--emergency"
+        id="operation-panel-emergency"
+        role="tabpanel"
+        aria-labelledby="operation-tab-emergency"
+        data-operation-panel="emergency"
+        hidden>
+        <div class="operation-search__heading">
+            <span>Asistencia prioritaria</span>
+            <h2>Necesito resolver una urgencia.</h2>
+            <p>Indica el tipo de problema y tu zona para iniciar la solicitud.</p>
+        </div>
+        <form action="/emergencias/nueva" method="GET" class="operation-search__form">
+            <label class="operation-field">
+                <span>Tipo de emergencia</span>
+                <select name="categoria">
+                    <option value="">Seleccionar problema</option>
+                    <option>Electricidad</option>
+                    <option>Perdida de agua</option>
+                    <option>Gas domiciliario</option>
+                    <option>Climatizacion</option>
+                    <option>Cerrajeria</option>
+                </select>
+            </label>
+            <label class="operation-field">
+                <span>Zona</span>
+                <input type="text" name="zona" placeholder="Ubicacion de la urgencia">
+            </label>
+            <button class="operation-search__submit operation-search__submit--emergency" type="submit">
+                Buscar ayuda ahora
+            </button>
+        </form>
+        <p class="operation-search__help">
+            Si existe riesgo para personas o bienes, contacta primero al servicio local adecuado.
+        </p>
+    </div>
+
+    <div
+        class="operation-search__panel"
+        id="operation-panel-proposal"
+        role="tabpanel"
+        aria-labelledby="operation-tab-proposal"
+        data-operation-panel="proposal"
+        hidden>
+        <div class="operation-search__heading">
+            <span>Para profesionales</span>
+            <h2>Encontra trabajos para tu especialidad.</h2>
+            <p>Accede al flujo de propuestas y presenta tu experiencia profesional.</p>
+        </div>
+        <form action="/propuestas/nueva" method="GET" class="operation-search__form">
+            <label class="operation-field">
+                <span>Especialidad</span>
+                <select name="categoria">
+                    <option value="">Cualquier especialidad</option>
+                    <option>Electricidad</option>
+                    <option>Refrigeracion A/C</option>
+                    <option>Plomeria</option>
+                    <option>Herreria</option>
+                    <option>Gas domiciliario</option>
+                </select>
+            </label>
+            <label class="operation-field">
+                <span>Tipo de oportunidad</span>
+                <select name="orden">
+                    <option value="recientes">Mas recientes</option>
+                    <option value="urgentes">Urgentes</option>
+                    <option value="presupuesto">Mejor presupuesto</option>
+                </select>
+            </label>
+            <button class="operation-search__submit operation-search__submit--dark" type="submit">
+                Ver oportunidades
+            </button>
+        </form>
+        <p class="operation-search__help">El acceso puede requerir un perfil profesional completo.</p>
+    </div>
+</section>

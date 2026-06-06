@@ -1,100 +1,94 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home-v1.css') }}">
+{% endblock %}
+
 {% block content %}
-
-<main>
-    <section class="startup-hero">
-        <div class="hero-glow glow-one"></div>
-        <div class="hero-glow glow-two"></div>
-
-        <div class="shell hero-layout hero-layout-centered">
-            <div class="hero-content hero-content-centered">
-                <span class="signal">TRAX network beta</span>
-                <h1>Contrata talento tecnico confiable en minutos, no en dias.</h1>
-                <p>
-                    Encontra profesionales y empresas por servicio, zona o identificador,
-                    con una experiencia rapida, clara y preparada para contratar mejor.
+<main class="trax-home">
+    <section class="trax-home__hero" aria-labelledby="home-title">
+        <div class="trax-home__grid"></div>
+        <div class="shell trax-home__hero-layout">
+            <div class="trax-home__intro">
+                <span class="trax-home__eyebrow">Servicios tecnicos y oficios</span>
+                <h1 id="home-title">El trabajo correcto empieza con una conexion confiable.</h1>
+                <p class="trax-home__lead">
+                    Encontra profesionales, compara presupuestos, resolve una urgencia
+                    o accede a nuevas oportunidades desde un solo lugar.
                 </p>
 
-                <div class="hero-segments" aria-label="Tipo de busqueda">
-                    <a class="segment-btn active" href="/contratacion/nueva">Contratacion</a>
-                    <a class="segment-btn" href="/presupuestos/nuevo">Presupuestos</a>
-                    <a class="segment-btn" href="/emergencias/nueva">Emergencias</a>
-                    <a class="segment-btn" href="/propuestas/nueva">Propuestas</a>
+                <div class="trax-home__proof" aria-label="Beneficios de TRAX">
+                    <span>Perfiles con reputacion visible</span>
+                    <span>Busqueda por servicio y zona</span>
+                    <span>Seguimiento dentro de TRAX</span>
                 </div>
+            </div>
 
-                <form action="/buscar" method="GET" class="search-strip centered-search" aria-label="Buscar servicios">
-                    <label>
-                        <span>Servicio</span>
-                        <select name="servicio">
-                            <option value="">Cualquier servicio</option>
-                            <option>Electricidad</option>
-                            <option>Refrigeracion A/C</option>
-                            <option>Plomeria</option>
-                            <option>Herreria</option>
-                            <option>Gas domiciliario</option>
-                        </select>
-                    </label>
-                    <label>
-                        <span>Zona</span>
-                        <input type="text" name="zona" placeholder="Zona, ciudad o barrio">
-                    </label>
-                    <button type="submit">Buscar</button>
-                </form>
+            {% include "home/_operation_search.html" %}
+        </div>
+    </section>
 
-                <div class="quick-actions" aria-label="Acciones rapidas de busqueda">
-                    <a href="/buscar?servicio=&zona=">Buscar por nombre de empresa o profesional</a>
-                    <a href="/resultados">Buscar por zona / mapa</a>
-                    <a href="/resultados">Buscar por codigo de anunciante</a>
+    <section class="trax-home__pathways" aria-labelledby="pathways-title">
+        <div class="shell">
+            <div class="trax-home__section-heading">
+                <div>
+                    <span class="trax-home__eyebrow trax-home__eyebrow--dark">Una red para cada tarea</span>
+                    <h2 id="pathways-title">Elegi como queres avanzar.</h2>
                 </div>
+                <p>
+                    TRAX conecta necesidades concretas con profesionales preparados,
+                    sin mezclar contrataciones, cotizaciones y oportunidades.
+                </p>
+            </div>
+
+            <div class="trax-home__pathway-grid">
+                <article class="trax-home__pathway">
+                    <span class="trax-home__pathway-index">01</span>
+                    <h3>Busca con criterio</h3>
+                    <p>Filtra por especialidad y zona antes de revisar cada perfil.</p>
+                    <a href="/resultados">Explorar profesionales</a>
+                </article>
+                <article class="trax-home__pathway">
+                    <span class="trax-home__pathway-index">02</span>
+                    <h3>Compara propuestas</h3>
+                    <p>Publica el trabajo y evalua alcance, plazo y condiciones.</p>
+                    <a href="/presupuestos/nuevo">Pedir presupuestos</a>
+                </article>
+                <article class="trax-home__pathway trax-home__pathway--dark">
+                    <span class="trax-home__pathway-index">03</span>
+                    <h3>Hace crecer tu oficio</h3>
+                    <p>Presenta tu experiencia y accede a trabajos relevantes.</p>
+                    <a href="/propuestas/nueva">Ver propuestas</a>
+                </article>
             </div>
         </div>
     </section>
 
-    <section class="trust-band">
-        <div class="shell trust-grid">
+    <section class="trax-home__trust" aria-labelledby="trust-title">
+        <div class="shell trax-home__trust-layout">
             <div>
-                <span class="kicker">Por que convierte</span>
-                <h2>Senales claras antes de tocar el boton de contacto.</h2>
+                <span class="trax-home__eyebrow trax-home__eyebrow--dark">Confianza operativa</span>
+                <h2 id="trust-title">Decisiones claras antes del primer contacto.</h2>
             </div>
-            <article>
-                <strong>Perfiles verificados</strong>
-                <p>Badges, zonas, experiencia, reputacion y tiempos de respuesta visibles.</p>
-            </article>
-            <article>
-                <strong>Busqueda accionable</strong>
-                <p>Filtros simples, categorias rapidas y CTAs directos a WhatsApp o llamada.</p>
-            </article>
-            <article>
-                <strong>Oferta premium</strong>
-                <p>Promoted cards, portfolio visual y pricing de referencia para decidir rapido.</p>
-            </article>
-        </div>
-    </section>
-
-    <section class="home-market-preview">
-        <div class="shell section-head">
-            <span class="kicker">Marketplace destacado</span>
-            <h2>Profesionales listos para trabajos reales.</h2>
-        </div>
-        <div class="shell preview-grid">
-            <a href="/buscar?servicio=Electricidad&zona=Palermo" class="preview-card hot">
-                <span>Top rated</span>
-                <strong>Electricidad premium</strong>
-                <small>Palermo, Belgrano, Colegiales</small>
-            </a>
-            <a href="/buscar?servicio=Refrigeracion%20A/C&zona=Caballito" class="preview-card">
-                <span>Fast response</span>
-                <strong>Refrigeracion A/C</strong>
-                <small>Instalacion y mantenimiento</small>
-            </a>
-            <a href="/buscar?servicio=Plomeria&zona=Flores" class="preview-card">
-                <span>24h</span>
-                <strong>Plomeria urgente</strong>
-                <small>Perdidas, sanitarios y obra</small>
-            </a>
+            <div class="trax-home__trust-list">
+                <article>
+                    <strong>Identidad profesional</strong>
+                    <p>Especialidad, zona, reputacion y badges visibles.</p>
+                </article>
+                <article>
+                    <strong>Contexto de trabajo</strong>
+                    <p>Cada operacion solicita solo la informacion necesaria.</p>
+                </article>
+                <article>
+                    <strong>Estados comprensibles</strong>
+                    <p>Sabes que accion realizaste y cual es el proximo paso.</p>
+                </article>
+            </div>
         </div>
     </section>
 </main>
+{% endblock %}
 
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/home-tabs.js') }}"></script>
 {% endblock %}
