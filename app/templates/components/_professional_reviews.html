@@ -1,0 +1,30 @@
+<section class="profile-section" aria-labelledby="reviews-title">
+    <div class="profile-section__heading profile-section__heading--split">
+        <div>
+            <span>Reputacion</span>
+            <h2 id="reviews-title">Resenas de clientes</h2>
+        </div>
+        {% if can_review %}
+            <a class="profile-section__link" href="/profesional/{{ pro.id }}/review">Dejar resena</a>
+        {% endif %}
+    </div>
+
+    {% if reviews %}
+        <div class="profile-review-list">
+            {% for review in reviews %}
+                <article>
+                    <div class="profile-review-list__score">
+                        <span aria-hidden="true">&#9733;</span>
+                        <strong>{{ review.rating }}/5</strong>
+                    </div>
+                    <p>{{ review.comentario or "Sin comentario adicional." }}</p>
+                    {% if review.created_at %}
+                        <small>{{ review.created_at.strftime("%d/%m/%Y") }}</small>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="profile-placeholder">Este profesional todavia no tiene resenas visibles.</p>
+    {% endif %}
+</section>

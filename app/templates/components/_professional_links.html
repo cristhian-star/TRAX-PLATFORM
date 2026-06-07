@@ -1,0 +1,68 @@
+{% set links = namespace(count=0) %}
+
+<section class="profile-side-card" aria-labelledby="external-links-title">
+    <span class="profile-side-card__eyebrow">Presencia digital</span>
+    <h2 id="external-links-title">Enlaces externos</h2>
+
+    <div class="profile-external-links">
+        {% for raw_url in portfolio_entries %}
+            {% set external_url = raw_url|trim %}
+            {% set external_lower = external_url|lower %}
+            {% if external_url.startswith(("http://", "https://")) %}
+                {% set links.count = links.count + 1 %}
+                {% if "drive.google.com" in external_lower %}
+                    {% set link_type = "drive" %}
+                    {% set link_label = "Google Drive" %}
+                    {% set link_icon = "GD" %}
+                {% elif "instagram.com" in external_lower %}
+                    {% set link_type = "instagram" %}
+                    {% set link_label = "Instagram" %}
+                    {% set link_icon = "IG" %}
+                {% elif "tiktok.com" in external_lower %}
+                    {% set link_type = "tiktok" %}
+                    {% set link_label = "TikTok" %}
+                    {% set link_icon = "TT" %}
+                {% elif "youtube.com" in external_lower or "youtu.be" in external_lower %}
+                    {% set link_type = "youtube" %}
+                    {% set link_label = "YouTube" %}
+                    {% set link_icon = "YT" %}
+                {% elif "facebook.com" in external_lower %}
+                    {% set link_type = "social" %}
+                    {% set link_label = "Facebook" %}
+                    {% set link_icon = "FB" %}
+                {% elif "linkedin.com" in external_lower %}
+                    {% set link_type = "social" %}
+                    {% set link_label = "LinkedIn" %}
+                    {% set link_icon = "IN" %}
+                {% else %}
+                    {% set link_type = "website" %}
+                    {% set link_label = "Sitio web u otro enlace" %}
+                    {% set link_icon = "WEB" %}
+                {% endif %}
+                <a
+                    class="profile-external-link profile-external-link--{{ link_type }}"
+                    href="{{ external_url }}"
+                    target="_blank"
+                    rel="noreferrer">
+                    <span aria-hidden="true">{{ link_icon }}</span>
+                    <strong>{{ link_label }}</strong>
+                    <small>Abrir enlace</small>
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if links.count == 0 %}
+            <div class="profile-links-placeholder">
+                <div><span>GD</span><strong>Google Drive</strong></div>
+                <div><span>WEB</span><strong>Sitio web</strong></div>
+                <div><span>IG</span><strong>Instagram</strong></div>
+                <div><span>TT</span><strong>TikTok</strong></div>
+                <div><span>YT</span><strong>YouTube</strong></div>
+                <div><span>+</span><strong>Otras redes</strong></div>
+            </div>
+            <p class="profile-side-card__note">
+                Seccion preparada. Los enlaces se cargaran en Professional Media &amp; Links v1.
+            </p>
+        {% endif %}
+    </div>
+</section>

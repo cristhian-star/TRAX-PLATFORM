@@ -1,161 +1,187 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-profile-v2.css') }}">
+{% endblock %}
+
 {% block content %}
-
-{% set pro = profesional|default({"nombre": "Voltix Pro Services", "servicio": "Electricidad", "zona": "Palermo", "telefono": "1122334455", "descripcion": "Equipo tecnico para instalaciones electricas, tableros, mantenimiento y urgencias con garantia."}, true) %}
-{% set nombre = pro["nombre"]|default("Voltix Pro Services", true) %}
-{% set servicio = pro["servicio"]|default("Electricidad", true) %}
-{% set zona = pro["zona"]|default("Palermo", true) %}
-{% set telefono = pro["telefono"]|default("1122334455", true) %}
-{% set descripcion = pro["descripcion"]|default("Equipo tecnico para instalaciones electricas, tableros, mantenimiento y urgencias con garantia.", true) %}
+{% set pro = profesional %}
+{% set nombre = pro.nombre %}
+{% set especialidad = pro.especialidad or pro.servicio %}
+{% set servicio = pro.servicio %}
+{% set zona = pro.zona %}
+{% set telefono = pro.telefono %}
+{% set descripcion = pro.descripcion %}
 {% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
+{% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
 
-<main class="profile-screen">
-    <section class="profile-hero">
-        <div class="shell profile-grid">
-            <div class="profile-gallery">
-                <div class="gallery-feature"></div>
-                <div class="gallery-mini">
-                    <div></div>
-                    <div></div>
-                </div>
-            </div>
-
-            <aside class="profile-summary">
-                <div class="badge-row profile-badge-row">
-                    <span class="trust-badge work">WORK</span>
-                    {% if badges.pro %}<span class="trust-badge pro">PRO</span>{% endif %}
-                    {% if badges.verified %}<span class="trust-badge verified">VERIFICADO</span>{% endif %}
-                </div>
-                {% set filled_stars = (average_rating|round(0, "common")|int) if average_rating else 0 %}
-                <div class="profile-rating-highlight {{ 'rating-pro' if badges.pro else 'rating-work' }}">
-                    <div class="rating-stars" aria-label="Rating {{ average_rating or 0 }} de 5">
-                        {% for star in range(1, 6) %}
-                            <span class="star {{ 'star-filled' if star <= filled_stars else 'star-empty' }}">&#9733;</span>
-                        {% endfor %}
-                    </div>
-                    <span class="rating-label">
-                        {% if average_rating %}{{ average_rating }} / 5{% else %}Sin calificaciones{% endif %} &middot; {{ review_count or 0 }} resenas
-                    </span>
-                </div>
-                <h1>{{ nombre }}</h1>
-                <p>{{ descripcion }}</p>
-                {% if report_created %}<p class="report-created-message">Reporte enviado correctamente. El equipo TRAX lo revisara.</p>{% endif %}
-                <div class="social-proof">
-                    <span><strong>{{ average_rating or "-" }}</strong> rating</span>
-                    <span><strong>{{ review_count or 0 }}</strong> resenas</span>
-                    <span><strong>420+</strong> trabajos</span>
-                    <span><strong>12 min</strong> respuesta</span>
-                </div>
-            </aside>
+<main class="professional-profile">
+    <section class="professional-profile__cover" aria-label="Portada profesional">
+        <div class="professional-profile__cover-grid"></div>
+        <div class="shell professional-profile__cover-content">
+            <span>Portada profesional</span>
+            <small>Espacio preparado para Professional Media &amp; Links v1</small>
         </div>
     </section>
 
-    <section class="shell profile-content">
-        <div class="profile-main">
-            <section class="profile-block brand-block">
-                <div class="logo-orb">VP</div>
-                <div>
-                    <span class="kicker">Premium branding</span>
-                    <h2>{{ servicio }} para clientes que necesitan claridad, velocidad y confianza.</h2>
-                    <p>
-                        Trabajamos en {{ zona }} y zonas cercanas. Priorizamos diagnostico claro,
-                        tiempos precisos, materiales certificados y comunicacion directa durante todo el servicio.
-                    </p>
-                </div>
-            </section>
-
-            <section class="profile-block">
-                <div class="section-title">
-                    <span class="kicker">Servicios y pricing</span>
-                    <h2>Opciones listas para cotizar.</h2>
-                </div>
-                <div class="pricing-cards">
-                    <article>
-                        <strong>Visita tecnica</strong>
-                        <span>Desde $18.000</span>
-                        <p>Diagnostico, relevamiento y presupuesto.</p>
-                    </article>
-                    <article>
-                        <strong>Instalacion completa</strong>
-                        <span>Desde $45.000</span>
-                        <p>Tableros, circuitos, protecciones y prueba final.</p>
-                    </article>
-                    <article>
-                        <strong>Urgencia prioritaria</strong>
-                        <span>Consultar</span>
-                        <p>Respuesta rapida segun zona y franja horaria.</p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="profile-block">
-                <div class="section-title">
-                    <span class="kicker">Work portfolio</span>
-                    <h2>Trabajos realizados</h2>
-                </div>
-                <div class="portfolio">
-                    <article>
-                        <div class="work-img one"></div>
-                        <strong>Tablero comercial</strong>
-                        <p>Rediseno y normalizacion por sectores.</p>
-                    </article>
-                    <article>
-                        <div class="work-img two"></div>
-                        <strong>Obra residencial</strong>
-                        <p>Cableado completo y puesta a tierra.</p>
-                    </article>
-                    <article>
-                        <div class="work-img three"></div>
-                        <strong>Mantenimiento</strong>
-                        <p>Plan preventivo para edificio chico.</p>
-                    </article>
-                </div>
-            </section>
-            <section class="profile-block profile-reviews">
-                <div class="section-title">
-                    <span class="kicker">Resenas</span>
-                    <h2>Experiencias de clientes</h2>
-                    {% if can_review %}
-                    <a class="btn secondary" href="/profesional/{{ pro.id }}/review">Dejar resena</a>
-                    {% endif %}
-                </div>
-
-                {% if reviews %}
-                    <div class="review-list">
-                        {% for review in reviews %}
-                        <article>
-                            <strong>{{ review.rating }}/5</strong>
-                            <p>{{ review.comentario or "Sin comentario adicional." }}</p>
-                        </article>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="empty-reviews">Este profesional todavia no tiene resenas visibles.</p>
-                {% endif %}
-            </section>
+    <section class="shell professional-profile__identity">
+        <div class="professional-profile__brand" aria-label="Logo o marca profesional">
+            <span>{{ nombre[:2]|upper }}</span>
+            <small>Marca</small>
         </div>
 
-        <aside class="contact-panel">
-            <div class="contact-card">
-                <span class="signal">Online ahora</span>
-                <h2>Contactar proveedor</h2>
-                <a class="btn whatsapp" href="https://wa.me/{{ telefono }}" target="_blank" rel="noreferrer">WhatsApp</a>
-                <a class="btn orange" href="tel:{{ telefono }}">Llamar</a>
-                <a class="btn secondary" href="mailto:hola@trax.local">Enviar consulta</a>
-                <a class="btn danger" href="/reportar/usuario/{{ pro.id }}">Reportar usuario</a>
-                <div class="social-links">
-                    <a href="/resultados">LinkedIn</a>
-                    <a href="/resultados">Instagram</a>
-                    <a href="/">Web</a>
+        <div class="professional-profile__avatar" aria-label="Avatar de {{ nombre }}">
+            {{ nombre[:2]|upper }}
+        </div>
+
+        <div class="professional-profile__headline">
+            <div class="professional-profile__badges" aria-label="Distinciones del perfil">
+                {% if badges.work %}
+                    <span class="profile-badge profile-badge--work">WORK</span>
+                {% endif %}
+                {% if badges.pro %}
+                    <span class="profile-badge profile-badge--pro">PRO</span>
+                {% endif %}
+                {% if badges.verified %}
+                    <span class="profile-badge profile-badge--verified">VERIFICADO</span>
+                {% endif %}
+            </div>
+            <h1>{{ nombre }}</h1>
+            <p class="professional-profile__specialty">{{ especialidad }}</p>
+            <p class="professional-profile__location">{{ zona }}</p>
+
+            <div class="professional-profile__rating">
+                {% if average_rating %}
+                    <span aria-hidden="true">&#9733;</span>
+                    <strong>{{ average_rating }}</strong>
+                    <span>
+                        {{ review_count or 0 }}
+                        {% if review_count == 1 %}resena{% else %}resenas{% endif %}
+                    </span>
+                {% else %}
+                    <strong>Sin calificaciones</strong>
+                    <span>0 resenas</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="professional-profile__actions" aria-label="Acciones del perfil">
+            {% if telefono %}
+                <a
+                    class="profile-action profile-action--whatsapp"
+                    href="https://wa.me/{{ telefono }}"
+                    target="_blank"
+                    rel="noreferrer">
+                    WhatsApp
+                </a>
+            {% else %}
+                <span class="profile-action profile-action--disabled" aria-disabled="true">WhatsApp</span>
+            {% endif %}
+            <a
+                class="profile-action profile-action--primary"
+                href="/contratacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
+                Contactar
+            </a>
+            <button class="profile-action profile-action--secondary" type="button" data-share-profile>
+                Compartir perfil
+            </button>
+            <p class="professional-profile__share-status" data-share-status aria-live="polite"></p>
+        </div>
+    </section>
+
+    {% if report_created %}
+        <div class="shell">
+            <p class="professional-profile__notice">
+                Reporte enviado correctamente. El equipo TRAX lo revisara.
+            </p>
+        </div>
+    {% endif %}
+
+    <section class="shell professional-profile__layout">
+        <div class="professional-profile__main">
+            <section class="profile-section" aria-labelledby="about-title">
+                <div class="profile-section__heading">
+                    <span>Perfil profesional</span>
+                    <h2 id="about-title">Acerca de {{ nombre }}</h2>
                 </div>
-            </div>
-            <div class="map-card small">
-                <span>Coverage</span>
-                <strong>{{ zona }} y zonas cercanas</strong>
-            </div>
+                {% if descripcion %}
+                    <p class="profile-section__body">{{ descripcion }}</p>
+                {% else %}
+                    <p class="profile-placeholder">
+                        Este profesional todavia no agrego una descripcion.
+                    </p>
+                {% endif %}
+
+                <div class="profile-service-grid">
+                    <article>
+                        <span>Servicio principal</span>
+                        <strong>{{ servicio }}</strong>
+                    </article>
+                    <article>
+                        <span>Zona de trabajo</span>
+                        <strong>{{ zona }}</strong>
+                    </article>
+                    {% if pro.anios_experiencia is not none %}
+                        <article>
+                            <span>Experiencia informada</span>
+                            <strong>
+                                {{ pro.anios_experiencia }}
+                                {% if pro.anios_experiencia == 1 %}ano{% else %}anos{% endif %}
+                            </strong>
+                        </article>
+                    {% endif %}
+                </div>
+            </section>
+
+            {% include "components/_professional_gallery.html" %}
+            {% include "components/_professional_credentials.html" %}
+            {% include "components/_professional_reviews.html" %}
+        </div>
+
+        <aside class="professional-profile__sidebar">
+            <section class="profile-side-card">
+                <span class="profile-side-card__eyebrow">Resumen</span>
+                <h2>Informacion del perfil</h2>
+                <dl>
+                    <div>
+                        <dt>Especialidad</dt>
+                        <dd>{{ especialidad }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicacion</dt>
+                        <dd>{{ zona }}</dd>
+                    </div>
+                    <div>
+                        <dt>Reputacion TRAX</dt>
+                        <dd>{{ badges.reputation_score or 0 }}</dd>
+                    </div>
+                    {% if pro.estado_perfil %}
+                        <div>
+                            <dt>Estado del perfil</dt>
+                            <dd>{{ pro.estado_perfil|replace("_", " ")|title }}</dd>
+                        </div>
+                    {% endif %}
+                    {% if pro.disponibilidad|default(none) %}
+                        <div>
+                            <dt>Disponibilidad</dt>
+                            <dd>{{ pro.disponibilidad }}</dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </section>
+
+            {% include "components/_professional_links.html" %}
+
+            <section class="profile-side-card profile-side-card--support">
+                <h2>Seguridad y soporte</h2>
+                <p>Reporta informacion incorrecta o una conducta que deba revisar TRAX.</p>
+                <a href="/reportar/usuario/{{ pro.id }}">Reportar usuario</a>
+            </section>
         </aside>
     </section>
 </main>
+{% endblock %}
 
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/professional-profile-v2.js') }}"></script>
 {% endblock %}
