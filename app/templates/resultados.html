@@ -1,129 +1,81 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-cards-v1.css') }}">
+{% endblock %}
+
 {% block content %}
+{% set profesionales = resultados if resultados is defined else [] %}
 
-{% set fallback_profesionales = [
-    {"id": 1, "nombre": "Voltix Pro Services", "servicio": "Electricidad", "zona": "Palermo", "telefono": "1122334455", "descripcion": "Instalaciones, tableros, urgencias y mantenimiento para hogares y locales."},
-    {"id": 2, "nombre": "Frio Central A/C", "servicio": "Refrigeracion A/C", "zona": "Caballito", "telefono": "1133445566", "descripcion": "Instalacion, service y carga de equipos con garantia escrita."},
-    {"id": 3, "nombre": "FlowFix Plomeria", "servicio": "Plomeria", "zona": "Flores", "telefono": "1155667788", "descripcion": "Soluciones rapidas para perdidas, sanitarios, termotanques y obra chica."}
-] %}
-{% set profesionales = resultados if resultados is defined and resultados else fallback_profesionales %}
-
-<main class="listing-screen">
-    <section class="listing-hero">
-        <div class="shell">
-            <span class="signal">Smart marketplace</span>
-            <h1>{{ servicio or "Servicios tecnicos" }}{% if zona %} en {{ zona }}{% endif %}</h1>
-            <p>Compara reputacion, velocidad de respuesta, badges de confianza y precios de referencia.</p>
+<main class="professional-listing">
+    <section class="professional-listing__hero">
+        <div class="shell professional-listing__hero-layout">
+            <div>
+                <span class="professional-listing__eyebrow">Red profesional TRAX</span>
+                <h1>{{ servicio or "Profesionales tecnicos" }}{% if zona %} en {{ zona }}{% endif %}</h1>
+                <p>
+                    Revisa especialidad, ubicacion, reputacion y verificaciones antes
+                    de iniciar una contratacion.
+                </p>
+            </div>
+            <div class="professional-listing__summary" aria-label="Resumen de resultados">
+                <strong>{{ profesionales|length }}</strong>
+                <span>
+                    {% if profesionales|length == 1 %}
+                        profesional encontrado
+                    {% else %}
+                        profesionales encontrados
+                    {% endif %}
+                </span>
+            </div>
         </div>
     </section>
 
-    <section class="shell listing-shell">
-        <form action="/buscar" method="GET" class="smart-filters" aria-label="Filtrar profesionales">
+    <section class="shell professional-listing__content">
+        <form action="/buscar" method="GET" class="professional-filters" aria-label="Filtrar profesionales">
             <label>
                 <span>Servicio</span>
                 <select name="servicio">
-                    <option value="">Todos</option>
-                    <option {% if servicio == "Electricidad" %}selected{% endif %}>Electricidad</option>
-                    <option {% if servicio == "Refrigeracion A/C" %}selected{% endif %}>Refrigeracion A/C</option>
-                    <option {% if servicio == "Plomeria" %}selected{% endif %}>Plomeria</option>
+                    <option value="">Todos los servicios</option>
+                    <option {% if servicio in ("Electricidad",) %}selected{% endif %}>Electricidad</option>
+                    <option
+                        value="Refrigeración A/C"
+                        {% if servicio in ("Refrigeracion A/C", "Refrigeración A/C") %}selected{% endif %}>
+                        Refrigeracion A/C
+                    </option>
+                    <option
+                        value="Plomería"
+                        {% if servicio in ("Plomeria", "Plomería") %}selected{% endif %}>
+                        Plomeria
+                    </option>
                     <option {% if servicio == "Herreria" %}selected{% endif %}>Herreria</option>
                     <option {% if servicio == "Gas domiciliario" %}selected{% endif %}>Gas domiciliario</option>
                 </select>
             </label>
             <label>
                 <span>Zona</span>
-                <input name="zona" value="{{ zona or '' }}" placeholder="Barrio o ciudad">
+                <input name="zona" value="{{ zona or '' }}" placeholder="Ciudad, barrio o zona">
             </label>
-            <label>
-                <span>Disponibilidad</span>
-                <select name="disponibilidad">
-                    <option>Hoy</option>
-                    <option>Esta semana</option>
-                    <option>Urgencias</option>
-                </select>
-            </label>
-            <button type="submit">Aplicar</button>
+            <button type="submit">Aplicar filtros</button>
         </form>
 
-        <div class="listing-grid">
-            <div class="provider-stack">
-                {% for r in profesionales %}
-                {% set profile_id = r["id"]|default(loop.index, true) %}
-                {% set phone = r["telefono"]|default("1122334455", true) %}
-                {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
-                {% set rating = professional_ratings.get(profile_id, {"average": none, "count": 0}) if professional_ratings is defined else {"average": none, "count": 0} %}
-                {% set filled_stars = (rating.average|round(0, "common")|int) if rating.average else 0 %}
-                <article class="provider-card {% if loop.first %}promoted{% endif %}">
-                    <div class="provider-media media-{{ loop.index }}">
-                        {% if loop.first %}<span>Promoted</span>{% endif %}
-                    </div>
-                    <div class="provider-body">
-                        <div class="provider-top">
-                            <div>
-                                <div class="badge-row">
-                                    <span class="trust-badge work">WORK</span>
-                                    {% if badges.pro %}<span class="trust-badge pro">PRO</span>{% endif %}
-                                    {% if badges.verified %}<span class="trust-badge verified">VERIFICADO</span>{% endif %}
-                                </div>
-                                <h2>{{ r["nombre"] }}</h2>
-                                <p>{{ r["servicio"] }} / {{ r["zona"] }}</p>
-                            </div>
-                            <button class="save-btn" type="button" aria-label="Guardar profesional">&hearts;</button>
-                        </div>
-                        <div class="rating-summary {{ 'rating-pro' if badges.pro else 'rating-work' }}">
-                            <div class="rating-stars" aria-label="Rating {{ rating.average or 0 }} de 5">
-                                {% for star in range(1, 6) %}
-                                    <span class="star {{ 'star-filled' if star <= filled_stars else 'star-empty' }}">&#9733;</span>
-                                {% endfor %}
-                            </div>
-                            <span class="rating-label">
-                                {% if rating.average %}{{ rating.average }} / 5{% else %}Sin calificaciones{% endif %}
-                            </span>
-                        </div>
-                        <p class="provider-copy">{{ r["descripcion"] }}</p>
-                        <div class="provider-metrics">
-                            <span><strong>{{ badges.reputation_score }}</strong> reputacion</span>
-                            <span><strong>12 min</strong> respuesta</span>
-                            <span><strong>$18k+</strong> desde</span>
-                        </div>
-                        <div class="action-row">
-                            <a class="btn whatsapp" href="https://wa.me/{{ phone }}" target="_blank" rel="noreferrer">WhatsApp</a>
-                            <a class="btn secondary" href="tel:{{ phone }}">Contactar</a>
-                            <a class="btn orange" href="/profesional/{{ profile_id }}">Ver perfil</a>
-                        </div>
-                    </div>
-                </article>
+        {% if profesionales %}
+            <div class="professional-list" aria-label="Resultados de profesionales">
+                {% for professional in profesionales %}
+                    {% set profile_id = professional.id %}
+                    {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
+                    {% set rating = professional_ratings.get(profile_id, {"average": none, "count": 0}) if professional_ratings is defined else {"average": none, "count": 0} %}
+                    {% include "components/_professional_card.html" %}
                 {% endfor %}
-
-                {% if resultados is defined and not resultados %}
-                <div class="empty-state">
-                    No encontramos coincidencias exactas. Te mostramos alternativas activas para ampliar la busqueda.
-                </div>
-                {% endif %}
             </div>
-
-            <aside class="market-sidebar">
-                <div class="map-card">
-                    <span>Live map</span>
-                    <strong>3 zonas con oferta activa</strong>
-                    <p>Placeholder para mapa por cobertura y disponibilidad.</p>
-                </div>
-                <div class="side-panel gradient">
-                    <span class="kicker">Premium boost</span>
-                    <h3>Publica como proveedor destacado</h3>
-                    <p>Aparece arriba con badge, metricas y portfolio visual.</p>
-                    <a href="/profesionales/nuevo">Crear perfil</a>
-                </div>
-                <div class="side-panel">
-                    <h3>Sponsored listings</h3>
-                    <p>Voltix Pro Services</p>
-                    <p>Frio Central A/C</p>
-                    <p>FlowFix Plomeria</p>
-                </div>
-            </aside>
-        </div>
+        {% else %}
+            <section class="professional-empty" aria-labelledby="professional-empty-title">
+                <span aria-hidden="true">0</span>
+                <h2 id="professional-empty-title">No encontramos profesionales con esos filtros.</h2>
+                <p>Proba con otro servicio, amplia la zona o limpia la busqueda.</p>
+                <a href="/resultados">Ver todos los profesionales</a>
+            </section>
+        {% endif %}
     </section>
 </main>
-
 {% endblock %}

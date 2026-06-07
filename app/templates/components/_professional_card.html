@@ -1,0 +1,100 @@
+{% set professional_name = professional.nombre %}
+{% set professional_specialty = professional.especialidad or professional.servicio %}
+{% set professional_service = professional.servicio %}
+{% set professional_zone = professional.zona %}
+{% set professional_description = professional.descripcion %}
+{% set professional_phone = professional.telefono %}
+{% set professional_availability = professional.disponibilidad|default(none) %}
+{% set rating_average = rating.average if rating.average is not none else none %}
+{% set review_count = rating.count or 0 %}
+
+<article class="professional-card">
+    <div class="professional-card__identity">
+        <div class="professional-card__avatar" aria-hidden="true">
+            {{ professional_name[:2]|upper }}
+        </div>
+        <div class="professional-card__title">
+            <div class="professional-card__badges" aria-label="Distinciones">
+                {% if badges.work %}
+                    <span class="professional-badge professional-badge--work">WORK</span>
+                {% endif %}
+                {% if badges.pro %}
+                    <span class="professional-badge professional-badge--pro">PRO</span>
+                {% endif %}
+                {% if badges.verified %}
+                    <span class="professional-badge professional-badge--verified">VERIFICADO</span>
+                {% endif %}
+            </div>
+            <h2>
+                <a href="/profesional/{{ profile_id }}">{{ professional_name }}</a>
+            </h2>
+            <p>{{ professional_specialty }}</p>
+        </div>
+    </div>
+
+    <div class="professional-card__facts">
+        <div class="professional-card__location">
+            <span>Zona</span>
+            <strong>{{ professional_zone }}</strong>
+        </div>
+        <div class="professional-card__rating">
+            {% if rating_average is not none %}
+                <span class="professional-card__star" aria-hidden="true">&#9733;</span>
+                <strong>{{ rating_average }}</strong>
+                <span>
+                    {{ review_count }}
+                    {% if review_count == 1 %}resena{% else %}resenas{% endif %}
+                </span>
+            {% else %}
+                <strong>Sin calificaciones</strong>
+                <span>0 resenas</span>
+            {% endif %}
+        </div>
+        {% if professional_availability %}
+            <div class="professional-card__availability">
+                <span>Disponibilidad</span>
+                <strong>{{ professional_availability }}</strong>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if professional_description %}
+        <p class="professional-card__description">{{ professional_description }}</p>
+    {% endif %}
+
+    <div class="professional-card__footer">
+        {% if badges.reputation_score %}
+            <span class="professional-card__reputation">
+                Reputacion TRAX: <strong>{{ badges.reputation_score }}</strong>
+            </span>
+        {% else %}
+            <span class="professional-card__reputation">Perfil disponible en TRAX</span>
+        {% endif %}
+        <div class="professional-card__actions">
+            <a class="professional-card__button professional-card__button--secondary" href="/profesional/{{ profile_id }}">
+                Ver perfil
+            </a>
+            {% if professional_phone %}
+                <a
+                    class="professional-card__button professional-card__button--whatsapp"
+                    href="https://wa.me/{{ professional_phone }}"
+                    target="_blank"
+                    rel="noreferrer">
+                    WhatsApp
+                </a>
+            {% else %}
+                <span
+                    class="professional-card__button professional-card__button--whatsapp is-disabled"
+                    aria-disabled="true"
+                    title="Este profesional no informo un numero de WhatsApp">
+                    WhatsApp
+                </span>
+            {% endif %}
+            <a
+                class="professional-card__button professional-card__button--primary"
+                href="/contratacion/nueva?professional_id={{ profile_id }}&servicio={{ professional_service|urlencode }}">
+                Contactar
+            </a>
+        </div>
+    </div>
+</article>

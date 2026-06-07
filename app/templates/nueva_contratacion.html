@@ -2,6 +2,9 @@
 
 {% block content %}
 
+{% set entry_professional_id = request.args.get("professional_id", "") %}
+{% set entry_service = request.args.get("servicio", "") %}
+
 <section class="form-section">
     <div class="section-container">
         <h2>Nueva contratacion</h2>
@@ -13,9 +16,19 @@
 
         <form action="/contratacion/nueva" method="POST" class="form-card">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="number" name="professional_id" placeholder="ID del profesional" required>
+            <input
+                type="number"
+                name="professional_id"
+                value="{{ entry_professional_id }}"
+                placeholder="ID del profesional"
+                required>
 
-            <input type="text" name="servicio" placeholder="Servicio requerido" required>
+            <input
+                type="text"
+                name="servicio"
+                value="{{ entry_service }}"
+                placeholder="Servicio requerido"
+                required>
 
             <textarea name="descripcion" placeholder="Descripcion del trabajo"></textarea>
 
