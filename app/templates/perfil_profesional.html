@@ -14,20 +14,30 @@
 {% set descripcion = pro.descripcion %}
 {% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
 {% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
+{% set gallery_entries = pro.gallery_urls.splitlines() if pro.gallery_urls else [] %}
 
 <main class="professional-profile">
     <section class="professional-profile__cover" aria-label="Portada profesional">
+        {% if pro.cover_url %}
+            <img class="professional-profile__cover-image" src="{{ pro.cover_url }}" alt="">
+        {% endif %}
         <div class="professional-profile__cover-grid"></div>
         <div class="shell professional-profile__cover-content">
-            <span>Portada profesional</span>
-            <small>Espacio preparado para Professional Media &amp; Links v1</small>
+            {% if not pro.cover_url %}
+                <span>Portada profesional</span>
+                <small>Agrega una portada desde la edicion de tu perfil</small>
+            {% endif %}
         </div>
     </section>
 
     <section class="shell professional-profile__identity">
         <div class="professional-profile__brand" aria-label="Logo o marca profesional">
-            <span>{{ nombre[:2]|upper }}</span>
-            <small>Marca</small>
+            {% if pro.logo_url %}
+                <img src="{{ pro.logo_url }}" alt="Logo de {{ nombre }}">
+            {% else %}
+                <span>{{ nombre[:2]|upper }}</span>
+                <small>Marca</small>
+            {% endif %}
         </div>
 
         <div class="professional-profile__avatar" aria-label="Avatar de {{ nombre }}">

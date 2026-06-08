@@ -32,6 +32,14 @@
     background-size: 42px 42px;
 }
 
+.professional-profile__cover-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .professional-profile__cover-content {
     position: relative;
     z-index: 1;
@@ -94,6 +102,13 @@
     font-weight: var(--trax-font-weight-bold);
     letter-spacing: 0.06em;
     text-transform: uppercase;
+}
+
+.professional-profile__brand img {
+    width: 100%;
+    height: 100%;
+    border-radius: calc(var(--trax-radius-lg) - 4px);
+    object-fit: cover;
 }
 
 .professional-profile__avatar {

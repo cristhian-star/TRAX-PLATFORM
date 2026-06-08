@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-media-form.css') }}">
+{% endblock %}
+
 {% block content %}
+{% set gallery_entries = professional.gallery_urls.splitlines() if professional and professional.gallery_urls else [] %}
 
 <section class="form-section professional-onboarding">
     <div class="section-container">
@@ -45,8 +50,82 @@
 
             <label>
                 Portfolio / trabajos realizados
-                <textarea name="portfolio_urls" placeholder="Links a Drive, redes, web, fotos o trabajos realizados">{{ professional.portfolio_urls if professional and professional.portfolio_urls else '' }}</textarea>
+                <textarea name="portfolio_urls" placeholder="Referencias o evidencia adicional que quieras conservar">{{ professional.portfolio_urls if professional and professional.portfolio_urls else '' }}</textarea>
+                <small>Campo compatible con perfiles anteriores. Usa las secciones siguientes para mostrar medios y redes en tu perfil publico.</small>
             </label>
+
+            <fieldset class="media-form-panel">
+                <legend>Identidad visual</legend>
+                <p>Las imagenes deben estar publicadas en una URL HTTPS. TRAX no almacena archivos en esta etapa.</p>
+
+                <div class="media-form-grid">
+                    <label>
+                        Logo URL
+                        <input type="url" name="logo_url" inputmode="url" placeholder="https://..." value="{{ professional.logo_url if professional and professional.logo_url else '' }}">
+                    </label>
+
+                    <label>
+                        Portada URL
+                        <input type="url" name="cover_url" inputmode="url" placeholder="https://..." value="{{ professional.cover_url if professional and professional.cover_url else '' }}">
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="media-form-panel">
+                <legend>Galeria de trabajos</legend>
+                <p>Podes agregar hasta 6 URLs HTTPS de imagenes.</p>
+
+                <div class="media-form-grid media-form-grid--gallery">
+                    {% for position in range(6) %}
+                        <label>
+                            Imagen {{ position + 1 }}
+                            <input
+                                type="url"
+                                name="gallery_urls"
+                                inputmode="url"
+                                placeholder="https://..."
+                                value="{{ gallery_entries[position] if position < gallery_entries|length else '' }}">
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="media-form-panel">
+                <legend>Enlaces externos</legend>
+                <p>Agrega solo canales profesionales que quieras mostrar publicamente.</p>
+
+                <div class="media-form-grid">
+                    <label>
+                        Google Drive
+                        <input type="url" name="google_drive_url" inputmode="url" placeholder="https://drive.google.com/..." value="{{ professional.google_drive_url if professional and professional.google_drive_url else '' }}">
+                    </label>
+
+                    <label>
+                        Sitio web
+                        <input type="url" name="website_url" inputmode="url" placeholder="https://..." value="{{ professional.website_url if professional and professional.website_url else '' }}">
+                    </label>
+
+                    <label>
+                        Instagram
+                        <input type="url" name="instagram_url" inputmode="url" placeholder="https://instagram.com/..." value="{{ professional.instagram_url if professional and professional.instagram_url else '' }}">
+                    </label>
+
+                    <label>
+                        TikTok
+                        <input type="url" name="tiktok_url" inputmode="url" placeholder="https://tiktok.com/@..." value="{{ professional.tiktok_url if professional and professional.tiktok_url else '' }}">
+                    </label>
+
+                    <label>
+                        YouTube
+                        <input type="url" name="youtube_url" inputmode="url" placeholder="https://youtube.com/..." value="{{ professional.youtube_url if professional and professional.youtube_url else '' }}">
+                    </label>
+                </div>
+
+                <label>
+                    Otros enlaces
+                    <textarea name="other_links" placeholder="Una URL por linea">{{ professional.other_links if professional and professional.other_links else '' }}</textarea>
+                </label>
+            </fieldset>
 
             <div class="evidence-panel">
                 <strong>Validacion profesional</strong>

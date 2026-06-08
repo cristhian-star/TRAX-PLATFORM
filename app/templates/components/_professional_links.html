@@ -1,55 +1,59 @@
 {% set links = namespace(count=0) %}
 
+{% macro external_link(url, link_type, label, icon) %}
+    {% if url %}
+        {% set links.count = links.count + 1 %}
+        <a
+            class="profile-external-link profile-external-link--{{ link_type }}"
+            href="{{ url }}"
+            target="_blank"
+            rel="noopener noreferrer">
+            <span aria-hidden="true">{{ icon }}</span>
+            <strong>{{ label }}</strong>
+            <small>Abrir enlace</small>
+        </a>
+    {% endif %}
+{% endmacro %}
+
 <section class="profile-side-card" aria-labelledby="external-links-title">
     <span class="profile-side-card__eyebrow">Presencia digital</span>
     <h2 id="external-links-title">Enlaces externos</h2>
 
     <div class="profile-external-links">
-        {% for raw_url in portfolio_entries %}
-            {% set external_url = raw_url|trim %}
-            {% set external_lower = external_url|lower %}
-            {% if external_url.startswith(("http://", "https://")) %}
-                {% set links.count = links.count + 1 %}
-                {% if "drive.google.com" in external_lower %}
-                    {% set link_type = "drive" %}
-                    {% set link_label = "Google Drive" %}
-                    {% set link_icon = "GD" %}
-                {% elif "instagram.com" in external_lower %}
-                    {% set link_type = "instagram" %}
-                    {% set link_label = "Instagram" %}
-                    {% set link_icon = "IG" %}
-                {% elif "tiktok.com" in external_lower %}
-                    {% set link_type = "tiktok" %}
-                    {% set link_label = "TikTok" %}
-                    {% set link_icon = "TT" %}
-                {% elif "youtube.com" in external_lower or "youtu.be" in external_lower %}
-                    {% set link_type = "youtube" %}
-                    {% set link_label = "YouTube" %}
-                    {% set link_icon = "YT" %}
-                {% elif "facebook.com" in external_lower %}
-                    {% set link_type = "social" %}
-                    {% set link_label = "Facebook" %}
-                    {% set link_icon = "FB" %}
-                {% elif "linkedin.com" in external_lower %}
-                    {% set link_type = "social" %}
-                    {% set link_label = "LinkedIn" %}
-                    {% set link_icon = "IN" %}
-                {% else %}
-                    {% set link_type = "website" %}
-                    {% set link_label = "Sitio web u otro enlace" %}
-                    {% set link_icon = "WEB" %}
+        {{ external_link(pro.google_drive_url, "drive", "Google Drive", "GD") }}
+        {{ external_link(pro.website_url, "website", "Sitio web", "WEB") }}
+        {{ external_link(pro.instagram_url, "instagram", "Instagram", "IG") }}
+        {{ external_link(pro.tiktok_url, "tiktok", "TikTok", "TT") }}
+        {{ external_link(pro.youtube_url, "youtube", "YouTube", "YT") }}
+
+        {% if pro.other_links %}
+            {% for raw_url in pro.other_links.splitlines() %}
+                {% set other_url = raw_url|trim %}
+                {% if other_url %}
+                    {{ external_link(other_url, "website", "Otro enlace", "+") }}
                 {% endif %}
-                <a
-                    class="profile-external-link profile-external-link--{{ link_type }}"
-                    href="{{ external_url }}"
-                    target="_blank"
-                    rel="noreferrer">
-                    <span aria-hidden="true">{{ link_icon }}</span>
-                    <strong>{{ link_label }}</strong>
-                    <small>Abrir enlace</small>
-                </a>
-            {% endif %}
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        {% if links.count == 0 %}
+            {% for raw_url in portfolio_entries %}
+                {% set legacy_url = raw_url|trim %}
+                {% set legacy_lower = legacy_url|lower %}
+                {% if legacy_url.startswith(("http://", "https://")) %}
+                    {% if "drive.google.com" in legacy_lower %}
+                        {{ external_link(legacy_url, "drive", "Google Drive", "GD") }}
+                    {% elif "instagram.com" in legacy_lower %}
+                        {{ external_link(legacy_url, "instagram", "Instagram", "IG") }}
+                    {% elif "tiktok.com" in legacy_lower %}
+                        {{ external_link(legacy_url, "tiktok", "TikTok", "TT") }}
+                    {% elif "youtube.com" in legacy_lower or "youtu.be" in legacy_lower %}
+                        {{ external_link(legacy_url, "youtube", "YouTube", "YT") }}
+                    {% else %}
+                        {{ external_link(legacy_url, "website", "Sitio web u otro enlace", "WEB") }}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
         {% if links.count == 0 %}
             <div class="profile-links-placeholder">
@@ -61,7 +65,7 @@
                 <div><span>+</span><strong>Otras redes</strong></div>
             </div>
             <p class="profile-side-card__note">
-                Seccion preparada. Los enlaces se cargaran en Professional Media &amp; Links v1.
+                Este profesional todavia no agrego enlaces externos.
             </p>
         {% endif %}
     </div>

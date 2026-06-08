@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from flask import Blueprint, render_template, request, redirect, session
 from app.services.audit_service import create_audit_log, get_recent_audit_logs
 from app.services.abuse_report_service import (
@@ -74,6 +76,38 @@ def _parse_optional_int(value):
         return None
 
     return int(value)
+
+
+def _normalize_url(value, field_label, https_only=False):
+    value = _empty_to_none(value)
+
+    if value is None:
+        return None
+
+    parsed = urlsplit(value)
+    allowed_schemes = {"https"} if https_only else {"http", "https"}
+
+    if parsed.scheme.lower() not in allowed_schemes or not parsed.netloc:
+        scheme_hint = "HTTPS" if https_only else "HTTP o HTTPS"
+        raise ValueError(f"{field_label} debe ser una URL {scheme_hint} valida")
+
+    return value
+
+
+def _normalize_url_list(values, field_label, max_items=None, https_only=False):
+    normalized = []
+
+    for value in values:
+        value = _empty_to_none(value)
+        if value is None:
+            continue
+
+        normalized.append(_normalize_url(value, field_label, https_only=https_only))
+
+    if max_items is not None and len(normalized) > max_items:
+        raise ValueError(f"{field_label} admite hasta {max_items} URLs")
+
+    return "\n".join(normalized) or None
 
 
 def _build_evidence_text(form):
@@ -301,6 +335,50 @@ def completar_perfil_profesional():
         certificaciones_text = _empty_to_none(request.form.get("certificaciones_text"))
         portfolio_urls = _empty_to_none(request.form.get("portfolio_urls"))
 
+        try:
+            logo_url = _normalize_url(
+                request.form.get("logo_url"),
+                "Logo",
+                https_only=True,
+            )
+            cover_url = _normalize_url(
+                request.form.get("cover_url"),
+                "Portada",
+                https_only=True,
+            )
+            gallery_urls = _normalize_url_list(
+                request.form.getlist("gallery_urls"),
+                "Galeria",
+                max_items=6,
+                https_only=True,
+            )
+            google_drive_url = _normalize_url(
+                request.form.get("google_drive_url"),
+                "Google Drive",
+            )
+            website_url = _normalize_url(
+                request.form.get("website_url"),
+                "Sitio web",
+            )
+            instagram_url = _normalize_url(
+                request.form.get("instagram_url"),
+                "Instagram",
+            )
+            tiktok_url = _normalize_url(
+                request.form.get("tiktok_url"),
+                "TikTok",
+            )
+            youtube_url = _normalize_url(
+                request.form.get("youtube_url"),
+                "YouTube",
+            )
+            other_links = _normalize_url_list(
+                request.form.get("other_links", "").splitlines(),
+                "Otros enlaces",
+            )
+        except ValueError as error:
+            return str(error), 400
+
         professional = complete_professional_profile(
             user_id=user_id,
             nombre=session.get("user_name", "Profesional TRAX"),
@@ -310,6 +388,15 @@ def completar_perfil_profesional():
             numero_credencial=_empty_to_none(request.form.get("numero_credencial")),
             certificaciones_text=certificaciones_text,
             portfolio_urls=portfolio_urls,
+            logo_url=logo_url,
+            cover_url=cover_url,
+            gallery_urls=gallery_urls,
+            google_drive_url=google_drive_url,
+            website_url=website_url,
+            instagram_url=instagram_url,
+            tiktok_url=tiktok_url,
+            youtube_url=youtube_url,
+            other_links=other_links,
         )
 
         create_or_update_professional_verification_request(

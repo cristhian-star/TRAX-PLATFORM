@@ -51,6 +51,15 @@ def complete_professional_profile(
     numero_credencial=None,
     certificaciones_text=None,
     portfolio_urls=None,
+    logo_url=None,
+    cover_url=None,
+    gallery_urls=None,
+    google_drive_url=None,
+    website_url=None,
+    instagram_url=None,
+    tiktok_url=None,
+    youtube_url=None,
+    other_links=None,
 ):
     professional = get_professional_by_user_id(user_id)
 
@@ -70,6 +79,15 @@ def complete_professional_profile(
     professional.numero_credencial = numero_credencial
     professional.certificaciones_text = certificaciones_text
     professional.portfolio_urls = portfolio_urls
+    professional.logo_url = logo_url
+    professional.cover_url = cover_url
+    professional.gallery_urls = gallery_urls
+    professional.google_drive_url = google_drive_url
+    professional.website_url = website_url
+    professional.instagram_url = instagram_url
+    professional.tiktok_url = tiktok_url
+    professional.youtube_url = youtube_url
+    professional.other_links = other_links
     professional.estado_perfil = "PENDIENTE_VERIFICACION"
     professional.perfil_completo = True
 

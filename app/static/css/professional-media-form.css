@@ -1,0 +1,49 @@
+.professional-onboarding .onboarding-form {
+    display: grid;
+    gap: var(--trax-space-5);
+}
+
+.professional-onboarding label {
+    display: grid;
+    gap: var(--trax-space-2);
+}
+
+.professional-onboarding label small,
+.media-form-panel > p {
+    margin: 0;
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-14);
+    line-height: var(--trax-line-height-body);
+}
+
+.media-form-panel {
+    display: grid;
+    gap: var(--trax-space-4);
+    margin: 0;
+    padding: var(--trax-space-5);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-lg);
+    background: var(--trax-color-surface-subtle);
+}
+
+.media-form-panel legend {
+    padding: 0 var(--trax-space-2);
+    color: var(--trax-color-brand-strong);
+    font-size: var(--trax-font-size-18);
+    font-weight: var(--trax-font-weight-bold);
+}
+
+.media-form-grid {
+    display: grid;
+    gap: var(--trax-space-4);
+}
+
+@media (min-width: 48rem) {
+    .media-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .media-form-grid--gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
