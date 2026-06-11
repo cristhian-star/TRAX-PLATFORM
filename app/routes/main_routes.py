@@ -10,7 +10,8 @@ from app.services.abuse_report_service import (
 from app.services.category_service import (
     request_category,
     get_category_requests_summary,
-    approve_category
+    approve_category,
+    get_explorable_categories,
 )
 from app.services.professional_service import (
     create_professional,
@@ -275,6 +276,36 @@ def listado_profesionales():
         zona=zona,
         professional_badges=_get_professionals_badges(resultados),
         professional_ratings=_get_professionals_ratings(resultados)
+    )
+
+
+@main.route("/explorar")
+def explorar_rubros():
+    industria = request.args.get("industria", "").strip()
+    rubro_seleccionado = request.args.get("rubro", "").strip()
+    rubros_disponibles = get_explorable_categories()
+    rubros = rubros_disponibles
+
+    if industria:
+        rubros = [
+            rubro
+            for rubro in rubros
+            if rubro["industria"].casefold() == industria.casefold()
+        ]
+
+    if rubro_seleccionado:
+        rubros = [
+            rubro
+            for rubro in rubros
+            if rubro["nombre"].casefold() == rubro_seleccionado.casefold()
+        ]
+
+    return render_template(
+        "explorar_rubros.html",
+        rubros=rubros,
+        rubros_disponibles=rubros_disponibles,
+        industria=industria,
+        rubro_seleccionado=rubro_seleccionado,
     )
 
 

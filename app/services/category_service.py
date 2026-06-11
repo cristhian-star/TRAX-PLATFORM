@@ -1,6 +1,49 @@
 from app import db
 from app.models.category import Category
 from app.models.category_request import CategoryRequest
+from app.models.professional import Professional
+
+
+def get_explorable_categories():
+    categories = Category.query.filter_by(estado="ACTIVO").order_by(Category.nombre).all()
+    known_names = {category.nombre.casefold() for category in categories}
+    rubros = [
+        {
+            "nombre": category.nombre,
+            "descripcion": category.descripcion,
+            "industria": "Servicios tecnicos",
+            "source": "category",
+        }
+        for category in categories
+    ]
+
+    published_services = (
+        db.session.query(Professional.servicio)
+        .filter(Professional.servicio.isnot(None))
+        .filter(Professional.servicio != "")
+        .distinct()
+        .order_by(Professional.servicio)
+        .all()
+    )
+
+    for service_row in published_services:
+        service_name = service_row[0].strip()
+        normalized_name = service_name.casefold()
+
+        if not service_name or normalized_name in known_names:
+            continue
+
+        known_names.add(normalized_name)
+        rubros.append(
+            {
+                "nombre": service_name,
+                "descripcion": None,
+                "industria": "Servicios tecnicos",
+                "source": "professional",
+            }
+        )
+
+    return sorted(rubros, key=lambda rubro: rubro["nombre"].casefold())
 
 
 def request_category(nombre_rubro, descripcion, email_notificacion):

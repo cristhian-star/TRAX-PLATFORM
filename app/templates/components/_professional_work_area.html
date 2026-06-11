@@ -1,0 +1,44 @@
+<section class="profile-section" aria-labelledby="work-area-title">
+    <div class="profile-section__heading profile-section__heading--split">
+        <div>
+            <span>Cobertura profesional</span>
+            <h2 id="work-area-title">Zona de trabajo</h2>
+        </div>
+        <small>Mapa ilustrativo</small>
+    </div>
+
+    <div class="profile-work-area">
+        <div
+            class="profile-work-area__map"
+            role="img"
+            aria-label="Representacion visual de la cobertura en {{ zona or 'zona no informada' }}">
+            <span class="profile-work-area__road profile-work-area__road--one"></span>
+            <span class="profile-work-area__road profile-work-area__road--two"></span>
+            <span class="profile-work-area__road profile-work-area__road--three"></span>
+            <span class="profile-work-area__coverage"></span>
+            <span class="profile-work-area__marker">
+                <i aria-hidden="true"></i>
+                <strong>{{ zona or "Zona no informada" }}</strong>
+            </span>
+        </div>
+
+        <dl class="profile-work-area__details">
+            <div>
+                <dt>Zona principal</dt>
+                <dd>{{ zona or "No informada" }}</dd>
+            </div>
+            <div>
+                <dt>Radio de cobertura</dt>
+                <dd>A coordinar con el profesional</dd>
+            </div>
+            <div>
+                <dt>Localidad / area de trabajo</dt>
+                <dd>{{ zona or "Consultar disponibilidad" }}</dd>
+            </div>
+        </dl>
+    </div>
+
+    <p class="profile-work-area__note">
+        La ubicacion es orientativa. La cobertura exacta se confirma antes de contratar.
+    </p>
+</section>

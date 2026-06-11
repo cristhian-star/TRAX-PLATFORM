@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/explore-rubros-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="explore-rubros">
+    <section class="explore-rubros__hero">
+        <div class="shell explore-rubros__hero-layout">
+            <div>
+                <span class="explore-rubros__eyebrow">Directorio TRAX</span>
+                <h1>Explora rubros y encontra al profesional indicado</h1>
+                <p>
+                    Recorre los servicios disponibles en la plataforma y accede al
+                    listado de profesionales de cada especialidad.
+                </p>
+            </div>
+            <div class="explore-rubros__metric" aria-label="Cantidad de rubros visibles">
+                <strong>{{ rubros|length }}</strong>
+                <span>rubros disponibles</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shell explore-rubros__content">
+        <form action="/explorar" method="GET" class="explore-filters" aria-label="Filtrar rubros">
+            <label>
+                <span>Industria</span>
+                <select name="industria">
+                    <option value="">Todas las industrias</option>
+                    <option value="Servicios tecnicos" {% if industria == "Servicios tecnicos" %}selected{% endif %}>
+                        Servicios tecnicos
+                    </option>
+                </select>
+            </label>
+
+            <label>
+                <span>Rubro / categoria</span>
+                <select name="rubro">
+                    <option value="">Todos los rubros</option>
+                    {% for rubro in rubros_disponibles %}
+                        <option value="{{ rubro.nombre }}" {% if rubro_seleccionado == rubro.nombre %}selected{% endif %}>
+                            {{ rubro.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <button type="submit">Aplicar filtros</button>
+            {% if industria or rubro_seleccionado %}
+                <a href="/explorar">Limpiar</a>
+            {% endif %}
+        </form>
+
+        {% if rubros %}
+            <div class="rubro-grid" aria-label="Rubros disponibles">
+                {% for rubro in rubros %}
+                    <article class="rubro-card">
+                        <div class="rubro-card__visual" aria-hidden="true">
+                            <span>{{ "%02d"|format(loop.index) }}</span>
+                            <i></i>
+                            <i></i>
+                            <i></i>
+                        </div>
+                        <div class="rubro-card__body">
+                            <span class="rubro-card__industry">{{ rubro.industria }}</span>
+                            <h2>{{ rubro.nombre }}</h2>
+                            <p>
+                                {{ rubro.descripcion or "Profesionales disponibles para trabajos, mantenimiento y asistencia tecnica." }}
+                            </p>
+                            <a href="/resultados?servicio={{ rubro.nombre|urlencode }}">
+                                Ver profesionales
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="explore-empty" aria-labelledby="explore-empty-title">
+                <span aria-hidden="true">0</span>
+                <h2 id="explore-empty-title">No encontramos rubros con esos filtros.</h2>
+                <p>Proba otra categoria o limpia los filtros para ver todo el directorio.</p>
+                <a href="/explorar">Ver todos los rubros</a>
+            </section>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
