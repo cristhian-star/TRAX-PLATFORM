@@ -30,11 +30,64 @@
     </section>
 
     <section class="budget-shell budget-entry">
+        {% if anonymous_preview %}
+            <div class="budget-alert budget-alert--success" role="status">
+                Tu solicitud fue preparada correctamente. No se publico todavia porque estas navegando como visitante.
+            </div>
+
+            <section class="budget-panel">
+                <div class="budget-section-heading">
+                    <span class="budget-eyebrow">Vista previa</span>
+                    <h2>{{ anonymous_preview.titulo }}</h2>
+                    <p>
+                        Podes iniciar tu solicitud sin registrarte. Para gestionar, adjudicar o hacer
+                        seguimiento, te pediremos iniciar sesion mas adelante.
+                    </p>
+                </div>
+
+                <dl class="budget-facts">
+                    <div>
+                        <dt>Categoria</dt>
+                        <dd>{{ anonymous_preview.categoria }}</dd>
+                    </div>
+                    <div>
+                        <dt>Zona</dt>
+                        <dd>{{ anonymous_preview.zona }}</dd>
+                    </div>
+                    <div>
+                        <dt>Fecha estimada</dt>
+                        <dd>{{ anonymous_preview.fecha_estimada_display }}</dd>
+                    </div>
+                    <div>
+                        <dt>Urgencia</dt>
+                        <dd>{{ anonymous_preview.urgencia|capitalize }}</dd>
+                    </div>
+                </dl>
+
+                <p class="budget-description">{{ anonymous_preview.descripcion }}</p>
+
+                <div class="budget-form__actions">
+                    <p>
+                        Por seguridad, esta vista previa no se guarda ni queda disponible para otros usuarios.
+                    </p>
+                    <a class="budget-button budget-button--primary" href="/login?next=/presupuestos/nuevo">
+                        Iniciar sesion para publicar
+                    </a>
+                </div>
+            </section>
+        {% else %}
         <div class="budget-section-heading">
             <span class="budget-eyebrow">Nueva solicitud</span>
             <h2>Datos del trabajo</h2>
             <p>Los campos marcados con * son obligatorios.</p>
         </div>
+
+        {% if is_anonymous %}
+            <div class="budget-alert budget-alert--info" role="status">
+                Podes iniciar tu solicitud sin registrarte. Para gestionar, adjudicar o hacer seguimiento,
+                te pediremos iniciar sesion mas adelante.
+            </div>
+        {% endif %}
 
         {% if error %}
             <div class="budget-alert budget-alert--error" role="alert">{{ error }}</div>
@@ -108,10 +161,11 @@
             <div class="budget-form__actions">
                 <p>Podras revisar los presupuestos desde el detalle de esta solicitud.</p>
                 <button class="budget-button budget-button--primary" type="submit">
-                    Publicar solicitud
+                    {% if is_anonymous %}Preparar solicitud{% else %}Publicar solicitud{% endif %}
                 </button>
             </div>
         </form>
+        {% endif %}
     </section>
 </main>
 {% endblock %}

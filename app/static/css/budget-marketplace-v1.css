@@ -211,6 +211,12 @@
     background: var(--trax-success-50);
 }
 
+.budget-alert--info {
+    border-color: var(--trax-cyan-100);
+    color: var(--trax-cyan-700);
+    background: var(--trax-cyan-50);
+}
+
 .budget-detail-hero {
     padding: var(--trax-space-8) 0 var(--trax-space-10);
 }

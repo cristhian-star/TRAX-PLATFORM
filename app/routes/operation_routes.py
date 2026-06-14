@@ -302,8 +302,14 @@ def cancelar_contratacion(id):
 
 
 @operations.route("/presupuestos/nuevo", methods=["GET", "POST"])
-@login_required
 def nuevo_presupuesto():
+    current_user = (
+        db.session.get(User, session.get("user_id"))
+        if session.get("user_id")
+        else None
+    )
+    is_anonymous = not is_user_active(current_user)
+
     if request.method == "POST":
         form_data = {
             "categoria": _empty_to_none(request.form.get("categoria")) or "",
@@ -322,6 +328,7 @@ def nuevo_presupuesto():
                 "nuevo_presupuesto.html",
                 form_data=form_data,
                 error="Completa categoria, zona, titulo y descripcion.",
+                is_anonymous=is_anonymous,
             ), 400
 
         if form_data["urgencia"] not in ("BAJA", "NORMAL", "ALTA"):
@@ -329,6 +336,7 @@ def nuevo_presupuesto():
                 "nuevo_presupuesto.html",
                 form_data=form_data,
                 error="Selecciona una urgencia valida.",
+                is_anonymous=is_anonymous,
             ), 400
 
         try:
@@ -338,19 +346,35 @@ def nuevo_presupuesto():
                 "nuevo_presupuesto.html",
                 form_data=form_data,
                 error="La fecha estimada no es valida.",
+                is_anonymous=is_anonymous,
             ), 400
 
-        budget_request = create_budget_request(
-            cliente_id=session["user_id"],
-            categoria=form_data["categoria"],
-            titulo=form_data["titulo"],
-            descripcion=form_data["descripcion"],
-            zona=form_data["zona"],
-            fecha_estimada=estimated_date,
-            urgencia=form_data["urgencia"],
-        )
+        if not is_anonymous:
+            budget_request = create_budget_request(
+                cliente_id=current_user.id,
+                categoria=form_data["categoria"],
+                titulo=form_data["titulo"],
+                descripcion=form_data["descripcion"],
+                zona=form_data["zona"],
+                fecha_estimada=estimated_date,
+                urgencia=form_data["urgencia"],
+            )
 
-        return redirect(url_for("operations.detalle_presupuesto", id=budget_request.id))
+            return redirect(url_for("operations.detalle_presupuesto", id=budget_request.id))
+
+        return render_template(
+            "nuevo_presupuesto.html",
+            form_data=form_data,
+            anonymous_preview={
+                **form_data,
+                "fecha_estimada_display": (
+                    estimated_date.strftime("%d/%m/%Y")
+                    if estimated_date
+                    else "A coordinar"
+                ),
+            },
+            is_anonymous=True,
+        )
 
     return render_template(
         "nuevo_presupuesto.html",
@@ -359,6 +383,7 @@ def nuevo_presupuesto():
             "fecha_estimada": _empty_to_none(request.args.get("fecha_estimada")) or "",
             "urgencia": _empty_to_none(request.args.get("urgencia")) or "NORMAL",
         },
+        is_anonymous=is_anonymous,
     )
 
 
