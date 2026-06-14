@@ -36,6 +36,10 @@
             <p class="emergency-directory__notice">
                 Solicitud registrada. Ahora podés contactar profesionales compatibles.
             </p>
+        {% elif anonymous_search %}
+            <p class="emergency-directory__notice">
+                Búsqueda preparada. Como visitante no se guardó una solicitud en TRAX.
+            </p>
         {% endif %}
 
         <div class="emergency-directory__toolbar">

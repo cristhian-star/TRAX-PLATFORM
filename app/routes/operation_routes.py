@@ -27,6 +27,7 @@ from app.services.review_service import (
     get_professional_reviews,
 )
 from app.services.subscription_service import has_pro_access
+from app.services.user_service import is_user_active
 from app.services.verification_service import has_approved_verification
 from app.utils.decorators import login_required, pro_required, profile_complete_required, role_required, verified_required
 
@@ -280,23 +281,38 @@ def nuevo_presupuesto():
 
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
-@login_required
 def nueva_emergencia():
     if request.method == "POST":
-        emergency_request = create_emergency_request(
-            cliente_id=session["user_id"],
-            categoria=request.form.get("categoria"),
-            descripcion=request.form.get("descripcion"),
-            zona=request.form.get("zona"),
-            prioridad=request.form.get("prioridad")
-        )
+        categoria = _empty_to_none(request.form.get("categoria"))
+        zona = _empty_to_none(request.form.get("zona"))
+        descripcion = _empty_to_none(request.form.get("descripcion"))
+
+        if not categoria or not zona or not descripcion:
+            return "Categoria, zona y descripcion son requeridas", 400
+
+        redirect_values = {
+            "categoria": categoria,
+            "zona": zona,
+        }
+
+        current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
+
+        if is_user_active(current_user):
+            emergency_request = create_emergency_request(
+                cliente_id=current_user.id,
+                categoria=categoria,
+                descripcion=descripcion,
+                zona=zona,
+                prioridad=request.form.get("prioridad") or "ALTA",
+            )
+            redirect_values["solicitud"] = emergency_request.id
+        else:
+            redirect_values["consulta_anonima"] = "1"
 
         return redirect(
             url_for(
                 "operations.directorio_emergencias",
-                categoria=emergency_request.categoria,
-                zona=emergency_request.zona,
-                solicitud=emergency_request.id,
+                **redirect_values,
             )
         )
 
@@ -307,7 +323,6 @@ def nueva_emergencia():
 
 
 @operations.route("/emergencias/directorio", methods=["GET"])
-@login_required
 def directorio_emergencias():
     categoria = _empty_to_none(request.args.get("categoria")) or ""
     zona = _empty_to_none(request.args.get("zona")) or ""
@@ -323,6 +338,7 @@ def directorio_emergencias():
         categoria=categoria,
         zona=zona,
         request_created=bool(request.args.get("solicitud")),
+        anonymous_search=request.args.get("consulta_anonima") == "1",
     )
 
 
