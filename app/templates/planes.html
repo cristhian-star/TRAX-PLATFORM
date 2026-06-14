@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/planes-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="plans-page">
+    <section class="plans-hero">
+        <div class="shell plans-hero__content">
+            <span>Planes TRAX</span>
+            <h1>Una modalidad para cada etapa de trabajo</h1>
+            <p>
+                Compara alternativas para explorar la plataforma, ampliar herramientas
+                y potenciar tu presencia profesional.
+            </p>
+        </div>
+    </section>
+
+    <section class="shell plans-content" aria-labelledby="plans-title">
+        <div class="plans-heading">
+            <span>Comparativa publica</span>
+            <h2 id="plans-title">Elegí el plan que mejor acompaña tus objetivos</h2>
+            <p>Los precios son placeholders y se definirán en una etapa comercial posterior.</p>
+        </div>
+
+        <div class="plans-grid">
+            <article class="plan-card">
+                <span class="plan-card__label">Inicio</span>
+                <h3>Free</h3>
+                <p class="plan-card__price">$0 <small>/ mes</small></p>
+                <p class="plan-card__summary">Para conocer TRAX y operar con las funciones esenciales.</p>
+                <ul>
+                    <li>Acceso al directorio de rubros</li>
+                    <li>Perfil básico en la plataforma</li>
+                    <li>Consultas y oportunidades iniciales</li>
+                </ul>
+                <a href="/register">Comenzar con Free</a>
+            </article>
+
+            <article class="plan-card plan-card--plus">
+                <span class="plan-card__label">Más herramientas</span>
+                <h3>Plus</h3>
+                <p class="plan-card__price">$-- <small>/ mes</small></p>
+                <p class="plan-card__summary">Para usuarios que necesitan mayor capacidad y seguimiento.</p>
+                <ul>
+                    <li>Todo lo incluido en Free</li>
+                    <li>Mayor visibilidad en búsquedas</li>
+                    <li>Herramientas ampliadas de gestión</li>
+                </ul>
+                <a href="/register">Elegir Plus</a>
+            </article>
+
+            <article class="plan-card plan-card--pro">
+                <span class="plan-card__label">Profesionales</span>
+                <h3>Pro</h3>
+                <p class="plan-card__price">$-- <small>/ mes</small></p>
+                <p class="plan-card__summary">Para técnicos y contratistas que quieren potenciar su actividad.</p>
+                <ul>
+                    <li>Todo lo incluido en Plus</li>
+                    <li>Distinción PRO en el perfil</li>
+                    <li>Prioridad y herramientas profesionales</li>
+                </ul>
+                <a href="/register">Conocer Pro</a>
+            </article>
+        </div>
+
+        <p class="plans-disclaimer">
+            Esta pantalla es informativa. Precios, límites y beneficios definitivos están sujetos a validación comercial.
+        </p>
+    </section>
+</main>
+{% endblock %}

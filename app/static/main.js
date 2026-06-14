@@ -5,8 +5,32 @@ document.addEventListener("DOMContentLoaded", () => {
         menuToggle.addEventListener("click", () => {
             const isOpen = document.body.classList.toggle("menu-open");
             menuToggle.setAttribute("aria-expanded", String(isOpen));
+            menuToggle.setAttribute("aria-label", isOpen ? "Cerrar menu" : "Abrir menu");
         });
     }
+
+    const navDropdowns = document.querySelectorAll(".nav-dropdown");
+
+    navDropdowns.forEach((dropdown) => {
+        const summary = dropdown.querySelector("summary");
+
+        dropdown.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape" || !dropdown.open) {
+                return;
+            }
+
+            dropdown.open = false;
+            summary?.focus();
+        });
+    });
+
+    document.addEventListener("click", (event) => {
+        navDropdowns.forEach((dropdown) => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.open = false;
+            }
+        });
+    });
 
     const segmentButtons = document.querySelectorAll(".segment-btn");
 

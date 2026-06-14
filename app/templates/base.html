@@ -7,30 +7,36 @@
     <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visitor-navbar-v1.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="site-header">
+    <header class="site-header{% if not session.get('user_id') %} site-header--visitor{% endif %}">
         <a class="brand" href="/" aria-label="TRAX inicio">
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TRAX Logo">
             <span>TRAX</span>
         </a>
 
-        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+        <button
+            class="menu-toggle"
+            type="button"
+            aria-label="Abrir menu"
+            aria-expanded="false"
+            aria-controls="primary-navigation">
             <span></span>
             <span></span>
         </button>
 
-        <nav class="main-nav" aria-label="Navegacion principal">
-            <a href="/explorar">Explorar</a>
-            <a href="/mercados">Ver mercados</a>
-            <a href="/profesionales/nuevo">TRAX PRO</a>
-            <a href="/resultados">TRAX ACADEMY</a>
-            <a href="/resultados">TRAX E-COMMERCE</a>
-        </nav>
+        {% if session.get("user_id") %}
+            <nav id="primary-navigation" class="main-nav" aria-label="Navegacion principal">
+                <a href="/explorar">Explorar</a>
+                <a href="/mercados">Ver mercados</a>
+                <a href="/profesionales/nuevo">TRAX PRO</a>
+                <a href="/resultados">TRAX ACADEMY</a>
+                <a href="/resultados">TRAX E-COMMERCE</a>
+            </nav>
 
-        <div class="header-actions">
-            {% if session.get("user_id") %}
+            <div class="header-actions">
                 <div class="session-pill">
                     <strong>{{ session.get("user_name") }}</strong>
                     <span>{{ session.get("user_role") }}</span>
@@ -39,11 +45,41 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="ghost-link">Salir</button>
                 </form>
-            {% else %}
-                <a href="/login" class="ghost-link">Ingresar</a>
-                <a href="/register" class="nav-cta">Registrarse</a>
-            {% endif %}
-        </div>
+            </div>
+        {% else %}
+            <nav id="primary-navigation" class="main-nav main-nav--visitor" aria-label="Navegacion publica">
+                <a href="/explorar">Explorar rubros</a>
+                <a href="/mercados">Mercados</a>
+
+                <details class="nav-dropdown">
+                    <summary>
+                        Ecosistema
+                        <span aria-hidden="true"></span>
+                    </summary>
+                    <div class="nav-dropdown__menu" aria-label="Productos del ecosistema">
+                        <span class="nav-dropdown__item" aria-disabled="true">
+                            <strong>TRAX Academy</strong>
+                            <small>Formacion profesional. Proximamente.</small>
+                        </span>
+                        <span class="nav-dropdown__item" aria-disabled="true">
+                            <strong>TRAX Tools</strong>
+                            <small>Herramientas para el trabajo. Proximamente.</small>
+                        </span>
+                    </div>
+                </details>
+
+                <a href="/planes">Planes</a>
+            </nav>
+
+            <div class="header-actions header-actions--visitor">
+                <a href="/login" class="visitor-start">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0"></path>
+                    </svg>
+                    <span>Iniciar</span>
+                </a>
+            </div>
+        {% endif %}
     </header>
 
     {% block content %}{% endblock %}

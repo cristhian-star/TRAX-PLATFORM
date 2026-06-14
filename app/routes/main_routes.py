@@ -314,6 +314,11 @@ def mercados():
     return render_template("mercados.html")
 
 
+@main.route("/planes")
+def planes():
+    return render_template("planes.html")
+
+
 
 
 @main.route("/profesional/pro/upgrade", methods=["GET", "POST"])
