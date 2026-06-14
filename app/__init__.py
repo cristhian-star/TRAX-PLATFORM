@@ -55,6 +55,7 @@ def create_app(initialize_schema=True):
     from app.models.category_request import CategoryRequest
     from app.models.contract_request import ContractRequest
     from app.models.budget_request import BudgetRequest
+    from app.models.budget_offer import BudgetOffer
     from app.models.emergency_request import EmergencyRequest
     from app.models.proposal_request import ProposalRequest
     from app.models.verification_request import VerificationRequest

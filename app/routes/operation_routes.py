@@ -3,9 +3,20 @@ import re
 
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 
+from app import db
 from app.models.user import User
 from app.services.audit_service import create_audit_log
-from app.services.budget_service import create_budget_request
+from app.models.professional import Professional
+from app.services.budget_service import (
+    MAX_OFFERS_PER_REQUEST,
+    award_budget_offer,
+    create_budget_offer,
+    create_budget_request,
+    get_budget_offers,
+    get_budget_request_by_id,
+    get_open_budget_requests,
+    get_offer_allowance,
+)
 from app.services.contract_service import (
     accept_contract,
     cancel_contract,
@@ -51,6 +62,15 @@ def _parse_datetime(value):
     return datetime.fromisoformat(value)
 
 
+def _parse_date(value):
+    value = _empty_to_none(value)
+
+    if value is None:
+        return None
+
+    return datetime.strptime(value, "%Y-%m-%d").date()
+
+
 def _get_query_prefill(*field_names):
     return {
         field_name: _empty_to_none(request.args.get(field_name)) or ""
@@ -85,6 +105,26 @@ def _get_emergency_professional_data(professional):
             else 1 if is_pro or is_verified
             else 0
         ),
+    }
+
+
+def _get_budget_offer_data(offer):
+    professional = offer.professional
+    reviews = get_professional_reviews(professional.id)
+    user_id = professional.user_id
+
+    return {
+        "offer": offer,
+        "professional": professional,
+        "badges": {
+            "work": True,
+            "pro": has_pro_access(user_id) if user_id else False,
+            "verified": has_approved_verification(user_id) if user_id else False,
+        },
+        "rating": {
+            "average": get_professional_average_rating(professional.id),
+            "count": len(reviews),
+        },
     }
 
 
@@ -265,19 +305,183 @@ def cancelar_contratacion(id):
 @login_required
 def nuevo_presupuesto():
     if request.method == "POST":
+        form_data = {
+            "categoria": _empty_to_none(request.form.get("categoria")) or "",
+            "zona": _empty_to_none(request.form.get("zona")) or "",
+            "titulo": _empty_to_none(request.form.get("titulo")) or "",
+            "descripcion": _empty_to_none(request.form.get("descripcion")) or "",
+            "fecha_estimada": _empty_to_none(request.form.get("fecha_estimada")) or "",
+            "urgencia": _empty_to_none(request.form.get("urgencia")) or "NORMAL",
+        }
+
+        if not all(
+            form_data[field]
+            for field in ("categoria", "zona", "titulo", "descripcion")
+        ):
+            return render_template(
+                "nuevo_presupuesto.html",
+                form_data=form_data,
+                error="Completa categoria, zona, titulo y descripcion.",
+            ), 400
+
+        if form_data["urgencia"] not in ("BAJA", "NORMAL", "ALTA"):
+            return render_template(
+                "nuevo_presupuesto.html",
+                form_data=form_data,
+                error="Selecciona una urgencia valida.",
+            ), 400
+
+        try:
+            estimated_date = _parse_date(form_data["fecha_estimada"])
+        except ValueError:
+            return render_template(
+                "nuevo_presupuesto.html",
+                form_data=form_data,
+                error="La fecha estimada no es valida.",
+            ), 400
+
         budget_request = create_budget_request(
             cliente_id=session["user_id"],
-            categoria=request.form.get("categoria"),
-            descripcion=request.form.get("descripcion"),
-            zona=request.form.get("zona")
+            categoria=form_data["categoria"],
+            titulo=form_data["titulo"],
+            descripcion=form_data["descripcion"],
+            zona=form_data["zona"],
+            fecha_estimada=estimated_date,
+            urgencia=form_data["urgencia"],
         )
 
-        return render_template("nuevo_presupuesto.html", created=budget_request)
+        return redirect(url_for("operations.detalle_presupuesto", id=budget_request.id))
 
     return render_template(
         "nuevo_presupuesto.html",
-        form_data=_get_query_prefill("categoria", "zona", "descripcion"),
+        form_data={
+            **_get_query_prefill("categoria", "zona", "titulo", "descripcion"),
+            "fecha_estimada": _empty_to_none(request.args.get("fecha_estimada")) or "",
+            "urgencia": _empty_to_none(request.args.get("urgencia")) or "NORMAL",
+        },
     )
+
+
+@operations.route("/presupuestos", methods=["GET"])
+@login_required
+@role_required("PROFESIONAL")
+def marketplace_presupuestos():
+    categoria = _empty_to_none(request.args.get("categoria")) or ""
+    zona = _empty_to_none(request.args.get("zona")) or ""
+    budget_requests = get_open_budget_requests(categoria, zona)
+
+    return render_template(
+        "listado_presupuestos.html",
+        budget_requests=budget_requests,
+        categoria=categoria,
+        zona=zona,
+        offer_allowance=get_offer_allowance(session["user_id"]),
+    )
+
+
+@operations.route("/presupuestos/<int:id>", methods=["GET"])
+@login_required
+def detalle_presupuesto(id):
+    budget_request = get_budget_request_by_id(id)
+    if budget_request is None:
+        abort(404)
+
+    current_user_id = session["user_id"]
+    current_user = db.session.get(User, current_user_id)
+    is_owner = budget_request.cliente_id == current_user_id
+    current_professional = Professional.query.filter_by(user_id=current_user_id).first()
+    is_professional = (
+        current_user is not None
+        and current_user.rol == "PROFESIONAL"
+        and current_professional is not None
+    )
+    offers = get_budget_offers(id)
+    own_offer = next(
+        (
+            offer
+            for offer in offers
+            if offer.professional_user_id == current_user_id
+        ),
+        None,
+    )
+
+    return render_template(
+        "detalle_presupuesto.html",
+        budget_request=budget_request,
+        offer_rows=[_get_budget_offer_data(offer) for offer in offers] if is_owner else [],
+        offer_count=len(offers),
+        max_offers=MAX_OFFERS_PER_REQUEST,
+        is_owner=is_owner,
+        is_professional=is_professional,
+        own_offer=own_offer,
+        offer_allowance=get_offer_allowance(current_user_id) if is_professional else None,
+        offer_error=request.args.get("error"),
+        awarded=request.args.get("adjudicado") == "1",
+    )
+
+
+@operations.route("/presupuestos/<int:id>/ofertar", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@profile_complete_required
+def ofertar_presupuesto(id):
+    monto = _empty_to_none(request.form.get("monto"))
+    mensaje = _empty_to_none(request.form.get("mensaje"))
+    plazo_estimado = _empty_to_none(request.form.get("plazo_estimado"))
+    condiciones = _empty_to_none(request.form.get("condiciones"))
+
+    if not monto or not mensaje or not plazo_estimado:
+        return redirect(url_for(
+            "operations.detalle_presupuesto",
+            id=id,
+            error="Completa monto, mensaje y plazo estimado.",
+        ))
+
+    try:
+        create_budget_offer(
+            budget_request_id=id,
+            professional_user_id=session["user_id"],
+            monto=monto,
+            mensaje=mensaje,
+            plazo_estimado=plazo_estimado,
+            condiciones=condiciones,
+        )
+    except ValueError as error:
+        return redirect(url_for(
+            "operations.detalle_presupuesto",
+            id=id,
+            error=str(error),
+        ))
+
+    return redirect(url_for("operations.detalle_presupuesto", id=id))
+
+
+@operations.route(
+    "/presupuestos/<int:id>/adjudicar/<int:presupuesto_id>",
+    methods=["POST"],
+)
+@login_required
+def adjudicar_presupuesto(id, presupuesto_id):
+    try:
+        award_budget_offer(
+            budget_request_id=id,
+            offer_id=presupuesto_id,
+            cliente_id=session["user_id"],
+        )
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return redirect(url_for(
+            "operations.detalle_presupuesto",
+            id=id,
+            error=str(error),
+        ))
+
+    return redirect(url_for(
+        "operations.detalle_presupuesto",
+        id=id,
+        adjudicado="1",
+    ))
 
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
