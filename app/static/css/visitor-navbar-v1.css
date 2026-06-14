@@ -101,6 +101,11 @@
     line-height: var(--trax-line-height-body);
 }
 
+.nav-dropdown__item--link:hover,
+.nav-dropdown__item--link:focus-visible {
+    background: var(--trax-cyan-50);
+}
+
 .visitor-start {
     display: inline-flex;
     min-height: var(--trax-control-height-md);
