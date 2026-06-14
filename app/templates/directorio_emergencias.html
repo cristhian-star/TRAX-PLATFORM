@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="emergency-directory">
+    <section class="emergency-directory__hero">
+        <div class="shell emergency-directory__hero-layout">
+            <div>
+                <span>Directorio de emergencia</span>
+                <h1>Profesionales compatibles para {{ categoria or "tu solicitud" }}</h1>
+                <p>
+                    Zona consultada: <strong>{{ zona or "sin zona específica" }}</strong>.
+                    Contactá al profesional y confirmá disponibilidad, alcance y condiciones.
+                </p>
+            </div>
+            <div class="emergency-directory__count">
+                <strong>{{ professional_rows|length }}</strong>
+                <span>perfiles encontrados</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shell emergency-directory__content">
+        <div class="emergency-legal emergency-legal--directory">
+            <span aria-hidden="true">!</span>
+            <p>
+                Si existe riesgo para personas, incendio, fuga grave o emergencia vital,
+                contactá primero a los servicios de emergencia correspondientes.
+            </p>
+        </div>
+
+        {% if request_created %}
+            <p class="emergency-directory__notice">
+                Solicitud registrada. Ahora podés contactar profesionales compatibles.
+            </p>
+        {% endif %}
+
+        <div class="emergency-directory__toolbar">
+            <div>
+                <span>Categoría</span>
+                <strong>{{ categoria or "Todas" }}</strong>
+            </div>
+            <div>
+                <span>Zona</span>
+                <strong>{{ zona or "Todas" }}</strong>
+            </div>
+            <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                Ajustar búsqueda
+            </a>
+        </div>
+
+        {% if professional_rows %}
+            <div class="emergency-card-list">
+                {% for row in professional_rows %}
+                    {% set professional = row.professional %}
+                    {% set badges = row.badges %}
+                    {% set rating = row.rating %}
+                    {% set phone = row.phone %}
+                    {% include "components/_emergency_professional_card.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="emergency-empty">
+                <span aria-hidden="true">0</span>
+                <h2>No encontramos perfiles completos con esos filtros.</h2>
+                <p>
+                    Probá ampliar la zona o usar una categoría más general. Esto no significa
+                    que no existan servicios disponibles fuera de TRAX.
+                </p>
+                <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                    Modificar emergencia
+                </a>
+            </section>
+        {% endif %}
+
+        <section class="emergency-membership-note" aria-label="Información de membresías">
+            <article>
+                <strong>WORK</strong>
+                <p>Oportunidades mensuales limitadas próximamente.</p>
+            </article>
+            <article>
+                <strong>PRO</strong>
+                <p>Emergencias ilimitadas próximamente.</p>
+            </article>
+        </section>
+    </section>
+</main>
+{% endblock %}

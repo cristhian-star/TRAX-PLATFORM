@@ -1,6 +1,7 @@
 from datetime import datetime
+import re
 
-from flask import Blueprint, abort, redirect, render_template, request, session
+from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 
 from app.models.user import User
 from app.services.audit_service import create_audit_log
@@ -17,7 +18,16 @@ from app.services.contract_service import (
 )
 from app.services.emergency_service import create_emergency_request
 from app.services.proposal_service import create_proposal_request
-from app.services.professional_service import get_professional_by_id
+from app.services.professional_service import (
+    get_professional_by_id,
+    search_emergency_professionals,
+)
+from app.services.review_service import (
+    get_professional_average_rating,
+    get_professional_reviews,
+)
+from app.services.subscription_service import has_pro_access
+from app.services.verification_service import has_approved_verification
 from app.utils.decorators import login_required, pro_required, profile_complete_required, role_required, verified_required
 
 operations = Blueprint("operations", __name__)
@@ -44,6 +54,36 @@ def _get_query_prefill(*field_names):
     return {
         field_name: _empty_to_none(request.args.get(field_name)) or ""
         for field_name in field_names
+    }
+
+
+def _get_emergency_professional_data(professional):
+    user_id = professional.user_id
+    phone_digits = re.sub(r"\D", "", professional.telefono or "")
+    is_pro = has_pro_access(user_id) if user_id else False
+    is_verified = has_approved_verification(user_id) if user_id else False
+    reviews = get_professional_reviews(professional.id)
+
+    return {
+        "professional": professional,
+        "badges": {
+            "work": True,
+            "pro": is_pro,
+            "verified": is_verified,
+        },
+        "rating": {
+            "average": get_professional_average_rating(professional.id),
+            "count": len(reviews),
+        },
+        "phone": {
+            "whatsapp": phone_digits or None,
+            "call": f"+{phone_digits}" if phone_digits else None,
+        },
+        "priority": (
+            2 if is_pro and is_verified
+            else 1 if is_pro or is_verified
+            else 0
+        ),
     }
 
 
@@ -241,9 +281,6 @@ def nuevo_presupuesto():
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
 @login_required
-@pro_required
-@verified_required
-@profile_complete_required
 def nueva_emergencia():
     if request.method == "POST":
         emergency_request = create_emergency_request(
@@ -254,11 +291,38 @@ def nueva_emergencia():
             prioridad=request.form.get("prioridad")
         )
 
-        return render_template("nueva_emergencia.html", created=emergency_request)
+        return redirect(
+            url_for(
+                "operations.directorio_emergencias",
+                categoria=emergency_request.categoria,
+                zona=emergency_request.zona,
+                solicitud=emergency_request.id,
+            )
+        )
 
     return render_template(
         "nueva_emergencia.html",
-        form_data=_get_query_prefill("categoria", "zona"),
+        form_data=_get_query_prefill("categoria", "zona", "descripcion"),
+    )
+
+
+@operations.route("/emergencias/directorio", methods=["GET"])
+@login_required
+def directorio_emergencias():
+    categoria = _empty_to_none(request.args.get("categoria")) or ""
+    zona = _empty_to_none(request.args.get("zona")) or ""
+    professionals = search_emergency_professionals(categoria, zona)
+    professional_rows = sorted(
+        (_get_emergency_professional_data(professional) for professional in professionals),
+        key=lambda row: (-row["priority"], row["professional"].nombre.casefold()),
+    )
+
+    return render_template(
+        "directorio_emergencias.html",
+        professional_rows=professional_rows,
+        categoria=categoria,
+        zona=zona,
+        request_created=bool(request.args.get("solicitud")),
     )
 
 

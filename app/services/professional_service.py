@@ -1,5 +1,6 @@
 from app import db
 from app.models.professional import Professional
+from app.models.user import User
 
 
 def get_professional_by_user_id(user_id):
@@ -37,6 +38,30 @@ def search_professionals(servicio="", zona=""):
         query = query.filter(Professional.zona.ilike(f"%{zona}%"))
 
     return query.all()
+
+
+def search_emergency_professionals(categoria="", zona=""):
+    query = (
+        Professional.query
+        .join(User, Professional.user_id == User.id)
+        .filter(
+            User.estado == "ACTIVO",
+            Professional.perfil_completo.is_(True),
+        )
+    )
+
+    if categoria:
+        query = query.filter(
+            db.or_(
+                Professional.servicio.ilike(f"%{categoria}%"),
+                Professional.especialidad.ilike(f"%{categoria}%"),
+            )
+        )
+
+    if zona:
+        query = query.filter(Professional.zona.ilike(f"%{zona}%"))
+
+    return query.order_by(Professional.nombre.asc()).all()
 
 
 def get_professional_by_id(professional_id):

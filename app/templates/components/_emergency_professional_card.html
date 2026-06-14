@@ -1,0 +1,77 @@
+{% set specialty = professional.especialidad or professional.servicio %}
+
+<article class="emergency-card">
+    <div class="emergency-card__identity">
+        <div class="emergency-card__avatar" aria-hidden="true">
+            {{ professional.nombre[:2]|upper }}
+        </div>
+        <div>
+            <div class="emergency-card__badges" aria-label="Distinciones">
+                {% if badges.work %}
+                    <span class="emergency-badge emergency-badge--work">WORK</span>
+                {% endif %}
+                {% if badges.pro %}
+                    <span class="emergency-badge emergency-badge--pro">PRO</span>
+                {% endif %}
+                {% if badges.verified %}
+                    <span class="emergency-badge emergency-badge--verified">VERIFICADO</span>
+                {% endif %}
+            </div>
+            <h2>{{ professional.nombre }}</h2>
+            <p>{{ specialty }}</p>
+        </div>
+    </div>
+
+    <div class="emergency-card__status">
+        <span class="emergency-status">
+            <i aria-hidden="true"></i>
+            Disponible según perfil
+        </span>
+        <small>Guardia no configurada</small>
+    </div>
+
+    <dl class="emergency-card__facts">
+        <div>
+            <dt>Zona declarada</dt>
+            <dd>{{ professional.zona }}</dd>
+        </div>
+        <div>
+            <dt>Calificación</dt>
+            <dd>
+                {% if rating.average is not none %}
+                    <span aria-hidden="true">&#9733;</span>
+                    {{ rating.average }} · {{ rating.count }}
+                    {% if rating.count == 1 %}reseña{% else %}reseñas{% endif %}
+                {% else %}
+                    Sin calificaciones
+                {% endif %}
+            </dd>
+        </div>
+    </dl>
+
+    <div class="emergency-card__actions">
+        {% if phone.whatsapp %}
+            <a
+                class="emergency-action emergency-action--whatsapp"
+                href="https://wa.me/{{ phone.whatsapp }}"
+                target="_blank"
+                rel="noopener noreferrer">
+                WhatsApp
+            </a>
+        {% else %}
+            <span class="emergency-action is-disabled" aria-disabled="true">WhatsApp</span>
+        {% endif %}
+
+        {% if phone.call %}
+            <a class="emergency-action emergency-action--call" href="tel:{{ phone.call }}">
+                Llamar
+            </a>
+        {% else %}
+            <span class="emergency-action is-disabled" aria-disabled="true">Llamar</span>
+        {% endif %}
+
+        <a class="emergency-action emergency-action--profile" href="/profesional/{{ professional.id }}">
+            Ver perfil
+        </a>
+    </div>
+</article>

@@ -1,45 +1,87 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
+{% endblock %}
+
 {% block content %}
+{% set entry_data = form_data|default({}) %}
 
-<section class="form-section">
-    <div class="section-container">
-        <h2>Nueva emergencia</h2>
-        <p class="form-helper">Registra una solicitud urgente para resolver un problema critico.</p>
+<main class="emergency-entry">
+    <section class="emergency-entry__hero">
+        <div class="shell emergency-entry__hero-content">
+            <span>Asistencia urgente TRAX</span>
+            <h1>Contanos qué pasó y buscá profesionales compatibles.</h1>
+            <p>
+                Completá los datos esenciales. TRAX mostrará perfiles disponibles
+                según su servicio y zona declarada, sin garantizar tiempos de respuesta.
+            </p>
+        </div>
+    </section>
 
-        {% if created %}
-            <p class="form-alert">Emergencia creada correctamente.</p>
-        {% endif %}
-
-        {% set entry_data = form_data|default({}) %}
-        <form action="/emergencias/nueva" method="POST" class="form-card">
+    <section class="shell emergency-entry__layout">
+        <form action="/emergencias/nueva" method="POST" class="emergency-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input
-                type="text"
-                name="categoria"
-                value="{{ entry_data.get('categoria', '') }}"
-                placeholder="Categoria o rubro"
-                required>
+            <input type="hidden" name="prioridad" value="ALTA">
 
-            <input
-                type="text"
-                name="zona"
-                value="{{ entry_data.get('zona', '') }}"
-                placeholder="Zona o localidad"
-                required>
+            <div class="emergency-form__heading">
+                <span>Solicitud urgente</span>
+                <h2>Buscar ayuda ahora</h2>
+            </div>
 
-            <select name="prioridad" required>
-                <option value="">Prioridad</option>
-                <option>ALTA</option>
-                <option>MEDIA</option>
-                <option>BAJA</option>
-            </select>
+            <label>
+                <span>Tipo de emergencia / categoría</span>
+                <input
+                    type="text"
+                    name="categoria"
+                    value="{{ entry_data.get('categoria', '') }}"
+                    placeholder="Ej: Electricidad, plomería, refrigeración"
+                    required>
+            </label>
 
-            <textarea name="descripcion" placeholder="Describe la emergencia" required></textarea>
+            <label>
+                <span>Zona</span>
+                <input
+                    type="text"
+                    name="zona"
+                    value="{{ entry_data.get('zona', '') }}"
+                    placeholder="Barrio, localidad o área"
+                    required>
+            </label>
 
-            <button type="submit">Crear emergencia</button>
+            <label class="emergency-form__wide">
+                <span>Descripción breve</span>
+                <textarea
+                    name="descripcion"
+                    maxlength="600"
+                    placeholder="Describí qué ocurre, qué instalación está afectada y cualquier riesgo visible."
+                    required>{{ entry_data.get('descripcion', '') }}</textarea>
+            </label>
+
+            <button class="emergency-form__wide" type="submit">Buscar ayuda ahora</button>
         </form>
-    </div>
-</section>
 
+        <aside class="emergency-entry__aside">
+            <section class="emergency-legal" aria-labelledby="emergency-legal-title">
+                <span aria-hidden="true">!</span>
+                <div>
+                    <h2 id="emergency-legal-title">Primero, protegé a las personas</h2>
+                    <p>
+                        Si existe riesgo para personas, incendio, fuga grave o emergencia vital,
+                        contactá primero a los servicios de emergencia correspondientes.
+                    </p>
+                </div>
+            </section>
+
+            <section class="emergency-process" aria-labelledby="emergency-process-title">
+                <h2 id="emergency-process-title">Cómo funciona esta versión</h2>
+                <ol>
+                    <li>Registrás la categoría y zona.</li>
+                    <li>TRAX busca profesionales compatibles.</li>
+                    <li>Elegís WhatsApp, llamada o perfil.</li>
+                </ol>
+            </section>
+        </aside>
+    </section>
+</main>
 {% endblock %}
