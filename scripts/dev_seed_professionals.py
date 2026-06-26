@@ -18,6 +18,11 @@ from app.models.user import User
 DEMO_PASSWORD = os.environ.get("TRAX_DEMO_PASSWORD", "TraxDemo2026!")
 DEMO_MARKER = "[DEV_SEED_PROFESSIONALS_V1]"
 
+DEMO_CLIENT = {
+    "email": "cliente.demo@trax.local",
+    "nombre": "Cliente Demo TRAX",
+}
+
 DEMO_PROFESSIONALS = (
     {
         "email": "electricidad.pro@demo.trax.local",
@@ -164,6 +169,29 @@ def _upsert_user(data):
     return user, created
 
 
+def _upsert_demo_client():
+    user = User.query.filter_by(email=DEMO_CLIENT["email"]).first()
+    created = user is None
+
+    if created:
+        user = User(
+            nombre=DEMO_CLIENT["nombre"],
+            email=DEMO_CLIENT["email"],
+            password=generate_password_hash(DEMO_PASSWORD),
+            rol="CLIENTE",
+            estado="ACTIVO",
+        )
+        db.session.add(user)
+        db.session.flush()
+    else:
+        user.nombre = DEMO_CLIENT["nombre"]
+        user.rol = "CLIENTE"
+        user.estado = "ACTIVO"
+        user.motivo_estado = None
+
+    return user, created
+
+
 def _upsert_professional(user, data):
     professional = Professional.query.filter_by(user_id=user.id).first()
     created = professional is None
@@ -269,11 +297,20 @@ def seed_professionals():
     optional_models = _load_optional_models()
     summary = {
         "users_created": 0,
+        "clients_created": 0,
         "professionals_created": 0,
         "subscriptions_created": 0,
         "verifications_created": 0,
         "reputation_events_created": 0,
     }
+
+    demo_client, client_created = _upsert_demo_client()
+    summary["users_created"] += int(client_created)
+    summary["clients_created"] += int(client_created)
+    print(
+        f"{'CREADO' if client_created else 'ACTUALIZADO'} "
+        f"{demo_client.nombre} <{demo_client.email}>"
+    )
 
     for data in DEMO_PROFESSIONALS:
         user, user_created = _upsert_user(data)
@@ -312,7 +349,12 @@ def seed_professionals():
 
 
 def main():
-    if os.environ.get("FLASK_ENV") == "production" and os.environ.get("ALLOW_DEV_SEED") != "1":
+    production_env = (
+        os.environ.get("FLASK_ENV") == "production"
+        or os.environ.get("APP_ENV") == "production"
+    )
+
+    if production_env and os.environ.get("ALLOW_DEV_SEED") != "1":
         raise SystemExit(
             "Seed DEV bloqueado en produccion. Usa ALLOW_DEV_SEED=1 solo si es intencional."
         )
