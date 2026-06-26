@@ -11,7 +11,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="site-header{% if not session.get('user_id') %} site-header--visitor{% endif %}">
+    <header class="site-header site-header--visitor">
         <a class="brand" href="/" aria-label="TRAX inicio">
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="TRAX Logo">
             <span>TRAX</span>
@@ -27,73 +27,88 @@
             <span></span>
         </button>
 
-        {% if session.get("user_id") %}
-            <nav id="primary-navigation" class="main-nav" aria-label="Navegacion principal">
-                <a href="/explorar">Explorar</a>
-                <a href="/mercados">Ver mercados</a>
-                <a href="/profesionales/nuevo">TRAX PRO</a>
-                <a href="/resultados">TRAX ACADEMY</a>
-                <a href="/resultados">TRAX E-COMMERCE</a>
-            </nav>
+        <nav id="primary-navigation" class="main-nav main-nav--visitor" aria-label="Navegacion principal">
+            <a href="/">Inicio</a>
+            <a href="/explorar">Explorar rubros</a>
 
-            <div class="header-actions">
-                <div class="session-pill">
-                    <strong>{{ session.get("user_name") }}</strong>
-                    <span>{{ session.get("user_role") }}</span>
+            <details class="nav-dropdown">
+                <summary>
+                    Operaciones
+                    <span aria-hidden="true"></span>
+                </summary>
+                <div class="nav-dropdown__menu" aria-label="Operaciones principales">
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=contratacion">
+                        <strong>Contratacion</strong>
+                    </a>
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/presupuestos/nuevo">
+                        <strong>Presupuestos</strong>
+                    </a>
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/emergencias/nueva">
+                        <strong>Emergencias</strong>
+                    </a>
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=propuestas">
+                        <strong>Propuestas</strong>
+                    </a>
                 </div>
-                <form action="/logout" method="POST" class="logout-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="ghost-link">Salir</button>
-                </form>
+            </details>
+
+            <a href="/mercados">Mercados</a>
+
+            <details class="nav-dropdown">
+                <summary>
+                    Ecosistema
+                    <span aria-hidden="true"></span>
+                </summary>
+                <div class="nav-dropdown__menu" aria-label="Productos del ecosistema">
+                    <span class="nav-dropdown__item" aria-disabled="true">
+                        <strong>TRAX Academy</strong>
+                        <small>Formacion profesional. Proximamente.</small>
+                    </span>
+                    <span class="nav-dropdown__item" aria-disabled="true">
+                        <strong>TRAX Tools</strong>
+                        <small>Herramientas para el trabajo. Proximamente.</small>
+                    </span>
+                </div>
+            </details>
+
+            <a href="/planes">Planes</a>
+        </nav>
+
+        {% if session.get("user_id") %}
+            <div class="header-actions header-actions--visitor header-actions--account">
+                <details class="nav-dropdown account-dropdown">
+                    <summary class="account-summary">
+                        <div class="account-summary__text">
+                            <strong>Mi cuenta</strong>
+                            <small>{{ session.get("user_name") }} · {{ session.get("user_role") }}</small>
+                        </div>
+                        <span aria-hidden="true"></span>
+                    </summary>
+                    <div class="nav-dropdown__menu nav-dropdown__menu--account" aria-label="Opciones de cuenta">
+                        <a class="nav-dropdown__item nav-dropdown__item--link" href="/">
+                            <strong>Dashboard general</strong>
+                            <small>Volver al inicio de tu cuenta.</small>
+                        </a>
+                        {% if session.get("user_role") == "PROFESIONAL" %}
+                            <a class="nav-dropdown__item nav-dropdown__item--link" href="/profesional/dashboard">
+                                <strong>Panel profesional</strong>
+                                <small>Gestionar perfil, oportunidades y cuenta PRO.</small>
+                            </a>
+                        {% endif %}
+                        {% if session.get("user_role") == "SUPER_ADMIN" %}
+                            <a class="nav-dropdown__item nav-dropdown__item--link" href="/admin/dashboard">
+                                <strong>Admin</strong>
+                                <small>Acceder al hub administrativo.</small>
+                            </a>
+                        {% endif %}
+                        <form action="/logout" method="POST" class="nav-dropdown__item account-logout-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Cerrar sesion</button>
+                        </form>
+                    </div>
+                </details>
             </div>
         {% else %}
-            <nav id="primary-navigation" class="main-nav main-nav--visitor" aria-label="Navegacion publica">
-                <a href="/">Inicio</a>
-                <a href="/explorar">Explorar rubros</a>
-
-                <details class="nav-dropdown">
-                    <summary>
-                        Operaciones
-                        <span aria-hidden="true"></span>
-                    </summary>
-                    <div class="nav-dropdown__menu" aria-label="Operaciones principales">
-                        <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=contratacion">
-                            <strong>Contratacion</strong>
-                        </a>
-                        <a class="nav-dropdown__item nav-dropdown__item--link" href="/presupuestos/nuevo">
-                            <strong>Presupuestos</strong>
-                        </a>
-                        <a class="nav-dropdown__item nav-dropdown__item--link" href="/emergencias/nueva">
-                            <strong>Emergencias</strong>
-                        </a>
-                        <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=propuestas">
-                            <strong>Propuestas</strong>
-                        </a>
-                    </div>
-                </details>
-
-                <a href="/mercados">Mercados</a>
-
-                <details class="nav-dropdown">
-                    <summary>
-                        Ecosistema
-                        <span aria-hidden="true"></span>
-                    </summary>
-                    <div class="nav-dropdown__menu" aria-label="Productos del ecosistema">
-                        <span class="nav-dropdown__item" aria-disabled="true">
-                            <strong>TRAX Academy</strong>
-                            <small>Formacion profesional. Proximamente.</small>
-                        </span>
-                        <span class="nav-dropdown__item" aria-disabled="true">
-                            <strong>TRAX Tools</strong>
-                            <small>Herramientas para el trabajo. Proximamente.</small>
-                        </span>
-                    </div>
-                </details>
-
-                <a href="/planes">Planes</a>
-            </nav>
-
             <div class="header-actions header-actions--visitor">
                 <a href="/login" class="visitor-start">
                     <svg viewBox="0 0 24 24" aria-hidden="true">

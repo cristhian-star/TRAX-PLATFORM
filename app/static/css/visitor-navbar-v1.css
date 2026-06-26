@@ -138,6 +138,69 @@
     background: var(--trax-color-action-primary-hover);
 }
 
+.account-dropdown > summary.account-summary {
+    min-height: var(--trax-control-height-md);
+    gap: var(--trax-space-3);
+    padding: 0 var(--trax-space-4);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-pill);
+    background: var(--trax-color-surface);
+    box-shadow: var(--trax-shadow-sm);
+}
+
+.account-summary__text {
+    display: grid;
+    gap: 0.1rem;
+    line-height: 1.1;
+}
+
+.account-summary__text strong {
+    color: var(--trax-color-brand-strong);
+    font-size: var(--trax-font-size-14);
+}
+
+.account-summary__text small {
+    max-width: 10rem;
+    overflow: hidden;
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-12);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-dropdown__menu--account {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
+.nav-dropdown__menu--account::before {
+    left: auto;
+    right: var(--trax-space-8);
+    transform: rotate(45deg);
+}
+
+.account-logout-form {
+    margin: 0;
+}
+
+.account-logout-form button {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    color: var(--trax-error-700);
+    background: transparent;
+    font: inherit;
+    font-weight: var(--trax-font-weight-bold);
+    text-align: left;
+    cursor: pointer;
+}
+
+.account-logout-form:hover,
+.account-logout-form:focus-within {
+    background: var(--trax-error-50);
+}
+
 .site-header--visitor a:focus-visible,
 .site-header--visitor summary:focus-visible,
 .site-header--visitor button:focus-visible {
@@ -193,6 +256,24 @@
     }
 
     .visitor-start {
+        width: 100%;
+    }
+
+    .header-actions--account {
+        align-items: stretch;
+    }
+
+    .account-dropdown > summary.account-summary {
+        width: 100%;
+        justify-content: space-between;
+        border-radius: var(--trax-radius-md);
+    }
+
+    .account-summary__text small {
+        max-width: 100%;
+    }
+
+    .nav-dropdown__menu--account {
         width: 100%;
     }
 }
