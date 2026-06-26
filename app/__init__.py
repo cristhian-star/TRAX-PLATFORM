@@ -47,6 +47,9 @@ def create_app(initialize_schema=True):
 
     from app.routes.operation_routes import operations
     app.register_blueprint(operations)
+
+    from app.routes.dev_routes import dev
+    app.register_blueprint(dev)
     
     from app.models.user import User
     from app.models.professional import Professional

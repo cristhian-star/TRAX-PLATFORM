@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dev-qa-panel.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="dev-qa-page">
+    <section class="dev-qa-hero">
+        <div class="dev-qa-shell dev-qa-hero__layout">
+            <div>
+                <span class="dev-qa-eyebrow">DEV QA</span>
+                <h1>Panel de pruebas TRAX</h1>
+                <p>
+                    Inicia sesion rapidamente con usuarios existentes para probar Presupuestos,
+                    Emergencias, Contratacion y Perfiles.
+                </p>
+            </div>
+            <aside class="dev-qa-warning" role="note">
+                <strong>Panel exclusivo para desarrollo.</strong>
+                <span>No usar en produccion.</span>
+            </aside>
+        </div>
+    </section>
+
+    <section class="dev-qa-shell dev-qa-content">
+        <div class="dev-qa-toolbar">
+            <div>
+                <span class="dev-qa-eyebrow">Sesion actual</span>
+                {% if current_user_id %}
+                    <h2>{{ current_user_name }}</h2>
+                    <p>ID {{ current_user_id }} · {{ current_user_role }}</p>
+                {% else %}
+                    <h2>Sin sesion activa</h2>
+                    <p>Elegí un usuario demo existente para iniciar sesion.</p>
+                {% endif %}
+            </div>
+
+            {% if current_user_id %}
+                <form action="/dev/qa/logout" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="dev-qa-button dev-qa-button--secondary" type="submit">
+                        Cerrar sesion actual
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+        <div class="dev-qa-alert" role="alert">
+            <strong>Advertencia:</strong>
+            este panel no pide contraseña y solo debe habilitarse con
+            <code>ENABLE_DEV_QA_PANEL=true</code> en entornos de desarrollo.
+        </div>
+
+        <div class="dev-qa-grid" aria-label="Usuarios demo disponibles">
+            {% for user in users %}
+                <article class="dev-qa-card{% if user.id == current_user_id %} is-current{% endif %}">
+                    <header class="dev-qa-card__header">
+                        <div>
+                            <span class="dev-qa-card__id">#{{ user.id }}</span>
+                            <h2>{{ user.nombre }}</h2>
+                            <p>{{ user.email }}</p>
+                        </div>
+                        {% if user.id == current_user_id %}
+                            <span class="dev-qa-pill dev-qa-pill--active">Sesion actual</span>
+                        {% endif %}
+                    </header>
+
+                    <dl class="dev-qa-facts">
+                        <div>
+                            <dt>Rol</dt>
+                            <dd><span class="dev-qa-pill">{{ user.rol }}</span></dd>
+                        </div>
+                        <div>
+                            <dt>Estado</dt>
+                            <dd>
+                                <span class="dev-qa-pill {{ 'dev-qa-pill--active' if user.estado == 'ACTIVO' else 'dev-qa-pill--blocked' }}">
+                                    {{ user.estado }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Perfil profesional</dt>
+                            <dd>
+                                {% if user.has_professional_profile %}
+                                    Si{% if user.professional_profile_complete %}, completo{% endif %}
+                                    {% if user.professional_service %}
+                                        <small>{{ user.professional_service }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Plan</dt>
+                            <dd>
+                                <span class="dev-qa-pill {{ 'dev-qa-pill--pro' if user.is_pro else '' }}">
+                                    {{ 'PRO' if user.is_pro else 'WORK / Free' }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Verificacion</dt>
+                            <dd>
+                                <span class="dev-qa-pill {{ 'dev-qa-pill--verified' if user.is_verified else '' }}">
+                                    {{ 'Verificado' if user.is_verified else 'No verificado' }}
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <form action="/dev/qa/login/{{ user.id }}" method="POST" class="dev-qa-card__action">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="dev-qa-button dev-qa-button--primary" type="submit">
+                            Iniciar como este usuario
+                        </button>
+                    </form>
+                </article>
+            {% else %}
+                <div class="dev-qa-empty">
+                    <h2>No hay usuarios existentes</h2>
+                    <p>Este sprint no crea usuarios nuevos. Ejecuta un seed DEV existente o registra usuarios manualmente.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}
