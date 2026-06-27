@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="proposal-page">
+    <section class="proposal-hero">
+        <div class="shell proposal-hero__layout">
+            <div>
+                <a class="proposal-back" href="/propuestas">&larr; Volver a propuestas</a>
+                <span class="proposal-status proposal-status--{{ proposal.estado|lower }}">{{ proposal.estado }}</span>
+                <h1>{{ proposal.titulo or proposal.categoria }}</h1>
+                <p>{{ proposal.industria or "Industria" }} / {{ proposal.categoria }} / {{ proposal.rubro or "Rubro" }}</p>
+            </div>
+            <div class="proposal-hero__meta">
+                <strong>{{ applications|length if is_owner else proposal.applications|length }}</strong>
+                <span>postulaciones</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shell proposal-detail">
+        <div class="proposal-detail__main">
+            {% if error %}
+                <div class="proposal-alert proposal-alert--error" role="alert">{{ error }}</div>
+            {% endif %}
+            {% if applied %}
+                <div class="proposal-alert proposal-alert--success" role="status">Postulacion enviada correctamente.</div>
+            {% endif %}
+            {% if published %}
+                <div class="proposal-alert proposal-alert--success" role="status">Propuesta publicada correctamente.</div>
+            {% endif %}
+
+            <article class="proposal-panel">
+                <div class="proposal-section__heading">
+                    <span class="proposal-eyebrow">Detalle completo</span>
+                    <h2>Oportunidad publicada</h2>
+                </div>
+                <p class="proposal-description">{{ proposal.descripcion }}</p>
+                <dl class="proposal-facts">
+                    <div><dt>Publicador</dt><dd>{{ owner.nombre if owner else "Usuario TRAX" }}</dd></div>
+                    <div><dt>Ubicacion</dt><dd>{{ proposal.ubicacion or "A coordinar" }}</dd></div>
+                    <div><dt>Modalidad</dt><dd>{{ proposal.modalidad or "A coordinar" }}</dd></div>
+                    <div><dt>Especialidad</dt><dd>{{ proposal.especialidad or "No especificada" }}</dd></div>
+                    <div><dt>Cantidad requerida</dt><dd>{{ proposal.cantidad_profesionales or 1 }}</dd></div>
+                    <div>
+                        <dt>Presupuesto estimado</dt>
+                        <dd>
+                            {% if proposal.presupuesto_estimado %}
+                                ${{ "{:,.2f}".format(proposal.presupuesto_estimado) }}
+                            {% else %}
+                                No informado
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Inicio estimado</dt>
+                        <dd>{{ proposal.fecha_inicio_estimada.strftime('%d/%m/%Y') if proposal.fecha_inicio_estimada else "A coordinar" }}</dd>
+                    </div>
+                    <div>
+                        <dt>Limite postulacion</dt>
+                        <dd>{{ proposal.fecha_limite_postulacion.strftime('%d/%m/%Y') if proposal.fecha_limite_postulacion else "Sin fecha limite" }}</dd>
+                    </div>
+                </dl>
+            </article>
+
+            {% if is_owner %}
+                <section class="proposal-panel">
+                    <div class="proposal-section__heading">
+                        <span class="proposal-eyebrow">Gestion del publicador</span>
+                        <h2>Postulaciones recibidas</h2>
+                    </div>
+                    {% if applications %}
+                        <div class="proposal-application-list">
+                            {% for application in applications %}
+                                {% set professional = application.professional %}
+                                {% set phone_digits = professional.telefono|replace(' ', '')|replace('-', '')|replace('+', '') if professional and professional.telefono else '' %}
+                                <article class="proposal-application">
+                                    <header>
+                                        <div>
+                                            <h3>{{ professional.nombre if professional else "Profesional" }}</h3>
+                                            <p>{{ professional.especialidad or professional.servicio if professional else "" }}</p>
+                                        </div>
+                                        <span class="proposal-status proposal-status--{{ application.estado|lower }}">{{ application.estado }}</span>
+                                    </header>
+                                    <p>{{ application.mensaje }}</p>
+                                    {% if application.experiencia_relevante %}<p><strong>Experiencia:</strong> {{ application.experiencia_relevante }}</p>{% endif %}
+                                    {% if application.disponibilidad %}<p><strong>Disponibilidad:</strong> {{ application.disponibilidad }}</p>{% endif %}
+                                    {% if application.pretension_economica %}<p><strong>Pretension:</strong> ${{ "{:,.2f}".format(application.pretension_economica) }}</p>{% endif %}
+                                    <footer>
+                                        {% if application.estado == "ACEPTADA" and phone_digits %}
+                                            <a class="proposal-button proposal-button--whatsapp" href="https://wa.me/{{ phone_digits }}" target="_blank" rel="noreferrer">WhatsApp</a>
+                                        {% elif application.estado == "ACEPTADA" %}
+                                            <span class="proposal-button proposal-button--disabled" aria-disabled="true">WhatsApp no disponible</span>
+                                        {% endif %}
+                                        {% if application.estado == "POSTULADA" and proposal.estado == "PUBLICADA" %}
+                                            <form action="/propuestas/{{ proposal.id }}/aceptar/{{ application.id }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button class="proposal-button proposal-button--primary" type="submit">Aceptar</button>
+                                            </form>
+                                            <form action="/propuestas/{{ proposal.id }}/descartar/{{ application.id }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button class="proposal-button proposal-button--secondary" type="submit">Descartar</button>
+                                            </form>
+                                        {% endif %}
+                                    </footer>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="proposal-empty"><p>Todavia no recibiste postulaciones.</p></div>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </div>
+
+        <aside class="proposal-detail__aside">
+            {% if is_owner %}
+                <section class="proposal-panel">
+                    <h2>Acciones</h2>
+                    {% if proposal.estado == "PUBLICADA" %}
+                        <form action="/propuestas/{{ proposal.id }}/cancelar" method="POST" onsubmit="return confirm('Seguro que queres cancelar esta propuesta?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="proposal-button proposal-button--secondary" type="submit">Cancelar propuesta</button>
+                        </form>
+                    {% else %}
+                        <p>Esta propuesta ya no recibe postulaciones.</p>
+                    {% endif %}
+                </section>
+            {% elif is_professional %}
+                <section class="proposal-panel">
+                    <h2>Postularme</h2>
+                    {% if own_application %}
+                        <p>Ya te postulaste. Estado: <strong>{{ own_application.estado }}</strong></p>
+                    {% elif proposal.estado == "PUBLICADA" %}
+                        <form action="/propuestas/{{ proposal.id }}/postular" method="POST" class="proposal-apply-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <label><span>Mensaje *</span><textarea name="mensaje" required></textarea></label>
+                            <label><span>Experiencia relevante</span><textarea name="experiencia_relevante"></textarea></label>
+                            <label><span>Disponibilidad</span><input name="disponibilidad" placeholder="Ej: inmediata, 20 hs semanales"></label>
+                            <label><span>Pretension economica</span><input type="number" step="0.01" min="0" name="pretension_economica"></label>
+                            <button class="proposal-button proposal-button--primary" type="submit">Enviar postulacion</button>
+                        </form>
+                    {% else %}
+                        <p>Esta propuesta ya no recibe postulaciones.</p>
+                    {% endif %}
+                </section>
+            {% else %}
+                <section class="proposal-panel">
+                    <h2>Postulaciones profesionales</h2>
+                    <p>Inicia sesion como profesional para postularte.</p>
+                    <a class="proposal-button proposal-button--primary" href="/login?next=/propuestas/{{ proposal.id }}">Iniciar sesion</a>
+                </section>
+            {% endif %}
+        </aside>
+    </section>
+</main>
+{% endblock %}

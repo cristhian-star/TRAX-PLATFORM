@@ -61,6 +61,7 @@ def create_app(initialize_schema=True):
     from app.models.budget_offer import BudgetOffer
     from app.models.emergency_request import EmergencyRequest
     from app.models.proposal_request import ProposalRequest
+    from app.models.proposal_application import ProposalApplication
     from app.models.verification_request import VerificationRequest
     from app.models.review import Review
     from app.models.abuse_report import AbuseReport
