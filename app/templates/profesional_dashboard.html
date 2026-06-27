@@ -14,11 +14,11 @@
     <section class="pro-dashboard__hero">
         <div class="pro-dashboard__shell pro-dashboard__hero-grid">
             <div class="pro-dashboard__hero-copy">
-                <span class="pro-dashboard__eyebrow">Centro profesional TRAX</span>
+                <span class="pro-dashboard__eyebrow">Operacion profesional</span>
                 <h1>Dashboard profesional</h1>
                 <p>
-                    Gestiona tu perfil publico, actividad comercial, reputacion y oportunidades
-                    desde una vista unica pensada para tecnicos, oficios y contratistas.
+                    Una cabina operativa para entender como estas trabajando dentro de TRAX:
+                    estado, reputacion, presupuestos, propuestas, limites y proximas acciones.
                 </p>
                 <div class="pro-dashboard__hero-actions" aria-label="Accesos principales">
                     <a class="pro-dashboard__button pro-dashboard__button--primary" href="{{ public_profile_url }}">Ver perfil publico</a>
@@ -26,19 +26,10 @@
                 </div>
             </div>
 
-            <aside class="pro-dashboard__profile-card" aria-label="Resumen del perfil publico">
-                <div class="pro-dashboard__avatar-wrap">
-                    {% if professional and professional.logo_url %}
-                        <img src="{{ professional.logo_url }}" alt="Logo o marca de {{ profile_name }}">
-                    {% else %}
-                        <span>{{ profile_name[:1] }}</span>
-                    {% endif %}
-                </div>
-                <div>
-                    <h2>{{ profile_name }}</h2>
-                    <p>{{ profile_specialty }}</p>
-                    <p class="pro-dashboard__muted">{{ profile_zone }}</p>
-                </div>
+            <aside class="pro-dashboard__status-card" aria-label="Estado operativo del profesional">
+                <span class="pro-dashboard__status-label">Estado actual</span>
+                <h2>{{ profile_name }}</h2>
+                <p>{{ profile_specialty }} · {{ profile_zone }}</p>
                 <div class="pro-dashboard__badges">
                     <span class="pro-dashboard__badge {% if is_pro %}pro-dashboard__badge--pro{% endif %}">
                         {{ "PRO" if is_pro else "WORK" }}
@@ -47,21 +38,21 @@
                         {{ "VERIFICADO" if is_verified else "VERIFICACION PENDIENTE" }}
                     </span>
                     <span class="pro-dashboard__badge">
-                        {{ professional.estado_perfil|replace("_", " ")|title if professional else "Perfil pendiente" }}
+                        {{ "PERFIL COMPLETO" if is_profile_complete else "PERFIL INCOMPLETO" }}
                     </span>
                 </div>
-                <dl class="pro-dashboard__profile-stats">
+                <dl class="pro-dashboard__status-stats">
                     <div>
                         <dt>Rating</dt>
                         <dd>{{ "%.1f"|format(average_rating) if average_rating else "-" }}</dd>
                     </div>
                     <div>
-                        <dt>Reseñas</dt>
+                        <dt>Resenas</dt>
                         <dd>{{ review_count }}</dd>
                     </div>
                     <div>
                         <dt>Perfil</dt>
-                        <dd>{{ "Completo" if is_profile_complete else "Incompleto" }}</dd>
+                        <dd>{{ professional.estado_perfil|replace("_", " ")|title if professional else "Pendiente" }}</dd>
                     </div>
                 </dl>
             </aside>
@@ -80,27 +71,18 @@
         {% endif %}
 
         <section class="pro-dashboard__quick-links" aria-label="Accesos rapidos">
-            <a href="/profesional/perfil/completar">Editar perfil</a>
             <a href="{{ public_profile_url }}">Ver perfil publico</a>
-            <a href="/presupuestos/mis-enviados">Ver presupuestos enviados</a>
-            <a href="/propuestas">Ver propuestas</a>
-            <a href="/emergencias/nueva">Ver emergencias</a>
+            <a href="/profesional/perfil/completar">Editar perfil</a>
+            <a href="/presupuestos/mis-enviados">Mis presupuestos enviados</a>
+            <a href="/propuestas">Mis propuestas</a>
             <a href="/planes">Ver planes</a>
         </section>
 
-        <section class="pro-dashboard__metrics" aria-label="Actividad comercial">
+        <section class="pro-dashboard__metrics" aria-label="Indicadores operativos">
             <article>
                 <span>Presupuestos enviados</span>
                 <strong>{{ budget_offers_count }}</strong>
-                <small>
-                    {% if offer_allowance and offer_allowance.is_pro %}
-                        PRO ilimitado este mes
-                    {% elif offer_allowance %}
-                        {{ offer_allowance.remaining }} de {{ offer_allowance.limit }} disponibles este mes
-                    {% else %}
-                        Limite mensual pendiente
-                    {% endif %}
-                </small>
+                <small>Estimaciones preliminares enviadas</small>
             </article>
             <article>
                 <span>Presupuestos adjudicados</span>
@@ -114,138 +96,57 @@
             </article>
             <article>
                 <span>Emergencias</span>
-                <strong>Guardia</strong>
-                <small>Disponibilidad configurable proximamente</small>
+                <strong>Placeholder</strong>
+                <small>Guardias y disponibilidad operativa proximamente</small>
             </article>
         </section>
 
         <div class="pro-dashboard__grid">
-            <article class="pro-dashboard__panel pro-dashboard__panel--wide">
-                <div class="pro-dashboard__section-head">
-                    <div>
-                        <span class="pro-dashboard__eyebrow">Perfil publico</span>
-                        <h2>Resumen profesional</h2>
-                    </div>
-                    <a href="{{ public_profile_url }}">Abrir perfil</a>
-                </div>
-                <div class="pro-dashboard__summary-grid">
-                    <div>
-                        <span>Nombre</span>
-                        <strong>{{ profile_name }}</strong>
-                    </div>
-                    <div>
-                        <span>Especialidad</span>
-                        <strong>{{ profile_specialty }}</strong>
-                    </div>
-                    <div>
-                        <span>Zona</span>
-                        <strong>{{ profile_zone }}</strong>
-                    </div>
-                    <div>
-                        <span>Telefono</span>
-                        <strong>{{ professional.telefono if professional and professional.telefono else "No informado" }}</strong>
-                    </div>
-                </div>
-                <p class="pro-dashboard__description">
-                    {{ professional.descripcion if professional and professional.descripcion else "Agrega una descripcion breve para contar que trabajos haces, como trabajas y que tipo de clientes atendes." }}
-                </p>
-            </article>
-
             <article class="pro-dashboard__panel">
                 <div class="pro-dashboard__section-head">
                     <div>
-                        <span class="pro-dashboard__eyebrow">Media</span>
-                        <h2>Gestion visual del perfil</h2>
+                        <span class="pro-dashboard__eyebrow">Cuenta</span>
+                        <h2>Estado profesional</h2>
                     </div>
-                    <a href="/profesional/perfil/completar">Gestionar</a>
-                </div>
-                <div class="pro-dashboard__cover-preview">
-                    {% if professional and professional.cover_url %}
-                        <img src="{{ professional.cover_url }}" alt="Portada profesional de {{ profile_name }}">
-                    {% else %}
-                        <span>Portada profesional</span>
-                    {% endif %}
-                </div>
-                <div class="pro-dashboard__media-list">
-                    <div>
-                        <span>Avatar / logo</span>
-                        <strong>{{ "Configurado" if professional and professional.logo_url else "Placeholder activo" }}</strong>
-                    </div>
-                    <div>
-                        <span>Galeria</span>
-                        <strong>{{ gallery_entries|length }} / 6 imagenes</strong>
-                    </div>
-                    <div>
-                        <span>Portfolio</span>
-                        <strong>{{ portfolio_entries|length }} links guardados</strong>
-                    </div>
-                    <div>
-                        <span>Enlaces externos</span>
-                        <strong>{{ external_links|length }} activos</strong>
-                    </div>
-                </div>
-                <a class="pro-dashboard__button pro-dashboard__button--secondary pro-dashboard__button--full" href="/profesional/perfil/completar">
-                    Gestionar imagenes y enlaces
-                </a>
-            </article>
-
-            <article class="pro-dashboard__panel">
-                <div class="pro-dashboard__section-head">
-                    <div>
-                        <span class="pro-dashboard__eyebrow">Cobertura</span>
-                        <h2>Zona de trabajo</h2>
-                    </div>
-                </div>
-                <div class="pro-dashboard__map-placeholder" aria-label="Mapa ilustrativo de zona de trabajo">
-                    <span></span>
-                    <strong>{{ profile_zone }}</strong>
-                    <small>Radio visual de cobertura</small>
-                </div>
-                <dl class="pro-dashboard__work-area">
-                    <div>
-                        <dt>Zona principal</dt>
-                        <dd>{{ profile_zone }}</dd>
-                    </div>
-                    <div>
-                        <dt>Radio / cobertura</dt>
-                        <dd>Consultar disponibilidad por localidad</dd>
-                    </div>
-                </dl>
-                <p class="pro-dashboard__hint">
-                    Proximamente podras configurar tu zona de cobertura con mapa interactivo.
-                </p>
-                <button class="pro-dashboard__button pro-dashboard__button--disabled" type="button" disabled>
-                    Configurar zona de trabajo
-                </button>
-            </article>
-
-            <article class="pro-dashboard__panel">
-                <div class="pro-dashboard__section-head">
-                    <div>
-                        <span class="pro-dashboard__eyebrow">Confianza</span>
-                        <h2>Reputacion y verificacion</h2>
-                    </div>
-                    <a href="/profesional/verificacion/solicitar">Verificacion</a>
-                </div>
-                <div class="pro-dashboard__trust-score">
-                    <strong>{{ "%.1f"|format(average_rating) if average_rating else "-" }}</strong>
-                    <span>{{ review_count }} reseñas visibles</span>
+                    <a href="/profesional/perfil/completar">Actualizar</a>
                 </div>
                 <ul class="pro-dashboard__checklist">
                     <li class="{{ 'is-complete' if is_profile_complete else '' }}">Perfil completo</li>
                     <li class="{{ 'is-complete' if is_verified else '' }}">Verificacion aprobada</li>
-                    <li class="{{ 'is-complete' if external_links else '' }}">Enlaces externos cargados</li>
-                    <li class="{{ 'is-complete' if gallery_entries or portfolio_entries else '' }}">Portfolio o galeria disponible</li>
+                    <li class="{{ 'is-complete' if is_pro else '' }}">Plan PRO activo</li>
+                    <li class="{{ 'is-complete' if average_rating else '' }}">Rating publicado</li>
                 </ul>
             </article>
 
             <article class="pro-dashboard__panel">
                 <div class="pro-dashboard__section-head">
                     <div>
-                        <span class="pro-dashboard__eyebrow">Oportunidades</span>
-                        <h2>Actividad comercial</h2>
+                        <span class="pro-dashboard__eyebrow">Limites</span>
+                        <h2>Uso WORK / PRO</h2>
                     </div>
-                    <a href="/presupuestos">Ver oportunidades</a>
+                    <a href="/planes">Ver planes</a>
+                </div>
+                <div class="pro-dashboard__limit-card">
+                    {% if offer_allowance and offer_allowance.is_pro %}
+                        <strong>Presupuestos ilimitados</strong>
+                        <span>Tu cuenta PRO no tiene limite mensual de presupuestos.</span>
+                    {% elif offer_allowance %}
+                        <strong>{{ offer_allowance.remaining }} disponibles</strong>
+                        <span>{{ offer_allowance.used }} usados de {{ offer_allowance.limit }} presupuestos WORK este mes.</span>
+                    {% else %}
+                        <strong>Limite pendiente</strong>
+                        <span>No pudimos calcular el limite operativo actual.</span>
+                    {% endif %}
+                </div>
+            </article>
+
+            <article class="pro-dashboard__panel pro-dashboard__panel--wide">
+                <div class="pro-dashboard__section-head">
+                    <div>
+                        <span class="pro-dashboard__eyebrow">Actividad</span>
+                        <h2>Movimiento comercial</h2>
+                    </div>
+                    <a href="/presupuestos/mis-enviados">Ver enviados</a>
                 </div>
                 <div class="pro-dashboard__activity-list">
                     <div>
@@ -258,20 +159,54 @@
                     </div>
                     <div>
                         <strong>{{ proposal_applications_count }}</strong>
-                        <span>Postulaciones a propuestas</span>
+                        <span>Postulaciones enviadas a propuestas</span>
                     </div>
                     <div>
-                        <strong>{{ "PRO" if is_pro else "WORK" }}</strong>
-                        <span>Plan comercial activo</span>
+                        <strong>{{ accepted_proposal_applications_count }}</strong>
+                        <span>Postulaciones aceptadas</span>
                     </div>
+                </div>
+            </article>
+
+            <article class="pro-dashboard__panel">
+                <div class="pro-dashboard__section-head">
+                    <div>
+                        <span class="pro-dashboard__eyebrow">Confianza</span>
+                        <h2>Reputacion</h2>
+                    </div>
+                    <a href="{{ public_profile_url }}">Ver publico</a>
+                </div>
+                <div class="pro-dashboard__trust-score">
+                    <strong>{{ "%.1f"|format(average_rating) if average_rating else "-" }}</strong>
+                    <span>{{ review_count }} resenas visibles</span>
+                </div>
+                <p class="pro-dashboard__hint">
+                    El rating y las resenas ayudan a convertir oportunidades, presupuestos y contrataciones.
+                </p>
+            </article>
+
+            <article class="pro-dashboard__panel">
+                <div class="pro-dashboard__section-head">
+                    <div>
+                        <span class="pro-dashboard__eyebrow">Emergencias</span>
+                        <h2>Operacion urgente</h2>
+                    </div>
+                    <a href="/emergencias/nueva">Ver flujo</a>
+                </div>
+                <div class="pro-dashboard__placeholder">
+                    <strong>Guardias proximamente</strong>
+                    <span>
+                        Este modulo queda preparado para mostrar disponibilidad, guardias activas
+                        y oportunidades urgentes cuando exista el dato operativo.
+                    </span>
                 </div>
             </article>
 
             <article class="pro-dashboard__panel pro-dashboard__panel--wide">
                 <div class="pro-dashboard__section-head">
                     <div>
-                        <span class="pro-dashboard__eyebrow">Mejoras sugeridas</span>
-                        <h2>Proximos pasos para vender mejor</h2>
+                        <span class="pro-dashboard__eyebrow">Prioridades</span>
+                        <h2>Proximas acciones operativas</h2>
                     </div>
                     {% if not is_pro %}
                         <a href="/profesional/pro/upgrade">Pasar a PRO</a>
@@ -285,8 +220,8 @@
                     </ul>
                 {% else %}
                     <p class="pro-dashboard__empty">
-                        Tu perfil ya tiene los elementos principales. Mantenelo actualizado y responde rapido
-                        para mejorar conversion.
+                        Tu operacion esta al dia. Revisa oportunidades, responde rapido y mantene
+                        tu perfil publico actualizado desde la edicion de perfil.
                     </p>
                 {% endif %}
             </article>

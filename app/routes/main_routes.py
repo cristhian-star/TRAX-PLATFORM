@@ -72,17 +72,6 @@ def _empty_to_none(value):
     return value or None
 
 
-def _split_lines(value, limit=None):
-    if not value:
-        return []
-
-    items = [item.strip() for item in value.splitlines() if item.strip()]
-    if limit is None:
-        return items
-
-    return items[:limit]
-
-
 def _parse_optional_int(value):
     value = _empty_to_none(value)
 
@@ -511,27 +500,6 @@ def profesional_dashboard():
     accepted_proposal_applications = [
         application for application in proposal_applications if application.estado == "ACEPTADA"
     ]
-    gallery_entries = _split_lines(professional.gallery_urls, 6) if professional else []
-    portfolio_entries = _split_lines(professional.portfolio_urls, 4) if professional else []
-    external_links = []
-
-    if professional:
-        link_fields = (
-            ("Google Drive", professional.google_drive_url),
-            ("Sitio web", professional.website_url),
-            ("Instagram", professional.instagram_url),
-            ("TikTok", professional.tiktok_url),
-            ("YouTube", professional.youtube_url),
-        )
-        external_links = [
-            {"label": label, "url": url}
-            for label, url in link_fields
-            if url
-        ]
-        external_links.extend(
-            {"label": "Otro enlace", "url": url}
-            for url in _split_lines(professional.other_links, 4)
-        )
 
     recommendations = []
     if not professional:
@@ -541,10 +509,10 @@ def profesional_dashboard():
             recommendations.append("Completa datos clave de tu oficio y experiencia.")
         if not professional.descripcion:
             recommendations.append("Agrega una descripcion clara de tus servicios.")
-        if not gallery_entries and not portfolio_entries:
-            recommendations.append("Suma trabajos realizados o links de portfolio.")
-        if not external_links:
-            recommendations.append("Agrega enlaces externos para reforzar confianza.")
+        if not professional.perfil_completo:
+            recommendations.append("Revisa que tu perfil publico este completo antes de competir por mas oportunidades.")
+        if not has_approved_verification(user_id):
+            recommendations.append("Solicita verificacion para reforzar confianza en contrataciones.")
         if not reviews:
             recommendations.append("Impulsa tus primeras reseñas cerrando trabajos dentro de TRAX.")
 
@@ -564,9 +532,6 @@ def profesional_dashboard():
         proposal_applications_count=len(proposal_applications),
         accepted_proposal_applications_count=len(accepted_proposal_applications),
         offer_allowance=get_offer_allowance(user_id) if user_id else None,
-        gallery_entries=gallery_entries,
-        portfolio_entries=portfolio_entries,
-        external_links=external_links,
         recommendations=recommendations,
     )
 
