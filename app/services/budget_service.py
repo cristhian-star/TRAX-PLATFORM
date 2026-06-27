@@ -60,7 +60,7 @@ def get_budget_offers(budget_request_id):
     return (
         BudgetOffer.query
         .filter_by(budget_request_id=budget_request_id)
-        .order_by(BudgetOffer.monto.asc(), BudgetOffer.fecha_creacion.asc())
+        .order_by(BudgetOffer.monto_desde.asc(), BudgetOffer.monto.asc(), BudgetOffer.fecha_creacion.asc())
         .all()
     )
 
@@ -129,8 +129,10 @@ def get_offer_allowance(professional_user_id):
 def create_budget_offer(
     budget_request_id,
     professional_user_id,
-    monto,
-    mensaje,
+    cobra_visita,
+    precio_visita,
+    monto_desde,
+    monto_hasta,
     plazo_estimado,
     condiciones=None,
 ):
@@ -138,13 +140,37 @@ def create_budget_offer(
     if professional is None or not professional.perfil_completo:
         raise ValueError("Necesitas completar tu perfil profesional para ofertar")
 
-    try:
-        amount = Decimal(str(monto))
-    except (InvalidOperation, TypeError, ValueError):
-        raise ValueError("El monto ingresado no es valido") from None
+    charges_visit = str(cobra_visita).strip().lower() in ("1", "si", "sí", "true", "on")
 
-    if amount <= 0:
-        raise ValueError("El monto debe ser mayor que cero")
+    def parse_amount(value, field_label, required=True):
+        if value is None or str(value).strip() == "":
+            if required:
+                raise ValueError(f"{field_label} es requerido")
+            return None
+
+        try:
+            parsed = Decimal(str(value))
+        except (InvalidOperation, TypeError, ValueError):
+            raise ValueError(f"{field_label} no es valido") from None
+
+        if parsed < 0:
+            raise ValueError(f"{field_label} no puede ser negativo")
+
+        return parsed
+
+    visit_amount = parse_amount(
+        precio_visita,
+        "El precio de visita",
+        required=charges_visit,
+    )
+    amount_from = parse_amount(monto_desde, "El monto desde")
+    amount_to = parse_amount(monto_hasta, "El monto hasta")
+
+    if amount_from > amount_to:
+        raise ValueError("El monto desde debe ser menor o igual al monto hasta")
+
+    if not charges_visit:
+        visit_amount = None
 
     budget_request = (
         BudgetRequest.query
@@ -180,8 +206,12 @@ def create_budget_offer(
         budget_request_id=budget_request.id,
         professional_id=professional.id,
         professional_user_id=professional_user_id,
-        monto=amount,
-        mensaje=mensaje,
+        monto=amount_from,
+        cobra_visita=charges_visit,
+        precio_visita=visit_amount,
+        monto_desde=amount_from,
+        monto_hasta=amount_to,
+        mensaje=condiciones or "Presupuesto preliminar enviado.",
         plazo_estimado=plazo_estimado,
         condiciones=condiciones,
     )

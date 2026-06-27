@@ -114,6 +114,7 @@ def _get_budget_offer_data(offer):
     professional = offer.professional
     reviews = get_professional_reviews(professional.id)
     user_id = professional.user_id
+    phone_digits = re.sub(r"\D", "", professional.telefono or "")
 
     return {
         "offer": offer,
@@ -126,6 +127,9 @@ def _get_budget_offer_data(offer):
         "rating": {
             "average": get_professional_average_rating(professional.id),
             "count": len(reviews),
+        },
+        "phone": {
+            "whatsapp": phone_digits or None,
         },
     }
 
@@ -515,24 +519,28 @@ def detalle_presupuesto(id):
 @role_required("PROFESIONAL")
 @profile_complete_required
 def ofertar_presupuesto(id):
-    monto = _empty_to_none(request.form.get("monto"))
-    mensaje = _empty_to_none(request.form.get("mensaje"))
+    cobra_visita = _empty_to_none(request.form.get("cobra_visita")) or "no"
+    precio_visita = _empty_to_none(request.form.get("precio_visita"))
+    monto_desde = _empty_to_none(request.form.get("monto_desde"))
+    monto_hasta = _empty_to_none(request.form.get("monto_hasta"))
     plazo_estimado = _empty_to_none(request.form.get("plazo_estimado"))
     condiciones = _empty_to_none(request.form.get("condiciones"))
 
-    if not monto or not mensaje or not plazo_estimado:
+    if not monto_desde or not monto_hasta or not plazo_estimado:
         return redirect(url_for(
             "operations.detalle_presupuesto",
             id=id,
-            error="Completa monto, mensaje y plazo estimado.",
+            error="Completa monto desde, monto hasta y plazo estimado.",
         ))
 
     try:
         create_budget_offer(
             budget_request_id=id,
             professional_user_id=session["user_id"],
-            monto=monto,
-            mensaje=mensaje,
+            cobra_visita=cobra_visita,
+            precio_visita=precio_visita,
+            monto_desde=monto_desde,
+            monto_hasta=monto_hasta,
             plazo_estimado=plazo_estimado,
             condiciones=condiciones,
         )

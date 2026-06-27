@@ -32,6 +32,8 @@
                 {% for row in offer_rows %}
                     {% set offer = row.offer %}
                     {% set item = row.budget_request %}
+                    {% set amount_from = offer.monto_desde or offer.monto %}
+                    {% set amount_to = offer.monto_hasta or offer.monto %}
                     <article class="budget-request-card">
                         <header>
                             <span class="budget-status {{ 'budget-status--adjudicada' if offer.estado == 'ADJUDICADO' else '' }}">
@@ -53,8 +55,22 @@
                         </div>
                         <dl class="budget-facts">
                             <div>
-                                <dt>Monto</dt>
-                                <dd>${{ "{:,.2f}".format(offer.monto) }}</dd>
+                                <dt>Rango estimado</dt>
+                                <dd>${{ "{:,.2f}".format(amount_from) }} - ${{ "{:,.2f}".format(amount_to) }}</dd>
+                            </div>
+                            <div>
+                                <dt>Visita tecnica</dt>
+                                <dd>
+                                    {% if offer.cobra_visita %}
+                                        Con cargo · ${{ "{:,.2f}".format(offer.precio_visita or 0) }}
+                                    {% else %}
+                                        Sin cargo
+                                    {% endif %}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Plazo</dt>
+                                <dd>{{ offer.plazo_estimado }}</dd>
                             </div>
                             <div>
                                 <dt>Fecha</dt>

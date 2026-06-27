@@ -198,6 +198,15 @@
     cursor: not-allowed;
 }
 
+.budget-button--whatsapp {
+    color: var(--trax-white);
+    background: var(--trax-success-600);
+}
+
+.budget-button--whatsapp:hover {
+    background: var(--trax-success-700);
+}
+
 .budget-alert {
     margin-bottom: var(--trax-space-5);
     padding: var(--trax-space-4);
@@ -448,6 +457,11 @@
 .budget-badge--verified {
     color: var(--trax-cyan-700);
     background: var(--trax-cyan-100);
+}
+
+.budget-badge--preliminary {
+    color: var(--trax-warning-700);
+    background: var(--trax-warning-50);
 }
 
 .budget-offer-card__price {

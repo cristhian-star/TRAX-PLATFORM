@@ -38,6 +38,10 @@ class BudgetOffer(db.Model):
         index=True,
     )
     monto = db.Column(db.Numeric(12, 2), nullable=False)
+    cobra_visita = db.Column(db.Boolean, nullable=False, default=False)
+    precio_visita = db.Column(db.Numeric(12, 2))
+    monto_desde = db.Column(db.Numeric(12, 2))
+    monto_hasta = db.Column(db.Numeric(12, 2))
     mensaje = db.Column(db.Text, nullable=False)
     plazo_estimado = db.Column(db.String(120), nullable=False)
     condiciones = db.Column(db.Text)

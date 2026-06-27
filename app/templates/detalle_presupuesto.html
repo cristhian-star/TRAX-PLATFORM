@@ -94,6 +94,8 @@
                             {% for row in offer_rows %}
                                 {% set offer = row.offer %}
                                 {% set professional = row.professional %}
+                                {% set amount_from = offer.monto_desde or offer.monto %}
+                                {% set amount_to = offer.monto_hasta or offer.monto %}
                                 <article class="budget-offer-card{% if offer.estado == 'ADJUDICADO' %} is-awarded{% endif %}">
                                     <header class="budget-offer-card__header">
                                         <div class="budget-offer-card__identity">
@@ -104,6 +106,7 @@
                                             </div>
                                         </div>
                                         <div class="budget-badges" aria-label="Distinciones">
+                                            <span class="budget-badge budget-badge--preliminary">Presupuesto preliminar</span>
                                             {% if row.badges.work %}<span class="budget-badge budget-badge--work">WORK</span>{% endif %}
                                             {% if row.badges.pro %}<span class="budget-badge budget-badge--pro">PRO</span>{% endif %}
                                             {% if row.badges.verified %}<span class="budget-badge budget-badge--verified">VERIFICADO</span>{% endif %}
@@ -111,11 +114,21 @@
                                     </header>
 
                                     <div class="budget-offer-card__price">
-                                        <span>Monto propuesto</span>
-                                        <strong>${{ "{:,.2f}".format(offer.monto) }}</strong>
+                                        <span>Rango estimado</span>
+                                        <strong>${{ "{:,.2f}".format(amount_from) }} - ${{ "{:,.2f}".format(amount_to) }}</strong>
                                     </div>
 
                                     <dl class="budget-offer-card__facts">
+                                        <div>
+                                            <dt>Visita tecnica</dt>
+                                            <dd>
+                                                {% if offer.cobra_visita %}
+                                                    Con cargo · ${{ "{:,.2f}".format(offer.precio_visita or 0) }}
+                                                {% else %}
+                                                    Sin cargo
+                                                {% endif %}
+                                            </dd>
+                                        </div>
                                         <div>
                                             <dt>Plazo</dt>
                                             <dd>{{ offer.plazo_estimado }}</dd>
@@ -132,14 +145,9 @@
                                         </div>
                                     </dl>
 
-                                    <div class="budget-offer-card__copy">
-                                        <strong>Propuesta</strong>
-                                        <p>{{ offer.mensaje }}</p>
-                                    </div>
-
                                     {% if offer.condiciones %}
                                         <div class="budget-offer-card__copy">
-                                            <strong>Condiciones</strong>
+                                            <strong>Condiciones / observaciones</strong>
                                             <p>{{ offer.condiciones }}</p>
                                         </div>
                                     {% endif %}
@@ -149,6 +157,19 @@
                                             Ver perfil
                                         </a>
                                         {% if offer.estado == "ADJUDICADO" %}
+                                            {% if row.phone.whatsapp %}
+                                                <a
+                                                    class="budget-button budget-button--whatsapp"
+                                                    href="https://wa.me/{{ row.phone.whatsapp }}"
+                                                    target="_blank"
+                                                    rel="noreferrer">
+                                                    WhatsApp
+                                                </a>
+                                            {% else %}
+                                                <span class="budget-button budget-button--disabled" aria-disabled="true">
+                                                    WhatsApp no disponible
+                                                </span>
+                                            {% endif %}
                                             <span class="budget-awarded">Adjudicado</span>
                                         {% elif budget_request.estado != "ADJUDICADA" %}
                                             <form action="/presupuestos/{{ budget_request.id }}/adjudicar/{{ offer.id }}" method="POST">
@@ -186,8 +207,22 @@
                                     Presupuesto enviado
                                 {% endif %}
                             </h2>
-                            <strong>${{ "{:,.2f}".format(own_offer.monto) }}</strong>
-                            <p>{{ own_offer.mensaje }}</p>
+                            <strong>
+                                ${{ "{:,.2f}".format(own_offer.monto_desde or own_offer.monto) }}
+                                -
+                                ${{ "{:,.2f}".format(own_offer.monto_hasta or own_offer.monto) }}
+                            </strong>
+                            <p>
+                                Visita tecnica:
+                                {% if own_offer.cobra_visita %}
+                                    con cargo de ${{ "{:,.2f}".format(own_offer.precio_visita or 0) }}
+                                {% else %}
+                                    sin cargo
+                                {% endif %}
+                            </p>
+                            {% if own_offer.condiciones %}
+                                <p>{{ own_offer.condiciones }}</p>
+                            {% endif %}
                             <span>Plazo: {{ own_offer.plazo_estimado }}</span>
                         </div>
                     {% elif budget_request.estado in ("ABIERTO", "COTIZANDO") and offer_count < max_offers %}
@@ -217,20 +252,31 @@
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="budget-form__grid">
                                     <label class="budget-field">
-                                        <span>Monto *</span>
-                                        <input type="number" name="monto" min="0.01" step="0.01" placeholder="0,00" required>
+                                        <span>Cobra visita tecnica *</span>
+                                        <select name="cobra_visita" required>
+                                            <option value="no">No, visita sin cargo</option>
+                                            <option value="si">Si, visita con cargo</option>
+                                        </select>
+                                    </label>
+                                    <label class="budget-field">
+                                        <span>Precio visita</span>
+                                        <input type="number" name="precio_visita" min="0" step="0.01" placeholder="0,00">
+                                    </label>
+                                    <label class="budget-field">
+                                        <span>Monto desde *</span>
+                                        <input type="number" name="monto_desde" min="0" step="0.01" placeholder="0,00" required>
+                                    </label>
+                                    <label class="budget-field">
+                                        <span>Monto hasta *</span>
+                                        <input type="number" name="monto_hasta" min="0" step="0.01" placeholder="0,00" required>
                                     </label>
                                     <label class="budget-field">
                                         <span>Plazo estimado *</span>
                                         <input type="text" name="plazo_estimado" maxlength="120" placeholder="Ej. 3 dias" required>
                                     </label>
                                     <label class="budget-field budget-field--wide">
-                                        <span>Mensaje *</span>
-                                        <textarea name="mensaje" rows="5" placeholder="Explica el alcance incluido y por que sos una buena opcion." required></textarea>
-                                    </label>
-                                    <label class="budget-field budget-field--wide">
-                                        <span>Condiciones</span>
-                                        <textarea name="condiciones" rows="3" placeholder="Forma de trabajo, materiales, vigencia u otras aclaraciones."></textarea>
+                                        <span>Condiciones / observaciones</span>
+                                        <textarea name="condiciones" rows="4" placeholder="Aclaraciones, supuestos, materiales incluidos, vigencia o informacion necesaria."></textarea>
                                     </label>
                                 </div>
                                 <div class="budget-form__actions">
