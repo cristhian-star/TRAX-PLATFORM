@@ -47,6 +47,8 @@ from app.services.review_service import (
     get_professional_average_rating,
     get_professional_reviews
 )
+from app.services.budget_service import get_offer_allowance, get_professional_budget_offers
+from app.models.proposal_application import ProposalApplication
 
 main = Blueprint("main", __name__)
 
@@ -68,6 +70,17 @@ def _empty_to_none(value):
 
     value = value.strip()
     return value or None
+
+
+def _split_lines(value, limit=None):
+    if not value:
+        return []
+
+    items = [item.strip() for item in value.splitlines() if item.strip()]
+    if limit is None:
+        return items
+
+    return items[:limit]
 
 
 def _parse_optional_int(value):
@@ -480,7 +493,60 @@ def solicitar_verificacion():
 @main.route("/profesional/dashboard")
 @role_required("PROFESIONAL")
 def profesional_dashboard():
-    professional = get_professional_by_user_id(session.get("user_id"))
+    user_id = session.get("user_id")
+    professional = get_professional_by_user_id(user_id)
+    reviews = get_professional_reviews(professional.id) if professional else []
+    average_rating = get_professional_average_rating(professional.id) if professional else None
+    budget_offers = get_professional_budget_offers(user_id) if user_id else []
+    awarded_budget_offers = [
+        offer for offer in budget_offers if offer.estado == "ADJUDICADO"
+    ]
+    proposal_applications = (
+        ProposalApplication.query
+        .filter_by(professional_user_id=user_id)
+        .order_by(ProposalApplication.created_at.desc(), ProposalApplication.id.desc())
+        .all()
+        if user_id else []
+    )
+    accepted_proposal_applications = [
+        application for application in proposal_applications if application.estado == "ACEPTADA"
+    ]
+    gallery_entries = _split_lines(professional.gallery_urls, 6) if professional else []
+    portfolio_entries = _split_lines(professional.portfolio_urls, 4) if professional else []
+    external_links = []
+
+    if professional:
+        link_fields = (
+            ("Google Drive", professional.google_drive_url),
+            ("Sitio web", professional.website_url),
+            ("Instagram", professional.instagram_url),
+            ("TikTok", professional.tiktok_url),
+            ("YouTube", professional.youtube_url),
+        )
+        external_links = [
+            {"label": label, "url": url}
+            for label, url in link_fields
+            if url
+        ]
+        external_links.extend(
+            {"label": "Otro enlace", "url": url}
+            for url in _split_lines(professional.other_links, 4)
+        )
+
+    recommendations = []
+    if not professional:
+        recommendations.append("Completa tu perfil profesional para aparecer en el marketplace.")
+    else:
+        if not professional.perfil_completo:
+            recommendations.append("Completa datos clave de tu oficio y experiencia.")
+        if not professional.descripcion:
+            recommendations.append("Agrega una descripcion clara de tus servicios.")
+        if not gallery_entries and not portfolio_entries:
+            recommendations.append("Suma trabajos realizados o links de portfolio.")
+        if not external_links:
+            recommendations.append("Agrega enlaces externos para reforzar confianza.")
+        if not reviews:
+            recommendations.append("Impulsa tus primeras reseñas cerrando trabajos dentro de TRAX.")
 
     return render_template(
         "profesional_dashboard.html",
@@ -490,7 +556,18 @@ def profesional_dashboard():
         is_profile_complete=bool(professional and professional.perfil_completo),
         is_verified=has_approved_verification(session.get("user_id")),
         is_pro=has_pro_access(session.get("user_id")),
-        pro_upgraded=request.args.get("pro_upgraded") == "1"
+        pro_upgraded=request.args.get("pro_upgraded") == "1",
+        average_rating=average_rating,
+        review_count=len(reviews),
+        budget_offers_count=len(budget_offers),
+        awarded_budget_offers_count=len(awarded_budget_offers),
+        proposal_applications_count=len(proposal_applications),
+        accepted_proposal_applications_count=len(accepted_proposal_applications),
+        offer_allowance=get_offer_allowance(user_id) if user_id else None,
+        gallery_entries=gallery_entries,
+        portfolio_entries=portfolio_entries,
+        external_links=external_links,
+        recommendations=recommendations,
     )
 
 
