@@ -11,10 +11,10 @@
     <section class="emergency-entry__hero">
         <div class="shell emergency-entry__hero-content">
             <span>Asistencia urgente TRAX</span>
-            <h1>Contanos qué pasó y buscá profesionales compatibles.</h1>
+            <h1>Busca ayuda tecnica disponible para resolver una urgencia.</h1>
             <p>
-                Completá los datos esenciales. TRAX mostrará perfiles disponibles
-                según su servicio y zona declarada, sin garantizar tiempos de respuesta.
+                Completa categoria, zona y una descripcion breve. TRAX te mostrara profesionales compatibles
+                para contactar por WhatsApp o llamada, sin prometer tiempos de respuesta garantizados.
             </p>
         </div>
     </section>
@@ -27,15 +27,16 @@
             <div class="emergency-form__heading">
                 <span>Solicitud urgente</span>
                 <h2>Buscar ayuda ahora</h2>
+                <p>Te llevamos directo al directorio de profesionales compatibles para que confirmes disponibilidad.</p>
             </div>
 
             <label>
-                <span>Tipo de emergencia / categoría</span>
+                <span>Tipo de emergencia / categoria</span>
                 <input
                     type="text"
                     name="categoria"
                     value="{{ entry_data.get('categoria', '') }}"
-                    placeholder="Ej: Electricidad, plomería, refrigeración"
+                    placeholder="Ej: Electricidad, plomeria, refrigeracion"
                     required>
             </label>
 
@@ -45,40 +46,40 @@
                     type="text"
                     name="zona"
                     value="{{ entry_data.get('zona', '') }}"
-                    placeholder="Barrio, localidad o área"
+                    placeholder="Barrio, localidad o area"
                     required>
             </label>
 
             <label class="emergency-form__wide">
-                <span>Descripción breve</span>
+                <span>Descripcion breve</span>
                 <textarea
                     name="descripcion"
                     maxlength="600"
-                    placeholder="Describí qué ocurre, qué instalación está afectada y cualquier riesgo visible."
+                    placeholder="Describi que ocurre, que instalacion esta afectada y cualquier riesgo visible."
                     required>{{ entry_data.get('descripcion', '') }}</textarea>
             </label>
 
-            <button class="emergency-form__wide" type="submit">Buscar ayuda ahora</button>
+            <button class="emergency-form__wide emergency-form__submit" type="submit">Buscar ayuda ahora</button>
         </form>
 
         <aside class="emergency-entry__aside">
             <section class="emergency-legal" aria-labelledby="emergency-legal-title">
                 <span aria-hidden="true">!</span>
                 <div>
-                    <h2 id="emergency-legal-title">Primero, protegé a las personas</h2>
+                    <h2 id="emergency-legal-title">Primero, protege a las personas</h2>
                     <p>
-                        Si existe riesgo para personas, incendio, fuga grave o emergencia vital,
-                        contactá primero a los servicios de emergencia correspondientes.
+                        Si hay riesgo para personas, incendio, fuga grave o peligro inmediato,
+                        contacta primero a emergencias oficiales.
                     </p>
                 </div>
             </section>
 
             <section class="emergency-process" aria-labelledby="emergency-process-title">
-                <h2 id="emergency-process-title">Cómo funciona esta versión</h2>
+                <h2 id="emergency-process-title">Como funciona esta version</h2>
                 <ol>
-                    <li>Registrás la categoría y zona.</li>
-                    <li>TRAX busca profesionales compatibles.</li>
-                    <li>Elegís WhatsApp, llamada o perfil.</li>
+                    <li>Registras categoria, zona y que esta pasando.</li>
+                    <li>TRAX muestra profesionales compatibles por rubro y area declarada.</li>
+                    <li>Confirmas disponibilidad por WhatsApp o llamada.</li>
                 </ol>
             </section>
         </aside>

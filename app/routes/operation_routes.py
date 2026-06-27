@@ -87,6 +87,7 @@ def _get_emergency_professional_data(professional):
     is_pro = has_pro_access(user_id) if user_id else False
     is_verified = has_approved_verification(user_id) if user_id else False
     reviews = get_professional_reviews(professional.id)
+    average_rating = get_professional_average_rating(professional.id)
 
     return {
         "professional": professional,
@@ -96,18 +97,23 @@ def _get_emergency_professional_data(professional):
             "verified": is_verified,
         },
         "rating": {
-            "average": get_professional_average_rating(professional.id),
+            "average": average_rating,
             "count": len(reviews),
         },
         "phone": {
             "whatsapp": phone_digits or None,
             "call": f"+{phone_digits}" if phone_digits else None,
         },
-        "priority": (
-            2 if is_pro and is_verified
-            else 1 if is_pro or is_verified
-            else 0
-        ),
+        "availability": {
+            "primary": "Disponible segun perfil",
+            "secondary": "Guardia no configurada",
+            "priority": "Prioridad PRO" if is_pro else None,
+        },
+        "sort": {
+            "pro": 1 if is_pro else 0,
+            "verified": 1 if is_verified else 0,
+            "rating": average_rating or 0,
+        },
     }
 
 
@@ -667,7 +673,12 @@ def directorio_emergencias():
     professionals = search_emergency_professionals(categoria, zona)
     professional_rows = sorted(
         (_get_emergency_professional_data(professional) for professional in professionals),
-        key=lambda row: (-row["priority"], row["professional"].nombre.casefold()),
+        key=lambda row: (
+            -row["sort"]["pro"],
+            -row["sort"]["verified"],
+            -row["sort"]["rating"],
+            row["professional"].nombre.casefold(),
+        ),
     )
 
     return render_template(

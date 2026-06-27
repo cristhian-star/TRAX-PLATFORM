@@ -1,6 +1,6 @@
 {% set specialty = professional.especialidad or professional.servicio %}
 
-<article class="emergency-card">
+<article class="emergency-card{% if badges.pro %} emergency-card--pro{% endif %}{% if badges.verified %} emergency-card--verified{% endif %}">
     <div class="emergency-card__identity">
         <div class="emergency-card__avatar" aria-hidden="true">
             {{ professional.nombre[:2]|upper }}
@@ -25,9 +25,15 @@
     <div class="emergency-card__status">
         <span class="emergency-status">
             <i aria-hidden="true"></i>
-            Disponible según perfil
+            {{ row.availability.primary }}
         </span>
-        <small>Guardia no configurada</small>
+        <small>{{ row.availability.secondary }}</small>
+        {% if row.availability.priority %}
+            <span class="emergency-status emergency-status--priority">
+                <i aria-hidden="true"></i>
+                {{ row.availability.priority }}
+            </span>
+        {% endif %}
     </div>
 
     <dl class="emergency-card__facts">
@@ -36,12 +42,12 @@
             <dd>{{ professional.zona }}</dd>
         </div>
         <div>
-            <dt>Calificación</dt>
+            <dt>Calificacion</dt>
             <dd>
                 {% if rating.average is not none %}
                     <span aria-hidden="true">&#9733;</span>
-                    {{ rating.average }} · {{ rating.count }}
-                    {% if rating.count == 1 %}reseña{% else %}reseñas{% endif %}
+                    {{ rating.average }} / {{ rating.count }}
+                    {% if rating.count == 1 %}resena{% else %}resenas{% endif %}
                 {% else %}
                     Sin calificaciones
                 {% endif %}

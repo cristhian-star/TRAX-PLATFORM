@@ -87,6 +87,12 @@
     font-size: var(--trax-font-size-26);
 }
 
+.emergency-form__heading p {
+    margin: var(--trax-space-2) 0 0;
+    color: var(--trax-color-text-muted);
+    line-height: var(--trax-line-height-body);
+}
+
 .emergency-form label {
     display: grid;
     gap: var(--trax-space-2);
@@ -131,6 +137,13 @@
     background: var(--trax-emergency-600);
     font-weight: var(--trax-font-weight-bold);
     cursor: pointer;
+}
+
+.emergency-form__submit {
+    min-height: 3.5rem;
+    border-radius: var(--trax-radius-pill);
+    font-size: var(--trax-font-size-18);
+    box-shadow: 0 14px 30px rgba(200, 30, 30, 0.22);
 }
 
 .emergency-legal,
@@ -229,6 +242,17 @@
     font-weight: var(--trax-font-weight-semibold);
 }
 
+.emergency-directory__availability-note {
+    margin: 0 0 var(--trax-space-4);
+    padding: var(--trax-space-4);
+    color: var(--trax-cyan-700);
+    border: 1px solid var(--trax-cyan-100);
+    border-radius: var(--trax-radius-md);
+    background: var(--trax-cyan-50);
+    font-weight: var(--trax-font-weight-semibold);
+    line-height: var(--trax-line-height-body);
+}
+
 .emergency-directory__toolbar {
     display: grid;
     gap: var(--trax-space-3);
@@ -265,6 +289,21 @@
     font-weight: var(--trax-font-weight-bold);
 }
 
+.emergency-empty__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--trax-space-3);
+    width: 100%;
+}
+
+.emergency-empty__actions a {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+
 .emergency-card {
     display: grid;
     gap: var(--trax-space-4);
@@ -275,6 +314,15 @@
     border-radius: var(--trax-radius-lg);
     background: var(--trax-color-surface);
     box-shadow: var(--trax-shadow-sm);
+}
+
+.emergency-card--pro {
+    border-left-color: var(--trax-orange-500);
+    box-shadow: 0 16px 34px rgba(17, 24, 39, 0.1);
+}
+
+.emergency-card--verified {
+    border-color: var(--trax-cyan-100);
 }
 
 .emergency-card__identity {
@@ -366,6 +414,15 @@
     box-shadow: 0 0 0 0.25rem var(--trax-success-50);
 }
 
+.emergency-status--priority {
+    color: var(--trax-orange-700);
+}
+
+.emergency-status--priority i {
+    background: var(--trax-orange-500);
+    box-shadow: 0 0 0 0.25rem var(--trax-orange-50);
+}
+
 .emergency-card__facts {
     display: grid;
     gap: var(--trax-space-2);
@@ -399,11 +456,14 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--trax-space-2);
+    min-width: 0;
 }
 
 .emergency-action {
     display: inline-flex;
-    min-height: var(--trax-control-height-md);
+    min-width: 0;
+    max-width: 100%;
+    min-height: 3rem;
     align-items: center;
     justify-content: center;
     padding: 0 var(--trax-space-3);
@@ -411,6 +471,8 @@
     border-radius: var(--trax-control-radius);
     font-size: var(--trax-font-size-14);
     font-weight: var(--trax-font-weight-bold);
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .emergency-action--whatsapp {
@@ -465,6 +527,35 @@
     margin: 0;
     color: var(--trax-color-text-muted);
     line-height: var(--trax-line-height-body);
+}
+
+.emergency-guard-note {
+    display: grid;
+    gap: var(--trax-space-2);
+    margin-top: var(--trax-space-6);
+    padding: var(--trax-space-5);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-lg);
+    background: var(--trax-color-surface);
+    box-shadow: var(--trax-shadow-sm);
+}
+
+.emergency-guard-note span {
+    color: var(--trax-emergency-700);
+    font-size: var(--trax-font-size-12);
+    font-weight: var(--trax-font-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.emergency-guard-note strong {
+    color: var(--trax-color-brand-strong);
+    font-size: var(--trax-font-size-18);
+}
+
+.emergency-guard-note p {
+    margin: 0;
+    color: var(--trax-color-text-muted);
 }
 
 .emergency-membership-note {
@@ -537,6 +628,10 @@
 
     .emergency-action--profile {
         grid-column: auto;
+    }
+
+    .emergency-empty__actions a {
+        width: auto;
     }
 
     .emergency-membership-note {
