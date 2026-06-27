@@ -23,6 +23,13 @@
             <a class="budget-button budget-button--primary" href="/presupuestos/nuevo">Publicar nueva solicitud</a>
         </div>
 
+        <nav class="budget-filter-tabs" aria-label="Filtrar mis solicitudes">
+            <a class="budget-filter-tab{% if estado_filtro == 'activas' %} is-active{% endif %}" href="/presupuestos/mis-solicitudes?estado=activas">Activas</a>
+            <a class="budget-filter-tab{% if estado_filtro == 'adjudicadas' %} is-active{% endif %}" href="/presupuestos/mis-solicitudes?estado=adjudicadas">Adjudicadas</a>
+            <a class="budget-filter-tab{% if estado_filtro == 'canceladas' %} is-active{% endif %}" href="/presupuestos/mis-solicitudes?estado=canceladas">Canceladas</a>
+            <a class="budget-filter-tab{% if estado_filtro == 'todas' %} is-active{% endif %}" href="/presupuestos/mis-solicitudes?estado=todas">Todas</a>
+        </nav>
+
         {% if request_rows %}
             <div class="budget-request-grid">
                 {% for row in request_rows %}
@@ -32,10 +39,10 @@
                             <span class="budget-status budget-status--{{ item.estado|lower }}">{{ item.estado }}</span>
                             <span>{{ row.offer_count }}/{{ max_offers }} recibidos</span>
                         </header>
-                        <div>
-                            <span class="budget-eyebrow">{{ item.categoria }}</span>
-                            <h2>{{ item.titulo }}</h2>
-                            <p>{{ item.descripcion|truncate(160) }}</p>
+                        <div class="budget-request-card__body">
+                            <span class="budget-eyebrow budget-text-break">{{ item.categoria }}</span>
+                            <h2 class="budget-request-card__title">{{ item.titulo }}</h2>
+                            <p class="budget-request-card__description">{{ item.descripcion|truncate(220) }}</p>
                         </div>
                         <dl class="budget-facts">
                             <div>
@@ -47,9 +54,19 @@
                                 <dd>{{ item.fecha_creacion.strftime('%d/%m/%Y') }}</dd>
                             </div>
                         </dl>
-                        <a class="budget-button budget-button--primary" href="/presupuestos/{{ item.id }}">
-                            Ver detalle
-                        </a>
+                        <div class="budget-request-card__actions">
+                            <a class="budget-button budget-button--primary budget-card__cta" href="/presupuestos/{{ item.id }}">
+                                Ver detalle
+                            </a>
+                            {% if item.estado in ("ABIERTO", "COTIZANDO", "CERRADO") %}
+                                <form action="/presupuestos/{{ item.id }}/cancelar" method="POST" onsubmit="return confirm('&iquest;Seguro que quer&eacute;s cancelar esta solicitud? Los profesionales ya no podr&aacute;n enviar presupuestos.');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="budget-button budget-button--secondary budget-card__cta" type="submit">
+                                        Cancelar solicitud
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </article>
                 {% endfor %}
             </div>

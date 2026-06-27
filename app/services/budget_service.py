@@ -65,14 +65,21 @@ def get_budget_offers(budget_request_id):
     )
 
 
-def get_client_budget_requests_with_counts(cliente_id):
-    return (
+def get_client_budget_requests_with_counts(cliente_id, estados=None):
+    query = (
         db.session.query(
             BudgetRequest,
             db.func.count(BudgetOffer.id).label("offer_count"),
         )
         .outerjoin(BudgetOffer, BudgetOffer.budget_request_id == BudgetRequest.id)
         .filter(BudgetRequest.cliente_id == cliente_id)
+    )
+
+    if estados:
+        query = query.filter(BudgetRequest.estado.in_(estados))
+
+    return (
+        query
         .group_by(BudgetRequest.id)
         .order_by(BudgetRequest.fecha_creacion.desc())
         .all()
@@ -240,8 +247,8 @@ def award_budget_offer(budget_request_id, offer_id, cliente_id):
         raise PermissionError("Solo el cliente dueño puede adjudicar esta solicitud")
     if budget_request.estado == "ADJUDICADA":
         raise ValueError("Esta solicitud ya fue adjudicada")
-    if budget_request.estado == "CERRADO":
-        raise ValueError("Esta solicitud esta cerrada")
+    if budget_request.estado not in ("ABIERTO", "COTIZANDO"):
+        raise ValueError("Esta solicitud ya no permite adjudicar presupuestos")
 
     offer = BudgetOffer.query.filter_by(
         id=offer_id,
@@ -255,6 +262,29 @@ def award_budget_offer(budget_request_id, offer_id, cliente_id):
     db.session.commit()
 
     return offer
+
+
+def cancel_budget_request(budget_request_id, cliente_id):
+    budget_request = (
+        BudgetRequest.query
+        .filter_by(id=budget_request_id)
+        .with_for_update()
+        .first()
+    )
+
+    if budget_request is None:
+        raise ValueError("Solicitud de presupuesto no encontrada")
+    if budget_request.cliente_id != cliente_id:
+        raise PermissionError("Solo el cliente dueno puede cancelar esta solicitud")
+    if budget_request.estado == "ADJUDICADA":
+        raise ValueError("No podes cancelar una solicitud adjudicada")
+    if budget_request.estado == "CANCELADA":
+        return budget_request
+
+    budget_request.estado = "CANCELADA"
+    db.session.commit()
+
+    return budget_request
 
 
 def get_client_budget_requests(cliente_id):

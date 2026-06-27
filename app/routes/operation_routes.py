@@ -10,6 +10,7 @@ from app.models.professional import Professional
 from app.services.budget_service import (
     MAX_OFFERS_PER_REQUEST,
     award_budget_offer,
+    cancel_budget_request,
     create_budget_offer,
     create_budget_request,
     get_client_budget_requests_with_counts,
@@ -397,18 +398,32 @@ def nuevo_presupuesto():
 @login_required
 @role_required("CLIENTE")
 def mis_solicitudes_presupuesto():
+    estado_filtro = _empty_to_none(request.args.get("estado")) or "activas"
+    estados_por_filtro = {
+        "activas": ("ABIERTO", "COTIZANDO"),
+        "adjudicadas": ("ADJUDICADA",),
+        "canceladas": ("CANCELADA",),
+        "todas": None,
+    }
+    if estado_filtro not in estados_por_filtro:
+        estado_filtro = "activas"
+
     request_rows = [
         {
             "budget_request": budget_request,
             "offer_count": offer_count,
         }
-        for budget_request, offer_count in get_client_budget_requests_with_counts(session["user_id"])
+        for budget_request, offer_count in get_client_budget_requests_with_counts(
+            session["user_id"],
+            estados=estados_por_filtro[estado_filtro],
+        )
     ]
 
     return render_template(
         "mis_solicitudes_presupuesto.html",
         request_rows=request_rows,
         max_offers=MAX_OFFERS_PER_REQUEST,
+        estado_filtro=estado_filtro,
     )
 
 
@@ -580,6 +595,27 @@ def adjudicar_presupuesto(id, presupuesto_id):
         id=id,
         adjudicado="1",
     ))
+
+
+@operations.route("/presupuestos/<int:id>/cancelar", methods=["POST"])
+@login_required
+@role_required("CLIENTE")
+def cancelar_presupuesto(id):
+    try:
+        cancel_budget_request(
+            budget_request_id=id,
+            cliente_id=session["user_id"],
+        )
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return redirect(url_for(
+            "operations.detalle_presupuesto",
+            id=id,
+            error=str(error),
+        ))
+
+    return redirect(url_for("operations.mis_solicitudes_presupuesto", estado="canceladas"))
 
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])

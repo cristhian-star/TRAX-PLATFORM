@@ -145,12 +145,33 @@
                                         </div>
                                     </dl>
 
-                                    {% if offer.condiciones %}
-                                        <div class="budget-offer-card__copy">
-                                            <strong>Condiciones / observaciones</strong>
-                                            <p>{{ offer.condiciones }}</p>
+                                    <details class="budget-offer-details">
+                                        <summary>Ver propuesta completa</summary>
+                                        <div class="budget-offer-details__content">
+                                            <div>
+                                                <strong>Mensaje del profesional</strong>
+                                                <p>{{ offer.mensaje or "Sin mensaje adicional." }}</p>
+                                            </div>
+                                            <div>
+                                                <strong>Condiciones / observaciones</strong>
+                                                <p>{{ offer.condiciones or "Sin condiciones adicionales." }}</p>
+                                            </div>
+                                            <dl class="budget-offer-details__meta">
+                                                <div>
+                                                    <dt>Estado</dt>
+                                                    <dd>{{ offer.estado }}</dd>
+                                                </div>
+                                                <div>
+                                                    <dt>Fecha de envio</dt>
+                                                    <dd>{{ offer.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</dd>
+                                                </div>
+                                                <div>
+                                                    <dt>Tipo</dt>
+                                                    <dd>Presupuesto preliminar sujeto a inspeccion o informacion adicional.</dd>
+                                                </div>
+                                            </dl>
                                         </div>
-                                    {% endif %}
+                                    </details>
 
                                     <footer class="budget-offer-card__actions">
                                         <a class="budget-button budget-button--secondary" href="/profesional/{{ professional.id }}">
@@ -171,7 +192,7 @@
                                                 </span>
                                             {% endif %}
                                             <span class="budget-awarded">Adjudicado</span>
-                                        {% elif budget_request.estado != "ADJUDICADA" %}
+                                        {% elif budget_request.estado in ("ABIERTO", "COTIZANDO") %}
                                             <form action="/presupuestos/{{ budget_request.id }}/adjudicar/{{ offer.id }}" method="POST">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button class="budget-button budget-button--primary" type="submit">
