@@ -60,10 +60,10 @@
                             <span class="budget-status budget-status--{{ item.estado|lower }}">{{ item.estado }}</span>
                             <span>{{ item.offers|length }}/6 recibidos</span>
                         </header>
-                        <div>
-                            <span class="budget-eyebrow">{{ item.categoria }}</span>
-                            <h2>{{ item.titulo }}</h2>
-                            <p>{{ item.descripcion|truncate(180) }}</p>
+                        <div class="budget-request-card__body">
+                            <span class="budget-eyebrow budget-text-break">{{ item.categoria }}</span>
+                            <h2 class="budget-request-card__title">{{ item.titulo }}</h2>
+                            <p class="budget-request-card__description">{{ item.descripcion|truncate(220) }}</p>
                         </div>
                         <dl class="budget-facts">
                             <div>

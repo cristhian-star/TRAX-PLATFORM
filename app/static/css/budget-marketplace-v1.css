@@ -6,6 +6,7 @@
 
 .budget-shell {
     width: min(var(--trax-container-xl), calc(100% - (2 * var(--trax-page-gutter))));
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -166,6 +167,8 @@
 
 .budget-button {
     display: inline-flex;
+    min-width: 0;
+    max-width: 100%;
     min-height: var(--trax-control-height-md);
     align-items: center;
     justify-content: center;
@@ -173,6 +176,9 @@
     border: 1px solid transparent;
     border-radius: var(--trax-radius-pill);
     font-weight: var(--trax-font-weight-bold);
+    text-align: center;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     cursor: pointer;
 }
 
@@ -265,6 +271,8 @@
 
 .budget-detail-hero__heading h1 {
     max-width: 24ch;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     font-size: clamp(var(--trax-font-size-26), 6vw, var(--trax-font-size-44));
 }
 
@@ -338,10 +346,13 @@
 }
 
 .budget-description {
+    max-width: 100%;
     margin: 0;
     color: var(--trax-color-text-secondary);
     line-height: var(--trax-line-height-body);
     white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .budget-facts {
@@ -355,6 +366,7 @@
 .budget-facts div,
 .budget-offer-card__facts div {
     display: grid;
+    min-width: 0;
     gap: var(--trax-space-1);
 }
 
@@ -368,9 +380,12 @@
 
 .budget-facts dd,
 .budget-offer-card__facts dd {
+    min-width: 0;
     margin: 0;
     color: var(--trax-steel-950);
     font-weight: var(--trax-font-weight-semibold);
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .budget-offer-grid {
@@ -380,6 +395,8 @@
 
 .budget-offer-card {
     display: grid;
+    min-width: 0;
+    max-width: 100%;
     gap: var(--trax-space-5);
     padding: var(--trax-space-5);
     border: 1px solid var(--trax-color-border);
@@ -402,6 +419,7 @@
 
 .budget-offer-card__identity {
     display: flex;
+    min-width: 0;
     gap: var(--trax-space-3);
     align-items: center;
 }
@@ -421,11 +439,16 @@
 
 .budget-offer-card h3 {
     margin: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     color: var(--trax-steel-950);
 }
 
 .budget-offer-card__identity p,
 .budget-offer-card__copy p {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     margin: var(--trax-space-1) 0 0;
     color: var(--trax-color-text-secondary);
     line-height: var(--trax-line-height-body);
@@ -479,6 +502,8 @@
 
 .budget-offer-card__price strong {
     color: var(--trax-steel-950);
+    overflow-wrap: anywhere;
+    word-break: break-word;
     font-size: var(--trax-font-size-26);
 }
 
@@ -612,21 +637,28 @@
 
 .budget-request-grid {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--trax-space-5);
+    max-width: 100%;
+    overflow-x: clip;
 }
 
 .budget-request-card {
     display: grid;
+    min-width: 0;
+    max-width: 100%;
     gap: var(--trax-space-5);
     padding: var(--trax-space-5);
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-radius-lg);
     background: var(--trax-color-surface);
     box-shadow: var(--trax-shadow-sm);
+    overflow: hidden;
 }
 
 .budget-request-card header {
     display: flex;
+    min-width: 0;
     align-items: center;
     justify-content: space-between;
     gap: var(--trax-space-3);
@@ -645,6 +677,44 @@
     margin: 0;
     color: var(--trax-color-text-secondary);
     line-height: var(--trax-line-height-body);
+}
+
+
+.budget-text-break,
+.budget-request-card__body,
+.budget-request-card__title,
+.budget-request-card__description {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.budget-request-card__body {
+    overflow: hidden;
+}
+
+.budget-request-card__title,
+.budget-request-card__description {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}
+
+.budget-request-card__title {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.budget-request-card__description {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+}
+
+.budget-request-card .budget-button {
+    justify-self: stretch;
+    align-self: end;
 }
 
 @media (min-width: 48rem) {

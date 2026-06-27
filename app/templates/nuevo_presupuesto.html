@@ -127,7 +127,9 @@
                         maxlength="160"
                         value="{{ entry_data.get('titulo', '') }}"
                         placeholder="Ej. Renovacion de tablero electrico"
+                        aria-describedby="budget-title-help"
                         required>
+                    <small id="budget-title-help">Maximo 160 caracteres. Se recorta visualmente en los listados si es muy largo.</small>
                 </label>
 
                 <label class="budget-field">
@@ -152,9 +154,11 @@
                     <textarea
                         name="descripcion"
                         rows="6"
+                        maxlength="1200"
                         placeholder="Inclui alcance, medidas aproximadas, materiales disponibles y cualquier condicion relevante."
+                        aria-describedby="budget-description-help"
                         required>{{ entry_data.get('descripcion', '') }}</textarea>
-                    <small>No incluyas datos sensibles o medios de pago.</small>
+                    <small id="budget-description-help">Maximo 1200 caracteres. No incluyas datos sensibles o medios de pago.</small>
                 </label>
             </div>
 
