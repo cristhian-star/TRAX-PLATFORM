@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="proposal-page">
+    <section class="proposal-hero">
+        <div class="shell proposal-hero__layout">
+            <div>
+                <span class="proposal-eyebrow">Marketplace de oportunidades</span>
+                <h1>Propuestas abiertas para profesionales TRAX.</h1>
+                <p>Explora proyectos publicados por clientes, empresas y contratistas.</p>
+            </div>
+            <a class="proposal-button proposal-button--secondary" href="/propuestas/nueva">Publicar propuesta</a>
+        </div>
+    </section>
+
+    <section class="shell proposal-section">
+        <form class="proposal-filter" action="/propuestas" method="GET" aria-label="Filtrar propuestas">
+            <label>
+                <span>Industria</span>
+                <select name="industria">
+                    <option value="">Todas</option>
+                    {% for item in taxonomy.industrias %}
+                        <option value="{{ item.nombre }}" {% if filters.industria == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Categoria</span>
+                <select name="categoria">
+                    <option value="">Todas</option>
+                    {% for item in taxonomy.categorias %}
+                        <option value="{{ item.nombre }}" {% if filters.categoria == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Rubro</span>
+                <select name="rubro">
+                    <option value="">Todos</option>
+                    {% for item in taxonomy.rubros %}
+                        <option value="{{ item.nombre }}" {% if filters.rubro == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Ubicacion</span>
+                <input type="search" name="ubicacion" value="{{ filters.ubicacion }}" placeholder="Ciudad, zona o remoto">
+            </label>
+            <button class="proposal-button proposal-button--primary" type="submit">Filtrar</button>
+        </form>
+
+        <div class="proposal-section__heading">
+            <span class="proposal-eyebrow">Propuestas publicadas</span>
+            <h2>{{ proposals|length }} oportunidades</h2>
+        </div>
+
+        {% if proposals %}
+            <div class="proposal-grid">
+                {% for proposal in proposals %}
+                    <article class="proposal-card">
+                        <header>
+                            <span class="proposal-status proposal-status--{{ proposal.estado|lower }}">{{ proposal.estado }}</span>
+                            <span>{{ proposal.modalidad or "A coordinar" }}</span>
+                        </header>
+                        <div class="proposal-card__body">
+                            <span class="proposal-eyebrow">{{ proposal.industria or "Industria" }} / {{ proposal.categoria }}</span>
+                            <h2>{{ proposal.titulo or proposal.categoria }}</h2>
+                            <p>{{ proposal.descripcion|truncate(180) }}</p>
+                        </div>
+                        <dl class="proposal-card__facts">
+                            <div>
+                                <dt>Rubro</dt>
+                                <dd>{{ proposal.rubro or proposal.categoria }}</dd>
+                            </div>
+                            <div>
+                                <dt>Ubicacion</dt>
+                                <dd>{{ proposal.ubicacion or "A coordinar" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Cantidad</dt>
+                                <dd>{{ proposal.cantidad_profesionales or 1 }} profesional{% if (proposal.cantidad_profesionales or 1) != 1 %}es{% endif %}</dd>
+                            </div>
+                            <div>
+                                <dt>Limite</dt>
+                                <dd>
+                                    {% if proposal.fecha_limite_postulacion %}
+                                        {{ proposal.fecha_limite_postulacion.strftime('%d/%m/%Y') }}
+                                    {% else %}
+                                        Sin fecha limite
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </dl>
+                        <a class="proposal-button proposal-button--primary" href="/propuestas/{{ proposal.id }}">Ver propuesta</a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="proposal-empty">
+                <h2>No encontramos propuestas con esos filtros.</h2>
+                <p>Proba ajustar industria, categoria, rubro o ubicacion.</p>
+                <a class="proposal-button proposal-button--secondary" href="/propuestas">Ver todas</a>
+            </section>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

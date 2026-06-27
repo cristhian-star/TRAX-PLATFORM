@@ -31,7 +31,17 @@ from app.services.contract_service import (
     start_contract,
 )
 from app.services.emergency_service import create_emergency_request
-from app.services.proposal_service import create_proposal_request
+from app.services.proposal_service import (
+    accept_application,
+    apply_to_proposal,
+    cancel_proposal,
+    create_proposal_request,
+    discard_application,
+    get_open_proposals,
+    get_professional_application,
+    get_proposal_applications,
+    get_proposal_by_id,
+)
 from app.services.professional_service import (
     get_professional_by_id,
     search_emergency_professionals,
@@ -41,6 +51,12 @@ from app.services.review_service import (
     get_professional_reviews,
 )
 from app.services.subscription_service import has_pro_access
+from app.services.taxonomy_service import (
+    obtener_categorias,
+    obtener_especialidades,
+    obtener_industrias,
+    obtener_rubros,
+)
 from app.services.user_service import is_user_active
 from app.services.verification_service import has_approved_verification
 from app.utils.decorators import login_required, pro_required, profile_complete_required, role_required, verified_required
@@ -693,21 +709,192 @@ def directorio_emergencias():
 
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
 @login_required
-@pro_required
-@profile_complete_required
 def nueva_propuesta():
-    if request.method == "POST":
-        proposal_request = create_proposal_request(
-            cliente_id=session["user_id"],
-            categoria=request.form.get("categoria"),
-            descripcion=request.form.get("descripcion"),
-            presupuesto_estimado=_empty_to_none(request.form.get("presupuesto_estimado")),
-            fecha_limite=_parse_datetime(request.form.get("fecha_limite"))
-        )
+    taxonomy_options = {
+        "industrias": obtener_industrias(),
+        "categorias": obtener_categorias(),
+        "rubros": obtener_rubros(),
+        "especialidades": obtener_especialidades(),
+    }
 
-        return render_template("nueva_propuesta.html", created=proposal_request)
+    if request.method == "POST":
+        required_fields = ("industria", "categoria", "rubro", "titulo", "descripcion", "ubicacion", "modalidad")
+        form_data = {field: _empty_to_none(request.form.get(field)) or "" for field in required_fields}
+        form_data.update({
+            "especialidad": _empty_to_none(request.form.get("especialidad")) or "",
+            "cantidad_profesionales": _empty_to_none(request.form.get("cantidad_profesionales")) or "1",
+            "presupuesto_estimado": _empty_to_none(request.form.get("presupuesto_estimado")) or "",
+            "fecha_inicio_estimada": _empty_to_none(request.form.get("fecha_inicio_estimada")) or "",
+            "fecha_limite_postulacion": _empty_to_none(request.form.get("fecha_limite_postulacion")) or "",
+        })
+
+        if any(not form_data[field] for field in required_fields):
+            return render_template(
+                "nueva_propuesta.html",
+                form_data=form_data,
+                taxonomy=taxonomy_options,
+                error="Completa industria, categoria, rubro, titulo, descripcion, ubicacion y modalidad.",
+            ), 400
+
+        try:
+            proposal_request = create_proposal_request(
+                owner_user_id=session["user_id"],
+                industria=form_data["industria"],
+                categoria=form_data["categoria"],
+                rubro=form_data["rubro"],
+                especialidad=form_data["especialidad"],
+                titulo=form_data["titulo"],
+                descripcion=form_data["descripcion"],
+                ubicacion=form_data["ubicacion"],
+                modalidad=form_data["modalidad"],
+                cantidad_profesionales=int(form_data["cantidad_profesionales"] or 1),
+                presupuesto_estimado=form_data["presupuesto_estimado"],
+                fecha_inicio_estimada=_parse_date(form_data["fecha_inicio_estimada"]),
+                fecha_limite_postulacion=_parse_date(form_data["fecha_limite_postulacion"]),
+            )
+        except ValueError as error:
+            return render_template(
+                "nueva_propuesta.html",
+                form_data=form_data,
+                taxonomy=taxonomy_options,
+                error=str(error),
+            ), 400
+
+        return redirect(url_for("operations.detalle_propuesta", id=proposal_request.id, publicada="1"))
 
     return render_template(
         "nueva_propuesta.html",
         form_data=_get_query_prefill("categoria", "ubicacion"),
+        taxonomy=taxonomy_options,
     )
+
+
+@operations.route("/propuestas", methods=["GET"])
+def marketplace_propuestas():
+    industria = _empty_to_none(request.args.get("industria")) or ""
+    categoria = _empty_to_none(request.args.get("categoria")) or ""
+    rubro = _empty_to_none(request.args.get("rubro")) or ""
+    ubicacion = _empty_to_none(request.args.get("ubicacion")) or ""
+    proposals = get_open_proposals(
+        industria=industria,
+        categoria=categoria,
+        rubro=rubro,
+        ubicacion=ubicacion,
+    )
+
+    return render_template(
+        "listado_propuestas.html",
+        proposals=proposals,
+        filters={
+            "industria": industria,
+            "categoria": categoria,
+            "rubro": rubro,
+            "ubicacion": ubicacion,
+        },
+        taxonomy={
+            "industrias": obtener_industrias(),
+            "categorias": obtener_categorias(),
+            "rubros": obtener_rubros(),
+        },
+    )
+
+
+@operations.route("/propuestas/<int:id>", methods=["GET"])
+def detalle_propuesta(id):
+    proposal = get_proposal_by_id(id)
+    if proposal is None:
+        abort(404)
+
+    current_user_id = session.get("user_id")
+    current_user = db.session.get(User, current_user_id) if current_user_id else None
+    is_owner = current_user_id is not None and (proposal.owner_user_id or proposal.cliente_id) == current_user_id
+    current_professional = Professional.query.filter_by(user_id=current_user_id).first() if current_user_id else None
+    is_professional = current_user is not None and current_user.rol == "PROFESIONAL" and current_professional is not None
+    own_application = (
+        get_professional_application(proposal.id, current_user_id)
+        if is_professional
+        else None
+    )
+    applications = get_proposal_applications(proposal.id) if is_owner else []
+    owner = db.session.get(User, proposal.owner_user_id or proposal.cliente_id)
+
+    return render_template(
+        "detalle_propuesta.html",
+        proposal=proposal,
+        owner=owner,
+        applications=applications,
+        is_owner=is_owner,
+        is_professional=is_professional,
+        own_application=own_application,
+        current_user=current_user,
+        error=request.args.get("error"),
+        applied=request.args.get("postulada") == "1",
+        published=request.args.get("publicada") == "1",
+    )
+
+
+@operations.route("/propuestas/<int:id>/postular", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@profile_complete_required
+def postular_propuesta(id):
+    mensaje = _empty_to_none(request.form.get("mensaje"))
+    experiencia_relevante = _empty_to_none(request.form.get("experiencia_relevante"))
+    disponibilidad = _empty_to_none(request.form.get("disponibilidad"))
+    pretension_economica = _empty_to_none(request.form.get("pretension_economica"))
+
+    if not mensaje:
+        return redirect(url_for("operations.detalle_propuesta", id=id, error="Completa un mensaje para postularte."))
+
+    try:
+        apply_to_proposal(
+            proposal_id=id,
+            professional_user_id=session["user_id"],
+            mensaje=mensaje,
+            experiencia_relevante=experiencia_relevante,
+            disponibilidad=disponibilidad,
+            pretension_economica=pretension_economica,
+        )
+    except ValueError as error:
+        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+
+    return redirect(url_for("operations.detalle_propuesta", id=id, postulada="1"))
+
+
+@operations.route("/propuestas/<int:id>/aceptar/<int:application_id>", methods=["POST"])
+@login_required
+def aceptar_postulacion(id, application_id):
+    try:
+        accept_application(id, application_id, session["user_id"])
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+
+    return redirect(url_for("operations.detalle_propuesta", id=id))
+
+
+@operations.route("/propuestas/<int:id>/descartar/<int:application_id>", methods=["POST"])
+@login_required
+def descartar_postulacion(id, application_id):
+    try:
+        discard_application(id, application_id, session["user_id"])
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+
+    return redirect(url_for("operations.detalle_propuesta", id=id))
+
+
+@operations.route("/propuestas/<int:id>/cancelar", methods=["POST"])
+@login_required
+def cancelar_propuesta(id):
+    try:
+        cancel_proposal(id, session["user_id"])
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+
+    return redirect(url_for("operations.detalle_propuesta", id=id))
