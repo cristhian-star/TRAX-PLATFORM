@@ -43,6 +43,12 @@
                 <div class="budget-alert budget-alert--error" role="alert">{{ offer_error }}</div>
             {% endif %}
 
+            {% if offer_sent %}
+                <div class="budget-alert budget-alert--success" role="status">
+                    Presupuesto preliminar enviado correctamente.
+                </div>
+            {% endif %}
+
             <section class="budget-panel">
                 <div class="budget-section-heading">
                     <span class="budget-eyebrow">Trabajo solicitado</span>
@@ -166,6 +172,10 @@
                 </section>
             {% elif is_professional %}
                 <section class="budget-panel">
+                    <div class="budget-estimate-note" role="note">
+                        Los presupuestos enviados son estimaciones preliminares y podran ajustarse luego de la inspeccion tecnica o de recibir informacion adicional del trabajo.
+                    </div>
+
                     {% if own_offer %}
                         <div class="budget-own-offer">
                             <span class="budget-eyebrow">Tu presupuesto</span>

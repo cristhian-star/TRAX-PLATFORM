@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="budget-page">
+    <section class="budget-detail-hero">
+        <div class="budget-shell">
+            <span class="budget-eyebrow">Profesional</span>
+            <h1>Mis presupuestos enviados</h1>
+            <p>Consulta tus estimaciones preliminares enviadas y su estado dentro de cada solicitud.</p>
+        </div>
+    </section>
+
+    <section class="budget-shell budget-marketplace">
+        <div class="budget-estimate-note" role="note">
+            Los presupuestos enviados son estimaciones preliminares y podran ajustarse luego de la inspeccion tecnica o de recibir informacion adicional del trabajo.
+        </div>
+
+        <div class="budget-marketplace__heading">
+            <div>
+                <span class="budget-eyebrow">Historial profesional</span>
+                <h2>{{ offer_rows|length }} presupuestos enviados</h2>
+            </div>
+            <a class="budget-button budget-button--secondary" href="/presupuestos">Ver oportunidades</a>
+        </div>
+
+        {% if offer_rows %}
+            <div class="budget-request-grid">
+                {% for row in offer_rows %}
+                    {% set offer = row.offer %}
+                    {% set item = row.budget_request %}
+                    <article class="budget-request-card">
+                        <header>
+                            <span class="budget-status {{ 'budget-status--adjudicada' if offer.estado == 'ADJUDICADO' else '' }}">
+                                {% if offer.estado == "ADJUDICADO" %}Adjudicado{% else %}En competencia{% endif %}
+                            </span>
+                            <span>{{ row.offer_count }}/{{ max_offers }} recibidos</span>
+                        </header>
+                        <div>
+                            <span class="budget-eyebrow">{{ item.categoria }}</span>
+                            <h2>{{ item.titulo }}</h2>
+                            <p>
+                                Cliente:
+                                {% if row.client %}
+                                    {{ row.client.nombre }}
+                                {% else %}
+                                    No disponible
+                                {% endif %}
+                            </p>
+                        </div>
+                        <dl class="budget-facts">
+                            <div>
+                                <dt>Monto</dt>
+                                <dd>${{ "{:,.2f}".format(offer.monto) }}</dd>
+                            </div>
+                            <div>
+                                <dt>Fecha</dt>
+                                <dd>{{ offer.fecha_creacion.strftime('%d/%m/%Y') }}</dd>
+                            </div>
+                        </dl>
+                        <a class="budget-button budget-button--primary" href="/presupuestos/{{ item.id }}">
+                            Ver detalle
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="budget-empty">
+                <h2>Todavia no enviaste presupuestos</h2>
+                <p>Explora oportunidades abiertas y envia una estimacion preliminar cuando el trabajo coincida con tu perfil.</p>
+                <a class="budget-button budget-button--primary" href="/presupuestos">Ver oportunidades</a>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

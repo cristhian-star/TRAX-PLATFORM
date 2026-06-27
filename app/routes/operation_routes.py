@@ -12,10 +12,12 @@ from app.services.budget_service import (
     award_budget_offer,
     create_budget_offer,
     create_budget_request,
+    get_client_budget_requests_with_counts,
     get_budget_offers,
     get_budget_request_by_id,
     get_open_budget_requests,
     get_offer_allowance,
+    get_professional_budget_offers,
 )
 from app.services.contract_service import (
     accept_contract,
@@ -360,7 +362,7 @@ def nuevo_presupuesto():
                 urgencia=form_data["urgencia"],
             )
 
-            return redirect(url_for("operations.detalle_presupuesto", id=budget_request.id))
+            return redirect(url_for("operations.confirmacion_presupuesto", id=budget_request.id))
 
         return render_template(
             "nuevo_presupuesto.html",
@@ -387,6 +389,48 @@ def nuevo_presupuesto():
     )
 
 
+@operations.route("/presupuestos/mis-solicitudes", methods=["GET"])
+@login_required
+@role_required("CLIENTE")
+def mis_solicitudes_presupuesto():
+    request_rows = [
+        {
+            "budget_request": budget_request,
+            "offer_count": offer_count,
+        }
+        for budget_request, offer_count in get_client_budget_requests_with_counts(session["user_id"])
+    ]
+
+    return render_template(
+        "mis_solicitudes_presupuesto.html",
+        request_rows=request_rows,
+        max_offers=MAX_OFFERS_PER_REQUEST,
+    )
+
+
+@operations.route("/presupuestos/mis-enviados", methods=["GET"])
+@login_required
+@role_required("PROFESIONAL")
+def mis_presupuestos_enviados():
+    offer_rows = []
+
+    for offer in get_professional_budget_offers(session["user_id"]):
+        budget_request = offer.budget_request
+        client = db.session.get(User, budget_request.cliente_id)
+        offer_rows.append({
+            "offer": offer,
+            "budget_request": budget_request,
+            "client": client,
+            "offer_count": len(budget_request.offers),
+        })
+
+    return render_template(
+        "mis_presupuestos_enviados.html",
+        offer_rows=offer_rows,
+        max_offers=MAX_OFFERS_PER_REQUEST,
+    )
+
+
 @operations.route("/presupuestos", methods=["GET"])
 @login_required
 @role_required("PROFESIONAL")
@@ -401,6 +445,26 @@ def marketplace_presupuestos():
         categoria=categoria,
         zona=zona,
         offer_allowance=get_offer_allowance(session["user_id"]),
+    )
+
+
+@operations.route("/presupuestos/<int:id>/confirmacion", methods=["GET"])
+@login_required
+@role_required("CLIENTE")
+def confirmacion_presupuesto(id):
+    budget_request = get_budget_request_by_id(id)
+    if budget_request is None:
+        abort(404)
+    if budget_request.cliente_id != session["user_id"]:
+        abort(403)
+
+    offer_count = len(get_budget_offers(id))
+
+    return render_template(
+        "confirmacion_presupuesto.html",
+        budget_request=budget_request,
+        offer_count=offer_count,
+        max_offers=MAX_OFFERS_PER_REQUEST,
     )
 
 
@@ -441,6 +505,7 @@ def detalle_presupuesto(id):
         own_offer=own_offer,
         offer_allowance=get_offer_allowance(current_user_id) if is_professional else None,
         offer_error=request.args.get("error"),
+        offer_sent=request.args.get("enviado") == "1",
         awarded=request.args.get("adjudicado") == "1",
     )
 
@@ -478,7 +543,7 @@ def ofertar_presupuesto(id):
             error=str(error),
         ))
 
-    return redirect(url_for("operations.detalle_presupuesto", id=id))
+    return redirect(url_for("operations.detalle_presupuesto", id=id, enviado="1"))
 
 
 @operations.route(

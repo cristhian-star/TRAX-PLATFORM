@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="budget-page">
+    <section class="budget-detail-hero">
+        <div class="budget-shell">
+            <span class="budget-eyebrow">Cliente</span>
+            <h1>Mis solicitudes</h1>
+            <p>Segui el estado de tus pedidos y revisa los presupuestos recibidos apenas lleguen.</p>
+        </div>
+    </section>
+
+    <section class="budget-shell budget-marketplace">
+        <div class="budget-marketplace__heading">
+            <div>
+                <span class="budget-eyebrow">Solicitudes publicadas</span>
+                <h2>{{ request_rows|length }} solicitudes</h2>
+            </div>
+            <a class="budget-button budget-button--primary" href="/presupuestos/nuevo">Publicar nueva solicitud</a>
+        </div>
+
+        {% if request_rows %}
+            <div class="budget-request-grid">
+                {% for row in request_rows %}
+                    {% set item = row.budget_request %}
+                    <article class="budget-request-card">
+                        <header>
+                            <span class="budget-status budget-status--{{ item.estado|lower }}">{{ item.estado }}</span>
+                            <span>{{ row.offer_count }}/{{ max_offers }} recibidos</span>
+                        </header>
+                        <div>
+                            <span class="budget-eyebrow">{{ item.categoria }}</span>
+                            <h2>{{ item.titulo }}</h2>
+                            <p>{{ item.descripcion|truncate(160) }}</p>
+                        </div>
+                        <dl class="budget-facts">
+                            <div>
+                                <dt>Zona</dt>
+                                <dd>{{ item.zona }}</dd>
+                            </div>
+                            <div>
+                                <dt>Publicado</dt>
+                                <dd>{{ item.fecha_creacion.strftime('%d/%m/%Y') }}</dd>
+                            </div>
+                        </dl>
+                        <a class="budget-button budget-button--primary" href="/presupuestos/{{ item.id }}">
+                            Ver detalle
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="budget-empty">
+                <h2>Todavia no publicaste solicitudes</h2>
+                <p>Cuando publiques una necesidad, aparecera aca con su contador de presupuestos.</p>
+                <a class="budget-button budget-button--primary" href="/presupuestos/nuevo">Publicar solicitud</a>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

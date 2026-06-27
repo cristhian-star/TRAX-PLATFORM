@@ -65,6 +65,30 @@ def get_budget_offers(budget_request_id):
     )
 
 
+def get_client_budget_requests_with_counts(cliente_id):
+    return (
+        db.session.query(
+            BudgetRequest,
+            db.func.count(BudgetOffer.id).label("offer_count"),
+        )
+        .outerjoin(BudgetOffer, BudgetOffer.budget_request_id == BudgetRequest.id)
+        .filter(BudgetRequest.cliente_id == cliente_id)
+        .group_by(BudgetRequest.id)
+        .order_by(BudgetRequest.fecha_creacion.desc())
+        .all()
+    )
+
+
+def get_professional_budget_offers(professional_user_id):
+    return (
+        BudgetOffer.query
+        .filter_by(professional_user_id=professional_user_id)
+        .join(BudgetRequest, BudgetRequest.id == BudgetOffer.budget_request_id)
+        .order_by(BudgetOffer.fecha_creacion.desc())
+        .all()
+    )
+
+
 def get_professional_monthly_offer_count(professional_user_id, now=None):
     now = now or datetime.utcnow()
     month_start = datetime(now.year, now.month, 1)
