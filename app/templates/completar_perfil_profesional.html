@@ -6,61 +6,117 @@
 
 {% block content %}
 {% set gallery_entries = professional.gallery_urls.splitlines() if professional and professional.gallery_urls else [] %}
+{% set portfolio_entries = professional.portfolio_urls.splitlines() if professional and professional.portfolio_urls else [] %}
+{% set other_link_entries = professional.other_links.splitlines() if professional and professional.other_links else [] %}
+{% set profile_name = professional.nombre if professional else session.get("user_name", "Profesional TRAX") %}
+{% set profile_specialty = (professional.especialidad or professional.servicio) if professional else "Rubro no informado" %}
+{% set profile_zone = professional.zona if professional else "Zona no informada" %}
+{% set public_profile_url = "/profesional/" ~ professional.id if professional else "/profesional/dashboard" %}
 
-<section class="form-section professional-onboarding">
-    <div class="section-container">
-        <h2>Completar perfil profesional</h2>
-        <p class="form-helper">Antes de operar plenamente en TRAX necesitamos datos basicos de tu oficio y evidencia minima para revisar tu perfil.</p>
+<main class="private-profile" data-private-profile>
+    <section class="private-profile__hero">
+        <div class="private-profile__cover">
+            {% if professional and professional.cover_url %}
+                <img src="{{ professional.cover_url }}" alt="Portada profesional de {{ profile_name }}">
+            {% else %}
+                <span>Portada profesional</span>
+            {% endif %}
+        </div>
 
-        <form action="/profesional/perfil/completar" method="POST" class="form-card onboarding-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="private-profile__identity">
+            <div class="private-profile__avatar">
+                {% if professional and professional.logo_url %}
+                    <img src="{{ professional.logo_url }}" alt="Avatar o logo de {{ profile_name }}">
+                {% else %}
+                    <span>{{ profile_name[:1] }}</span>
+                {% endif %}
+            </div>
 
-            <label>
-                Especialidad u oficio
-                <input type="text" name="especialidad" placeholder="Ej: Electricista matriculado" value="{{ professional.especialidad if professional and professional.especialidad else '' }}" required>
-            </label>
+            <div class="private-profile__headline">
+                <span class="private-profile__eyebrow">Mi perfil profesional</span>
+                <h1>{{ profile_name }}</h1>
+                <p>{{ profile_specialty }} / {{ profile_zone }}</p>
+                <div class="private-profile__badges" aria-label="Estado profesional">
+                    <span class="private-profile__badge {{ 'private-profile__badge--pro' if is_pro else '' }}">{{ "PRO" if is_pro else "WORK" }}</span>
+                    <span class="private-profile__badge {{ 'private-profile__badge--verified' if is_verified else '' }}">{{ "Verificado" if is_verified else "Verificacion pendiente" }}</span>
+                    <span class="private-profile__badge">{{ "%.1f"|format(average_rating) if average_rating else "Sin rating" }}{% if average_rating %} / {{ review_count }} resenas{% endif %}</span>
+                </div>
+            </div>
 
-            <label>
-                Anios de experiencia
-                <input type="number" name="anios_experiencia" min="0" max="80" placeholder="Ej: 8" value="{{ professional.anios_experiencia if professional and professional.anios_experiencia is not none else '' }}">
-            </label>
+            <div class="private-profile__completion" aria-label="Perfil completo {{ profile_completion }}%">
+                <strong>{{ profile_completion }}%</strong>
+                <span>perfil completo</span>
+                <div class="private-profile__progress">
+                    <span style="width: {{ profile_completion }}%"></span>
+                </div>
+            </div>
 
-            <label>
-                Tipo de credencial
-                {% set current_credential = professional.tipo_credencial if professional else '' %}
-                <select name="tipo_credencial">
-                    <option value="">Sin credencial formal</option>
-                    <option value="MATRICULA" {% if current_credential == "MATRICULA" %}selected{% endif %}>Matricula profesional</option>
-                    <option value="CERTIFICADO_OFICIO" {% if current_credential == "CERTIFICADO_OFICIO" %}selected{% endif %}>Certificado de oficio</option>
-                    <option value="TITULO_TECNICO" {% if current_credential == "TITULO_TECNICO" %}selected{% endif %}>Titulo tecnico</option>
-                    <option value="TITULO_UNIVERSITARIO" {% if current_credential == "TITULO_UNIVERSITARIO" %}selected{% endif %}>Titulo universitario</option>
-                    <option value="OTRO" {% if current_credential == "OTRO" %}selected{% endif %}>Otro</option>
-                </select>
-            </label>
+            <div class="private-profile__actions">
+                <a class="private-profile__button private-profile__button--secondary" href="{{ public_profile_url }}">Ver perfil publico</a>
+                <button class="private-profile__button private-profile__button--secondary" type="button" data-share-private-profile>Compartir perfil</button>
+                <button class="private-profile__button private-profile__button--primary" type="button" data-profile-panel-trigger="settings">Configuracion</button>
+                <p class="private-profile__share-status" data-share-private-status aria-live="polite"></p>
+            </div>
+        </div>
+    </section>
 
-            <label>
-                Numero de credencial si aplica
-                <input type="text" name="numero_credencial" placeholder="Numero, codigo o referencia" value="{{ professional.numero_credencial if professional and professional.numero_credencial else '' }}">
-            </label>
+    <form action="/profesional/perfil/completar" method="POST" class="private-profile__layout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <label>
-                Certificaciones o formacion
-                <textarea name="certificaciones_text" placeholder="Cursos, certificados, instituciones o formacion relevante">{{ professional.certificaciones_text if professional and professional.certificaciones_text else '' }}</textarea>
-            </label>
+        <aside class="private-profile__sidebar" aria-label="Navegacion de perfil privado">
+            <span>Mi Perfil</span>
+            <button type="button" class="is-active" data-profile-panel-trigger="general">Informacion general</button>
+            <button type="button" data-profile-panel-trigger="media">Fotos y Portfolio</button>
+            <button type="button" data-profile-panel-trigger="coverage">Zona de cobertura</button>
+            <button type="button" data-profile-panel-trigger="services">Servicios</button>
+            <button type="button" data-profile-panel-trigger="social">Redes sociales</button>
+            <button type="button" data-profile-panel-trigger="certifications">Certificaciones</button>
+            <button type="button" data-profile-panel-trigger="experience">Experiencia</button>
+            <button type="button" data-profile-panel-trigger="availability">Disponibilidad</button>
+            <button type="button" data-profile-panel-trigger="settings">Configuracion</button>
+        </aside>
 
-            <label>
-                Portfolio / trabajos realizados
-                <textarea name="portfolio_urls" placeholder="Referencias o evidencia adicional que quieras conservar">{{ professional.portfolio_urls if professional and professional.portfolio_urls else '' }}</textarea>
-                <small>Campo compatible con perfiles anteriores. Usa las secciones siguientes para mostrar medios y redes en tu perfil publico.</small>
-            </label>
+        <section class="private-profile__workspace" aria-live="polite">
+            <section class="private-profile__panel is-active" data-profile-panel="general">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Base profesional</span>
+                        <h2>Informacion general</h2>
+                    </div>
+                    <small>Estos datos alimentan tu operacion y tu perfil publico.</small>
+                </div>
 
-            <fieldset class="media-form-panel">
-                <legend>Identidad visual</legend>
-                <p>Las imagenes deben estar publicadas en una URL HTTPS. TRAX no almacena archivos en esta etapa.</p>
-
-                <div class="media-form-grid">
+                <div class="private-profile__field-grid">
                     <label>
-                        Logo URL
+                        Rubro principal / especialidad
+                        <input type="text" name="especialidad" placeholder="Ej: Electricista matriculado" value="{{ professional.especialidad if professional and professional.especialidad else '' }}" required>
+                    </label>
+
+                    <label>
+                        Anios de experiencia
+                        <input type="number" name="anios_experiencia" min="0" max="80" placeholder="Ej: 8" value="{{ professional.anios_experiencia if professional and professional.anios_experiencia is not none else '' }}">
+                    </label>
+                </div>
+
+                <div class="private-profile__read-card">
+                    <span>Zona declarada</span>
+                    <strong>{{ profile_zone }}</strong>
+                    <p>La configuracion avanzada de cobertura queda preparada en la seccion Zona de cobertura.</p>
+                </div>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="media">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Visual</span>
+                        <h2>Fotos y Portfolio</h2>
+                    </div>
+                    <small>Solo URLs. No se suben archivos en esta etapa.</small>
+                </div>
+
+                <div class="private-profile__field-grid">
+                    <label>
+                        Avatar / Logo URL
                         <input type="url" name="logo_url" inputmode="url" placeholder="https://..." value="{{ professional.logo_url if professional and professional.logo_url else '' }}">
                     </label>
 
@@ -69,42 +125,90 @@
                         <input type="url" name="cover_url" inputmode="url" placeholder="https://..." value="{{ professional.cover_url if professional and professional.cover_url else '' }}">
                     </label>
                 </div>
-            </fieldset>
 
-            <fieldset class="media-form-panel">
-                <legend>Galeria de trabajos</legend>
-                <p>Podes agregar hasta 6 URLs HTTPS de imagenes.</p>
-
-                <div class="media-form-grid media-form-grid--gallery">
-                    {% for position in range(6) %}
-                        <label>
-                            Imagen {{ position + 1 }}
-                            <input
-                                type="url"
-                                name="gallery_urls"
-                                inputmode="url"
-                                placeholder="https://..."
-                                value="{{ gallery_entries[position] if position < gallery_entries|length else '' }}">
-                        </label>
-                    {% endfor %}
+                <div class="private-profile__section-block">
+                    <h3>Galeria de trabajos</h3>
+                    <p>Agrega hasta 12 URLs HTTPS de imagenes.</p>
+                    <div class="private-profile__gallery-grid">
+                        {% for position in range(12) %}
+                            <label>
+                                Imagen {{ position + 1 }}
+                                <input
+                                    type="url"
+                                    name="gallery_urls"
+                                    inputmode="url"
+                                    placeholder="https://..."
+                                    value="{{ gallery_entries[position] if position < gallery_entries|length else '' }}">
+                            </label>
+                        {% endfor %}
+                    </div>
                 </div>
-            </fieldset>
 
-            <fieldset class="media-form-panel">
-                <legend>Enlaces externos</legend>
-                <p>Agrega solo canales profesionales que quieras mostrar publicamente.</p>
+                <label>
+                    Portfolio / trabajos realizados
+                    <textarea name="portfolio_urls" placeholder="Una URL o referencia por linea">{{ professional.portfolio_urls if professional and professional.portfolio_urls else '' }}</textarea>
+                </label>
 
-                <div class="media-form-grid">
-                    <label>
-                        Google Drive
-                        <input type="url" name="google_drive_url" inputmode="url" placeholder="https://drive.google.com/..." value="{{ professional.google_drive_url if professional and professional.google_drive_url else '' }}">
-                    </label>
+                <div class="private-profile__hint-card">
+                    <strong>Videos y Google Drive</strong>
+                    <span>Usa Google Drive para carpetas, videos o evidencias pesadas. Los links quedan visibles en tu perfil publico si los completas.</span>
+                </div>
+            </section>
 
-                    <label>
-                        Sitio web
-                        <input type="url" name="website_url" inputmode="url" placeholder="https://..." value="{{ professional.website_url if professional and professional.website_url else '' }}">
-                    </label>
+            <section class="private-profile__panel" data-profile-panel="coverage">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Territorio</span>
+                        <h2>Zona de cobertura</h2>
+                    </div>
+                    <small>Placeholder preparado para Google Maps.</small>
+                </div>
 
+                <div class="private-profile__map-placeholder" aria-label="Mapa estatico de cobertura">
+                    <span></span>
+                    <strong>{{ profile_zone }}</strong>
+                    <small>Mapa estatico ilustrativo. Sin APIs externas.</small>
+                </div>
+
+                <div class="private-profile__radius-list" aria-label="Radio de cobertura">
+                    <button type="button">5 km</button>
+                    <button type="button">10 km</button>
+                    <button type="button" class="is-selected">20 km</button>
+                    <button type="button">50 km</button>
+                    <button type="button">Personalizado</button>
+                </div>
+
+                <button class="private-profile__button private-profile__button--secondary private-profile__button--inline" type="button" disabled>
+                    Editar cobertura
+                </button>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="services">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Oferta</span>
+                        <h2>Servicios</h2>
+                    </div>
+                    <small>Define como queres ser encontrado dentro de TRAX.</small>
+                </div>
+
+                <div class="private-profile__read-card">
+                    <span>Servicio principal actual</span>
+                    <strong>{{ profile_specialty }}</strong>
+                    <p>Por ahora se sincroniza con tu rubro principal. El catalogo avanzado de servicios queda para un sprint posterior.</p>
+                </div>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="social">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Canales</span>
+                        <h2>Redes sociales</h2>
+                    </div>
+                    <small>Mostra solo canales profesionales.</small>
+                </div>
+
+                <div class="private-profile__field-grid">
                     <label>
                         Instagram
                         <input type="url" name="instagram_url" inputmode="url" placeholder="https://instagram.com/..." value="{{ professional.instagram_url if professional and professional.instagram_url else '' }}">
@@ -119,34 +223,165 @@
                         YouTube
                         <input type="url" name="youtube_url" inputmode="url" placeholder="https://youtube.com/..." value="{{ professional.youtube_url if professional and professional.youtube_url else '' }}">
                     </label>
+
+                    <label>
+                        Sitio Web
+                        <input type="url" name="website_url" inputmode="url" placeholder="https://..." value="{{ professional.website_url if professional and professional.website_url else '' }}">
+                    </label>
+
+                    <label>
+                        Google Drive
+                        <input type="url" name="google_drive_url" inputmode="url" placeholder="https://drive.google.com/..." value="{{ professional.google_drive_url if professional and professional.google_drive_url else '' }}">
+                    </label>
                 </div>
 
                 <label>
-                    Otros enlaces
-                    <textarea name="other_links" placeholder="Una URL por linea">{{ professional.other_links if professional and professional.other_links else '' }}</textarea>
+                    Facebook, LinkedIn y otros enlaces
+                    <textarea name="other_links" placeholder="Una URL por linea. Ej: Facebook, LinkedIn, Behance, videos">{{ professional.other_links if professional and professional.other_links else '' }}</textarea>
                 </label>
-            </fieldset>
 
-            <div class="evidence-panel">
-                <strong>Validacion profesional</strong>
-                <p>Marca las evidencias que podes aportar. No subas archivos aca: pega links o referencias.</p>
+                <div class="private-profile__network-list">
+                    {% for label in ["Instagram", "TikTok", "Facebook", "YouTube", "LinkedIn", "Sitio Web", "Google Drive"] %}
+                        <span>{{ label }}</span>
+                    {% endfor %}
+                </div>
+            </section>
 
-                {% for key, label, placeholder in evidence_options %}
-                    <div class="evidence-item">
-                        <label class="checkbox-row">
-                            <input type="checkbox" name="evidencia_opciones" value="{{ key }}" data-evidence-toggle="{{ key }}">
-                            <span>{{ label }}</span>
-                        </label>
-                        <div class="evidence-detail" data-evidence-detail="{{ key }}">
-                            <input type="text" name="evidencia_{{ key }}" placeholder="{{ placeholder }}">
-                        </div>
+            <section class="private-profile__panel" data-profile-panel="certifications">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Confianza</span>
+                        <h2>Certificaciones</h2>
                     </div>
-                {% endfor %}
+                    <small>Credenciales y evidencias para revision.</small>
+                </div>
+
+                <div class="private-profile__field-grid">
+                    <label>
+                        Tipo de credencial
+                        {% set current_credential = professional.tipo_credencial if professional else '' %}
+                        <select name="tipo_credencial">
+                            <option value="">Sin credencial formal</option>
+                            <option value="MATRICULA" {% if current_credential == "MATRICULA" %}selected{% endif %}>Matricula profesional</option>
+                            <option value="CERTIFICADO_OFICIO" {% if current_credential == "CERTIFICADO_OFICIO" %}selected{% endif %}>Certificado de oficio</option>
+                            <option value="TITULO_TECNICO" {% if current_credential == "TITULO_TECNICO" %}selected{% endif %}>Titulo tecnico</option>
+                            <option value="TITULO_UNIVERSITARIO" {% if current_credential == "TITULO_UNIVERSITARIO" %}selected{% endif %}>Titulo universitario</option>
+                            <option value="OTRO" {% if current_credential == "OTRO" %}selected{% endif %}>Otro</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Numero de credencial si aplica
+                        <input type="text" name="numero_credencial" placeholder="Numero, codigo o referencia" value="{{ professional.numero_credencial if professional and professional.numero_credencial else '' }}">
+                    </label>
+                </div>
+
+                <label>
+                    Certificaciones o formacion
+                    <textarea name="certificaciones_text" placeholder="Cursos, certificados, instituciones o formacion relevante">{{ professional.certificaciones_text if professional and professional.certificaciones_text else '' }}</textarea>
+                </label>
+
+                <div class="private-profile__evidence-panel">
+                    <strong>Evidencias para revision</strong>
+                    <p>No subas archivos aca: pega links o referencias.</p>
+                    {% for key, label, placeholder in evidence_options %}
+                        <div class="private-profile__evidence-item">
+                            <label class="private-profile__checkbox-row">
+                                <input type="checkbox" name="evidencia_opciones" value="{{ key }}" data-evidence-toggle="{{ key }}">
+                                <span>{{ label }}</span>
+                            </label>
+                            <div class="evidence-detail" data-evidence-detail="{{ key }}">
+                                <input type="text" name="evidencia_{{ key }}" placeholder="{{ placeholder }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="experience">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Trayectoria</span>
+                        <h2>Experiencia y trabajos realizados</h2>
+                    </div>
+                    <small>Usa portfolio y certificaciones para respaldar tu experiencia.</small>
+                </div>
+
+                <div class="private-profile__timeline">
+                    <article>
+                        <span>Experiencia declarada</span>
+                        <strong>{{ professional.anios_experiencia if professional and professional.anios_experiencia is not none else "Sin informar" }}{% if professional and professional.anios_experiencia is not none %} anios{% endif %}</strong>
+                    </article>
+                    <article>
+                        <span>Trabajos / portfolio</span>
+                        <strong>{{ portfolio_entries|length }} referencias</strong>
+                    </article>
+                    <article>
+                        <span>Imagenes de galeria</span>
+                        <strong>{{ gallery_entries|length }} / 12</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="availability">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Operacion</span>
+                        <h2>Disponibilidad</h2>
+                    </div>
+                    <small>Sin agenda real todavia.</small>
+                </div>
+
+                <div class="private-profile__availability-grid">
+                    <article>
+                        <strong>Disponible segun perfil</strong>
+                        <span>Estado visual preparado para futuras guardias y agenda.</span>
+                    </article>
+                    <article>
+                        <strong>Guardias</strong>
+                        <span>Proximamente vas a poder activar dias y horarios.</span>
+                    </article>
+                    <article>
+                        <strong>Emergencias</strong>
+                        <span>Preparado para conectar disponibilidad urgente sin automatizaciones.</span>
+                    </article>
+                </div>
+            </section>
+
+            <section class="private-profile__panel" data-profile-panel="settings">
+                <div class="private-profile__panel-head">
+                    <div>
+                        <span class="private-profile__eyebrow">Control</span>
+                        <h2>Configuracion</h2>
+                    </div>
+                    <small>Opciones visibles sin tocar Auth ni privacidad global.</small>
+                </div>
+
+                <div class="private-profile__settings-grid">
+                    <article>
+                        <strong>Perfil publico</strong>
+                        <span>Visible para clientes cuando el perfil esta completo.</span>
+                    </article>
+                    <article>
+                        <strong>Estado de revision</strong>
+                        <span>{{ professional.estado_perfil|replace("_", " ")|title if professional else "Pendiente" }}</span>
+                    </article>
+                    <article>
+                        <strong>Plan actual</strong>
+                        <span>{{ "PRO" if is_pro else "WORK" }}</span>
+                    </article>
+                </div>
+            </section>
+
+            <div class="private-profile__form-actions">
+                <a class="private-profile__button private-profile__button--secondary" href="/profesional/dashboard">Volver al dashboard</a>
+                <button class="private-profile__button private-profile__button--primary" type="submit">Guardar y enviar a revision</button>
             </div>
+        </section>
+    </form>
+</main>
+{% endblock %}
 
-            <button type="submit">Enviar perfil a revision</button>
-        </form>
-    </div>
-</section>
-
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/profile-private-ux-a.js') }}"></script>
 {% endblock %}

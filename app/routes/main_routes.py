@@ -113,6 +113,35 @@ def _normalize_url_list(values, field_label, max_items=None, https_only=False):
     return "\n".join(normalized) or None
 
 
+def _calculate_private_profile_completion(professional, is_verified=False):
+    if professional is None:
+        return 0
+
+    checks = (
+        bool(professional.nombre),
+        bool(professional.especialidad or professional.servicio),
+        bool(professional.zona),
+        bool(professional.descripcion),
+        bool(professional.logo_url),
+        bool(professional.cover_url),
+        bool(professional.gallery_urls),
+        bool(professional.portfolio_urls),
+        bool(
+            professional.google_drive_url
+            or professional.website_url
+            or professional.instagram_url
+            or professional.tiktok_url
+            or professional.youtube_url
+            or professional.other_links
+        ),
+        bool(professional.certificaciones_text),
+        bool(professional.anios_experiencia is not None),
+        bool(is_verified),
+    )
+
+    return round((sum(checks) / len(checks)) * 100)
+
+
 def _build_evidence_text(form):
     selected_options = set(form.getlist("evidencia_opciones"))
     evidence_lines = []
@@ -387,7 +416,7 @@ def completar_perfil_profesional():
             gallery_urls = _normalize_url_list(
                 request.form.getlist("gallery_urls"),
                 "Galeria",
-                max_items=6,
+                max_items=12,
                 https_only=True,
             )
             google_drive_url = _normalize_url(
@@ -454,7 +483,15 @@ def completar_perfil_profesional():
     return render_template(
         "completar_perfil_profesional.html",
         professional=professional,
-        evidence_options=EVIDENCE_OPTIONS
+        evidence_options=EVIDENCE_OPTIONS,
+        is_pro=has_pro_access(user_id),
+        is_verified=has_approved_verification(user_id),
+        average_rating=get_professional_average_rating(professional.id) if professional else None,
+        review_count=len(get_professional_reviews(professional.id)) if professional else 0,
+        profile_completion=_calculate_private_profile_completion(
+            professional,
+            has_approved_verification(user_id),
+        ),
     )
 
 @main.route("/profesional/verificacion/solicitar", methods=["GET", "POST"])
