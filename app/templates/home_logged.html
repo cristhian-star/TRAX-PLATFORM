@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logged-home-ux-a.css') }}">
+{% endblock %}
+
 {% block content %}
 
 {% set user_role = session.get("user_role", "CLIENTE") %}
+{% set user_name = session.get("user_name", "Usuario TRAX") %}
 {% if user_role == "SUPER_ADMIN" %}
     {% set dashboard_url = "/admin/dashboard" %}
 {% elif user_role == "PROFESIONAL" %}
@@ -10,95 +15,173 @@
 {% else %}
     {% set dashboard_url = "/cliente/dashboard" %}
 {% endif %}
+{% if user_role == "PROFESIONAL" %}
+    {% set profile_url = "/profesional/perfil/completar" %}
+    {% set budget_url = "/presupuestos/mis-enviados" %}
+{% else %}
+    {% set profile_url = "/cliente/dashboard" %}
+    {% set budget_url = "/presupuestos/mis-solicitudes" %}
+{% endif %}
 
-<main class="logged-home">
-    <section class="logged-hero">
-        <div class="shell logged-hero-grid">
-            <div>
-                <span class="signal">TRAX workspace</span>
-                <h1>Hola, {{ session.get("user_name", "usuario") }}.</h1>
-                <p>Tu centro operativo para contratar, cotizar, resolver urgencias y seguir actividad dentro del marketplace.</p>
-            </div>
-            <aside class="logged-profile-card">
-                <span>Sesion activa</span>
-                <strong>{{ session.get("user_name", "Usuario TRAX") }}</strong>
-                <small>{{ user_role }}</small>
-            </aside>
-        </div>
-    </section>
-
-    <section class="shell logged-home-layout">
-        <div class="logged-main-column">
-            <section class="quick-access-panel">
-                <div class="panel-title compact-title">
-                    <span class="kicker">Accesos rapidos</span>
-                    <h2>Que queres hacer ahora</h2>
+<main class="logged-dark-home">
+    <section class="logged-dark-shell">
+        <aside class="logged-dark-left" aria-label="Perfil y navegacion">
+            <article class="logged-dark-card logged-profile">
+                <div class="logged-profile__avatar" aria-hidden="true">{{ user_name[:1] }}</div>
+                <div>
+                    <span class="logged-badge logged-badge--verified">Verificado</span>
+                    {% if user_role == "PROFESIONAL" %}
+                        <span class="logged-badge logged-badge--pro">PRO</span>
+                    {% else %}
+                        <span class="logged-badge">Activo</span>
+                    {% endif %}
                 </div>
+                <h1>{{ user_name }}</h1>
+                <p>{{ user_role }}</p>
+                <div class="logged-profile__rating">
+                    <strong>4.8</strong>
+                    <span>Rating operativo</span>
+                </div>
+                <div class="logged-profile__progress" aria-label="Perfil 70 por ciento completo">
+                    <span>Perfil completo</span>
+                    <strong>70%</strong>
+                    <div><i></i></div>
+                </div>
+            </article>
 
-                <div class="logged-action-grid">
-                    <a href="/contratacion/nueva">
-                        <strong>Contratar</strong>
-                        <span>Inicia una contratacion directa con un profesional.</span>
+            <article class="logged-dark-card logged-side-nav">
+                <h2>Navegacion</h2>
+                <a class="is-active" href="/">Inicio</a>
+                <a href="{{ profile_url }}">Mi perfil</a>
+                <a href="{{ budget_url }}">Mis trabajos</a>
+                <a href="/propuestas">Propuestas</a>
+                <a href="/emergencias/nueva">Emergencias</a>
+                <a href="/mercados">Mercados</a>
+                <a href="/planes">Planes</a>
+                <a href="{{ dashboard_url }}">Dashboard</a>
+            </article>
+        </aside>
+
+        <section class="logged-dark-center" aria-label="Resumen operativo">
+            <article class="logged-dark-card logged-summary">
+                <div>
+                    <span class="logged-kicker">TRAX privado</span>
+                    <h2>Hola, {{ user_name }}.</h2>
+                    <p>Aca tenes un resumen de tu actividad y los accesos principales para operar dentro de TRAX.</p>
+                </div>
+                <div class="logged-summary__stats">
+                    <article>
+                        <span>Trabajos activos</span>
+                        <strong>5</strong>
+                        <a href="{{ budget_url }}">Ver todos</a>
+                    </article>
+                    <article>
+                        <span>Propuestas enviadas</span>
+                        <strong>8</strong>
+                        <a href="/propuestas">Ver todas</a>
+                    </article>
+                    <article>
+                        <span>Resenas nuevas</span>
+                        <strong>3</strong>
+                        <a href="{{ profile_url }}">Ver perfil</a>
+                    </article>
+                    <article>
+                        <span>Estado</span>
+                        <strong>{{ user_role }}</strong>
+                        <a href="/planes">Ver planes</a>
+                    </article>
+                </div>
+            </article>
+
+            <article class="logged-dark-card logged-work">
+                <div class="logged-section-title">
+                    <div>
+                        <span class="logged-kicker">Recomendados</span>
+                        <h2>Trabajos para revisar</h2>
+                    </div>
+                    <a href="/presupuestos">Ver todos</a>
+                </div>
+                <div class="logged-work__grid">
+                    <a href="/emergencias/nueva" class="logged-work-card is-featured">
+                        <span>Destacado</span>
+                        <strong>Instalacion electrica comercial</strong>
+                        <small>Caballito, CABA</small>
+                        <b>$ 120.000</b>
                     </a>
-                    <a href="/presupuestos/nuevo">
-                        <strong>Pedir presupuesto</strong>
-                        <span>Compara cotizaciones antes de avanzar.</span>
+                    <a href="/presupuestos/nuevo" class="logged-work-card">
+                        <strong>Mantenimiento de tableros trifasicos</strong>
+                        <small>Villa Crespo, CABA</small>
+                        <b>$ 85.000</b>
                     </a>
-                    <a href="/emergencias/nueva">
-                        <strong>Emergencias</strong>
-                        <span>Abre una solicitud urgente cuando el tiempo importa.</span>
-                    </a>
-                    <a href="/propuestas/nueva">
-                        <strong>Crear propuesta</strong>
-                        <span>Publica una necesidad y recibe respuestas.</span>
-                    </a>
-                    <a href="/buscar?servicio=&zona=">
-                        <strong>Buscar profesionales</strong>
-                        <span>Explora perfiles, zonas y servicios disponibles.</span>
-                    </a>
-                    <a href="/mercados">
-                        <strong>Ver mercados</strong>
-                        <span>Consulta tendencias y referencias del marketplace.</span>
-                    </a>
-                    <a href="{{ dashboard_url }}" class="primary-action-card">
-                        <strong>Mi dashboard</strong>
-                        <span>Entra a tu panel segun tu rol actual.</span>
+                    <a href="/propuestas" class="logged-work-card">
+                        <strong>Instalacion de aire acondicionado</strong>
+                        <small>Almagro, CABA</small>
+                        <b>$ 70.000</b>
                     </a>
                 </div>
-            </section>
+            </article>
 
-            <section class="feed-panel">
-                <div class="panel-title compact-title">
-                    <span class="kicker">Novedades</span>
-                    <h2>Noticias para tu red</h2>
+            <article class="logged-dark-card logged-activity">
+                <div class="logged-section-title">
+                    <div>
+                        <span class="logged-kicker">Actividad</span>
+                        <h2>Reciente</h2>
+                    </div>
                 </div>
+                <div class="logged-activity__list">
+                    <p><strong>Nuevo mensaje recibido</strong><span>Consulta sobre trabajo TRAX-2591</span><time>Hace 10 min</time></p>
+                    <p><strong>Tu propuesta fue vista</strong><span>Instalacion electrica comercial</span><time>Hace 35 min</time></p>
+                    <p><strong>Nueva resena recibida</strong><span>Calificacion positiva en tu perfil</span><time>Hace 1 h</time></p>
+                    <p><strong>Trabajo completado</strong><span>Solicitud marcada como finalizada</span><time>Hace 3 h</time></p>
+                </div>
+            </article>
+        </section>
 
-                <article class="feed-item">
-                    <strong>Nuevos flujos operativos disponibles</strong>
-                    <p>Contrataciones, presupuestos, emergencias y propuestas ya tienen formularios base para operar.</p>
-                </article>
-                <article class="feed-item">
-                    <strong>Confianza y reputacion en desarrollo</strong>
-                    <p>TRAX esta preparando verificacion, reviews y senales de reputacion para mejorar cada decision.</p>
-                </article>
-                <article class="feed-item">
-                    <strong>Mercados con indicadores iniciales</strong>
-                    <p>La vista de mercados suma placeholders para precios, demanda y tendencias por categoria.</p>
-                </article>
-            </section>
-        </div>
+        <aside class="logged-dark-right" aria-label="Agenda y herramientas">
+            <article class="logged-dark-card logged-widget">
+                <div class="logged-section-title">
+                    <h2>Agenda</h2>
+                    <a href="#">Ver calendario</a>
+                </div>
+                <div class="logged-widget__items">
+                    <p><strong>Hoy</strong><span>Visita tecnica - Belgrano</span></p>
+                    <p><strong>Hoy 14:30</strong><span>Instalacion electrica</span></p>
+                    <p><strong>Manana 11:00</strong><span>Presupuesto - Recoleta</span></p>
+                </div>
+            </article>
 
-        <aside class="activity-panel">
-            <div class="panel-title compact-title">
-                <span class="kicker">Actividad</span>
-                <h2>Reciente</h2>
-            </div>
+            <article class="logged-dark-card logged-widget">
+                <div class="logged-section-title">
+                    <h2>Recordatorios</h2>
+                    <a href="#">Ver todos</a>
+                </div>
+                <div class="logged-checklist">
+                    <label><input type="checkbox"> Renovar matricula</label>
+                    <label><input type="checkbox"> Completar perfil</label>
+                    <label><input type="checkbox" checked> Seguro tecnico</label>
+                </div>
+            </article>
 
-            <div class="activity-list">
-                <p><strong>Sin actividad nueva</strong><span>Cuando generes solicitudes, van a aparecer aca.</span></p>
-                <p><strong>Perfil listo</strong><span>Tu sesion esta activa para usar herramientas TRAX.</span></p>
-                <p><strong>Proximamente</strong><span>Alertas, mensajes y estados de solicitudes.</span></p>
-            </div>
+            <article class="logged-dark-card logged-tools">
+                <h2>Herramientas rapidas</h2>
+                <div>
+                    <a href="/mercados">Calculadora</a>
+                    <a href="/presupuestos/nuevo">Presupuesto</a>
+                    <a href="/propuestas/nueva">Plantillas</a>
+                    <a href="/explorar">Guias</a>
+                </div>
+            </article>
+
+            <article class="logged-dark-card logged-widget">
+                <div class="logged-section-title">
+                    <h2>Noticias</h2>
+                    <a href="/mercados">Ver todas</a>
+                </div>
+                <div class="logged-widget__items">
+                    <p><strong>Nuevas normas electricas 2026</strong><span>Actualizacion del sector</span></p>
+                    <p><strong>Sube la demanda HVAC</strong><span>Indicadores de mercado</span></p>
+                </div>
+            </article>
         </aside>
     </section>
 </main>
