@@ -1,0 +1,211 @@
+/*
+ * TRAX Design System v2
+ *
+ * Capa semantica de temas. Las pantallas deben consumir estas variables
+ * y evitar colores hardcodeados salvo en efectos decorativos puntuales.
+ */
+
+:root,
+.theme-light {
+    color-scheme: light;
+
+    /* Fondos */
+    --trax-ds-bg: #f7f9fc;
+    --trax-ds-bg-elevated: #ffffff;
+    --trax-ds-bg-subtle: #f1f5f9;
+    --trax-ds-bg-muted: #e8edf3;
+    --trax-ds-bg-inverse: #0b1220;
+
+    /* Superficies y cards */
+    --trax-ds-surface: #ffffff;
+    --trax-ds-surface-soft: #f8fafc;
+    --trax-ds-surface-muted: #f3f6fa;
+    --trax-ds-card: #ffffff;
+    --trax-ds-card-soft: #f8fafc;
+    --trax-ds-card-hover: #ffffff;
+
+    /* Bordes */
+    --trax-ds-border: #d7dee8;
+    --trax-ds-border-subtle: #e5eaf1;
+    --trax-ds-border-strong: #b8c2cf;
+
+    /* Texto */
+    --trax-ds-text: #111827;
+    --trax-ds-text-strong: #0b1220;
+    --trax-ds-text-secondary: #334155;
+    --trax-ds-text-muted: #64748b;
+    --trax-ds-text-disabled: #94a3b8;
+    --trax-ds-text-inverse: #ffffff;
+
+    /* Marca */
+    --trax-ds-primary: #d3440e;
+    --trax-ds-primary-hover: #b9380a;
+    --trax-ds-primary-soft: #fff4ed;
+    --trax-ds-primary-border: #ffded0;
+    --trax-ds-accent: #0b8799;
+    --trax-ds-accent-soft: #ecfeff;
+    --trax-ds-accent-border: #c8f3f7;
+
+    /* Estados */
+    --trax-ds-success: #15803d;
+    --trax-ds-success-soft: #f0fdf4;
+    --trax-ds-success-border: #bbf7d0;
+    --trax-ds-warning: #b54708;
+    --trax-ds-warning-soft: #fffaeb;
+    --trax-ds-warning-border: #fedf89;
+    --trax-ds-danger: #b42318;
+    --trax-ds-danger-soft: #fef3f2;
+    --trax-ds-danger-border: #fecdca;
+    --trax-ds-info: #087a8c;
+    --trax-ds-info-soft: #ecfeff;
+    --trax-ds-info-border: #c8f3f7;
+
+    /* Sombras */
+    --trax-ds-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+    --trax-ds-shadow-md: 0 12px 28px rgba(15, 23, 42, 0.1);
+    --trax-ds-shadow-lg: 0 24px 70px rgba(15, 23, 42, 0.14);
+    --trax-ds-shadow-focus: 0 0 0 3px rgba(14, 165, 183, 0.32);
+
+    /* Radio */
+    --trax-ds-radius-sm: 0.375rem;
+    --trax-ds-radius-md: 0.625rem;
+    --trax-ds-radius-lg: 1rem;
+    --trax-ds-radius-xl: 1.5rem;
+    --trax-ds-radius-card: 1rem;
+    --trax-ds-radius-pill: 999px;
+
+    /* Espaciado */
+    --trax-ds-space-1: 0.25rem;
+    --trax-ds-space-2: 0.5rem;
+    --trax-ds-space-3: 0.75rem;
+    --trax-ds-space-4: 1rem;
+    --trax-ds-space-5: 1.25rem;
+    --trax-ds-space-6: 1.5rem;
+    --trax-ds-space-8: 2rem;
+    --trax-ds-space-10: 2.5rem;
+    --trax-ds-space-12: 3rem;
+    --trax-ds-space-16: 4rem;
+    --trax-ds-space-20: 5rem;
+
+    /* Transiciones */
+    --trax-ds-duration-fast: 120ms;
+    --trax-ds-duration-base: 180ms;
+    --trax-ds-duration-slow: 260ms;
+    --trax-ds-ease: cubic-bezier(0.2, 0, 0, 1);
+
+    /* Componentes */
+    --trax-ds-input-bg: var(--trax-ds-surface);
+    --trax-ds-input-border: var(--trax-ds-border);
+    --trax-ds-input-text: var(--trax-ds-text);
+    --trax-ds-input-placeholder: var(--trax-ds-text-muted);
+    --trax-ds-link: var(--trax-ds-primary);
+    --trax-ds-link-hover: var(--trax-ds-primary-hover);
+    --trax-ds-hero-bg: linear-gradient(140deg, #0b1220, #111c2e);
+
+    /* Compatibilidad con Design System v1 */
+    --trax-color-brand: var(--trax-ds-text-strong);
+    --trax-color-brand-strong: var(--trax-ds-text-strong);
+    --trax-color-action-primary: var(--trax-ds-primary);
+    --trax-color-action-primary-hover: var(--trax-ds-primary-hover);
+    --trax-color-info: var(--trax-ds-info);
+    --trax-color-success: var(--trax-ds-success);
+    --trax-color-error: var(--trax-ds-danger);
+    --trax-color-warning: var(--trax-ds-warning);
+    --trax-color-emergency: var(--trax-ds-danger);
+    --trax-color-text: var(--trax-ds-text);
+    --trax-color-text-secondary: var(--trax-ds-text-secondary);
+    --trax-color-text-muted: var(--trax-ds-text-muted);
+    --trax-color-text-disabled: var(--trax-ds-text-disabled);
+    --trax-color-text-inverse: var(--trax-ds-text-inverse);
+    --trax-color-surface: var(--trax-ds-surface);
+    --trax-color-surface-subtle: var(--trax-ds-surface-soft);
+    --trax-color-surface-muted: var(--trax-ds-surface-muted);
+    --trax-color-surface-inverse: var(--trax-ds-bg-inverse);
+    --trax-color-border: var(--trax-ds-border);
+    --trax-color-border-subtle: var(--trax-ds-border-subtle);
+    --trax-color-focus: var(--trax-ds-accent);
+    --trax-focus-ring: var(--trax-ds-shadow-focus);
+    --trax-shadow-sm: var(--trax-ds-shadow-sm);
+    --trax-shadow-md: var(--trax-ds-shadow-md);
+    --trax-shadow-lg: var(--trax-ds-shadow-lg);
+    --trax-radius-sm: var(--trax-ds-radius-sm);
+    --trax-radius-md: var(--trax-ds-radius-md);
+    --trax-radius-lg: var(--trax-ds-radius-lg);
+    --trax-radius-xl: var(--trax-ds-radius-xl);
+    --trax-radius-pill: var(--trax-ds-radius-pill);
+    --trax-duration-fast: var(--trax-ds-duration-fast);
+    --trax-duration-base: var(--trax-ds-duration-base);
+    --trax-ease-standard: var(--trax-ds-ease);
+}
+
+.theme-dark {
+    color-scheme: dark;
+
+    --trax-ds-bg: #070b10;
+    --trax-ds-bg-elevated: #0d131d;
+    --trax-ds-bg-subtle: #101827;
+    --trax-ds-bg-muted: #18212f;
+    --trax-ds-bg-inverse: #f8fafc;
+
+    --trax-ds-surface: #0d131d;
+    --trax-ds-surface-soft: #101827;
+    --trax-ds-surface-muted: #18212f;
+    --trax-ds-card: #101827;
+    --trax-ds-card-soft: #111c2e;
+    --trax-ds-card-hover: #162133;
+
+    --trax-ds-border: rgba(148, 163, 184, 0.26);
+    --trax-ds-border-subtle: rgba(148, 163, 184, 0.16);
+    --trax-ds-border-strong: rgba(203, 213, 225, 0.34);
+
+    --trax-ds-text: #f8fafc;
+    --trax-ds-text-strong: #ffffff;
+    --trax-ds-text-secondary: #cbd5e1;
+    --trax-ds-text-muted: #94a3b8;
+    --trax-ds-text-disabled: #64748b;
+    --trax-ds-text-inverse: #0b1220;
+
+    --trax-ds-primary: #ff8a4c;
+    --trax-ds-primary-hover: #ffb28e;
+    --trax-ds-primary-soft: rgba(240, 90, 26, 0.16);
+    --trax-ds-primary-border: rgba(255, 138, 76, 0.34);
+    --trax-ds-accent: #67e8f9;
+    --trax-ds-accent-soft: rgba(14, 165, 183, 0.14);
+    --trax-ds-accent-border: rgba(103, 232, 249, 0.28);
+
+    --trax-ds-success: #86efac;
+    --trax-ds-success-soft: rgba(34, 197, 94, 0.15);
+    --trax-ds-success-border: rgba(134, 239, 172, 0.28);
+    --trax-ds-warning: #fcd34d;
+    --trax-ds-warning-soft: rgba(245, 158, 11, 0.16);
+    --trax-ds-warning-border: rgba(252, 211, 77, 0.32);
+    --trax-ds-danger: #fca5a5;
+    --trax-ds-danger-soft: rgba(239, 68, 68, 0.16);
+    --trax-ds-danger-border: rgba(252, 165, 165, 0.3);
+    --trax-ds-info: #67e8f9;
+    --trax-ds-info-soft: rgba(14, 165, 183, 0.16);
+    --trax-ds-info-border: rgba(103, 232, 249, 0.28);
+
+    --trax-ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.32);
+    --trax-ds-shadow-md: 0 14px 34px rgba(0, 0, 0, 0.3);
+    --trax-ds-shadow-lg: 0 26px 70px rgba(0, 0, 0, 0.38);
+    --trax-ds-shadow-focus: 0 0 0 3px rgba(103, 232, 249, 0.3);
+
+    --trax-ds-input-bg: #0b111b;
+    --trax-ds-input-border: rgba(148, 163, 184, 0.32);
+    --trax-ds-input-text: var(--trax-ds-text);
+    --trax-ds-input-placeholder: #94a3b8;
+    --trax-ds-link: #ffb28e;
+    --trax-ds-link-hover: #67e8f9;
+    --trax-ds-hero-bg: linear-gradient(140deg, #05070b, #101827);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root,
+    .theme-light,
+    .theme-dark {
+        --trax-ds-duration-fast: 0ms;
+        --trax-ds-duration-base: 0ms;
+        --trax-ds-duration-slow: 0ms;
+    }
+}

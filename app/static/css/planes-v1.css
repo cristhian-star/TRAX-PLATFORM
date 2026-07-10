@@ -93,11 +93,11 @@
 }
 
 .plan-card--plus {
-    border-color: var(--trax-cyan-100);
+    border-color: var(--trax-ds-info-border);
 }
 
 .plan-card--pro {
-    border-color: var(--trax-orange-100);
+    border-color: var(--trax-ds-primary-border);
     box-shadow: var(--trax-shadow-md);
 }
 
@@ -107,7 +107,7 @@
 }
 
 .plan-card--pro .plan-card__label {
-    color: var(--trax-orange-700);
+    color: var(--trax-ds-primary);
 }
 
 .plan-card h3 {
@@ -175,13 +175,13 @@
 }
 
 .plan-card--pro > a {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-color-action-primary);
     background: var(--trax-color-action-primary);
 }
 
 .plan-card > a:focus-visible {
-    outline: 2px solid var(--trax-steel-950);
+    outline: 2px solid var(--trax-color-focus);
     outline-offset: 3px;
     box-shadow: var(--trax-focus-ring);
 }

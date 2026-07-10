@@ -104,7 +104,7 @@
     color: var(--trax-color-text);
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-control-radius);
-    background: var(--trax-color-surface);
+    background: var(--trax-ds-input-bg);
 }
 
 .explore-filters button,
@@ -124,7 +124,7 @@
 .explore-filters button,
 .rubro-card__body > a,
 .explore-empty a {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-color-action-primary);
     background: var(--trax-color-action-primary);
 }
@@ -245,7 +245,7 @@
 .explore-filters select:focus-visible,
 .explore-filters button:focus-visible,
 .explore-rubros a:focus-visible {
-    outline: 2px solid var(--trax-steel-950);
+    outline: 2px solid var(--trax-color-focus);
     outline-offset: 2px;
     box-shadow: var(--trax-focus-ring);
 }

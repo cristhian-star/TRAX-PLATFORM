@@ -1,16 +1,18 @@
+@import url("design-system-v2.css");
+
 :root {
-    --navy: #0f172a;
-    --navy-2: #111c35;
-    --orange: #ff5a1f;
-    --cyan: #06b6d4;
-    --soft: #f8fafc;
-    --white: #ffffff;
-    --ink: #111827;
-    --muted: #64748b;
-    --line: #e2e8f0;
-    --green: #16a34a;
-    --shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
-    --card-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+    --navy: var(--trax-ds-text-strong);
+    --navy-2: var(--trax-ds-bg-muted);
+    --orange: var(--trax-ds-primary);
+    --cyan: var(--trax-ds-accent);
+    --soft: var(--trax-ds-bg-subtle);
+    --white: var(--trax-ds-surface);
+    --ink: var(--trax-ds-text);
+    --muted: var(--trax-ds-text-muted);
+    --line: var(--trax-ds-border-subtle);
+    --green: var(--trax-ds-success);
+    --shadow: var(--trax-ds-shadow-lg);
+    --card-shadow: var(--trax-ds-shadow-md);
 }
 
 * {
@@ -26,6 +28,9 @@ body {
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: var(--ink);
     background: var(--white);
+    transition:
+        color var(--trax-ds-duration-base) var(--trax-ds-ease),
+        background-color var(--trax-ds-duration-base) var(--trax-ds-ease);
 }
 
 a {
@@ -2608,4 +2613,96 @@ button.ghost-link {
     .contract-summary {
         grid-template-columns: 1fr;
     }
+}
+
+/* Design System v2 component compatibility. Navbar intentionally excluded. */
+main,
+.trax-home,
+.logged-dark-home,
+.profile-screen,
+.form-section,
+.listing-screen,
+.markets-screen,
+.budget-page,
+.explore-rubros,
+.proposal-page,
+.plans-page,
+.pro-dashboard {
+    background-color: var(--trax-ds-bg);
+    color: var(--trax-ds-text);
+}
+
+:where(.form-card, .dashboard-card, .dashboard-grid div, .mini-provider, .trust-grid article,
+.preview-card, .provider-card, .side-panel, .profile-summary, .profile-block, .contact-card,
+.pricing-cards article, .portfolio article, .market-panel, .market-indicators article,
+.contract-panel, .contract-summary div, .logged-profile-card,
+.quick-access-panel, .feed-panel, .activity-panel, .logged-action-grid a, .feed-item) {
+    border-color: var(--trax-ds-border-subtle);
+    background-color: var(--trax-ds-card);
+    color: var(--trax-ds-text);
+    box-shadow: var(--trax-ds-shadow-md);
+}
+
+:where(.form-card input, .form-card select, .form-card textarea,
+.smart-filters input, .smart-filters select,
+.search-strip input, .search-strip select,
+input, select, textarea):not([type="checkbox"]):not([type="radio"]) {
+    color: var(--trax-ds-input-text);
+    border-color: var(--trax-ds-input-border);
+    background-color: var(--trax-ds-input-bg);
+}
+
+:where(input, textarea)::placeholder {
+    color: var(--trax-ds-input-placeholder);
+}
+
+:where(.form-card input, .form-card select, .form-card textarea,
+.smart-filters input, .smart-filters select,
+.search-strip input, .search-strip select,
+input, select, textarea):focus {
+    border-color: var(--trax-color-focus);
+    outline: 0;
+    box-shadow: var(--trax-focus-ring);
+}
+
+:where(.btn.secondary, .budget-button--secondary, .proposal-button--secondary,
+.pro-dashboard__button--secondary, .explore-filters > a) {
+    color: var(--trax-ds-text-strong);
+    border-color: var(--trax-ds-border);
+    background-color: var(--trax-ds-surface);
+}
+
+:where(.form-alert, .dashboard-alert, .empty-state) {
+    border-color: var(--trax-ds-warning-border);
+    color: var(--trax-ds-warning);
+    background-color: var(--trax-ds-warning-soft);
+}
+
+:where(.trust-badge, .session-pill, .provider-metrics span, .social-proof span,
+.budget-badge, .logged-badge) {
+    border-color: var(--trax-ds-border-subtle);
+    background-color: var(--trax-ds-surface-soft);
+    color: var(--trax-ds-text-secondary);
+}
+
+:where(.trust-badge.verified, .budget-badge--verified) {
+    color: var(--trax-ds-success);
+    background-color: var(--trax-ds-success-soft);
+}
+
+:where(.trust-badge.work, .budget-badge--pro, .logged-badge--pro) {
+    color: var(--trax-ds-primary);
+    background-color: var(--trax-ds-primary-soft);
+}
+
+:where(.btn.danger) {
+    color: var(--trax-ds-danger);
+    background-color: var(--trax-ds-danger-soft);
+}
+
+:where(a:not(.brand):not(.visitor-start):not(.nav-cta):not(.nav-dropdown__item)) {
+    transition:
+        color var(--trax-ds-duration-base) var(--trax-ds-ease),
+        background-color var(--trax-ds-duration-base) var(--trax-ds-ease),
+        border-color var(--trax-ds-duration-base) var(--trax-ds-ease);
 }

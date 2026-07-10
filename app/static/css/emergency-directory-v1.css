@@ -18,7 +18,7 @@
 .emergency-entry__hero,
 .emergency-directory__hero {
     padding: var(--trax-space-10) 0;
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     background:
         radial-gradient(circle at 85% 15%, rgba(200, 30, 30, 0.26), transparent 24rem),
         radial-gradient(circle at 12% 0, rgba(14, 165, 183, 0.16), transparent 26rem),
@@ -28,7 +28,7 @@
 .emergency-entry__hero-content > span,
 .emergency-directory__hero-layout > div:first-child > span,
 .emergency-form__heading > span {
-    color: #fecdd3;
+    color: var(--trax-ds-danger);
     font-size: var(--trax-font-size-12);
     font-weight: var(--trax-font-weight-bold);
     letter-spacing: 0.08em;
@@ -117,7 +117,7 @@
     padding: var(--trax-space-3) var(--trax-space-4);
     color: var(--trax-color-text);
     border: 1px solid var(--trax-color-border);
-    background: var(--trax-color-surface);
+    background: var(--trax-ds-input-bg);
 }
 
 .emergency-form input {
@@ -132,7 +132,7 @@
 .emergency-form button {
     min-height: var(--trax-control-height-lg);
     padding: 0 var(--trax-space-5);
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border: 1px solid var(--trax-emergency-600);
     background: var(--trax-emergency-600);
     font-weight: var(--trax-font-weight-bold);
@@ -157,9 +157,9 @@
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: var(--trax-space-3);
-    color: var(--trax-error-700);
-    border: 1px solid var(--trax-error-200);
-    background: var(--trax-error-50);
+    color: var(--trax-ds-danger);
+    border: 1px solid var(--trax-ds-danger-border);
+    background: var(--trax-ds-danger-soft);
 }
 
 .emergency-legal > span {
@@ -167,7 +167,7 @@
     width: 2rem;
     height: 2rem;
     place-items: center;
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-radius: 50%;
     background: var(--trax-emergency-600);
     font-weight: var(--trax-font-weight-extrabold);
@@ -235,20 +235,20 @@
 .emergency-directory__notice {
     margin: 0 0 var(--trax-space-4);
     padding: var(--trax-space-4);
-    color: var(--trax-success-700);
-    border: 1px solid var(--trax-success-200);
+    color: var(--trax-ds-success);
+    border: 1px solid var(--trax-ds-success-border);
     border-radius: var(--trax-radius-md);
-    background: var(--trax-success-50);
+    background: var(--trax-ds-success-soft);
     font-weight: var(--trax-font-weight-semibold);
 }
 
 .emergency-directory__availability-note {
     margin: 0 0 var(--trax-space-4);
     padding: var(--trax-space-4);
-    color: var(--trax-cyan-700);
-    border: 1px solid var(--trax-cyan-100);
+    color: var(--trax-ds-info);
+    border: 1px solid var(--trax-ds-info-border);
     border-radius: var(--trax-radius-md);
-    background: var(--trax-cyan-50);
+    background: var(--trax-ds-info-soft);
     font-weight: var(--trax-font-weight-semibold);
     line-height: var(--trax-line-height-body);
 }
@@ -336,7 +336,7 @@
     width: 3.5rem;
     height: 3.5rem;
     place-items: center;
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-radius: var(--trax-radius-md);
     background: var(--trax-steel-900);
     font-weight: var(--trax-font-weight-extrabold);
@@ -449,7 +449,7 @@
 }
 
 .emergency-card__facts dd span {
-    color: #b45309;
+    color: var(--trax-ds-warning);
 }
 
 .emergency-card__actions {
@@ -476,13 +476,13 @@
 }
 
 .emergency-action--whatsapp {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-success-600);
     background: var(--trax-success-600);
 }
 
 .emergency-action--call {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-emergency-600);
     background: var(--trax-emergency-600);
 }
@@ -585,7 +585,7 @@
 .emergency-form textarea:focus-visible,
 .emergency-form button:focus-visible,
 .emergency-directory a:focus-visible {
-    outline: 2px solid var(--trax-steel-950);
+    outline: 2px solid var(--trax-color-focus);
     outline-offset: 2px;
     box-shadow: var(--trax-focus-ring);
 }

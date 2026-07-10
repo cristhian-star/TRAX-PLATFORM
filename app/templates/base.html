@@ -86,17 +86,18 @@
             <a href="/planes">Planes</a>
         </nav>
 
-        <button
-            class="theme-switch"
-            type="button"
-            data-theme-switch
-            aria-label="Cambiar a tema oscuro"
-            aria-pressed="false">
-            <span class="theme-switch__track" aria-hidden="true">
-                <span class="theme-switch__thumb"></span>
-            </span>
-            <span class="theme-switch__label">Tema</span>
-        </button>
+        <div class="header-utilities">
+            <button
+                class="theme-switch"
+                type="button"
+                data-theme-switch
+                aria-label="Cambiar a tema oscuro"
+                aria-pressed="false">
+                <span class="theme-switch__track" aria-hidden="true">
+                    <span class="theme-switch__thumb"></span>
+                </span>
+                <span class="theme-switch__label">Tema</span>
+            </button>
 
         {% if session.get("user_id") %}
             <div class="header-actions header-actions--visitor header-actions--account">
@@ -142,6 +143,7 @@
                 </a>
             </div>
         {% endif %}
+        </div>
     </header>
 
     {% block content %}{% endblock %}

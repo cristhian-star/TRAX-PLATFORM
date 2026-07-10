@@ -1,7 +1,7 @@
 .private-profile {
     background:
         radial-gradient(circle at top left, rgba(14, 165, 183, 0.12), transparent 34rem),
-        linear-gradient(180deg, var(--trax-gray-50), #ffffff 38rem);
+        linear-gradient(180deg, var(--trax-ds-bg), var(--trax-ds-surface) 38rem);
     color: var(--trax-color-text);
     font-family: var(--trax-font-sans);
     min-height: 100vh;
@@ -34,7 +34,7 @@
     background:
         linear-gradient(135deg, rgba(11, 18, 32, 0.92), rgba(8, 122, 140, 0.78)),
         repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 18px);
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     display: flex;
     font-weight: var(--trax-font-weight-bold);
     justify-content: center;
@@ -58,7 +58,7 @@
 .private-profile__avatar {
     align-items: center;
     background: linear-gradient(135deg, var(--trax-steel-900), var(--trax-cyan-700));
-    border: 4px solid var(--trax-white);
+    border: 4px solid var(--trax-color-surface);
     border-radius: var(--trax-radius-xl);
     box-shadow: var(--trax-shadow-md);
     display: inline-flex;
@@ -76,7 +76,7 @@
 }
 
 .private-profile__avatar span {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     font-size: var(--trax-font-size-36);
     font-weight: var(--trax-font-weight-extrabold);
     text-transform: uppercase;
@@ -98,7 +98,7 @@
 .private-profile h1,
 .private-profile h2,
 .private-profile h3 {
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     margin: 0;
 }
 
@@ -214,13 +214,13 @@
 
 .private-profile__button--primary {
     background: var(--trax-color-action-primary);
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
 }
 
 .private-profile__button--secondary {
-    background: var(--trax-white);
+    background: var(--trax-color-surface);
     border-color: var(--trax-color-border);
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
 }
 
 .private-profile__button--inline {
@@ -228,8 +228,8 @@
 }
 
 .private-profile__button:disabled {
-    background: var(--trax-gray-100);
-    color: var(--trax-gray-500);
+    background: var(--trax-color-surface-muted);
+    color: var(--trax-color-text-disabled);
     cursor: not-allowed;
 }
 
@@ -263,7 +263,7 @@
 }
 
 .private-profile__sidebar span {
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     font-size: var(--trax-font-size-18);
     font-weight: var(--trax-font-weight-bold);
     margin-bottom: var(--trax-space-2);
@@ -281,9 +281,9 @@
 
 .private-profile__sidebar button.is-active,
 .private-profile__sidebar button:hover {
-    background: var(--trax-orange-50);
-    border-color: var(--trax-orange-100);
-    color: var(--trax-orange-700);
+    background: var(--trax-ds-primary-soft);
+    border-color: var(--trax-ds-primary-border);
+    color: var(--trax-ds-primary);
 }
 
 .private-profile__workspace {
@@ -318,7 +318,7 @@
 }
 
 .private-profile label {
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     display: grid;
     font-weight: var(--trax-font-weight-semibold);
     gap: var(--trax-space-2);
@@ -328,7 +328,7 @@
 .private-profile input,
 .private-profile select,
 .private-profile textarea {
-    background: var(--trax-white);
+    background: var(--trax-ds-input-bg);
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-radius-md);
     color: var(--trax-color-text);
@@ -441,7 +441,7 @@
 
 .private-profile__map-placeholder span {
     background: var(--trax-orange-600);
-    border: 4px solid var(--trax-white);
+    border: 4px solid var(--trax-color-surface);
     border-radius: 50%;
     box-shadow: var(--trax-shadow-md);
     height: 1.4rem;
@@ -458,10 +458,10 @@
 
 .private-profile__radius-list button,
 .private-profile__network-list span {
-    background: var(--trax-white);
+    background: var(--trax-color-surface);
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-radius-pill);
-    color: var(--trax-steel-800);
+    color: var(--trax-color-text-secondary);
     font-weight: var(--trax-font-weight-semibold);
     padding: var(--trax-space-2) var(--trax-space-4);
 }

@@ -62,7 +62,7 @@
 .professional-profile__cover-content small {
     max-width: calc(100% - 7rem);
     margin-top: var(--trax-space-2);
-    color: #c8d5e3;
+    color: var(--trax-color-text-secondary);
 }
 
 .professional-profile__identity {
@@ -86,7 +86,7 @@
     height: 5rem;
     place-items: center;
     color: var(--trax-color-text-muted);
-    border: 4px solid var(--trax-white);
+    border: 4px solid var(--trax-color-surface);
     border-radius: var(--trax-radius-lg);
     background: var(--trax-color-surface-muted);
     box-shadow: var(--trax-shadow-md);
@@ -116,7 +116,7 @@
     width: 5.5rem;
     height: 5.5rem;
     place-items: center;
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-radius: var(--trax-radius-lg);
     background:
         linear-gradient(145deg, rgba(14, 165, 183, 0.28), transparent 60%),
@@ -198,7 +198,7 @@
 }
 
 .professional-profile__rating > span:first-child {
-    color: #b45309;
+    color: var(--trax-ds-warning);
     font-size: var(--trax-font-size-18);
 }
 
@@ -227,13 +227,13 @@
 }
 
 .profile-action--whatsapp {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-success-600);
     background: var(--trax-success-600);
 }
 
 .profile-action--primary {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-color: var(--trax-color-action-primary);
     background: var(--trax-color-action-primary);
 }
@@ -626,7 +626,7 @@
     display: flex;
     align-items: center;
     gap: var(--trax-space-2);
-    color: #b45309;
+    color: var(--trax-ds-warning);
 }
 
 .profile-review-list__score strong {
@@ -699,7 +699,7 @@
     height: 2.5rem;
     grid-row: 1 / 3;
     place-items: center;
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     border-radius: var(--trax-radius-sm);
     background: var(--trax-steel-800);
     font-size: 0.6875rem;
@@ -719,7 +719,7 @@
 }
 
 .profile-external-link--instagram > span {
-    background: #9d174d;
+    background: var(--trax-ds-danger);
 }
 
 .profile-external-link--tiktok > span {
@@ -778,7 +778,7 @@
 .profile-action:focus-visible,
 .professional-profile a:focus-visible,
 .professional-profile button:focus-visible {
-    outline: 2px solid var(--trax-steel-950);
+    outline: 2px solid var(--trax-color-focus);
     outline-offset: 2px;
     box-shadow: var(--trax-focus-ring);
 }

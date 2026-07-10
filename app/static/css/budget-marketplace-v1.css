@@ -88,7 +88,7 @@
 
 .budget-section-heading h2 {
     margin: var(--trax-space-2) 0;
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     font-size: clamp(var(--trax-font-size-24), 4vw, var(--trax-font-size-32));
 }
 
@@ -114,7 +114,7 @@
 .budget-field {
     display: grid;
     gap: var(--trax-space-2);
-    color: var(--trax-steel-900);
+    color: var(--trax-color-text-secondary);
     font-weight: var(--trax-font-weight-semibold);
 }
 
@@ -127,7 +127,7 @@
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-control-radius);
     color: var(--trax-color-text);
-    background: var(--trax-color-surface);
+    background: var(--trax-ds-input-bg);
 }
 
 .budget-field textarea {
@@ -194,7 +194,7 @@
 
 .budget-button--secondary {
     border-color: var(--trax-color-border);
-    color: var(--trax-steel-900);
+    color: var(--trax-color-brand-strong);
     background: var(--trax-color-surface);
 }
 
@@ -223,21 +223,21 @@
 }
 
 .budget-alert--error {
-    border-color: var(--trax-error-200);
-    color: var(--trax-error-700);
-    background: var(--trax-error-50);
+    border-color: var(--trax-ds-danger-border);
+    color: var(--trax-ds-danger);
+    background: var(--trax-ds-danger-soft);
 }
 
 .budget-alert--success {
-    border-color: var(--trax-success-200);
-    color: var(--trax-success-700);
-    background: var(--trax-success-50);
+    border-color: var(--trax-ds-success-border);
+    color: var(--trax-ds-success);
+    background: var(--trax-ds-success-soft);
 }
 
 .budget-alert--info {
-    border-color: var(--trax-cyan-100);
-    color: var(--trax-cyan-700);
-    background: var(--trax-cyan-50);
+    border-color: var(--trax-ds-info-border);
+    color: var(--trax-ds-info);
+    background: var(--trax-ds-info-soft);
 }
 
 .budget-detail-hero {
@@ -288,20 +288,20 @@
 .budget-status {
     padding: var(--trax-space-1) var(--trax-space-3);
     border-radius: var(--trax-radius-pill);
-    color: var(--trax-steel-950);
-    background: var(--trax-cyan-100);
+    color: var(--trax-ds-info);
+    background: var(--trax-ds-info-soft);
     font-size: var(--trax-font-size-12);
     font-weight: var(--trax-font-weight-bold);
 }
 
 .budget-status--adjudicada {
-    color: var(--trax-success-700);
-    background: var(--trax-success-200);
+    color: var(--trax-ds-success);
+    background: var(--trax-ds-success-soft);
 }
 
 .budget-status--cancelada {
-    color: var(--trax-error-700);
-    background: var(--trax-error-50);
+    color: var(--trax-ds-danger);
+    background: var(--trax-ds-danger-soft);
 }
 
 .budget-counter {
@@ -388,7 +388,7 @@
 .budget-offer-card__facts dd {
     min-width: 0;
     margin: 0;
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     font-weight: var(--trax-font-weight-semibold);
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -447,7 +447,7 @@
     margin: 0;
     overflow-wrap: anywhere;
     word-break: break-word;
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
 }
 
 .budget-offer-card__identity p,
@@ -507,7 +507,7 @@
 }
 
 .budget-offer-card__price strong {
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     overflow-wrap: anywhere;
     word-break: break-word;
     font-size: var(--trax-font-size-26);
@@ -622,7 +622,7 @@
 .budget-empty h3,
 .budget-upgrade strong {
     margin: 0;
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
 }
 
 .budget-empty p,
@@ -641,7 +641,7 @@
 }
 
 .budget-own-offer > strong {
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     font-size: var(--trax-font-size-32);
 }
 
@@ -700,7 +700,7 @@
     padding: var(--trax-space-2) var(--trax-space-4);
     border: 1px solid var(--trax-color-border);
     border-radius: var(--trax-radius-pill);
-    color: var(--trax-steel-900);
+    color: var(--trax-color-brand-strong);
     background: var(--trax-color-surface);
     font-size: var(--trax-font-size-14);
     font-weight: var(--trax-font-weight-bold);
@@ -757,7 +757,7 @@
 
 .budget-request-card h2 {
     margin: var(--trax-space-2) 0;
-    color: var(--trax-steel-950);
+    color: var(--trax-color-brand-strong);
     font-size: var(--trax-font-size-21);
 }
 

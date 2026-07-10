@@ -182,13 +182,13 @@
 }
 
 .proposal-button--secondary {
-    color: var(--trax-steel-900);
+    color: var(--trax-color-brand-strong);
     border-color: var(--trax-color-border);
     background: var(--trax-color-surface);
 }
 
 .proposal-button--whatsapp {
-    color: var(--trax-white);
+    color: var(--trax-color-text-inverse);
     background: var(--trax-success-600);
 }
 
@@ -206,15 +206,15 @@
 }
 
 .proposal-alert--error {
-    color: var(--trax-error-700);
-    border-color: var(--trax-error-200);
-    background: var(--trax-error-50);
+    color: var(--trax-ds-danger);
+    border-color: var(--trax-ds-danger-border);
+    background: var(--trax-ds-danger-soft);
 }
 
 .proposal-alert--success {
-    color: var(--trax-success-700);
-    border-color: var(--trax-success-200);
-    background: var(--trax-success-50);
+    color: var(--trax-ds-success);
+    border-color: var(--trax-ds-success-border);
+    background: var(--trax-ds-success-soft);
 }
 
 .proposal-filter {
@@ -306,21 +306,21 @@
     display: inline-flex;
     padding: var(--trax-space-1) var(--trax-space-3);
     border-radius: var(--trax-radius-pill);
-    color: var(--trax-cyan-700);
-    background: var(--trax-cyan-50);
+    color: var(--trax-ds-info);
+    background: var(--trax-ds-info-soft);
     font-size: var(--trax-font-size-12);
     font-weight: var(--trax-font-weight-bold);
 }
 
 .proposal-status--cancelada,
 .proposal-status--descartada {
-    color: var(--trax-error-700);
-    background: var(--trax-error-50);
+    color: var(--trax-ds-danger);
+    background: var(--trax-ds-danger-soft);
 }
 
 .proposal-status--aceptada {
-    color: var(--trax-success-700);
-    background: var(--trax-success-50);
+    color: var(--trax-ds-success);
+    background: var(--trax-ds-success-soft);
 }
 
 .proposal-detail {
