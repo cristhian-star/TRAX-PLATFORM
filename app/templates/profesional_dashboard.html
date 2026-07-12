@@ -144,28 +144,26 @@
                 <div class="pro-dashboard__section-head">
                     <div>
                         <span class="pro-dashboard__eyebrow">Actividad</span>
-                        <h2>Movimiento comercial</h2>
+                        <h2>Actividad reciente</h2>
                     </div>
-                    <a href="/presupuestos/mis-enviados">Ver enviados</a>
+                    <a href="/notificaciones">Ver toda la actividad</a>
                 </div>
-                <div class="pro-dashboard__activity-list">
-                    <div>
-                        <strong>{{ budget_offers_count }}</strong>
-                        <span>Presupuestos preliminares enviados</span>
+                {% if recent_activity %}
+                    <div class="pro-dashboard__notification-list">
+                        {% for notification in recent_activity %}
+                            <a href="{{ notification.url_destino or '/notificaciones' }}" class="{{ 'is-unread' if not notification.leida else 'is-read' }}">
+                                <span>{{ notification.categoria }}</span>
+                                <strong>{{ notification.titulo }}</strong>
+                                <small>{{ notification.mensaje }} - {{ format_notification_date(notification.created_at) }}</small>
+                            </a>
+                        {% endfor %}
                     </div>
-                    <div>
-                        <strong>{{ awarded_budget_offers_count }}</strong>
-                        <span>Presupuestos adjudicados</span>
+                {% else %}
+                    <div class="pro-dashboard__placeholder">
+                        <strong>Tu actividad reciente aparecera aqui.</strong>
+                        <span>Los presupuestos, adjudicaciones y postulaciones reales se mostraran en este resumen.</span>
                     </div>
-                    <div>
-                        <strong>{{ proposal_applications_count }}</strong>
-                        <span>Postulaciones enviadas a propuestas</span>
-                    </div>
-                    <div>
-                        <strong>{{ accepted_proposal_applications_count }}</strong>
-                        <span>Postulaciones aceptadas</span>
-                    </div>
-                </div>
+                {% endif %}
             </article>
 
             <article class="pro-dashboard__panel">

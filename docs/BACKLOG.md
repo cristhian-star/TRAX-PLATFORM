@@ -9,9 +9,11 @@
 - Crear listado dedicado de emergencias del cliente para reemplazar enlaces operativos provisorios.
 - Crear vista consolidada de solicitudes del cliente que incluya presupuestos, emergencias y propuestas.
 - Realizar auditoria visual completa de pantallas secundarias para Design System v2 Fase 2.
-- Implementar Notificaciones.
 - Implementar Agenda.
+- Implementar canal Email para notificaciones transaccionales.
 - Integrar WhatsApp.
+- Evaluar Push notifications cuando exista estrategia mobile/browser.
+- Evaluar polling moderado o WebSockets solo cuando el producto requiera tiempo real.
 
 ## Baja prioridad
 

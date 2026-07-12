@@ -2,6 +2,26 @@
 
 ## 2026-07-12
 
+Se decidio crear un modelo central `ActivityNotification` para unificar actividad historica y notificaciones internas.
+
+Motivo:
+
+El mismo evento operativo debe poder alimentar dashboards, centro de notificaciones y canales futuros sin duplicar logica por pantalla.
+
+Alcance:
+
+- Registrar actividad y notificacion interna en una unica tabla.
+- Usar strings controlados y constantes centralizadas en lugar de enums rigidos.
+- Integrar solo eventos reales existentes de presupuestos, propuestas y emergencias.
+- Mantener los canales Email, WhatsApp, Push y tiempo real fuera de esta version.
+- Proteger lectura y modificacion por propietario de la notificacion.
+
+Criterio:
+
+Los nuevos eventos operativos deberan registrarse mediante el servicio central de notificaciones y no directamente desde templates o consultas ad hoc.
+
+## 2026-07-12
+
 Se decidio implementar el Dashboard Cliente como centro de operaciones y no como perfil personal.
 
 Motivo:

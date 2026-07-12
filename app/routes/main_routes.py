@@ -55,6 +55,10 @@ from app.services.budget_service import (
     get_offer_allowance,
     get_professional_budget_offers,
 )
+from app.services.notification_service import (
+    formatear_fecha_notificacion,
+    obtener_notificaciones_usuario,
+)
 from app.models.proposal_application import ProposalApplication
 
 main = Blueprint("main", __name__)
@@ -689,6 +693,8 @@ def profesional_dashboard():
         accepted_proposal_applications_count=len(accepted_proposal_applications),
         offer_allowance=get_offer_allowance(user_id) if user_id else None,
         recommendations=recommendations,
+        recent_activity=obtener_notificaciones_usuario(user_id, limit=5) if user_id else [],
+        format_notification_date=formatear_fecha_notificacion,
     )
 
 
@@ -845,6 +851,8 @@ def cliente_dashboard():
         request_sections=request_sections,
         recommendations=recommendations[:5],
         format_dashboard_date=_format_dashboard_date,
+        recent_activity=obtener_notificaciones_usuario(user_id, limit=5),
+        format_notification_date=formatear_fecha_notificacion,
     )
 
 

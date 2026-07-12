@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="notifications-page">
+    <section class="notifications-page__shell">
+        <header class="notifications-page__header">
+            <div>
+                <span class="notifications-page__eyebrow">Centro de actividad</span>
+                <h1>Notificaciones</h1>
+                <p>Actividad historica y novedades internas de tu cuenta TRAX.</p>
+            </div>
+            <form action="/notificaciones/marcar-todas-leidas" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit">Marcar todas como leidas</button>
+            </form>
+        </header>
+
+        <nav class="notifications-page__filters" aria-label="Filtros de notificaciones">
+            <a class="{{ 'is-active' if filtro == 'todas' else '' }}" href="/notificaciones?filtro=todas">Todas</a>
+            <a class="{{ 'is-active' if filtro == 'no-leidas' else '' }}" href="/notificaciones?filtro=no-leidas">No leidas</a>
+            <a class="{{ 'is-active' if filtro == 'accion' else '' }}" href="/notificaciones?filtro=accion">Accion requerida</a>
+            <a class="{{ 'is-active' if filtro == 'info' else '' }}" href="/notificaciones?filtro=info">Informacion</a>
+            <a class="{{ 'is-active' if filtro == 'recordatorios' else '' }}" href="/notificaciones?filtro=recordatorios">Recordatorios</a>
+        </nav>
+
+        {% if notifications %}
+            <section class="notifications-page__list" aria-label="Listado de notificaciones">
+                {% for notification in notifications %}
+                    <article class="notification-card {{ 'is-unread' if not notification.leida else 'is-read' }}">
+                        <div class="notification-card__meta">
+                            <span>{{ notification.categoria }}</span>
+                            <span>{{ notification.prioridad|replace("_", " ")|title }}</span>
+                            <time datetime="{{ notification.created_at.isoformat() }}">
+                                {{ format_notification_date(notification.created_at) }}
+                            </time>
+                        </div>
+                        <h2>{{ notification.titulo }}</h2>
+                        <p>{{ notification.mensaje }}</p>
+                        <div class="notification-card__actions">
+                            {% if notification.url_destino %}
+                                <a href="{{ notification.url_destino }}">Abrir destino</a>
+                            {% endif %}
+                            {% if not notification.leida %}
+                                <form action="/notificaciones/{{ notification.id }}/leer" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="next" value="{{ request.full_path }}">
+                                    <button type="submit">Marcar como leida</button>
+                                </form>
+                            {% else %}
+                                <span>Leida</span>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <div class="notifications-page__empty">
+                <strong>No tenes novedades por el momento.</strong>
+                <span>Cuando exista actividad relevante, aparecera en este centro.</span>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

@@ -1,5 +1,24 @@
 # CHANGELOG TRAX
 
+## 2026-07-12 - Centro de Actividad + Notificaciones v1
+
+### Agregado
+
+- Se creo el modelo `ActivityNotification` para registrar actividad historica y notificaciones internas.
+- Se agrego el servicio central `notification_service.py` con constantes, consultas y marcado de lectura.
+- Se agregaron rutas `/notificaciones`, `/notificaciones/<id>/leer` y `/notificaciones/marcar-todas-leidas`.
+- Se agrego campana de notificaciones en el navbar para usuarios autenticados.
+- Se integraron eventos reales de presupuestos, propuestas y emergencias.
+
+### Mejorado
+
+- Dashboard Cliente y Dashboard Profesional muestran actividad reciente basada en notificaciones reales.
+- El sistema queda preparado para canales futuros como Email, WhatsApp y Push sin implementarlos todavia.
+
+### Corregido
+
+- Sin correcciones registradas.
+
 ## 2026-07-12
 
 ### Agregado

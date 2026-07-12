@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visitor-navbar-v1.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switch-v1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notification-navbar-v1.css') }}">
     <script>
         (function () {
             try {
@@ -100,6 +101,41 @@
             </button>
 
         {% if session.get("user_id") %}
+            <details class="nav-dropdown notification-dropdown">
+                <summary class="notification-summary" aria-label="Notificaciones">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                        <path d="M10 21h4"></path>
+                    </svg>
+                    {% if navbar_unread_notifications %}
+                        <span class="notification-summary__count">{{ navbar_unread_notifications }}</span>
+                    {% endif %}
+                </summary>
+                <div class="nav-dropdown__menu notification-dropdown__menu" aria-label="Ultimas notificaciones">
+                    <div class="notification-dropdown__head">
+                        <strong>Notificaciones</strong>
+                        <a href="/notificaciones">Ver todas</a>
+                    </div>
+                    {% if navbar_notifications %}
+                        <div class="notification-dropdown__list">
+                            {% for notification in navbar_notifications %}
+                                <a
+                                    class="notification-dropdown__item {{ 'is-unread' if not notification.leida else 'is-read' }}"
+                                    href="{{ notification.url_destino or '/notificaciones' }}">
+                                    <span>{{ notification.categoria }}</span>
+                                    <strong>{{ notification.titulo }}</strong>
+                                    <small>{{ notification.mensaje }}</small>
+                                    <time datetime="{{ notification.created_at.isoformat() }}">
+                                        {{ notification.created_at.strftime("%d/%m/%Y") }}
+                                    </time>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="notification-dropdown__empty">No tenes novedades por el momento.</p>
+                    {% endif %}
+                </div>
+            </details>
             <div class="header-actions header-actions--visitor header-actions--account">
                 <details class="nav-dropdown account-dropdown">
                     <summary class="account-summary">

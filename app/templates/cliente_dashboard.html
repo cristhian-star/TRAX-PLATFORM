@@ -90,26 +90,23 @@
                         <span class="client-dashboard__eyebrow">Actividad</span>
                         <h2>Centro de actividad</h2>
                     </div>
-                    <a href="/presupuestos/mis-solicitudes">Ver solicitudes</a>
+                    <a href="/notificaciones">Ver toda la actividad</a>
                 </div>
 
-                {% if activity_rows %}
+                {% if recent_activity %}
                     <div class="client-dashboard__activity-list">
-                        {% for row in activity_rows %}
-                            <a href="{{ row.href }}">
-                                <span>{{ row.kind }}</span>
-                                <strong>{{ row.title }}</strong>
-                                <small>{{ row.detail }} - {{ format_dashboard_date(row.date) }}</small>
+                        {% for notification in recent_activity %}
+                            <a href="{{ notification.url_destino or '/notificaciones' }}" class="{{ 'is-unread' if not notification.leida else 'is-read' }}">
+                                <span>{{ notification.categoria }}</span>
+                                <strong>{{ notification.titulo }}</strong>
+                                <small>{{ notification.mensaje }} - {{ format_notification_date(notification.created_at) }}</small>
                             </a>
                         {% endfor %}
                     </div>
                 {% else %}
                     <div class="client-dashboard__placeholder">
-                        <strong>Todavia no hay actividad suficiente</strong>
-                        <span>
-                            Cuando publiques presupuestos, emergencias o propuestas,
-                            aca vas a ver los movimientos mas importantes.
-                        </span>
+                        <strong>Tu actividad reciente aparecera aqui.</strong>
+                        <span>Cuando exista actividad real en tus solicitudes, la vas a ver en este resumen.</span>
                     </div>
                 {% endif %}
             </article>

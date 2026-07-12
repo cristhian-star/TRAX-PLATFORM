@@ -22,7 +22,7 @@
 
 [x] Dashboard Cliente
 
-[ ] Notificaciones
+[x] Notificaciones
 
 [ ] Agenda
 

@@ -356,6 +356,43 @@
     grid-template-columns: 1fr;
 }
 
+.pro-dashboard__notification-list {
+    display: grid;
+    gap: var(--trax-space-3);
+}
+
+.pro-dashboard__notification-list a {
+    display: grid;
+    gap: var(--trax-space-1);
+    min-width: 0;
+    padding: var(--trax-space-4);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-lg);
+    background: var(--trax-color-surface-subtle);
+    text-decoration: none;
+}
+
+.pro-dashboard__notification-list a.is-unread {
+    border-color: var(--trax-ds-primary-border);
+    background: var(--trax-ds-primary-soft);
+}
+
+.pro-dashboard__notification-list span {
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-14);
+    font-weight: var(--trax-font-weight-semibold);
+}
+
+.pro-dashboard__notification-list strong {
+    color: var(--trax-color-brand-strong);
+    overflow-wrap: anywhere;
+}
+
+.pro-dashboard__notification-list small {
+    color: var(--trax-color-text-muted);
+    line-height: var(--trax-line-height-body);
+}
+
 .pro-dashboard__activity-list div {
     align-items: center;
     display: flex;

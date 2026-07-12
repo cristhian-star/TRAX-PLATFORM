@@ -31,6 +31,27 @@ from app.services.contract_service import (
     start_contract,
 )
 from app.services.emergency_service import create_emergency_request
+from app.services.notification_service import (
+    CATEGORIA_EMERGENCIAS,
+    CATEGORIA_PRESUPUESTOS,
+    CATEGORIA_PROPUESTAS,
+    PRIORIDAD_ACCION_REQUERIDA,
+    PRIORIDAD_INFO,
+    TIPO_EMERGENCIA_PUBLICADA,
+    TIPO_PRESUPUESTO_ADJUDICADO_CLIENTE,
+    TIPO_PRESUPUESTO_ADJUDICADO_PROFESIONAL,
+    TIPO_PRESUPUESTO_CANCELADO,
+    TIPO_PRESUPUESTO_OFERTA_ENVIADA,
+    TIPO_PRESUPUESTO_OFERTA_RECIBIDA,
+    TIPO_PRESUPUESTO_PUBLICADO,
+    TIPO_PROPUESTA_CANCELADA,
+    TIPO_PROPUESTA_POSTULACION_ACEPTADA,
+    TIPO_PROPUESTA_POSTULACION_DESCARTADA,
+    TIPO_PROPUESTA_POSTULACION_ENVIADA,
+    TIPO_PROPUESTA_POSTULACION_RECIBIDA,
+    TIPO_PROPUESTA_PUBLICADA,
+    registrar_evento,
+)
 from app.services.proposal_service import (
     accept_application,
     apply_to_proposal,
@@ -171,6 +192,240 @@ def _audit_contract_action(action, contract, description):
         ip_address=request.remote_addr,
         user_agent=request.user_agent.string,
     )
+
+
+def _user_display_name(user_id, fallback="Usuario TRAX"):
+    user = db.session.get(User, user_id) if user_id else None
+    return user.nombre if user and user.nombre else fallback
+
+
+def _notify_budget_created(budget_request):
+    registrar_evento(
+        user_id=budget_request.cliente_id,
+        actor_user_id=budget_request.cliente_id,
+        tipo=TIPO_PRESUPUESTO_PUBLICADO,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Publicaste una solicitud de presupuesto",
+        mensaje=f"{budget_request.titulo} quedo disponible para recibir ofertas.",
+        url_destino=f"/presupuestos/{budget_request.id}",
+        entity_type="BudgetRequest",
+        entity_id=budget_request.id,
+    )
+
+
+def _notify_budget_offer_created(offer):
+    budget_request = offer.budget_request
+    professional_name = _user_display_name(offer.professional_user_id, "Un profesional")
+
+    registrar_evento(
+        user_id=offer.professional_user_id,
+        actor_user_id=offer.professional_user_id,
+        tipo=TIPO_PRESUPUESTO_OFERTA_ENVIADA,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Enviaste un presupuesto preliminar",
+        mensaje=f"Tu oferta para {budget_request.titulo} quedo registrada.",
+        url_destino=f"/presupuestos/{budget_request.id}",
+        entity_type="BudgetOffer",
+        entity_id=offer.id,
+    )
+    registrar_evento(
+        user_id=budget_request.cliente_id,
+        actor_user_id=offer.professional_user_id,
+        tipo=TIPO_PRESUPUESTO_OFERTA_RECIBIDA,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Recibiste un nuevo presupuesto",
+        mensaje=f"{professional_name} envio una oferta para {budget_request.titulo}.",
+        url_destino=f"/presupuestos/{budget_request.id}",
+        entity_type="BudgetOffer",
+        entity_id=offer.id,
+        prioridad=PRIORIDAD_ACCION_REQUERIDA,
+        requiere_accion=True,
+    )
+
+
+def _notify_budget_awarded(offer):
+    budget_request = offer.budget_request
+    professional_name = _user_display_name(offer.professional_user_id, "el profesional")
+
+    registrar_evento(
+        user_id=budget_request.cliente_id,
+        actor_user_id=budget_request.cliente_id,
+        tipo=TIPO_PRESUPUESTO_ADJUDICADO_CLIENTE,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Adjudicaste una oferta",
+        mensaje=f"Seleccionaste a {professional_name} para {budget_request.titulo}.",
+        url_destino=f"/presupuestos/{budget_request.id}",
+        entity_type="BudgetOffer",
+        entity_id=offer.id,
+    )
+    registrar_evento(
+        user_id=offer.professional_user_id,
+        actor_user_id=budget_request.cliente_id,
+        tipo=TIPO_PRESUPUESTO_ADJUDICADO_PROFESIONAL,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Tu presupuesto fue adjudicado",
+        mensaje=f"Fuiste seleccionado para {budget_request.titulo}.",
+        url_destino=f"/presupuestos/{budget_request.id}",
+        entity_type="BudgetOffer",
+        entity_id=offer.id,
+        prioridad=PRIORIDAD_ACCION_REQUERIDA,
+        requiere_accion=True,
+    )
+
+
+def _notify_budget_cancelled(budget_request):
+    registrar_evento(
+        user_id=budget_request.cliente_id,
+        actor_user_id=budget_request.cliente_id,
+        tipo=TIPO_PRESUPUESTO_CANCELADO,
+        categoria=CATEGORIA_PRESUPUESTOS,
+        titulo="Cancelaste una solicitud de presupuesto",
+        mensaje=f"{budget_request.titulo} ya no recibira nuevas ofertas.",
+        url_destino="/presupuestos/mis-solicitudes?estado=canceladas",
+        entity_type="BudgetRequest",
+        entity_id=budget_request.id,
+    )
+
+    notified_professionals = {
+        offer.professional_user_id
+        for offer in budget_request.offers
+        if offer.professional_user_id
+    }
+    for professional_user_id in notified_professionals:
+        registrar_evento(
+            user_id=professional_user_id,
+            actor_user_id=budget_request.cliente_id,
+            tipo=TIPO_PRESUPUESTO_CANCELADO,
+            categoria=CATEGORIA_PRESUPUESTOS,
+            titulo="Una solicitud fue cancelada",
+            mensaje=f"La solicitud {budget_request.titulo} fue cancelada por el cliente.",
+            url_destino=f"/presupuestos/{budget_request.id}",
+            entity_type="BudgetRequest",
+            entity_id=budget_request.id,
+        )
+
+
+def _notify_emergency_created(emergency_request):
+    registrar_evento(
+        user_id=emergency_request.cliente_id,
+        actor_user_id=emergency_request.cliente_id,
+        tipo=TIPO_EMERGENCIA_PUBLICADA,
+        categoria=CATEGORIA_EMERGENCIAS,
+        titulo="Publicaste una emergencia",
+        mensaje=f"Tu emergencia de {emergency_request.categoria} en {emergency_request.zona} quedo registrada.",
+        url_destino="/emergencias/directorio",
+        entity_type="EmergencyRequest",
+        entity_id=emergency_request.id,
+        prioridad=PRIORIDAD_ACCION_REQUERIDA,
+        requiere_accion=True,
+    )
+
+
+def _notify_proposal_created(proposal):
+    registrar_evento(
+        user_id=proposal.owner_user_id or proposal.cliente_id,
+        actor_user_id=proposal.owner_user_id or proposal.cliente_id,
+        tipo=TIPO_PROPUESTA_PUBLICADA,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo="Publicaste una propuesta",
+        mensaje=f"{proposal.titulo} ya puede recibir postulaciones.",
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalRequest",
+        entity_id=proposal.id,
+    )
+
+
+def _notify_proposal_application_created(application):
+    proposal = application.proposal
+    owner_id = proposal.owner_user_id or proposal.cliente_id
+    professional_name = _user_display_name(application.professional_user_id, "Un profesional")
+
+    registrar_evento(
+        user_id=application.professional_user_id,
+        actor_user_id=application.professional_user_id,
+        tipo=TIPO_PROPUESTA_POSTULACION_ENVIADA,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo="Te postulaste a una propuesta",
+        mensaje=f"Tu postulacion para {proposal.titulo} quedo registrada.",
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalApplication",
+        entity_id=application.id,
+    )
+    registrar_evento(
+        user_id=owner_id,
+        actor_user_id=application.professional_user_id,
+        tipo=TIPO_PROPUESTA_POSTULACION_RECIBIDA,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo="Recibiste una postulacion",
+        mensaje=f"{professional_name} se postulo a {proposal.titulo}.",
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalApplication",
+        entity_id=application.id,
+        prioridad=PRIORIDAD_ACCION_REQUERIDA,
+        requiere_accion=True,
+    )
+
+
+def _notify_proposal_application_status(application, tipo, title, message):
+    proposal = application.proposal
+    owner_id = proposal.owner_user_id or proposal.cliente_id
+
+    registrar_evento(
+        user_id=owner_id,
+        actor_user_id=owner_id,
+        tipo=tipo,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo=title,
+        mensaje=message,
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalApplication",
+        entity_id=application.id,
+    )
+    registrar_evento(
+        user_id=application.professional_user_id,
+        actor_user_id=owner_id,
+        tipo=tipo,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo=title,
+        mensaje=message,
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalApplication",
+        entity_id=application.id,
+        prioridad=PRIORIDAD_INFO,
+    )
+
+
+def _notify_proposal_cancelled(proposal):
+    owner_id = proposal.owner_user_id or proposal.cliente_id
+    registrar_evento(
+        user_id=owner_id,
+        actor_user_id=owner_id,
+        tipo=TIPO_PROPUESTA_CANCELADA,
+        categoria=CATEGORIA_PROPUESTAS,
+        titulo="Cancelaste una propuesta",
+        mensaje=f"{proposal.titulo} ya no recibira postulaciones.",
+        url_destino=f"/propuestas/{proposal.id}",
+        entity_type="ProposalRequest",
+        entity_id=proposal.id,
+    )
+
+    notified_professionals = {
+        application.professional_user_id
+        for application in proposal.applications
+        if application.professional_user_id
+    }
+    for professional_user_id in notified_professionals:
+        registrar_evento(
+            user_id=professional_user_id,
+            actor_user_id=owner_id,
+            tipo=TIPO_PROPUESTA_CANCELADA,
+            categoria=CATEGORIA_PROPUESTAS,
+            titulo="Una propuesta fue cancelada",
+            mensaje=f"La propuesta {proposal.titulo} fue cancelada por el publicador.",
+            url_destino=f"/propuestas/{proposal.id}",
+            entity_type="ProposalRequest",
+            entity_id=proposal.id,
+        )
 
 
 def _load_contract_or_404(contract_id):
@@ -388,6 +643,7 @@ def nuevo_presupuesto():
                 fecha_estimada=estimated_date,
                 urgencia=form_data["urgencia"],
             )
+            _notify_budget_created(budget_request)
 
             return redirect(url_for("operations.confirmacion_presupuesto", id=budget_request.id))
 
@@ -571,7 +827,7 @@ def ofertar_presupuesto(id):
         ))
 
     try:
-        create_budget_offer(
+        offer = create_budget_offer(
             budget_request_id=id,
             professional_user_id=session["user_id"],
             cobra_visita=cobra_visita,
@@ -581,6 +837,7 @@ def ofertar_presupuesto(id):
             plazo_estimado=plazo_estimado,
             condiciones=condiciones,
         )
+        _notify_budget_offer_created(offer)
     except ValueError as error:
         return redirect(url_for(
             "operations.detalle_presupuesto",
@@ -598,11 +855,12 @@ def ofertar_presupuesto(id):
 @login_required
 def adjudicar_presupuesto(id, presupuesto_id):
     try:
-        award_budget_offer(
+        offer = award_budget_offer(
             budget_request_id=id,
             offer_id=presupuesto_id,
             cliente_id=session["user_id"],
         )
+        _notify_budget_awarded(offer)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -624,10 +882,11 @@ def adjudicar_presupuesto(id, presupuesto_id):
 @role_required("CLIENTE")
 def cancelar_presupuesto(id):
     try:
-        cancel_budget_request(
+        budget_request = cancel_budget_request(
             budget_request_id=id,
             cliente_id=session["user_id"],
         )
+        _notify_budget_cancelled(budget_request)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -665,6 +924,7 @@ def nueva_emergencia():
                 zona=zona,
                 prioridad=request.form.get("prioridad") or "ALTA",
             )
+            _notify_emergency_created(emergency_request)
             redirect_values["solicitud"] = emergency_request.id
         else:
             redirect_values["consulta_anonima"] = "1"
@@ -752,6 +1012,7 @@ def nueva_propuesta():
                 fecha_inicio_estimada=_parse_date(form_data["fecha_inicio_estimada"]),
                 fecha_limite_postulacion=_parse_date(form_data["fecha_limite_postulacion"]),
             )
+            _notify_proposal_created(proposal_request)
         except ValueError as error:
             return render_template(
                 "nueva_propuesta.html",
@@ -847,7 +1108,7 @@ def postular_propuesta(id):
         return redirect(url_for("operations.detalle_propuesta", id=id, error="Completa un mensaje para postularte."))
 
     try:
-        apply_to_proposal(
+        application = apply_to_proposal(
             proposal_id=id,
             professional_user_id=session["user_id"],
             mensaje=mensaje,
@@ -855,6 +1116,7 @@ def postular_propuesta(id):
             disponibilidad=disponibilidad,
             pretension_economica=pretension_economica,
         )
+        _notify_proposal_application_created(application)
     except ValueError as error:
         return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
 
@@ -865,7 +1127,13 @@ def postular_propuesta(id):
 @login_required
 def aceptar_postulacion(id, application_id):
     try:
-        accept_application(id, application_id, session["user_id"])
+        application = accept_application(id, application_id, session["user_id"])
+        _notify_proposal_application_status(
+            application,
+            TIPO_PROPUESTA_POSTULACION_ACEPTADA,
+            "Postulacion aceptada",
+            f"La postulacion para {application.proposal.titulo} fue aceptada.",
+        )
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -878,7 +1146,13 @@ def aceptar_postulacion(id, application_id):
 @login_required
 def descartar_postulacion(id, application_id):
     try:
-        discard_application(id, application_id, session["user_id"])
+        application = discard_application(id, application_id, session["user_id"])
+        _notify_proposal_application_status(
+            application,
+            TIPO_PROPUESTA_POSTULACION_DESCARTADA,
+            "Postulacion descartada",
+            f"La postulacion para {application.proposal.titulo} fue descartada.",
+        )
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -891,7 +1165,8 @@ def descartar_postulacion(id, application_id):
 @login_required
 def cancelar_propuesta(id):
     try:
-        cancel_proposal(id, session["user_id"])
+        proposal = cancel_proposal(id, session["user_id"])
+        _notify_proposal_cancelled(proposal)
     except PermissionError:
         abort(403)
     except ValueError as error:

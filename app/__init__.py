@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from flask import Flask
+from flask import Flask, session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -48,6 +48,9 @@ def create_app(initialize_schema=True):
     from app.routes.operation_routes import operations
     app.register_blueprint(operations)
 
+    from app.routes.notification_routes import notifications
+    app.register_blueprint(notifications)
+
     from app.routes.dev_routes import dev
     app.register_blueprint(dev)
     
@@ -69,10 +72,30 @@ def create_app(initialize_schema=True):
     from app.models.subscription import Subscription
     from app.models.reputation_event import ReputationEvent
     from app.models.audit_log import AuditLog
+    from app.models.activity_notification import ActivityNotification
 
     if initialize_schema:
         with app.app_context():
             db.create_all()
+
+    @app.context_processor
+    def inject_notification_navbar():
+        if not session.get("user_id"):
+            return {
+                "navbar_notifications": [],
+                "navbar_unread_notifications": 0,
+            }
+
+        from app.services.notification_service import (
+            obtener_no_leidas,
+            obtener_notificaciones_usuario,
+        )
+
+        user_id = session["user_id"]
+        return {
+            "navbar_notifications": obtener_notificaciones_usuario(user_id, limit=5),
+            "navbar_unread_notifications": obtener_no_leidas(user_id),
+        }
 
     @app.after_request
     def add_security_headers(response):

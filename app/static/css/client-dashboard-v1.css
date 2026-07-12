@@ -300,6 +300,12 @@
 .client-dashboard__request-list a {
     display: grid;
     gap: var(--trax-space-1);
+    text-decoration: none;
+}
+
+.client-dashboard__activity-list a.is-unread {
+    border-color: var(--trax-ds-primary-border);
+    background: var(--trax-ds-primary-soft);
 }
 
 .client-dashboard__activity-list strong,
