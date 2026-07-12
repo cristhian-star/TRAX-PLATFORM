@@ -1,61 +1,206 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client-dashboard-v1.css') }}">
+{% endblock %}
 
 {% block content %}
+{% set client_name = current_user.nombre if current_user else session.get("user_name", "Cliente TRAX") %}
+{% set account_status = current_user.estado if current_user else "ACTIVO" %}
 
-<main class="role-dashboard">
-    <section class="dashboard-hero">
-        <div class="shell dashboard-hero-grid">
-            <div>
-                <span class="signal">Cuenta cliente</span>
-                <h1>Dashboard de cliente</h1>
-                <p>Un centro simple para seguir solicitudes, profesionales guardados y actividad reciente.</p>
+<main class="client-dashboard">
+    <section class="client-dashboard__hero">
+        <div class="client-dashboard__shell client-dashboard__hero-grid">
+            <div class="client-dashboard__hero-copy">
+                <span class="client-dashboard__eyebrow">Centro de operaciones cliente</span>
+                <h1>Hola, {{ client_name }}.</h1>
+                <p>
+                    Aca podes entender que esta pasando con tus solicitudes,
+                    presupuestos recibidos, emergencias, propuestas y contrataciones.
+                </p>
+                <div class="client-dashboard__hero-actions" aria-label="Accesos principales">
+                    <a class="client-dashboard__button client-dashboard__button--primary" href="/presupuestos/nuevo">Nuevo presupuesto</a>
+                    <a class="client-dashboard__button client-dashboard__button--secondary" href="/explorar">Buscar profesionales</a>
+                </div>
             </div>
-            <aside class="dashboard-status-card">
-                <span>Estado</span>
-                <strong>Activo</strong>
-                <small>Perfil listo para contratar servicios en TRAX.</small>
+
+            <aside class="client-dashboard__status-card" aria-label="Estado de cuenta cliente">
+                <span class="client-dashboard__status-label">Estado de la cuenta</span>
+                <h2>{{ account_status|replace("_", " ")|title }}</h2>
+                <p>Cuenta lista para publicar solicitudes y comparar profesionales en TRAX.</p>
+                <dl class="client-dashboard__status-stats">
+                    <div>
+                        <dt>Ultimo acceso</dt>
+                        <dd>{{ format_dashboard_date(last_access) if last_access else "No registrado" }}</dd>
+                    </div>
+                    <div>
+                        <dt>Solicitudes</dt>
+                        <dd>{{ total_request_count }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ultima actividad</dt>
+                        <dd>{{ format_dashboard_date(latest_activity) if latest_activity else "Sin actividad" }}</dd>
+                    </div>
+                </dl>
             </aside>
         </div>
     </section>
 
-    <section class="shell dashboard-content">
-        <div class="dashboard-metrics">
-            <article>
-                <span>Solicitudes abiertas</span>
-                <strong>0</strong>
-                <small>Pedidos pendientes de cotizacion</small>
-            </article>
-            <article>
-                <span>Profesionales guardados</span>
-                <strong>0</strong>
-                <small>Favoritos para consultar despues</small>
-            </article>
-            <article>
-                <span>Contrataciones</span>
-                <strong>0</strong>
-                <small>Historial futuro de servicios</small>
-            </article>
-        </div>
+    <section class="client-dashboard__shell client-dashboard__content">
+        <section class="client-dashboard__quick-links" aria-label="Accesos rapidos">
+            <a href="/presupuestos/nuevo">Nuevo Presupuesto</a>
+            <a href="/emergencias/nueva">Nueva Emergencia</a>
+            <a href="/propuestas/nueva">Nueva Propuesta</a>
+            <a href="/explorar">Buscar Profesionales</a>
+            <a href="/presupuestos/mis-solicitudes">Ver Mis Solicitudes</a>
+        </section>
 
-        <div class="dashboard-card-grid">
+        <section class="client-dashboard__metrics" aria-label="Resumen de actividad">
             <article>
-                <span class="kicker">Presupuestos</span>
-                <h2>Mis solicitudes</h2>
-                <p>Seguimiento de pedidos, presupuestos recibidos y estado de cada consulta.</p>
-                <a class="dashboard-link" href="/presupuestos/mis-solicitudes">Ver mis solicitudes</a>
+                <span>Presupuestos activos</span>
+                <strong>{{ active_budget_count }}</strong>
+                <small>{{ total_offer_count }} presupuestos recibidos</small>
             </article>
             <article>
-                <span class="kicker">Proximamente</span>
-                <h2>Profesionales favoritos</h2>
-                <p>Acceso rapido a perfiles guardados, zonas de cobertura y datos de contacto.</p>
+                <span>Emergencias activas</span>
+                <strong>{{ active_emergency_count }}</strong>
+                <small>Casos urgentes en seguimiento</small>
             </article>
             <article>
-                <span class="kicker">Proximamente</span>
-                <h2>Historial de servicios</h2>
-                <p>Registro de trabajos realizados, comprobantes y futuras recomendaciones.</p>
+                <span>Propuestas activas</span>
+                <strong>{{ active_proposal_count }}</strong>
+                <small>{{ total_application_count }} postulaciones recibidas</small>
+            </article>
+            <article>
+                <span>Profesionales adjudicados</span>
+                <strong>{{ awarded_professionals_count }}</strong>
+                <small>Presupuestos, propuestas o contrataciones aceptadas</small>
+            </article>
+            <article>
+                <span>Historial</span>
+                <strong>{{ history_count }}</strong>
+                <small>Movimientos registrados en tu cuenta</small>
+            </article>
+        </section>
+
+        <div class="client-dashboard__grid">
+            <article class="client-dashboard__panel client-dashboard__panel--wide">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Actividad</span>
+                        <h2>Centro de actividad</h2>
+                    </div>
+                    <a href="/presupuestos/mis-solicitudes">Ver solicitudes</a>
+                </div>
+
+                {% if activity_rows %}
+                    <div class="client-dashboard__activity-list">
+                        {% for row in activity_rows %}
+                            <a href="{{ row.href }}">
+                                <span>{{ row.kind }}</span>
+                                <strong>{{ row.title }}</strong>
+                                <small>{{ row.detail }} - {{ format_dashboard_date(row.date) }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="client-dashboard__placeholder">
+                        <strong>Todavia no hay actividad suficiente</strong>
+                        <span>
+                            Cuando publiques presupuestos, emergencias o propuestas,
+                            aca vas a ver los movimientos mas importantes.
+                        </span>
+                    </div>
+                {% endif %}
+            </article>
+
+            <article class="client-dashboard__panel client-dashboard__panel--wide">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Solicitudes</span>
+                        <h2>Mis solicitudes</h2>
+                    </div>
+                    <a href="/presupuestos/mis-solicitudes">Ver todas</a>
+                </div>
+
+                <div class="client-dashboard__request-grid">
+                    {% for section in request_sections %}
+                        <section class="client-dashboard__request-group" aria-label="{{ section['title'] }}">
+                            <div class="client-dashboard__request-head">
+                                <div>
+                                    <span>{{ section['title'] }}</span>
+                                    <strong>{{ section['active_count'] }} activas</strong>
+                                </div>
+                                <a href="{{ section['href'] }}">Ver todas</a>
+                            </div>
+
+                            {% if section['items'] %}
+                                <div class="client-dashboard__request-list">
+                                    {% for item in section['items'] %}
+                                        {% set item_title = item.titulo|default(item.categoria, true) %}
+                                        {% set item_date = item.fecha_creacion if item.fecha_creacion is defined else item.created_at %}
+                                        {% if section['title'] == "Presupuestos" %}
+                                            {% set item_href = "/presupuestos/" ~ item.id %}
+                                        {% elif section['title'] == "Propuestas" %}
+                                            {% set item_href = "/propuestas/" ~ item.id %}
+                                        {% else %}
+                                            {% set item_href = section['href'] %}
+                                        {% endif %}
+                                        <a href="{{ item_href }}">
+                                            <strong>{{ item_title }}</strong>
+                                            <small>{{ item.estado }} - {{ format_dashboard_date(item_date) }}</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="client-dashboard__empty">{{ section['empty'] }}</p>
+                            {% endif %}
+                        </section>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="client-dashboard__panel">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Cuenta</span>
+                        <h2>Estado operativo</h2>
+                    </div>
+                </div>
+                <dl class="client-dashboard__account-state">
+                    <div>
+                        <dt>Cuenta</dt>
+                        <dd>{{ account_status|replace("_", " ")|title }}</dd>
+                    </div>
+                    <div>
+                        <dt>Solicitudes totales</dt>
+                        <dd>{{ total_request_count }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ultima actividad</dt>
+                        <dd>{{ format_dashboard_date(latest_activity) if latest_activity else "Sin actividad" }}</dd>
+                    </div>
+                </dl>
+            </article>
+
+            <article class="client-dashboard__panel">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Sugerencias</span>
+                        <h2>Recomendaciones</h2>
+                    </div>
+                </div>
+                <ul class="client-dashboard__recommendations">
+                    {% for recommendation in recommendations %}
+                        <li>
+                            <strong>{{ recommendation.title }}</strong>
+                            <span>{{ recommendation.detail }}</span>
+                            <a href="{{ recommendation.href }}">Abrir</a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </article>
         </div>
     </section>
 </main>
-
 {% endblock %}

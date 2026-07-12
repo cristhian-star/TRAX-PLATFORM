@@ -1,5 +1,24 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-12
+
+Se decidio implementar el Dashboard Cliente como centro de operaciones y no como perfil personal.
+
+Motivo:
+
+El cliente necesita responder rapidamente que esta pasando con sus solicitudes, respuestas recibidas, emergencias, propuestas y contrataciones.
+
+Alcance:
+
+- Mostrar actividad operativa y resumen de estado.
+- Reutilizar datos reales ya disponibles en presupuestos, emergencias, propuestas y contrataciones.
+- Mantener fuera del dashboard la edicion de datos personales y la configuracion de perfil.
+- Consumir Design System v2 para sostener consistencia Light/Dark con el Dashboard Profesional.
+
+Criterio:
+
+Las futuras mejoras del dashboard deberan priorizar seguimiento operativo, estado de solicitudes y acciones rapidas.
+
 ## 2026-07-09
 
 Se decidio incorporar una documentacion permanente y viva dentro del repositorio como parte obligatoria del proceso oficial de desarrollo.

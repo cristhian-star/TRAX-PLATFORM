@@ -20,7 +20,7 @@
 
 [x] Home Privado
 
-[ ] Dashboard Cliente
+[x] Dashboard Cliente
 
 [ ] Notificaciones
 

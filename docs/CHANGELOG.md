@@ -1,5 +1,22 @@
 # CHANGELOG TRAX
 
+## 2026-07-12
+
+### Agregado
+
+- Se implemento el Dashboard Cliente v1 como centro de operaciones para solicitudes y contrataciones.
+- Se agrego una hoja de estilos dedicada para el dashboard cliente basada en Design System v2.
+- Se agregaron resumen, centro de actividad, accesos rapidos, mis solicitudes, recomendaciones y estado operativo del cliente.
+
+### Mejorado
+
+- Se reutilizaron datos reales de presupuestos, emergencias, propuestas y contrataciones existentes.
+- Se incorporaron placeholders elegantes cuando todavia no hay actividad suficiente.
+
+### Corregido
+
+- Sin correcciones registradas.
+
 ## 2026-07-10
 
 ### Agregado
