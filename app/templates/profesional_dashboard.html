@@ -115,6 +115,7 @@
                     <li class="{{ 'is-complete' if is_verified else '' }}">Verificacion aprobada</li>
                     <li class="{{ 'is-complete' if is_pro else '' }}">Plan PRO activo</li>
                     <li class="{{ 'is-complete' if average_rating else '' }}">Rating publicado</li>
+                    <li class="{{ 'is-complete' if coverage and coverage.configured else '' }}">Cobertura configurada</li>
                 </ul>
             </article>
 
@@ -181,6 +182,27 @@
                 <p class="pro-dashboard__hint">
                     El rating y las resenas ayudan a convertir oportunidades, presupuestos y contrataciones.
                 </p>
+            </article>
+
+            <article class="pro-dashboard__panel">
+                <div class="pro-dashboard__section-head">
+                    <div>
+                        <span class="pro-dashboard__eyebrow">Cobertura</span>
+                        <h2>Zona operativa</h2>
+                    </div>
+                    <a href="/profesional/perfil/completar">Editar cobertura</a>
+                </div>
+                <div class="pro-dashboard__coverage-summary">
+                    <strong>{{ "Cobertura configurada" if coverage and coverage.configured else "Cobertura pendiente" }}</strong>
+                    <span>
+                        {% if coverage and coverage.configured %}
+                            {{ coverage.description }}
+                        {% else %}
+                            Agrega tu zona principal, modalidad y radio para mejorar la lectura del perfil publico.
+                        {% endif %}
+                    </span>
+                    <small>Radio actual: {{ coverage.radius_km ~ " km" if coverage and coverage.radius_km is not none else "Sin radio definido" }}</small>
+                </div>
             </article>
 
             <article class="pro-dashboard__panel">

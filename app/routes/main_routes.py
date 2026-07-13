@@ -59,6 +59,11 @@ from app.services.notification_service import (
     formatear_fecha_notificacion,
     obtener_notificaciones_usuario,
 )
+from app.services.coverage_service import (
+    normalizar_cobertura,
+    obtener_cobertura_profesional,
+    obtener_opciones_radio,
+)
 from app.models.proposal_application import ProposalApplication
 
 main = Blueprint("main", __name__)
@@ -526,6 +531,7 @@ def completar_perfil_profesional():
         portfolio_urls = _empty_to_none(request.form.get("portfolio_urls"))
 
         try:
+            coverage_data = normalizar_cobertura(request.form)
             logo_url = _normalize_url(
                 request.form.get("logo_url"),
                 "Logo",
@@ -587,6 +593,7 @@ def completar_perfil_profesional():
             tiktok_url=tiktok_url,
             youtube_url=youtube_url,
             other_links=other_links,
+            **coverage_data,
         )
 
         create_or_update_professional_verification_request(
@@ -611,6 +618,8 @@ def completar_perfil_profesional():
         is_verified=has_approved_verification(user_id),
         average_rating=get_professional_average_rating(professional.id) if professional else None,
         review_count=len(get_professional_reviews(professional.id)) if professional else 0,
+        coverage=obtener_cobertura_profesional(professional),
+        coverage_radius_options=obtener_opciones_radio(),
         profile_completion=_calculate_private_profile_completion(
             professional,
             has_approved_verification(user_id),
@@ -660,6 +669,7 @@ def profesional_dashboard():
     accepted_proposal_applications = [
         application for application in proposal_applications if application.estado == "ACEPTADA"
     ]
+    coverage = obtener_cobertura_profesional(professional)
 
     recommendations = []
     if not professional:
@@ -675,6 +685,8 @@ def profesional_dashboard():
             recommendations.append("Solicita verificacion para reforzar confianza en contrataciones.")
         if not reviews:
             recommendations.append("Impulsa tus primeras reseÃ±as cerrando trabajos dentro de TRAX.")
+        if not coverage["configured"]:
+            recommendations.append("Configura tu zona de cobertura para que los clientes entiendan donde trabajas.")
 
     return render_template(
         "profesional_dashboard.html",
@@ -692,6 +704,7 @@ def profesional_dashboard():
         proposal_applications_count=len(proposal_applications),
         accepted_proposal_applications_count=len(accepted_proposal_applications),
         offer_allowance=get_offer_allowance(user_id) if user_id else None,
+        coverage=coverage,
         recommendations=recommendations,
         recent_activity=obtener_notificaciones_usuario(user_id, limit=5) if user_id else [],
         format_notification_date=formatear_fecha_notificacion,
@@ -990,6 +1003,7 @@ def perfil_profesional(id):
         average_rating=get_professional_average_rating(id),
         review_count=len(reviews),
         can_review=can_review,
+        coverage=obtener_cobertura_profesional(profesional),
         report_created=request.args.get("reported") == "1"
     )
 

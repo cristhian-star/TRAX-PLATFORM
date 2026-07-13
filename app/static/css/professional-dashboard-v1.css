@@ -318,7 +318,8 @@
 .pro-dashboard__checklist li,
 .pro-dashboard__recommendations li,
 .pro-dashboard__placeholder,
-.pro-dashboard__limit-card {
+.pro-dashboard__limit-card,
+.pro-dashboard__coverage-summary {
     border-radius: var(--trax-radius-lg);
     line-height: var(--trax-line-height-body);
     overflow-wrap: anywhere;
@@ -339,17 +340,29 @@
 
 .pro-dashboard__limit-card,
 .pro-dashboard__placeholder,
+.pro-dashboard__coverage-summary,
 .pro-dashboard__recommendations li {
     background: var(--trax-color-surface-subtle);
     border: 1px solid var(--trax-color-border-subtle);
 }
 
 .pro-dashboard__limit-card strong,
-.pro-dashboard__placeholder strong {
+.pro-dashboard__placeholder strong,
+.pro-dashboard__coverage-summary strong {
     color: var(--trax-color-brand-strong);
     display: block;
     font-size: var(--trax-font-size-24);
     margin-bottom: var(--trax-space-2);
+}
+
+.pro-dashboard__coverage-summary span,
+.pro-dashboard__coverage-summary small {
+    color: var(--trax-color-text-muted);
+    display: block;
+}
+
+.pro-dashboard__coverage-summary small {
+    margin-top: var(--trax-space-3);
 }
 
 .pro-dashboard__activity-list {

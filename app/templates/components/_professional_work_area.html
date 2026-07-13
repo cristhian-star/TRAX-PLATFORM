@@ -10,31 +10,55 @@
     <div class="profile-work-area">
         <div
             class="profile-work-area__map"
+            style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}"
             role="img"
-            aria-label="Representacion visual de la cobertura en {{ zona or 'zona no informada' }}">
+            aria-label="Representacion visual de la cobertura en {{ coverage.description if coverage else zona or 'zona no informada' }}">
             <span class="profile-work-area__road profile-work-area__road--one"></span>
             <span class="profile-work-area__road profile-work-area__road--two"></span>
             <span class="profile-work-area__road profile-work-area__road--three"></span>
             <span class="profile-work-area__coverage"></span>
             <span class="profile-work-area__marker">
                 <i aria-hidden="true"></i>
-                <strong>{{ zona or "Zona no informada" }}</strong>
+                <strong>{{ coverage.location or coverage.city or zona or "Zona no informada" if coverage and coverage.configured else "Sin cobertura" }}</strong>
             </span>
         </div>
 
         <dl class="profile-work-area__details">
-            <div>
-                <dt>Zona principal</dt>
-                <dd>{{ zona or "No informada" }}</dd>
-            </div>
-            <div>
-                <dt>Radio de cobertura</dt>
-                <dd>A coordinar con el profesional</dd>
-            </div>
-            <div>
-                <dt>Localidad / area de trabajo</dt>
-                <dd>{{ zona or "Consultar disponibilidad" }}</dd>
-            </div>
+            {% if coverage and coverage.configured %}
+                <div>
+                    <dt>Zona principal</dt>
+                    <dd>{{ coverage.location or zona or "No informada" }}</dd>
+                </div>
+                <div>
+                    <dt>Localidad / provincia</dt>
+                    <dd>
+                        {% if coverage.city or coverage.province %}
+                            {{ coverage.city or "Localidad no informada" }}{% if coverage.province %}, {{ coverage.province }}{% endif %}
+                        {% else %}
+                            Consultar disponibilidad
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Radio de cobertura</dt>
+                    <dd>{{ coverage.radius_km ~ " km" if coverage.radius_km is not none else "A coordinar" }}</dd>
+                </div>
+                <div>
+                    <dt>Modalidad</dt>
+                    <dd>{{ coverage.mode|replace("_", " ")|title if coverage.mode else "Radio" }}</dd>
+                </div>
+                {% if coverage.notes %}
+                    <div>
+                        <dt>Notas</dt>
+                        <dd>{{ coverage.notes }}</dd>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div>
+                    <dt>Estado</dt>
+                    <dd>Zona de cobertura no informada.</dd>
+                </div>
+            {% endif %}
         </dl>
     </div>
 

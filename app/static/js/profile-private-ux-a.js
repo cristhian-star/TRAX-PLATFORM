@@ -65,4 +65,43 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    const coverageMap = root.querySelector("[data-coverage-map]");
+    const radiusSelect = root.querySelector("[data-coverage-radius]");
+    const radiusCustom = root.querySelector("[data-coverage-radius-custom]");
+
+    const normalizeRadius = () => {
+        if (!radiusSelect) {
+            return 10;
+        }
+
+        const rawValue = radiusSelect.value === "PERSONALIZADO"
+            ? radiusCustom?.value
+            : radiusSelect.value;
+        const radius = Number.parseInt(rawValue, 10);
+
+        if (Number.isNaN(radius) || radius < 0) {
+            return 10;
+        }
+
+        return Math.min(radius, 200);
+    };
+
+    const updateCoveragePreview = () => {
+        if (!coverageMap) {
+            return;
+        }
+
+        const radius = normalizeRadius();
+        const scale = Math.min(Math.max(radius / 200, 0.08), 1);
+        coverageMap.style.setProperty("--coverage-scale", scale.toString());
+
+        if (radiusCustom && radiusSelect) {
+            radiusCustom.disabled = radiusSelect.value !== "PERSONALIZADO";
+        }
+    };
+
+    radiusSelect?.addEventListener("change", updateCoveragePreview);
+    radiusCustom?.addEventListener("input", updateCoveragePreview);
+    updateCoveragePreview();
 });

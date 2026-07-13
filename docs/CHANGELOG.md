@@ -1,5 +1,25 @@
 # CHANGELOG TRAX
 
+## 2026-07-12 - Cobertura Inteligente v1
+
+### Agregado
+
+- Se agregaron campos de cobertura al modelo `Professional`.
+- Se creo la migracion Alembic `20260712_02_smart_coverage_v1`.
+- Se creo `app/services/coverage_service.py` para normalizar radios y describir cobertura profesional.
+- Se agrego la seccion editable "Zona de cobertura" al perfil privado profesional.
+- Se agrego visualizacion publica de cobertura con mapa placeholder y anillo representativo.
+- Se agrego resumen operativo de cobertura al Dashboard Profesional.
+
+### Mejorado
+
+- El perfil publico informa zona principal, localidad/provincia, modalidad, radio y notas cuando existen.
+- La cobertura queda preparada para futura integracion con mapas, geocoding y matching por distancia.
+
+### Corregido
+
+- Se reemplazo el placeholder estatico de cobertura por datos persistentes y validados.
+
 ## 2026-07-12 - Centro de Actividad + Notificaciones v1
 
 ### Agregado

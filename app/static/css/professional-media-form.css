@@ -440,20 +440,49 @@
 }
 
 .private-profile__map-placeholder span {
+    background: rgba(14, 165, 183, 0.16);
+    border: 2px solid rgba(14, 165, 183, 0.55);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 0.9rem rgba(14, 165, 183, 0.08),
+        var(--trax-shadow-md);
+    height: 9rem;
+    position: relative;
+    transform: scale(var(--coverage-scale, 0.2));
+    transition: transform var(--trax-transition-base);
+    width: 1.4rem;
+    width: 9rem;
+    z-index: 1;
+}
+
+.private-profile__map-placeholder span::after {
     background: var(--trax-orange-600);
     border: 4px solid var(--trax-color-surface);
     border-radius: 50%;
-    box-shadow: var(--trax-shadow-md);
+    content: "";
     height: 1.4rem;
-    position: relative;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
     width: 1.4rem;
-    z-index: 1;
 }
 
 .private-profile__map-placeholder strong,
 .private-profile__map-placeholder small {
+    background: color-mix(in srgb, var(--trax-color-surface) 88%, transparent);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-pill);
+    color: var(--trax-color-text);
+    max-width: min(92%, 44rem);
+    padding: var(--trax-space-2) var(--trax-space-3);
     position: relative;
+    text-align: center;
     z-index: 1;
+}
+
+.private-profile__map-placeholder small {
+    color: var(--trax-color-text-muted);
 }
 
 .private-profile__radius-list button,
@@ -471,6 +500,21 @@
     background: var(--trax-orange-50);
     border-color: var(--trax-orange-100);
     color: var(--trax-orange-700);
+}
+
+.private-profile__coverage-grid {
+    align-items: end;
+}
+
+.private-profile__coverage-custom input:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.private-profile__coverage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--trax-space-3);
 }
 
 .private-profile__evidence-panel {

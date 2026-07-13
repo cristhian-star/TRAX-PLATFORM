@@ -24,6 +24,8 @@
 
 [x] Notificaciones
 
+[x] Cobertura Inteligente v1
+
 [ ] Agenda
 
 [ ] WhatsApp

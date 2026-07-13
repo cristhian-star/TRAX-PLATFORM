@@ -85,6 +85,14 @@ def complete_professional_profile(
     tiktok_url=None,
     youtube_url=None,
     other_links=None,
+    coverage_location=None,
+    coverage_city=None,
+    coverage_province=None,
+    coverage_radius_km=None,
+    coverage_mode=None,
+    coverage_notes=None,
+    latitude=None,
+    longitude=None,
 ):
     professional = get_professional_by_user_id(user_id)
 
@@ -113,6 +121,14 @@ def complete_professional_profile(
     professional.tiktok_url = tiktok_url
     professional.youtube_url = youtube_url
     professional.other_links = other_links
+    professional.coverage_location = coverage_location
+    professional.coverage_city = coverage_city
+    professional.coverage_province = coverage_province
+    professional.coverage_radius_km = coverage_radius_km
+    professional.coverage_mode = coverage_mode
+    professional.coverage_notes = coverage_notes
+    professional.latitude = latitude
+    professional.longitude = longitude
     professional.estado_perfil = "PENDIENTE_VERIFICACION"
     professional.perfil_completo = True
 

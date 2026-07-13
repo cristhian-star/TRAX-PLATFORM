@@ -156,6 +156,9 @@
             </section>
 
             <section class="private-profile__panel" data-profile-panel="coverage">
+                {% set selected_radius = professional.coverage_radius_km if professional and professional.coverage_radius_km is not none else none %}
+                {% set selected_radius_value = selected_radius if selected_radius in coverage_radius_options else "PERSONALIZADO" %}
+                {% set selected_mode = professional.coverage_mode if professional and professional.coverage_mode else "RADIO" %}
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Territorio</span>
@@ -164,23 +167,100 @@
                     <small>Placeholder preparado para Google Maps.</small>
                 </div>
 
-                <div class="private-profile__map-placeholder" aria-label="Mapa estatico de cobertura">
+                <div
+                    class="private-profile__map-placeholder"
+                    aria-label="Mapa estatico de cobertura"
+                    data-coverage-map
+                    style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}">
                     <span></span>
-                    <strong>{{ profile_zone }}</strong>
-                    <small>Mapa estatico ilustrativo. Sin APIs externas.</small>
+                    <strong data-coverage-map-label>{{ coverage.description if coverage else profile_zone }}</strong>
+                    <small>Anillo ilustrativo del radio seleccionado. Sin APIs externas.</small>
                 </div>
 
-                <div class="private-profile__radius-list" aria-label="Radio de cobertura">
-                    <button type="button">5 km</button>
-                    <button type="button">10 km</button>
-                    <button type="button" class="is-selected">20 km</button>
-                    <button type="button">50 km</button>
-                    <button type="button">Personalizado</button>
+                <div class="private-profile__field-grid">
+                    <label>
+                        Ubicacion base
+                        <input
+                            type="text"
+                            name="coverage_location"
+                            maxlength="160"
+                            placeholder="Ej: Centro operativo, barrio o zona base"
+                            value="{{ professional.coverage_location if professional and professional.coverage_location else '' }}">
+                    </label>
+
+                    <label>
+                        Localidad
+                        <input
+                            type="text"
+                            name="coverage_city"
+                            maxlength="120"
+                            placeholder="Ej: Rosario"
+                            value="{{ professional.coverage_city if professional and professional.coverage_city else '' }}">
+                    </label>
+
+                    <label>
+                        Provincia
+                        <input
+                            type="text"
+                            name="coverage_province"
+                            maxlength="120"
+                            placeholder="Ej: Santa Fe"
+                            value="{{ professional.coverage_province if professional and professional.coverage_province else '' }}">
+                    </label>
+
+                    <label>
+                        Modalidad de cobertura
+                        <select name="coverage_mode">
+                            <option value="RADIO" {% if selected_mode == "RADIO" %}selected{% endif %}>Radio desde ubicacion base</option>
+                            <option value="LOCALIDAD" {% if selected_mode == "LOCALIDAD" %}selected{% endif %}>Localidad completa</option>
+                            <option value="PROVINCIA" {% if selected_mode == "PROVINCIA" %}selected{% endif %}>Provincia</option>
+                            <option value="PERSONALIZADA" {% if selected_mode == "PERSONALIZADA" %}selected{% endif %}>Personalizada</option>
+                        </select>
+                    </label>
                 </div>
 
-                <button class="private-profile__button private-profile__button--secondary private-profile__button--inline" type="button" disabled>
-                    Editar cobertura
-                </button>
+                <div class="private-profile__field-grid private-profile__coverage-grid">
+                    <label>
+                        Radio
+                        <select name="coverage_radius_km" data-coverage-radius>
+                            <option value="">Sin radio definido</option>
+                            {% for option in coverage_radius_options %}
+                                <option value="{{ option }}" {% if selected_radius == option %}selected{% endif %}>{{ option }} km</option>
+                            {% endfor %}
+                            <option value="PERSONALIZADO" {% if selected_radius_value == "PERSONALIZADO" and selected_radius is not none %}selected{% endif %}>Personalizado</option>
+                        </select>
+                    </label>
+
+                    <label class="private-profile__coverage-custom">
+                        Radio personalizado
+                        <input
+                            type="number"
+                            name="coverage_radius_custom"
+                            min="0"
+                            max="200"
+                            step="1"
+                            placeholder="Hasta 200 km"
+                            data-coverage-radius-custom
+                            value="{{ selected_radius if selected_radius is not none and selected_radius not in coverage_radius_options else '' }}">
+                    </label>
+                </div>
+
+                <label>
+                    Notas de cobertura
+                    <textarea
+                        name="coverage_notes"
+                        maxlength="600"
+                        placeholder="Ej: Atiendo zonas aledanas con coordinacion previa">{{ professional.coverage_notes if professional and professional.coverage_notes else '' }}</textarea>
+                </label>
+
+                <div class="private-profile__coverage-actions">
+                    <button class="private-profile__button private-profile__button--primary private-profile__button--inline" type="submit">
+                        Guardar cobertura
+                    </button>
+                    <a class="private-profile__button private-profile__button--secondary private-profile__button--inline" href="{{ public_profile_url }}">
+                        Ver perfil publico
+                    </a>
+                </div>
             </section>
 
             <section class="private-profile__panel" data-profile-panel="services">

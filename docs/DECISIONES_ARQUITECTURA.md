@@ -2,6 +2,25 @@
 
 ## 2026-07-12
 
+Se decidio modelar la cobertura profesional como datos persistentes del perfil `Professional`, sin integrar todavia APIs externas de mapas.
+
+Motivo:
+
+La cobertura es parte estructural de la oferta profesional y debe estar disponible para perfil privado, perfil publico, dashboard y futuro matching.
+
+Alcance:
+
+- Guardar ubicacion base, localidad, provincia, modalidad, radio, notas y coordenadas nullable.
+- Centralizar normalizacion y descripcion en `coverage_service.py`.
+- Mantener un mapa placeholder visual sin Google Maps, geocoding ni calculo real de distancia.
+- Preparar `latitude` y `longitude` como campos nullable para una fase posterior.
+
+Criterio:
+
+Las futuras integraciones de mapas y matching deberan apoyarse en el servicio de cobertura, evitando logica geografica dispersa en rutas o templates.
+
+## 2026-07-12
+
 Se decidio crear un modelo central `ActivityNotification` para unificar actividad historica y notificaciones internas.
 
 Motivo:
