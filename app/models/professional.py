@@ -43,5 +43,6 @@ class Professional(db.Model):
     coverage_notes = db.Column(db.Text)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    coverage_location_consent_at = db.Column(db.DateTime)
     estado_perfil = db.Column(db.String(50), nullable=False, default="INCOMPLETO")
     perfil_completo = db.Column(db.Boolean, nullable=False, default=False)

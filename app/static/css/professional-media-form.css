@@ -400,6 +400,23 @@
     overflow-wrap: anywhere;
 }
 
+.private-profile__coverage-map {
+    min-width: 0;
+    position: relative;
+}
+
+.private-profile__map-canvas {
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-xl);
+    min-height: 22rem;
+    overflow: hidden;
+    width: 100%;
+}
+
+.private-profile__map-canvas[hidden] {
+    display: none;
+}
+
 .private-profile__map-placeholder {
     align-items: center;
     background:
@@ -481,6 +498,10 @@
     z-index: 1;
 }
 
+.private-profile__map-placeholder[hidden] {
+    display: none;
+}
+
 .private-profile__map-placeholder small {
     color: var(--trax-color-text-muted);
 }
@@ -515,6 +536,23 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--trax-space-3);
+}
+
+.private-profile__privacy-note {
+    background: var(--trax-info-50);
+    border: 1px solid var(--trax-info-200);
+    border-radius: var(--trax-radius-lg);
+    color: var(--trax-info-700);
+    line-height: var(--trax-line-height-body);
+    margin: 0;
+    padding: var(--trax-space-4);
+}
+
+.private-profile__coverage-consent {
+    background: var(--trax-color-surface-subtle);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-lg);
+    padding: var(--trax-space-4);
 }
 
 .private-profile__evidence-panel {

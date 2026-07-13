@@ -1,4 +1,5 @@
-﻿from urllib.parse import urlsplit
+﻿import os
+from urllib.parse import urlsplit
 
 from flask import Blueprint, render_template, request, redirect, session
 from app.services.audit_service import create_audit_log, get_recent_audit_logs
@@ -620,6 +621,7 @@ def completar_perfil_profesional():
         review_count=len(get_professional_reviews(professional.id)) if professional else 0,
         coverage=obtener_cobertura_profesional(professional),
         coverage_radius_options=obtener_opciones_radio(),
+        google_maps_api_key=os.environ.get("GOOGLE_MAPS_API_KEY"),
         profile_completion=_calculate_private_profile_completion(
             professional,
             has_approved_verification(user_id),
@@ -1004,6 +1006,7 @@ def perfil_profesional(id):
         review_count=len(reviews),
         can_review=can_review,
         coverage=obtener_cobertura_profesional(profesional),
+        google_maps_api_key=os.environ.get("GOOGLE_MAPS_API_KEY"),
         report_created=request.args.get("reported") == "1"
     )
 

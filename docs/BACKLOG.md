@@ -6,7 +6,8 @@
 
 ## Media prioridad
 
-- Integrar Google Maps para cobertura profesional.
+- Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
+- Validar Google Maps con una API key real en entorno controlado.
 - Implementar geocoding de ubicaciones base.
 - Implementar matching por distancia entre clientes y profesionales.
 - Incorporar poligonos avanzados y zonas personalizadas multiples.

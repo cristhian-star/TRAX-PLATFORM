@@ -1,5 +1,27 @@
 # CHANGELOG TRAX
 
+## 2026-07-13 - Cobertura Inteligente v2 Google Maps
+
+### Agregado
+
+- Se agrego soporte frontend para Google Maps JavaScript API en cobertura profesional.
+- Se creo `app/static/js/professional-coverage-map.js` como modulo aislado del proveedor visual.
+- Se agrego consentimiento explicito para uso de ubicacion de cobertura.
+- Se agrego `coverage_location_consent_at` al modelo `Professional`.
+- Se agrego la migracion Alembic `20260713_01_google_maps_coverage_v2`.
+- Se documento `GOOGLE_MAPS_API_KEY` en `.env.example`.
+
+### Mejorado
+
+- El perfil privado puede persistir latitud, longitud y radio cuando existe consentimiento.
+- El perfil publico usa centro aproximado para no exponer el punto exacto del profesional.
+- Sin API key, la pantalla mantiene fallback visual y edicion textual.
+- Se ajusto CSP para permitir la carga acotada de Google Maps JavaScript API.
+
+### Corregido
+
+- Se evita guardar coordenadas nuevas cuando el profesional no presta consentimiento.
+
 ## 2026-07-12 - Cobertura Inteligente v1
 
 ### Agregado

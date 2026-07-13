@@ -485,6 +485,22 @@
         var(--trax-steel-50);
 }
 
+.profile-work-area__map-canvas,
+.profile-work-area__map-fallback {
+    min-height: 15rem;
+    width: 100%;
+}
+
+.profile-work-area__map-canvas[hidden],
+.profile-work-area__map-fallback[hidden] {
+    display: none;
+}
+
+.profile-work-area__map-fallback {
+    inset: 0;
+    position: absolute;
+}
+
 .profile-work-area__map::before,
 .profile-work-area__map::after {
     position: absolute;
@@ -501,6 +517,11 @@
 .profile-work-area__map::after {
     inset: 4rem 5% 1.5rem 38%;
     transform: rotate(12deg);
+}
+
+.profile-work-area__map.is-map-ready::before,
+.profile-work-area__map.is-map-ready::after {
+    display: none;
 }
 
 .profile-work-area__road {

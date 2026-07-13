@@ -195,4 +195,8 @@
 
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='js/professional-profile-v2.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/professional-coverage-map.js') }}"></script>
+    {% if google_maps_api_key and coverage and coverage.has_coordinates %}
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key|urlencode }}&callback=traxInitCoverageMaps"></script>
+    {% endif %}
 {% endblock %}

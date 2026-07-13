@@ -26,6 +26,8 @@
 
 [x] Cobertura Inteligente v1
 
+[x] Cobertura Inteligente v2 - Google Maps
+
 [ ] Agenda
 
 [ ] WhatsApp

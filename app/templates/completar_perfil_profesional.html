@@ -164,18 +164,35 @@
                         <span class="private-profile__eyebrow">Territorio</span>
                         <h2>Zona de cobertura</h2>
                     </div>
-                    <small>Placeholder preparado para Google Maps.</small>
+                    <small>{{ "Mapa interactivo disponible." if google_maps_api_key else "Mapa interactivo no disponible en este entorno." }}</small>
                 </div>
 
                 <div
-                    class="private-profile__map-placeholder"
-                    aria-label="Mapa estatico de cobertura"
+                    class="private-profile__coverage-map"
                     data-coverage-map
+                    data-map-mode="private"
+                    data-has-api-key="{{ 'true' if google_maps_api_key else 'false' }}"
+                    data-default-lat="{{ coverage.default_center.lat }}"
+                    data-default-lng="{{ coverage.default_center.lng }}"
+                    data-lat="{{ coverage.latitude if coverage and coverage.latitude is not none else '' }}"
+                    data-lng="{{ coverage.longitude if coverage and coverage.longitude is not none else '' }}"
+                    data-radius-km="{{ selected_radius if selected_radius is not none else 10 }}"
+                    data-summary-target="[data-coverage-map-label]"
                     style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}">
-                    <span></span>
-                    <strong data-coverage-map-label>{{ coverage.description if coverage else profile_zone }}</strong>
-                    <small>Anillo ilustrativo del radio seleccionado. Sin APIs externas.</small>
+                    <div class="private-profile__map-canvas" data-coverage-map-canvas aria-label="Mapa interactivo de cobertura"></div>
+                    <div class="private-profile__map-placeholder" data-coverage-map-fallback aria-label="Mapa estatico de cobertura">
+                        <span></span>
+                        <strong data-coverage-map-label>{{ coverage.description if coverage else profile_zone }}</strong>
+                        <small>{{ "Cargando mapa interactivo." if google_maps_api_key else "Mapa interactivo no disponible en este entorno." }}</small>
+                    </div>
                 </div>
+
+                <input type="hidden" name="latitude" data-coverage-latitude value="{{ coverage.latitude if coverage and coverage.latitude is not none else '' }}">
+                <input type="hidden" name="longitude" data-coverage-longitude value="{{ coverage.longitude if coverage and coverage.longitude is not none else '' }}">
+
+                <p class="private-profile__privacy-note">
+                    La ubicacion exacta se utiliza para calcular tu cobertura. En el perfil publico se mostrara unicamente una zona aproximada de cobertura.
+                </p>
 
                 <div class="private-profile__field-grid">
                     <label>
@@ -236,7 +253,7 @@
                         <input
                             type="number"
                             name="coverage_radius_custom"
-                            min="0"
+                            min="1"
                             max="200"
                             step="1"
                             placeholder="Hasta 200 km"
@@ -251,6 +268,14 @@
                         name="coverage_notes"
                         maxlength="600"
                         placeholder="Ej: Atiendo zonas aledanas con coordinacion previa">{{ professional.coverage_notes if professional and professional.coverage_notes else '' }}</textarea>
+                </label>
+
+                <label class="private-profile__checkbox-row private-profile__coverage-consent">
+                    <input
+                        type="checkbox"
+                        name="coverage_location_consent"
+                        {% if coverage and coverage.has_location_consent %}checked{% endif %}>
+                    <span>Autorizo a TRAX a utilizar esta ubicacion para calcular y mostrar mi zona aproximada de cobertura.</span>
                 </label>
 
                 <div class="private-profile__coverage-actions">
@@ -464,4 +489,8 @@
 
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='js/profile-private-ux-a.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/professional-coverage-map.js') }}"></script>
+    {% if google_maps_api_key %}
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key|urlencode }}&callback=traxInitCoverageMaps"></script>
+    {% endif %}
 {% endblock %}

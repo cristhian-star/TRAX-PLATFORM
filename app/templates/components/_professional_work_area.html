@@ -11,16 +11,25 @@
         <div
             class="profile-work-area__map"
             style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}"
+            data-coverage-map
+            data-map-mode="public"
+            data-has-api-key="{{ 'true' if google_maps_api_key else 'false' }}"
+            data-lat="{{ coverage.public_latitude if coverage and coverage.public_latitude is not none else '' }}"
+            data-lng="{{ coverage.public_longitude if coverage and coverage.public_longitude is not none else '' }}"
+            data-radius-km="{{ coverage.radius_km if coverage and coverage.radius_km is not none else 10 }}"
             role="img"
             aria-label="Representacion visual de la cobertura en {{ coverage.description if coverage else zona or 'zona no informada' }}">
-            <span class="profile-work-area__road profile-work-area__road--one"></span>
-            <span class="profile-work-area__road profile-work-area__road--two"></span>
-            <span class="profile-work-area__road profile-work-area__road--three"></span>
-            <span class="profile-work-area__coverage"></span>
-            <span class="profile-work-area__marker">
-                <i aria-hidden="true"></i>
-                <strong>{{ coverage.location or coverage.city or zona or "Zona no informada" if coverage and coverage.configured else "Sin cobertura" }}</strong>
-            </span>
+            <div class="profile-work-area__map-canvas" data-coverage-map-canvas aria-label="Mapa publico aproximado de cobertura"></div>
+            <div class="profile-work-area__map-fallback" data-coverage-map-fallback>
+                <span class="profile-work-area__road profile-work-area__road--one"></span>
+                <span class="profile-work-area__road profile-work-area__road--two"></span>
+                <span class="profile-work-area__road profile-work-area__road--three"></span>
+                <span class="profile-work-area__coverage"></span>
+                <span class="profile-work-area__marker">
+                    <i aria-hidden="true"></i>
+                    <strong>{{ coverage.location or coverage.city or zona or "Zona no informada" if coverage and coverage.configured else "Sin cobertura" }}</strong>
+                </span>
+            </div>
         </div>
 
         <dl class="profile-work-area__details">

@@ -1,5 +1,26 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-13
+
+Se decidio usar Google Maps Platform como proveedor inicial para el mapa interactivo de cobertura profesional.
+
+Motivo:
+
+La cobertura necesita un mapa real con marcador movible y circulo de radio, pero la logica de negocio debe permanecer independiente del proveedor visual.
+
+Alcance:
+
+- Usar Maps JavaScript API solo en perfil privado y perfil publico profesional.
+- Encapsular la implementacion frontend en `professional-coverage-map.js`.
+- Mantener `coverage_service.py` sin dependencias de Google.
+- Guardar coordenadas solo con consentimiento explicito.
+- Mostrar al publico un centro aproximado, sin exponer domicilio exacto ni coordenadas persistidas.
+- Mantener fallback visual cuando no exista `GOOGLE_MAPS_API_KEY`.
+
+Criterio:
+
+Las futuras integraciones de geocoding, Places, rutas, matching por distancia o proveedores alternativos deberan agregarse sin distribuir logica de mapas en templates ni servicios de dominio.
+
 ## 2026-07-12
 
 Se decidio modelar la cobertura profesional como datos persistentes del perfil `Professional`, sin integrar todavia APIs externas de mapas.

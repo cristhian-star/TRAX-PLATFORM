@@ -93,6 +93,7 @@ def complete_professional_profile(
     coverage_notes=None,
     latitude=None,
     longitude=None,
+    coverage_location_consent_at=None,
 ):
     professional = get_professional_by_user_id(user_id)
 
@@ -129,6 +130,7 @@ def complete_professional_profile(
     professional.coverage_notes = coverage_notes
     professional.latitude = latitude
     professional.longitude = longitude
+    professional.coverage_location_consent_at = coverage_location_consent_at
     professional.estado_perfil = "PENDIENTE_VERIFICACION"
     professional.perfil_completo = True
 
