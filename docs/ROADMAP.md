@@ -28,6 +28,8 @@
 
 [x] Cobertura Inteligente v2 - Google Maps
 
+[x] Matching Geografico por Distancia v1
+
 [x] WhatsApp Integration Foundation v1
 
 [ ] Agenda

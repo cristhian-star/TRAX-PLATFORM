@@ -452,6 +452,29 @@
     color: var(--trax-ds-warning);
 }
 
+.emergency-card__coverage dd {
+    display: grid;
+    gap: var(--trax-space-1);
+}
+
+.emergency-card__coverage--dentro-cobertura {
+    border: 1px solid var(--trax-success-200);
+    background: var(--trax-success-50) !important;
+}
+
+.emergency-card__coverage--dentro-cobertura dd {
+    color: var(--trax-success-700);
+}
+
+.emergency-card__coverage--fuera-cobertura {
+    border: 1px solid var(--trax-warning-200);
+    background: var(--trax-warning-50) !important;
+}
+
+.emergency-card__coverage--fuera-cobertura dd {
+    color: var(--trax-warning-700);
+}
+
 .emergency-card__actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

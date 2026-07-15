@@ -1,5 +1,24 @@
 # CHANGELOG TRAX
 
+## 2026-07-15 - Matching Geografico por Distancia v1
+
+### Agregado
+
+- Se creo `app/services/geographic_matching_service.py` con calculo Haversine en backend.
+- Se agregaron pruebas unitarias para distancia, cobertura, coordenadas ausentes e invalidas.
+- Se integro el resultado de cobertura en Resultados de profesionales y Directorio de Emergencias.
+- Se agrego visualizacion publica de estado de cobertura y distancia aproximada en cards compatibles.
+
+### Mejorado
+
+- Los resultados con coordenadas validas priorizan profesionales dentro de cobertura.
+- Las busquedas sin coordenadas conservan el matching textual actual por servicio y zona.
+- La interfaz informa cobertura sin exponer coordenadas ni punto base profesional.
+
+### Corregido
+
+- Sin correcciones registradas.
+
 ## 2026-07-14 - WhatsApp Integration Foundation v1
 
 ### Agregado

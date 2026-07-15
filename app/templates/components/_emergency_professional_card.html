@@ -53,6 +53,17 @@
                 {% endif %}
             </dd>
         </div>
+        {% if row.coverage_match %}
+            <div class="emergency-card__coverage emergency-card__coverage--{{ row.coverage_match.status|lower|replace('_', '-') }}">
+                <dt>Cobertura</dt>
+                <dd>
+                    {{ row.coverage_match.status_label }}
+                    {% if row.coverage_match.distance_label %}
+                        <span>{{ row.coverage_match.distance_label }}</span>
+                    {% endif %}
+                </dd>
+            </div>
+        {% endif %}
     </dl>
 
     <div class="emergency-card__actions">

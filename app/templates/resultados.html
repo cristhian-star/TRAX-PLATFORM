@@ -65,6 +65,7 @@
                     {% set profile_id = professional.id %}
                     {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
                     {% set rating = professional_ratings.get(profile_id, {"average": none, "count": 0}) if professional_ratings is defined else {"average": none, "count": 0} %}
+                    {% set coverage_match = matching_results.get(profile_id) if matching_results is defined else none %}
                     {% include "components/_professional_card.html" %}
                 {% endfor %}
             </div>

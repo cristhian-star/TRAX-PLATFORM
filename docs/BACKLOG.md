@@ -9,7 +9,8 @@
 - Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
 - Validar Google Maps con una API key real en entorno controlado.
 - Implementar geocoding de ubicaciones base.
-- Implementar matching por distancia entre clientes y profesionales.
+- Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
+- Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.
 - Incorporar poligonos avanzados y zonas personalizadas multiples.
 - Crear listado dedicado de emergencias del cliente para reemplazar enlaces operativos provisorios.
 - Crear vista consolidada de solicitudes del cliente que incluya presupuestos, emergencias y propuestas.

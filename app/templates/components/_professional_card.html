@@ -58,6 +58,17 @@
         {% endif %}
     </div>
 
+    {% if coverage_match %}
+        <div class="professional-card__coverage professional-card__coverage--{{ coverage_match.status|lower|replace('_', '-') }}">
+            <strong>{{ coverage_match.status_label }}</strong>
+            {% if coverage_match.distance_label %}
+                <span>{{ coverage_match.distance_label }}</span>
+            {% else %}
+                <span>Sin distancia disponible para esta busqueda.</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
     {% if professional_description %}
         <p class="professional-card__description">{{ professional_description }}</p>
     {% endif %}

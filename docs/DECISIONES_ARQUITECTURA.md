@@ -1,5 +1,31 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-15
+
+Se decidio implementar el matching geografico inicial con formula Haversine en backend.
+
+Motivo:
+
+TRAX necesita determinar si un profesional cubre una ubicacion de trabajo usando coordenadas y radio ya persistidos, sin depender de APIs externas ni exponer ubicaciones profesionales exactas.
+
+Alcance:
+
+- Crear `geographic_matching_service.py` como servicio aislado y reutilizable.
+- Calcular distancia en linea recta con Haversine.
+- Validar latitud, longitud y radio antes de calcular.
+- Priorizar profesionales dentro de cobertura cuando la solicitud tenga coordenadas.
+- Mantener fallback textual por servicio y zona cuando no existan coordenadas validas.
+- Mostrar solo estado de cobertura y distancia aproximada en cards publicas.
+- No exponer latitud, longitud ni punto base profesional en HTML publico.
+
+Criterio:
+
+El orden inicial con coordenadas es: dentro de cobertura, PRO, verificado, rating, menor distancia y nombre. En emergencias se reserva el lugar de disponibilidad/guardia para cuando exista un dato real.
+
+Limitacion:
+
+La distancia Haversine no representa rutas, transito ni tiempos de viaje. Las futuras mejoras podran evolucionar hacia PostGIS, poligonos o proveedores de rutas si el producto lo requiere.
+
 ## 2026-07-14
 
 Se decidio centralizar toda apertura de WhatsApp en un unico flujo interno de TRAX.

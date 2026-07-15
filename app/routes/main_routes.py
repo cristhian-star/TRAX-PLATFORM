@@ -65,6 +65,10 @@ from app.services.coverage_service import (
     obtener_cobertura_profesional,
     obtener_opciones_radio,
 )
+from app.services.geographic_matching_service import (
+    normalizar_coordenadas,
+    obtener_resultado_cobertura,
+)
 from app.services.whatsapp_contact_service import (
     obtener_contactos_cliente,
     obtener_contactos_profesional,
@@ -238,6 +242,45 @@ def _format_dashboard_date(value):
         return "Sin fecha"
 
     return value.strftime("%d/%m/%Y")
+
+
+def _get_query_coordinates():
+    latitude = request.args.get("latitude") or request.args.get("latitud") or request.args.get("lat")
+    longitude = request.args.get("longitude") or request.args.get("longitud") or request.args.get("lng")
+    return normalizar_coordenadas(latitude, longitude)
+
+
+def _build_matching_results(professionals, coordinates):
+    latitude = coordinates[0] if coordinates is not None else None
+    longitude = coordinates[1] if coordinates is not None else None
+
+    return {
+        _entity_value(professional, "id", index): obtener_resultado_cobertura(
+            professional,
+            latitude,
+            longitude,
+        )
+        for index, professional in enumerate(professionals, start=1)
+    }
+
+
+def _sort_professionals_for_listing(professionals, badges, ratings, matching_results, coordinates):
+    if coordinates is None:
+        return professionals
+
+    return sorted(
+        professionals,
+        key=lambda professional: (
+            matching_results.get(professional.id, {}).get("sort_rank", 2),
+            -int(bool(badges.get(professional.id, {}).get("pro"))),
+            -int(bool(badges.get(professional.id, {}).get("verified"))),
+            -(ratings.get(professional.id, {}).get("average") or 0),
+            matching_results.get(professional.id, {}).get("distance_km")
+            if matching_results.get(professional.id, {}).get("distance_km") is not None
+            else float("inf"),
+            (professional.nombre or "").casefold(),
+        ),
+    )
 
 
 def _build_client_activity_rows(budget_rows, emergency_requests, proposal_requests, contracts):
@@ -415,14 +458,27 @@ def buscar():
     zona = request.args.get("zona", "")
 
     resultados = search_professionals(servicio, zona)
+    coordinates = _get_query_coordinates()
+    professional_badges = _get_professionals_badges(resultados)
+    professional_ratings = _get_professionals_ratings(resultados)
+    matching_results = _build_matching_results(resultados, coordinates)
+    resultados = _sort_professionals_for_listing(
+        resultados,
+        professional_badges,
+        professional_ratings,
+        matching_results,
+        coordinates,
+    )
 
     return render_template(
         "resultados.html",
         resultados=resultados,
         servicio=servicio,
         zona=zona,
-        professional_badges=_get_professionals_badges(resultados),
-        professional_ratings=_get_professionals_ratings(resultados)
+        professional_badges=professional_badges,
+        professional_ratings=professional_ratings,
+        matching_results=matching_results,
+        has_geographic_context=coordinates is not None,
     )
 
 
@@ -432,14 +488,27 @@ def listado_profesionales():
     zona = request.args.get("zona", "")
 
     resultados = search_professionals(servicio, zona)
+    coordinates = _get_query_coordinates()
+    professional_badges = _get_professionals_badges(resultados)
+    professional_ratings = _get_professionals_ratings(resultados)
+    matching_results = _build_matching_results(resultados, coordinates)
+    resultados = _sort_professionals_for_listing(
+        resultados,
+        professional_badges,
+        professional_ratings,
+        matching_results,
+        coordinates,
+    )
 
     return render_template(
         "listado_profesionales.html",
         resultados=resultados,
         servicio=servicio,
         zona=zona,
-        professional_badges=_get_professionals_badges(resultados),
-        professional_ratings=_get_professionals_ratings(resultados)
+        professional_badges=professional_badges,
+        professional_ratings=professional_ratings,
+        matching_results=matching_results,
+        has_geographic_context=coordinates is not None,
     )
 
 

@@ -31,6 +31,10 @@ from app.services.contract_service import (
     start_contract,
 )
 from app.services.emergency_service import create_emergency_request
+from app.services.geographic_matching_service import (
+    normalizar_coordenadas,
+    obtener_resultado_cobertura,
+)
 from app.services.notification_service import (
     CATEGORIA_EMERGENCIAS,
     CATEGORIA_PRESUPUESTOS,
@@ -118,13 +122,22 @@ def _get_query_prefill(*field_names):
     }
 
 
-def _get_emergency_professional_data(professional):
+def _get_request_coordinates(source):
+    latitude = source.get("latitude") or source.get("latitud") or source.get("lat")
+    longitude = source.get("longitude") or source.get("longitud") or source.get("lng")
+    return normalizar_coordenadas(latitude, longitude)
+
+
+def _get_emergency_professional_data(professional, coordinates=None):
     user_id = professional.user_id
     phone_digits = re.sub(r"\D", "", professional.telefono or "")
     is_pro = has_pro_access(user_id) if user_id else False
     is_verified = has_approved_verification(user_id) if user_id else False
     reviews = get_professional_reviews(professional.id)
     average_rating = get_professional_average_rating(professional.id)
+    latitude = coordinates[0] if coordinates is not None else None
+    longitude = coordinates[1] if coordinates is not None else None
+    coverage_match = obtener_resultado_cobertura(professional, latitude, longitude)
 
     return {
         "professional": professional,
@@ -146,10 +159,13 @@ def _get_emergency_professional_data(professional):
             "secondary": "Guardia no configurada",
             "priority": "Prioridad PRO" if is_pro else None,
         },
+        "coverage_match": coverage_match,
         "sort": {
+            "coverage": coverage_match["sort_rank"],
             "pro": 1 if is_pro else 0,
             "verified": 1 if is_verified else 0,
             "rating": average_rating or 0,
+            "distance": coverage_match["distance_km"],
         },
     }
 
@@ -913,6 +929,10 @@ def nueva_emergencia():
             "categoria": categoria,
             "zona": zona,
         }
+        coordinates = _get_request_coordinates(request.form)
+        if coordinates is not None:
+            redirect_values["latitude"] = coordinates[0]
+            redirect_values["longitude"] = coordinates[1]
 
         current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
 
@@ -946,13 +966,18 @@ def nueva_emergencia():
 def directorio_emergencias():
     categoria = _empty_to_none(request.args.get("categoria")) or ""
     zona = _empty_to_none(request.args.get("zona")) or ""
+    coordinates = _get_request_coordinates(request.args)
     professionals = search_emergency_professionals(categoria, zona)
     professional_rows = sorted(
-        (_get_emergency_professional_data(professional) for professional in professionals),
+        (_get_emergency_professional_data(professional, coordinates) for professional in professionals),
         key=lambda row: (
+            row["sort"]["coverage"] if coordinates is not None else 0,
             -row["sort"]["pro"],
             -row["sort"]["verified"],
             -row["sort"]["rating"],
+            row["sort"]["distance"]
+            if coordinates is not None and row["sort"]["distance"] is not None
+            else float("inf"),
             row["professional"].nombre.casefold(),
         ),
     )
@@ -962,6 +987,7 @@ def directorio_emergencias():
         professional_rows=professional_rows,
         categoria=categoria,
         zona=zona,
+        has_geographic_context=coordinates is not None,
         emergency_request_id=request.args.get("solicitud"),
         request_created=bool(request.args.get("solicitud")),
         anonymous_search=request.args.get("consulta_anonima") == "1",

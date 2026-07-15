@@ -291,6 +291,45 @@
     -webkit-line-clamp: 3;
 }
 
+.professional-card__coverage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--trax-space-2) var(--trax-space-3);
+    padding: var(--trax-space-3);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-md);
+    background: var(--trax-color-surface-subtle);
+}
+
+.professional-card__coverage strong {
+    color: var(--trax-color-brand-strong);
+    font-size: var(--trax-font-size-14);
+}
+
+.professional-card__coverage span {
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-14);
+}
+
+.professional-card__coverage--dentro-cobertura {
+    border-color: var(--trax-success-200);
+    background: var(--trax-success-50);
+}
+
+.professional-card__coverage--dentro-cobertura strong {
+    color: var(--trax-success-700);
+}
+
+.professional-card__coverage--fuera-cobertura {
+    border-color: var(--trax-warning-200);
+    background: var(--trax-warning-50);
+}
+
+.professional-card__coverage--fuera-cobertura strong {
+    color: var(--trax-warning-700);
+}
+
 .professional-card__footer {
     display: grid;
     gap: var(--trax-space-4);
