@@ -2,6 +2,7 @@
     const MAX_RADIUS_KM = 200;
     const DEFAULT_RADIUS_KM = 10;
     const initializedMaps = new WeakSet();
+    const publicMaps = new WeakMap();
 
     const toNumber = (value, fallback = null) => {
         const parsed = Number.parseFloat(value);
@@ -84,6 +85,18 @@
         }
     };
 
+    const refreshPublicMap = (root) => {
+        const mapData = publicMaps.get(root);
+
+        if (!mapData || !window.google?.maps) {
+            return;
+        }
+
+        google.maps.event.trigger(mapData.map, "resize");
+        mapData.map.setCenter(mapData.center);
+        fitCircle(mapData.map, mapData.circle);
+    };
+
     const setMapReady = (root) => {
         const fallback = root.querySelector("[data-coverage-map-fallback]");
         const canvas = root.querySelector("[data-coverage-map-canvas]");
@@ -145,13 +158,25 @@
             center,
             radius: readRadius(root) * 1000,
             strokeColor: "#0ea5b7",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
+            strokeOpacity: 0.62,
+            strokeWeight: 1.5,
             fillColor: "#0ea5b7",
-            fillOpacity: 0.16,
+            fillOpacity: 0.14,
+        });
+
+        new google.maps.Marker({
+            position: center,
+            map,
+            title: "Centro aproximado de cobertura",
+            icon: {
+                url: "/static/img/trax-worker-marker.svg",
+                scaledSize: new google.maps.Size(48, 48),
+                anchor: new google.maps.Point(24, 48),
+            },
         });
 
         fitCircle(map, circle);
+        publicMaps.set(root, { map, circle, center });
     };
 
     const initCoverageMap = (root) => {
@@ -183,9 +208,11 @@
             center,
             clickableIcons: false,
             fullscreenControl: false,
+            gestureHandling: root.closest("dialog") ? "greedy" : "cooperative",
             mapTypeControl: false,
             streetViewControl: false,
             zoom: 11,
+            zoomControl: true,
         });
 
         if (root.dataset.mapMode === "private") {
@@ -201,7 +228,43 @@
         document.querySelectorAll("[data-coverage-map]").forEach(initCoverageMap);
     };
 
+    const initCoverageModal = () => {
+        const dialog = document.querySelector("[data-coverage-modal]");
+        const openButton = document.querySelector("[data-coverage-modal-open]");
+        const closeButton = document.querySelector("[data-coverage-modal-close]");
+
+        if (!dialog || !openButton) {
+            return;
+        }
+
+        openButton.addEventListener("click", () => {
+            if (typeof dialog.showModal === "function") {
+                dialog.showModal();
+            } else {
+                dialog.setAttribute("open", "");
+            }
+
+            initAllCoverageMaps();
+            dialog.querySelectorAll("[data-coverage-map]").forEach(refreshPublicMap);
+        });
+
+        closeButton?.addEventListener("click", () => {
+            dialog.close();
+            openButton.focus();
+        });
+
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+                openButton.focus();
+            }
+        });
+    };
+
     window.traxInitCoverageMaps = initAllCoverageMaps;
 
-    document.addEventListener("DOMContentLoaded", initAllCoverageMaps);
+    document.addEventListener("DOMContentLoaded", () => {
+        initAllCoverageMaps();
+        initCoverageModal();
+    });
 }());

@@ -1,5 +1,24 @@
 # CHANGELOG TRAX
 
+## 2026-07-15 - Public Profile Map UX v1
+
+### Agregado
+
+- Se agrego el marcador SVG reutilizable `trax-worker-marker.svg` para mapas publicos de cobertura.
+- Se agrego modal "Ver cobertura ampliada" en el perfil publico profesional.
+- Se agrego card vacia para profesionales sin zona de cobertura configurada.
+
+### Mejorado
+
+- Se rediseño la seccion publica "Zona de cobertura" con experiencia visual tipo marketplace.
+- El perfil publico muestra mapa, anillo de cobertura, centro aproximado, radio y zona base sin exponer direccion exacta.
+- El mapa publico usa marcador TRAX personalizado en lugar del pin clasico de Google.
+- La seccion queda adaptada a claro, oscuro, desktop, tablet y mobile.
+
+### Corregido
+
+- Se reemplazo el bloque textual largo por un resumen breve orientado a privacidad.
+
 ## 2026-07-15 - Matching Geografico por Distancia v1
 
 ### Agregado

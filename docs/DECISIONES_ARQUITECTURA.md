@@ -2,6 +2,26 @@
 
 ## 2026-07-15
 
+Se decidio rediseñar la cobertura del perfil publico como una experiencia visual de mapa aproximado, no como ficha textual.
+
+Motivo:
+
+El cliente debe entender rapidamente el area de trabajo del profesional, pero TRAX debe proteger la ubicacion exacta y evitar que el mapa parezca una direccion precisa.
+
+Alcance:
+
+- Mostrar centro aproximado, anillo de cobertura y radio declarado.
+- Usar un marcador propio TRAX con concepto de trabajador de oficio.
+- Reducir la informacion textual a cobertura aproximada, zona base y aviso de privacidad.
+- Agregar modal no editable para ver la cobertura ampliada.
+- Mantener intactas la logica de matching, Cobertura Inteligente, Google Maps v2, dashboards y rutas.
+
+Criterio:
+
+Las futuras mejoras visuales del mapa publico deberan sostener privacidad por defecto y no exponer domicilio, coordenadas ni punto base exacto del profesional.
+
+## 2026-07-15
+
 Se decidio implementar el matching geografico inicial con formula Haversine en backend.
 
 Motivo:

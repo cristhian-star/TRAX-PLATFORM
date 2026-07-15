@@ -15,6 +15,7 @@
 {% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
 {% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
 {% set gallery_entries = pro.gallery_urls.splitlines() if pro.gallery_urls else [] %}
+{% set public_google_maps_api_key = google_maps_api_key if google_maps_api_key and google_maps_api_key != "tu_clave_real" else none %}
 
 <main class="professional-profile">
     <section class="professional-profile__cover" aria-label="Portada profesional">
@@ -143,6 +144,7 @@
                 </div>
             </section>
 
+            {% set google_maps_api_key = public_google_maps_api_key %}
             {% include "components/_professional_work_area.html" %}
             {% include "components/_professional_gallery.html" %}
             {% include "components/_professional_credentials.html" %}
@@ -197,7 +199,7 @@
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='js/professional-profile-v2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/professional-coverage-map.js') }}"></script>
-    {% if google_maps_api_key and coverage and coverage.has_coordinates %}
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key|urlencode }}&callback=traxInitCoverageMaps"></script>
+    {% if public_google_maps_api_key and coverage and coverage.has_coordinates %}
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ public_google_maps_api_key|urlencode }}&callback=traxInitCoverageMaps"></script>
     {% endif %}
 {% endblock %}
