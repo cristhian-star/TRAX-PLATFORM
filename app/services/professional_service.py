@@ -85,6 +85,8 @@ def complete_professional_profile(
     tiktok_url=None,
     youtube_url=None,
     other_links=None,
+    whatsapp_username=None,
+    whatsapp_contact_preference=None,
     coverage_location=None,
     coverage_city=None,
     coverage_province=None,
@@ -122,6 +124,8 @@ def complete_professional_profile(
     professional.tiktok_url = tiktok_url
     professional.youtube_url = youtube_url
     professional.other_links = other_links
+    professional.whatsapp_username = whatsapp_username
+    professional.whatsapp_contact_preference = whatsapp_contact_preference or "AUTO"
     professional.coverage_location = coverage_location
     professional.coverage_city = coverage_city
     professional.coverage_province = coverage_province

@@ -1,5 +1,27 @@
 # CHANGELOG TRAX
 
+## 2026-07-15 - WhatsApp Contact Privacy v1
+
+### Agregado
+
+- Se agregaron `whatsapp_username` y `whatsapp_contact_preference` al modelo `Professional`.
+- Se agregaron `contact_identifier_type` y `contact_identifier_masked` a `WhatsAppContactSession`.
+- Se creo la migracion Alembic `20260715_01_whatsapp_contact_privacy_v1`.
+- Se agregaron helpers para normalizar, validar y resolver identificadores de contacto por WhatsApp.
+- Se agregaron campos de username y preferencia en el perfil privado profesional.
+- Se agregaron pruebas unitarias para el esquema hibrido de contacto.
+
+### Mejorado
+
+- El flujo central de WhatsApp prioriza username de forma conceptual cuando existe y la preferencia lo permite.
+- Mientras no exista URL publica estable por username, el telefono se mantiene como fallback tecnico de apertura.
+- Las sesiones registran solo tipo de identificador y valor enmascarado.
+- El perfil publico informa contacto protegido sin exponer telefono ni username completo.
+
+### Corregido
+
+- Se evita duplicar telefonos completos en nuevas sesiones de contacto.
+
 ## 2026-07-15 - Public Profile Map UX v1
 
 ### Agregado

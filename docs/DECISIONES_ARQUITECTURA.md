@@ -2,6 +2,27 @@
 
 ## 2026-07-15
 
+Se decidio implementar un esquema hibrido para contacto por WhatsApp: username como preferencia de privacidad y telefono como fallback tecnico.
+
+Motivo:
+
+Los usernames de WhatsApp mejoran la privacidad del profesional, pero no existe una URL publica estable y universal para abrir chats por username desde TRAX sin APIs avanzadas.
+
+Alcance:
+
+- Guardar `whatsapp_username` y `whatsapp_contact_preference` en el perfil profesional.
+- Priorizar username de forma conceptual cuando la preferencia sea `AUTO` o `USERNAME`.
+- Usar telefono como mecanismo tecnico de apertura mientras WhatsApp no ofrezca una URL publica estable por username.
+- Registrar en sesiones solo tipo de identificador y valor enmascarado.
+- No exponer telefono ni username completo en HTML publico.
+- Mantener el flujo central `POST /whatsapp/iniciar`.
+
+Criterio:
+
+No se inventaran URLs no documentadas para usernames de WhatsApp. Cualquier futura apertura directa por username debera integrarse en `whatsapp_contact_service.py`.
+
+## 2026-07-15
+
 Se decidio rediseñar la cobertura del perfil publico como una experiencia visual de mapa aproximado, no como ficha textual.
 
 Motivo:

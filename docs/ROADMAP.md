@@ -34,6 +34,8 @@
 
 [x] WhatsApp Integration Foundation v1
 
+[x] WhatsApp Contact Privacy v1
+
 [ ] Agenda
 
 [ ] WhatsApp Business API

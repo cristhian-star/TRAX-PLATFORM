@@ -276,6 +276,20 @@
     text-align: center;
 }
 
+.professional-profile__contact-privacy {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: var(--trax-space-2) var(--trax-space-3);
+    color: var(--trax-color-info);
+    border: 1px solid var(--trax-ds-info-border);
+    border-radius: var(--trax-radius-md);
+    background: var(--trax-ds-info-soft);
+    font-size: var(--trax-font-size-12);
+    font-weight: var(--trax-font-weight-semibold);
+    line-height: var(--trax-line-height-body);
+    text-align: center;
+}
+
 .professional-profile__notice {
     margin: var(--trax-space-5) 0 0;
     padding: var(--trax-space-4);

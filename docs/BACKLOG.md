@@ -19,6 +19,8 @@
 - Implementar Agenda.
 - Implementar canal Email para notificaciones transaccionales.
 - Integrar WhatsApp Business API cuando exista definicion de producto y proveedor.
+- Validar apertura directa por username si WhatsApp publica una URL estable para esa capacidad.
+- Evaluar grupos automaticos de WhatsApp solo con una API oficial y consentimiento explicito.
 - Implementar webhooks de WhatsApp solo si se aprueba lectura de eventos externos.
 - Evaluar Push notifications cuando exista estrategia mobile/browser.
 - Evaluar polling moderado o WebSockets solo cuando el producto requiera tiempo real.

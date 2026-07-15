@@ -35,10 +35,141 @@ ENTITY_PROPOSAL_APPLICATION = "ProposalApplication"
 
 TIPO_WHATSAPP_CONTACTO_INICIADO = "WHATSAPP_CONTACTO_INICIADO"
 
+IDENTIFIER_USERNAME = "USERNAME"
+IDENTIFIER_PHONE = "PHONE"
+WHATSAPP_USERNAME_MAX_LENGTH = 64
+WHATSAPP_USERNAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._]{2,63}$")
+
 
 def _sanitize_phone(value):
     digits = re.sub(r"\D", "", value or "")
     return digits or None
+
+
+def normalizar_whatsapp_username(value):
+    if value is None:
+        return None
+
+    username = value.strip().lower()
+    if not username:
+        return None
+
+    if username.startswith("@"):
+        username = username[1:]
+
+    username = username.strip()
+    if not username:
+        return None
+
+    if any(token in username for token in ("://", "wa.me", "whatsapp.com", "/", "?", "#")):
+        raise ValueError("El username de WhatsApp no debe ser una URL")
+
+    if any(character.isspace() for character in username):
+        raise ValueError("El username de WhatsApp no debe contener espacios")
+
+    if len(username) > WHATSAPP_USERNAME_MAX_LENGTH:
+        raise ValueError(f"El username de WhatsApp admite hasta {WHATSAPP_USERNAME_MAX_LENGTH} caracteres")
+
+    if not WHATSAPP_USERNAME_PATTERN.match(username):
+        raise ValueError("El username de WhatsApp solo admite letras, numeros, punto y guion bajo")
+
+    return username
+
+
+def validar_whatsapp_username(value):
+    try:
+        return normalizar_whatsapp_username(value) is not None
+    except ValueError:
+        return False
+
+
+def normalizar_preferencia_contacto(value):
+    preference = (value or Professional.WHATSAPP_CONTACT_AUTO).strip().upper()
+    if preference not in Professional.WHATSAPP_CONTACT_PREFERENCES:
+        raise ValueError("Preferencia de contacto por WhatsApp invalida")
+
+    return preference
+
+
+def _mask_phone(value):
+    phone = _sanitize_phone(value)
+    if not phone:
+        return None
+
+    if len(phone) <= 4:
+        return "*" * len(phone)
+
+    return f"{'*' * max(len(phone) - 4, 0)}{phone[-4:]}"
+
+
+def _mask_username(value):
+    username = normalizar_whatsapp_username(value)
+    if not username:
+        return None
+
+    if len(username) <= 3:
+        return f"@{username[0]}**"
+
+    return f"@{username[:2]}***{username[-1]}"
+
+
+def obtener_tipo_identificador(identifier_data):
+    return identifier_data["type"] if identifier_data else None
+
+
+def resolver_identificador_contacto(professional):
+    if professional is None:
+        raise ValueError("Profesional no encontrado")
+
+    phone = _sanitize_phone(professional.telefono)
+    username = normalizar_whatsapp_username(professional.whatsapp_username)
+    preference = normalizar_preferencia_contacto(professional.whatsapp_contact_preference)
+
+    uses_username_conceptually = (
+        preference == Professional.WHATSAPP_CONTACT_USERNAME
+        or (preference == Professional.WHATSAPP_CONTACT_AUTO and username)
+    )
+
+    if uses_username_conceptually and username:
+        if not phone:
+            raise ValueError("WhatsApp requiere telefono como fallback tecnico hasta que usernames tengan URL publica estable")
+
+        return {
+            "type": IDENTIFIER_USERNAME,
+            "identifier": username,
+            "masked": _mask_username(username),
+            "technical_type": IDENTIFIER_PHONE,
+            "technical_identifier": phone,
+            "uses_phone_url": True,
+            "fallback_reason": "WhatsApp no ofrece URL publica estable para abrir chats por username.",
+        }
+
+    if preference == Professional.WHATSAPP_CONTACT_USERNAME and not username:
+        if not phone:
+            raise ValueError("Configura un username de WhatsApp valido o habilita el telefono como fallback")
+
+        return {
+            "type": IDENTIFIER_PHONE,
+            "identifier": phone,
+            "masked": _mask_phone(phone),
+            "technical_type": IDENTIFIER_PHONE,
+            "technical_identifier": phone,
+            "uses_phone_url": True,
+            "fallback_reason": "Preferencia username sin username valido; se uso telefono como fallback seguro.",
+        }
+
+    if not phone:
+        raise ValueError("WhatsApp no disponible para este profesional")
+
+    return {
+        "type": IDENTIFIER_PHONE,
+        "identifier": phone,
+        "masked": _mask_phone(phone),
+        "technical_type": IDENTIFIER_PHONE,
+        "technical_identifier": phone,
+        "uses_phone_url": True,
+        "fallback_reason": None,
+    }
 
 
 def _build_message(professional, operation_type):
@@ -64,8 +195,7 @@ def _get_professional_or_error(professional_id):
         raise ValueError("Profesional no encontrado")
     if professional.user_id is None:
         raise ValueError("Perfil profesional sin propietario asociado")
-    if not _sanitize_phone(professional.telefono):
-        raise ValueError("WhatsApp no disponible para este profesional")
+    resolver_identificador_contacto(professional)
 
     return professional
 
@@ -145,6 +275,7 @@ def crear_sesion(
         entity_type=entity_type,
         entity_id=entity_id,
     )
+    identifier_data = resolver_identificador_contacto(professional)
     now = datetime.utcnow()
     contact_session = WhatsAppContactSession(
         client_user_id=client_user_id,
@@ -153,6 +284,8 @@ def crear_sesion(
         entity_type=entity_type,
         entity_id=entity_id,
         status=WhatsAppContactSession.STATUS_INICIADA,
+        contact_identifier_type=identifier_data["type"],
+        contact_identifier_masked=identifier_data["masked"],
         consent_given=True,
         consent_at=now,
         last_status_at=now,
@@ -170,7 +303,8 @@ def crear_sesion(
 
 def generar_url(contact_session):
     professional = contact_session.professional
-    phone = _sanitize_phone(professional.telefono)
+    identifier_data = resolver_identificador_contacto(professional)
+    phone = identifier_data["technical_identifier"]
 
     if not phone:
         raise ValueError("WhatsApp no disponible para este profesional")

@@ -23,6 +23,8 @@ class WhatsAppContactSession(db.Model):
     entity_type = db.Column(db.String(80), nullable=True, index=True)
     entity_id = db.Column(db.Integer, nullable=True, index=True)
     status = db.Column(db.String(50), nullable=False, default=STATUS_INICIADA, index=True)
+    contact_identifier_type = db.Column(db.String(20), nullable=True)
+    contact_identifier_masked = db.Column(db.String(120), nullable=True)
     consent_given = db.Column(db.Boolean, nullable=False, default=False)
     consent_at = db.Column(db.DateTime, nullable=True)
     initiated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), index=True)

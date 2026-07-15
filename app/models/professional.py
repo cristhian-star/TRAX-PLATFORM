@@ -4,6 +4,16 @@ from app import db
 class Professional(db.Model):
     __tablename__ = "professionals"
 
+    WHATSAPP_CONTACT_AUTO = "AUTO"
+    WHATSAPP_CONTACT_USERNAME = "USERNAME"
+    WHATSAPP_CONTACT_PHONE = "PHONE"
+
+    WHATSAPP_CONTACT_PREFERENCES = (
+        WHATSAPP_CONTACT_AUTO,
+        WHATSAPP_CONTACT_USERNAME,
+        WHATSAPP_CONTACT_PHONE,
+    )
+
     ESTADOS_PERFIL = (
         "INCOMPLETO",
         "PENDIENTE_VERIFICACION",
@@ -35,6 +45,8 @@ class Professional(db.Model):
     tiktok_url = db.Column(db.Text)
     youtube_url = db.Column(db.Text)
     other_links = db.Column(db.Text)
+    whatsapp_username = db.Column(db.String(64))
+    whatsapp_contact_preference = db.Column(db.String(20), nullable=False, default=WHATSAPP_CONTACT_AUTO)
     coverage_location = db.Column(db.String(160))
     coverage_city = db.Column(db.String(120))
     coverage_province = db.Column(db.String(120))

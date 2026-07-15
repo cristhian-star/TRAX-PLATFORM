@@ -70,6 +70,8 @@ from app.services.geographic_matching_service import (
     obtener_resultado_cobertura,
 )
 from app.services.whatsapp_contact_service import (
+    normalizar_preferencia_contacto,
+    normalizar_whatsapp_username,
     obtener_contactos_cliente,
     obtener_contactos_profesional,
 )
@@ -646,6 +648,10 @@ def completar_perfil_profesional():
                 request.form.get("other_links", "").splitlines(),
                 "Otros enlaces",
             )
+            whatsapp_username = normalizar_whatsapp_username(request.form.get("whatsapp_username"))
+            whatsapp_contact_preference = normalizar_preferencia_contacto(
+                request.form.get("whatsapp_contact_preference")
+            )
         except ValueError as error:
             return str(error), 400
 
@@ -667,6 +673,8 @@ def completar_perfil_profesional():
             tiktok_url=tiktok_url,
             youtube_url=youtube_url,
             other_links=other_links,
+            whatsapp_username=whatsapp_username,
+            whatsapp_contact_preference=whatsapp_contact_preference,
             **coverage_data,
         )
 

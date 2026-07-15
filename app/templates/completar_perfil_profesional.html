@@ -313,6 +313,35 @@
                     <small>Mostra solo canales profesionales.</small>
                 </div>
 
+                <div class="private-profile__hint-card">
+                    <strong>Privacidad en WhatsApp</strong>
+                    <span>TRAX priorizara tu username cuando este disponible para evitar exponer publicamente tu numero.</span>
+                </div>
+
+                <div class="private-profile__field-grid">
+                    <label>
+                        Username de WhatsApp
+                        <input
+                            type="text"
+                            name="whatsapp_username"
+                            maxlength="64"
+                            placeholder="@nombreprofesional"
+                            value="{{ '@' ~ professional.whatsapp_username if professional and professional.whatsapp_username else '' }}">
+                        <small>Esta funcion depende de que tu cuenta de WhatsApp tenga usernames habilitados.</small>
+                    </label>
+
+                    <label>
+                        Preferencia de contacto
+                        {% set selected_whatsapp_preference = professional.whatsapp_contact_preference if professional and professional.whatsapp_contact_preference else "AUTO" %}
+                        <select name="whatsapp_contact_preference">
+                            <option value="AUTO" {% if selected_whatsapp_preference == "AUTO" %}selected{% endif %}>Automatico</option>
+                            <option value="USERNAME" {% if selected_whatsapp_preference == "USERNAME" %}selected{% endif %}>Usar username</option>
+                            <option value="PHONE" {% if selected_whatsapp_preference == "PHONE" %}selected{% endif %}>Usar telefono</option>
+                        </select>
+                        <small>Si WhatsApp no permite abrir chats por username, TRAX usara el telefono como fallback tecnico.</small>
+                    </label>
+                </div>
+
                 <div class="private-profile__field-grid">
                     <label>
                         Instagram

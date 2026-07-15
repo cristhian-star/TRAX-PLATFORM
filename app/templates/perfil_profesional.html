@@ -88,6 +88,11 @@
             {% else %}
                 <span class="profile-action profile-action--disabled" aria-disabled="true">WhatsApp</span>
             {% endif %}
+            {% if pro.whatsapp_username and pro.whatsapp_contact_preference != "PHONE" %}
+                <p class="professional-profile__contact-privacy">
+                    Contacto protegido mediante username de WhatsApp.
+                </p>
+            {% endif %}
             <a
                 class="profile-action profile-action--primary"
                 href="/contratacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
