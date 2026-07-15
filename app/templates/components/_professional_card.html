@@ -75,13 +75,15 @@
                 Ver perfil
             </a>
             {% if professional_phone %}
-                <a
-                    class="professional-card__button professional-card__button--whatsapp"
-                    href="https://wa.me/{{ professional_phone }}"
-                    target="_blank"
-                    rel="noreferrer">
-                    WhatsApp
-                </a>
+                <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="professional_id" value="{{ profile_id }}">
+                    <input type="hidden" name="operation_type" value="CONTACTO_DIRECTO">
+                    <input type="hidden" name="whatsapp_consent" value="">
+                    <button class="professional-card__button professional-card__button--whatsapp" type="submit">
+                        WhatsApp
+                    </button>
+                </form>
             {% else %}
                 <span
                     class="professional-card__button professional-card__button--whatsapp is-disabled"

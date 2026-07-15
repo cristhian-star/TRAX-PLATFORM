@@ -1,5 +1,27 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-14
+
+Se decidio centralizar toda apertura de WhatsApp en un unico flujo interno de TRAX.
+
+Motivo:
+
+Los enlaces directos `wa.me` dispersos impiden auditar contactos, aplicar consentimiento, validar propiedad de operaciones y preparar futuras integraciones de forma segura.
+
+Alcance:
+
+- Crear `WhatsAppContactSession` como registro auditable de cada apertura.
+- Generar URLs de WhatsApp solo desde `whatsapp_contact_service.py`.
+- Usar `POST /whatsapp/iniciar` como unica entrada del flujo.
+- Exigir consentimiento explicito antes de redireccionar fuera de TRAX.
+- Registrar actividad interna sin enviar mensajes automaticos.
+- No almacenar conversaciones, mensajes, archivos ni datos sensibles.
+- Mantener fuera de esta fase WhatsApp Business API, webhooks, IA y lectura de conversaciones.
+
+Criterio:
+
+Las futuras capacidades de WhatsApp deberan extender este servicio y esta tabla, sin volver a generar enlaces directos desde templates ni exponer telefonos por APIs.
+
 ## 2026-07-13
 
 Se decidio usar Google Maps Platform como proveedor inicial para el mapa interactivo de cobertura profesional.

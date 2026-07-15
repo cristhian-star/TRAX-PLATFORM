@@ -222,6 +222,31 @@
                 </div>
             </article>
 
+            <article class="pro-dashboard__panel">
+                <div class="pro-dashboard__section-head">
+                    <div>
+                        <span class="pro-dashboard__eyebrow">WhatsApp</span>
+                        <h2>Oportunidades de contacto</h2>
+                    </div>
+                </div>
+                {% if whatsapp_contact_sessions %}
+                    <div class="pro-dashboard__contact-list">
+                        {% for contact in whatsapp_contact_sessions %}
+                            <div>
+                                <strong>{{ contact.client_user.nombre if contact.client_user else "Visitante TRAX" }}</strong>
+                                <span>{{ contact.operation_type|replace("_", " ")|title }}</span>
+                                <small>{{ format_notification_date(contact.initiated_at) }} - {{ contact.status|replace("_", " ")|title }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="pro-dashboard__placeholder">
+                        <strong>Sin contactos recientes por WhatsApp</strong>
+                        <span>Cuando un cliente abra WhatsApp desde TRAX, vas a verlo como oportunidad operativa.</span>
+                    </div>
+                {% endif %}
+            </article>
+
             <article class="pro-dashboard__panel pro-dashboard__panel--wide">
                 <div class="pro-dashboard__section-head">
                     <div>

@@ -242,7 +242,8 @@
 
 .pro-dashboard__metrics,
 .pro-dashboard__grid,
-.pro-dashboard__activity-list {
+.pro-dashboard__activity-list,
+.pro-dashboard__contact-list {
     display: grid;
     gap: var(--trax-grid-gap);
 }
@@ -340,6 +341,7 @@
 
 .pro-dashboard__limit-card,
 .pro-dashboard__placeholder,
+.pro-dashboard__contact-list div,
 .pro-dashboard__coverage-summary,
 .pro-dashboard__recommendations li {
     background: var(--trax-color-surface-subtle);
@@ -348,11 +350,26 @@
 
 .pro-dashboard__limit-card strong,
 .pro-dashboard__placeholder strong,
+.pro-dashboard__contact-list strong,
 .pro-dashboard__coverage-summary strong {
     color: var(--trax-color-brand-strong);
     display: block;
     font-size: var(--trax-font-size-24);
     margin-bottom: var(--trax-space-2);
+}
+
+.pro-dashboard__contact-list div {
+    display: grid;
+    gap: var(--trax-space-1);
+    border-radius: var(--trax-radius-lg);
+    line-height: var(--trax-line-height-body);
+    overflow-wrap: anywhere;
+    padding: var(--trax-space-4);
+}
+
+.pro-dashboard__contact-list span,
+.pro-dashboard__contact-list small {
+    color: var(--trax-color-text-muted);
 }
 
 .pro-dashboard__coverage-summary span,

@@ -962,6 +962,7 @@ def directorio_emergencias():
         professional_rows=professional_rows,
         categoria=categoria,
         zona=zona,
+        emergency_request_id=request.args.get("solicitud"),
         request_created=bool(request.args.get("solicitud")),
         anonymous_search=request.args.get("consulta_anonima") == "1",
     )

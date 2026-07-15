@@ -221,6 +221,7 @@
 .client-dashboard__activity-list,
 .client-dashboard__request-grid,
 .client-dashboard__request-list,
+.client-dashboard__contact-list,
 .client-dashboard__recommendations {
     display: grid;
     gap: var(--trax-grid-gap);
@@ -286,6 +287,7 @@
 
 .client-dashboard__activity-list a,
 .client-dashboard__request-list a,
+.client-dashboard__contact-list div,
 .client-dashboard__placeholder,
 .client-dashboard__empty,
 .client-dashboard__recommendations li {
@@ -310,10 +312,22 @@
 
 .client-dashboard__activity-list strong,
 .client-dashboard__request-list strong,
+.client-dashboard__contact-list strong,
 .client-dashboard__placeholder strong,
 .client-dashboard__recommendations strong {
     color: var(--trax-color-brand-strong);
     overflow-wrap: anywhere;
+}
+
+.client-dashboard__contact-list div {
+    display: grid;
+    gap: var(--trax-space-1);
+}
+
+.client-dashboard__contact-list span,
+.client-dashboard__contact-list small {
+    color: var(--trax-color-text-muted);
+    line-height: var(--trax-line-height-body);
 }
 
 .client-dashboard__request-group {

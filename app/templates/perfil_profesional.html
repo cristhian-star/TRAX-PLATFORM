@@ -77,13 +77,13 @@
 
         <div class="professional-profile__actions" aria-label="Acciones del perfil">
             {% if telefono %}
-                <a
-                    class="profile-action profile-action--whatsapp"
-                    href="https://wa.me/{{ telefono }}"
-                    target="_blank"
-                    rel="noreferrer">
-                    WhatsApp
-                </a>
+                <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="professional_id" value="{{ pro.id }}">
+                    <input type="hidden" name="operation_type" value="PERFIL_PROFESIONAL">
+                    <input type="hidden" name="whatsapp_consent" value="">
+                    <button class="profile-action profile-action--whatsapp" type="submit">WhatsApp</button>
+                </form>
             {% else %}
                 <span class="profile-action profile-action--disabled" aria-disabled="true">WhatsApp</span>
             {% endif %}
@@ -191,6 +191,7 @@
         </aside>
     </section>
 </main>
+{% include "components/_whatsapp_consent_modal.html" %}
 {% endblock %}
 
 {% block extra_scripts %}

@@ -51,6 +51,9 @@ def create_app(initialize_schema=True):
     from app.routes.notification_routes import notifications
     app.register_blueprint(notifications)
 
+    from app.routes.whatsapp_routes import whatsapp
+    app.register_blueprint(whatsapp)
+
     from app.routes.dev_routes import dev
     app.register_blueprint(dev)
     
@@ -73,6 +76,7 @@ def create_app(initialize_schema=True):
     from app.models.reputation_event import ReputationEvent
     from app.models.audit_log import AuditLog
     from app.models.activity_notification import ActivityNotification
+    from app.models.whatsapp_contact_session import WhatsAppContactSession
 
     if initialize_schema:
         with app.app_context():

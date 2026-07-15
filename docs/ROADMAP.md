@@ -28,9 +28,11 @@
 
 [x] Cobertura Inteligente v2 - Google Maps
 
+[x] WhatsApp Integration Foundation v1
+
 [ ] Agenda
 
-[ ] WhatsApp
+[ ] WhatsApp Business API
 
 [ ] Mercados
 

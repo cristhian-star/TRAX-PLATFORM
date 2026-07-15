@@ -65,6 +65,10 @@ from app.services.coverage_service import (
     obtener_cobertura_profesional,
     obtener_opciones_radio,
 )
+from app.services.whatsapp_contact_service import (
+    obtener_contactos_cliente,
+    obtener_contactos_profesional,
+)
 from app.models.proposal_application import ProposalApplication
 
 main = Blueprint("main", __name__)
@@ -708,6 +712,8 @@ def profesional_dashboard():
         offer_allowance=get_offer_allowance(user_id) if user_id else None,
         coverage=coverage,
         recommendations=recommendations,
+        whatsapp_contact_sessions=obtener_contactos_profesional(professional.id, limit=5)
+        if professional else [],
         recent_activity=obtener_notificaciones_usuario(user_id, limit=5) if user_id else [],
         format_notification_date=formatear_fecha_notificacion,
     )
@@ -865,6 +871,7 @@ def cliente_dashboard():
         latest_activity=latest_activity,
         request_sections=request_sections,
         recommendations=recommendations[:5],
+        whatsapp_contact_sessions=obtener_contactos_cliente(user_id, limit=5),
         format_dashboard_date=_format_dashboard_date,
         recent_activity=obtener_notificaciones_usuario(user_id, limit=5),
         format_notification_date=formatear_fecha_notificacion,

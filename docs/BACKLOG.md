@@ -16,7 +16,8 @@
 - Realizar auditoria visual completa de pantallas secundarias para Design System v2 Fase 2.
 - Implementar Agenda.
 - Implementar canal Email para notificaciones transaccionales.
-- Integrar WhatsApp.
+- Integrar WhatsApp Business API cuando exista definicion de producto y proveedor.
+- Implementar webhooks de WhatsApp solo si se aprueba lectura de eventos externos.
 - Evaluar Push notifications cuando exista estrategia mobile/browser.
 - Evaluar polling moderado o WebSockets solo cuando el producto requiera tiempo real.
 

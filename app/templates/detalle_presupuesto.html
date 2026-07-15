@@ -179,13 +179,17 @@
                                         </a>
                                         {% if offer.estado == "ADJUDICADO" %}
                                             {% if row.phone.whatsapp %}
-                                                <a
-                                                    class="budget-button budget-button--whatsapp"
-                                                    href="https://wa.me/{{ row.phone.whatsapp }}"
-                                                    target="_blank"
-                                                    rel="noreferrer">
-                                                    WhatsApp
-                                                </a>
+                                                <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <input type="hidden" name="professional_id" value="{{ professional.id }}">
+                                                    <input type="hidden" name="operation_type" value="PRESUPUESTO_ADJUDICADO">
+                                                    <input type="hidden" name="entity_type" value="BudgetOffer">
+                                                    <input type="hidden" name="entity_id" value="{{ offer.id }}">
+                                                    <input type="hidden" name="whatsapp_consent" value="">
+                                                    <button class="budget-button budget-button--whatsapp" type="submit">
+                                                        WhatsApp
+                                                    </button>
+                                                </form>
                                             {% else %}
                                                 <span class="budget-button budget-button--disabled" aria-disabled="true">
                                                     WhatsApp no disponible
@@ -339,4 +343,5 @@
         </aside>
     </div>
 </main>
+{% include "components/_whatsapp_consent_modal.html" %}
 {% endblock %}

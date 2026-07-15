@@ -57,13 +57,17 @@
 
     <div class="emergency-card__actions">
         {% if phone.whatsapp %}
-            <a
-                class="emergency-action emergency-action--whatsapp"
-                href="https://wa.me/{{ phone.whatsapp }}"
-                target="_blank"
-                rel="noopener noreferrer">
-                WhatsApp
-            </a>
+            <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="professional_id" value="{{ professional.id }}">
+                <input type="hidden" name="operation_type" value="EMERGENCIA">
+                <input type="hidden" name="entity_type" value="EmergencyRequest">
+                <input type="hidden" name="entity_id" value="{{ emergency_request_id or '' }}">
+                <input type="hidden" name="whatsapp_consent" value="">
+                <button class="emergency-action emergency-action--whatsapp" type="submit">
+                    WhatsApp
+                </button>
+            </form>
         {% else %}
             <span class="emergency-action is-disabled" aria-disabled="true">WhatsApp</span>
         {% endif %}

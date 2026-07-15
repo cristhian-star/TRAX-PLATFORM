@@ -91,7 +91,15 @@
                                     {% if application.pretension_economica %}<p><strong>Pretension:</strong> ${{ "{:,.2f}".format(application.pretension_economica) }}</p>{% endif %}
                                     <footer>
                                         {% if application.estado == "ACEPTADA" and phone_digits %}
-                                            <a class="proposal-button proposal-button--whatsapp" href="https://wa.me/{{ phone_digits }}" target="_blank" rel="noreferrer">WhatsApp</a>
+                                            <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="professional_id" value="{{ professional.id }}">
+                                                <input type="hidden" name="operation_type" value="PROPUESTA_ACEPTADA">
+                                                <input type="hidden" name="entity_type" value="ProposalApplication">
+                                                <input type="hidden" name="entity_id" value="{{ application.id }}">
+                                                <input type="hidden" name="whatsapp_consent" value="">
+                                                <button class="proposal-button proposal-button--whatsapp" type="submit">WhatsApp</button>
+                                            </form>
                                         {% elif application.estado == "ACEPTADA" %}
                                             <span class="proposal-button proposal-button--disabled" aria-disabled="true">WhatsApp no disponible</span>
                                         {% endif %}
@@ -157,4 +165,5 @@
         </aside>
     </section>
 </main>
+{% include "components/_whatsapp_consent_modal.html" %}
 {% endblock %}

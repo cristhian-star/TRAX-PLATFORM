@@ -1,5 +1,26 @@
 # CHANGELOG TRAX
 
+## 2026-07-14 - WhatsApp Integration Foundation v1
+
+### Agregado
+
+- Se creo el modelo `WhatsAppContactSession` para registrar aperturas de WhatsApp iniciadas desde TRAX.
+- Se agrego la migracion Alembic `20260714_01_whatsapp_contact_sessions`.
+- Se creo `app/services/whatsapp_contact_service.py` como servicio unico para validar operaciones, crear sesiones, generar URLs y actualizar estados.
+- Se agrego la ruta central `POST /whatsapp/iniciar` con CSRF, consentimiento obligatorio y redireccion controlada.
+- Se agrego modal de consentimiento previo a abrir WhatsApp.
+- Se agregaron resumenes de contactos iniciados en Dashboard Cliente y oportunidades de contacto en Dashboard Profesional.
+
+### Mejorado
+
+- Se reemplazaron enlaces directos de WhatsApp en perfiles, tarjetas profesionales, emergencias, presupuestos adjudicados y propuestas aceptadas.
+- Las aperturas de WhatsApp ahora generan notificaciones internas para cliente y profesional.
+- El flujo queda preparado para futuras integraciones sin almacenar mensajes, archivos ni conversaciones.
+
+### Corregido
+
+- Se elimino la generacion dispersa de enlaces `wa.me` desde templates.
+
 ## 2026-07-13 - Cobertura Inteligente v2 Google Maps
 
 ### Agregado
