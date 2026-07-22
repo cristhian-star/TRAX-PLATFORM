@@ -1,5 +1,28 @@
 # CHANGELOG TRAX
 
+## 2026-07-22 - Cierre de WhatsApp y Geolocalizacion
+
+### Agregado
+
+- Se agrego respuesta JSON segura en `POST /whatsapp/iniciar` para abrir la URL autorizada desde la interaccion del usuario.
+- Se agrego validacion central de disponibilidad de `GOOGLE_MAPS_API_KEY`.
+- Se agregaron pruebas de cierre para WhatsApp, Google Maps, privacidad, CSRF, ownership, radios y coordenadas.
+- Se documento el cierre operativo de WhatsApp y Geolocalizacion.
+
+### Mejorado
+
+- El modal de WhatsApp ya no depende exclusivamente de submit programatico y redirect backend.
+- El flujo conserva redirect HTML como fallback compatible.
+- El fallback del modal funciona en navegadores sin soporte de `<dialog>`.
+- Google Maps ignora placeholders y cae a fallback si falta la key, falla la carga o Google informa error de autenticacion.
+- Docker Compose expone `GOOGLE_MAPS_API_KEY` sin hardcodear claves.
+
+### Corregido
+
+- Se evita que una key placeholder active el mapa interactivo.
+- Se evita aceptar telefonos tecnicamente invalidos para construir URLs de WhatsApp.
+- Se redujo el riesgo de dobles envios desde el frontend mediante bloqueo de submit en curso.
+
 ## 2026-07-22 - Security & Compliance Foundation v1
 
 ### Agregado

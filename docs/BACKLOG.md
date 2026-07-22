@@ -17,7 +17,8 @@
 - Incorporar escaneo automatizado de dependencias y secretos en CI.
 - Evaluar Redis futuro para rate limiting, cache o colas cuando el volumen lo justifique.
 - Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
-- Validar Google Maps con una API key real en entorno controlado.
+- Validar Google Maps con una API key real restringida en staging.
+- Confirmar apertura de WhatsApp en Chrome escritorio y dispositivo movil fisico antes de produccion.
 - Implementar geocoding de ubicaciones base.
 - Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
 - Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.
@@ -29,9 +30,9 @@
 - Implementar Agenda.
 - Implementar canal Email para notificaciones transaccionales.
 - Integrar WhatsApp Business API cuando exista definicion de producto y proveedor.
+- Implementar webhooks de WhatsApp Business Cloud API solo si se aprueba el alcance de eventos externos.
 - Validar apertura directa por username si WhatsApp publica una URL estable para esa capacidad.
 - Evaluar grupos automaticos de WhatsApp solo con una API oficial y consentimiento explicito.
-- Implementar webhooks de WhatsApp solo si se aprueba lectura de eventos externos.
 - Evaluar Push notifications cuando exista estrategia mobile/browser.
 - Evaluar polling moderado o WebSockets solo cuando el producto requiera tiempo real.
 

@@ -36,6 +36,8 @@
 
 [x] WhatsApp Contact Privacy v1
 
+[x] Cierre de WhatsApp y Geolocalizacion
+
 [x] Consolidacion Arquitectonica v1
 
 [ ] Agenda
@@ -79,6 +81,8 @@
 [x] Alembic como autoridad del esquema
 
 [x] Security & Compliance Foundation v1
+
+[x] WhatsApp y Google Maps configurables con fallback seguro
 
 [ ] WSGI productivo
 
