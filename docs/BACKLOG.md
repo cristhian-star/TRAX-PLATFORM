@@ -2,15 +2,19 @@
 
 ## Alta prioridad
 
-- Implementar Security & Compliance Foundation v1.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
 - Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
+- Revisar politicas legales con profesional: terminos, privacidad, cookies y consentimientos.
+- Configurar Cloudflare/WAF o equivalente antes de exposicion publica.
+- Implementar checklist productivo en staging con secretos reales, HTTPS, backups, monitoreo y prueba de restauracion.
 
 ## Media prioridad
 
 - Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
+- Agregar `source` explicito al modelo de consentimientos si producto requiere trazabilidad separada del contexto tecnico.
+- Incorporar escaneo automatizado de dependencias y secretos en CI.
 - Evaluar Redis futuro para rate limiting, cache o colas cuando el volumen lo justifique.
 - Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
 - Validar Google Maps con una API key real en entorno controlado.

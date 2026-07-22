@@ -78,8 +78,10 @@
 
 [x] Alembic como autoridad del esquema
 
-[ ] Security & Compliance Foundation v1
+[x] Security & Compliance Foundation v1
 
 [ ] WSGI productivo
 
 [ ] Redis para rate limiting, cache o colas futuras
+
+[ ] Checklist productivo completo validado en staging

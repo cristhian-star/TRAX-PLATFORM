@@ -42,3 +42,20 @@ python -m unittest discover tests
 python -m compileall app scripts tests
 git diff --check
 ```
+
+## Seguridad y produccion
+
+Antes de promover TRAX a staging o produccion validar:
+
+- Secretos reales fuera de Git: `SECRET_KEY`, `DATABASE_URL`, claves externas y credenciales operativas.
+- HTTPS activo y HSTS habilitado solo sobre conexiones seguras.
+- Redis u otro backend compartido para Flask-Limiter.
+- Servidor WSGI productivo; no usar el servidor Flask de desarrollo.
+- Backups automáticos y prueba de restauracion.
+- Monitoreo de disponibilidad, errores y consumo de recursos.
+- Logs sin payloads sensibles, tokens, cookies, documentos, telefonos completos ni coordenadas exactas.
+- Cloudflare/WAF o equivalente configurado antes de exposicion publica.
+- Migraciones Alembic aplicadas y verificadas.
+- Rate limits revisados segun trafico real.
+- Politicas legales revisadas por profesional: terminos, privacidad, cookies y consentimientos.
+- Escaneo de dependencias y secretos antes de cada release.

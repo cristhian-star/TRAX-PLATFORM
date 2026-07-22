@@ -1,5 +1,27 @@
 # CHANGELOG TRAX
 
+## 2026-07-22 - Security & Compliance Foundation v1
+
+### Agregado
+
+- Se agregaron claves reutilizables de rate limiting por IP, usuario e IP+usuario.
+- Se agregaron limites especificos para login, registro, busquedas, WhatsApp, solicitudes, propuestas, reportes y POST administrativos.
+- Se agregaron handlers seguros para `400`, `403`, `404`, `413`, `429` y `500`.
+- Se agregaron limites configurables de tamano de request y memoria de formularios.
+- Se agregaron pruebas de seguridad, privacidad publica, headers, errores seguros y consentimientos versionados.
+
+### Mejorado
+
+- Se reforzaron cookies de sesion, headers de seguridad, CSP y HSTS condicionado a produccion HTTPS.
+- Se amplio `.gitignore` para artefactos locales sensibles.
+- Se documento Docker Compose como entorno local con credenciales no reutilizables en produccion.
+- Se redujo la precision de coordenadas publicas aproximadas de cobertura.
+
+### Corregido
+
+- Produccion ya no acepta placeholders inseguros de `SECRET_KEY`.
+- Los errores internos no exponen detalles ni payloads sensibles al usuario.
+
 ## 2026-07-21 - Consolidacion Arquitectonica v1
 
 ### Agregado
