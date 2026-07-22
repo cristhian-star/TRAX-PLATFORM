@@ -1,5 +1,26 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-21
+
+Se decidio consolidar TRAX como monolito modular con servicios internos concretos para reglas de negocio, view models, permisos operativos y notificaciones.
+
+Motivo:
+
+`main_routes.py` y `operation_routes.py` concentraban demasiada logica de aplicacion. Separar responsabilidades mejora mantenibilidad sin cambiar URLs, templates ni comportamiento visible.
+
+Alcance:
+
+- Extraer construccion de view models hacia servicios de vista.
+- Centralizar permisos y ownership de presupuestos, propuestas y contratos en helpers reutilizables.
+- Separar validacion y normalizacion de formularios operativos.
+- Concentrar notificaciones operativas fuera de las rutas.
+- Mantener Alembic como autoridad del esquema fuera de tests.
+- Validar configuracion por entorno con reglas especificas para desarrollo, testing y produccion.
+
+Criterio:
+
+Las rutas deben quedar limitadas a recibir la peticion, validar acceso, invocar servicios, manejar redirects y renderizar templates. No se creara una capa generica si un servicio concreto resuelve mejor el problema.
+
 ## 2026-07-15
 
 Se decidio implementar un esquema hibrido para contacto por WhatsApp: username como preferencia de privacidad y telefono como fallback tecnico.

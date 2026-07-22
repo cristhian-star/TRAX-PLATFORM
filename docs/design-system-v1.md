@@ -1,5 +1,11 @@
 # TRAX Design System v1
 
+## Jerarquia actual
+
+`docs/design-system-v1.md` conserva los criterios visuales, principios de UX y lineamientos historicos del sistema.
+
+`app/static/css/design-system-v2.css` es la implementacion activa de variables CSS para temas claro/oscuro y componentes reutilizables. Las pantallas nuevas deben priorizar Design System v2 y usar este documento como referencia conceptual.
+
 ## 1. Alcance
 
 Esta propuesta define la base visual para implementar el UX Map v1 de TRAX.

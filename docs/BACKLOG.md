@@ -2,10 +2,16 @@
 
 ## Alta prioridad
 
-- Sin pendientes criticos registrados.
+- Implementar Security & Compliance Foundation v1.
+- Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
+- Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
 
 ## Media prioridad
 
+- Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
+- Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
+- Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
+- Evaluar Redis futuro para rate limiting, cache o colas cuando el volumen lo justifique.
 - Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
 - Validar Google Maps con una API key real en entorno controlado.
 - Implementar geocoding de ubicaciones base.

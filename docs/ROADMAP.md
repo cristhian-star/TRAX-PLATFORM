@@ -36,6 +36,8 @@
 
 [x] WhatsApp Contact Privacy v1
 
+[x] Consolidacion Arquitectonica v1
+
 [ ] Agenda
 
 [ ] WhatsApp Business API
@@ -67,3 +69,17 @@
 [ ] Auditoria visual completa de todas las pantallas secundarias
 
 [ ] Design System v2 - Componentes avanzados
+
+## Arquitectura y Plataforma
+
+[x] Servicios internos para view models, permisos y operaciones
+
+[x] Configuracion por entorno
+
+[x] Alembic como autoridad del esquema
+
+[ ] Security & Compliance Foundation v1
+
+[ ] WSGI productivo
+
+[ ] Redis para rate limiting, cache o colas futuras
