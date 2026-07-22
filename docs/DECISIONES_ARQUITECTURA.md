@@ -2,6 +2,48 @@
 
 ## 2026-07-22
 
+Se decidio cerrar el flujo de WhatsApp con una estrategia mixta: `POST /whatsapp/iniciar` sigue siendo la autoridad del backend y el frontend solicita una respuesta JSON segura para abrir la URL autorizada desde la interaccion del usuario.
+
+Motivo:
+
+El redirect backend tradicional era correcto para validacion y auditoria, pero podia ser menos confiable para abrir WhatsApp despues del consentimiento en ciertos navegadores. La URL final no debe estar en templates ni generarse en HTML publico.
+
+Alcance:
+
+- Mantener `POST /whatsapp/iniciar` como punto unico de validacion, CSRF, ownership, rate limit, sesion y notificacion.
+- Responder `whatsapp_url` por JSON solo despues de validar y registrar la sesion.
+- Mantener redirect HTML como fallback compatible.
+- Reservar la apertura externa desde la accion confirmada del usuario.
+- Evitar dobles envios desde el frontend.
+- No almacenar conversaciones, mensajes ni archivos.
+- No exponer telefonos completos en HTML, DOM ni logs.
+
+Criterio:
+
+Las futuras integraciones con WhatsApp Business Cloud API o webhooks deberan extender el servicio central, sin volver a generar enlaces directos desde templates.
+
+## 2026-07-22
+
+Se decidio centralizar la disponibilidad de Google Maps y tratar la API key como configuracion de entorno con fallback obligatorio.
+
+Motivo:
+
+TRAX debe poder operar sin Google Maps en desarrollo, testing o entornos sin key real, y no debe activar scripts externos con placeholders ni exponer claves hardcodeadas.
+
+Alcance:
+
+- Centralizar validacion de `GOOGLE_MAPS_API_KEY`.
+- Rechazar placeholders como `tu_clave_real`.
+- Exponer la variable en Docker Compose sin valor hardcodeado.
+- Mantener fallback visual si falta la key, falla la carga del script o Google informa error de autenticacion.
+- Conservar la privacidad del perfil publico usando coordenadas aproximadas.
+
+Criterio:
+
+La key real debera restringirse por dominio/referrer, Maps JavaScript API, cuotas y alertas antes de staging. Geocoding, Places y PostGIS quedan fuera de este cierre.
+
+## 2026-07-22
+
 Se decidio incorporar una base de seguridad transversal sin cambiar URLs, modelos ni experiencia visible.
 
 Motivo:

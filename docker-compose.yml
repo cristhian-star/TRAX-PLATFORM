@@ -32,6 +32,8 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       # DATABASE_URL local de Docker Compose. Usar secretos externos en produccion.
       - DATABASE_URL=postgresql+psycopg2://trax_user:trax_password@postgres:5432/trax_db
+      # Clave publica de navegador para Google Maps. Puede quedar vacia en desarrollo.
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy

@@ -43,7 +43,10 @@ WHATSAPP_USERNAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._]{2,63}$")
 
 def _sanitize_phone(value):
     digits = re.sub(r"\D", "", value or "")
-    return digits or None
+    if not 8 <= len(digits) <= 15:
+        return None
+
+    return digits
 
 
 def normalizar_whatsapp_username(value):

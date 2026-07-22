@@ -59,3 +59,32 @@ Antes de promover TRAX a staging o produccion validar:
 - Rate limits revisados segun trafico real.
 - Politicas legales revisadas por profesional: terminos, privacidad, cookies y consentimientos.
 - Escaneo de dependencias y secretos antes de cada release.
+
+## WhatsApp
+
+Toda apertura de WhatsApp debe pasar por `POST /whatsapp/iniciar`.
+
+Reglas:
+
+- No generar enlaces `wa.me` desde templates.
+- Exigir consentimiento antes de salir de TRAX.
+- Validar operacion, ownership, CSRF y rate limit en backend.
+- Registrar `WhatsAppContactSession` y pasar a `CONTACTO_ABIERTO`.
+- Responder JSON seguro para apertura autorizada desde el frontend.
+- Mantener redirect HTML como fallback compatible.
+- No almacenar mensajes, archivos ni conversaciones.
+- No exponer telefonos completos en HTML, DOM ni logs.
+
+## Google Maps
+
+`GOOGLE_MAPS_API_KEY` es una clave publica de navegador y debe configurarse por entorno.
+
+Reglas:
+
+- No hardcodear claves en el repositorio.
+- Rechazar placeholders como `tu_clave_real`.
+- Restringir la key por dominio/referrer autorizado.
+- Limitar APIs habilitadas inicialmente a Maps JavaScript API.
+- Configurar cuotas y alertas en Google Cloud.
+- Mantener fallback visual cuando la key falte, sea placeholder, invalida o falle la carga del script.
+- Mostrar coordenadas publicas aproximadas; nunca exponer el punto exacto profesional.
