@@ -3,6 +3,7 @@ from urllib.parse import urlsplit
 from flask import Blueprint, render_template, request, redirect, session, url_for
 from app.services.auth_service import register_user, authenticate_user
 from app import limiter
+from app.utils.security import ip_rate_limit_key
 
 auth = Blueprint("auth", __name__)
 
@@ -26,7 +27,7 @@ def _safe_next_url(value):
 
 
 @auth.route("/register", methods=["GET", "POST"])
-@limiter.limit("3 per hour", methods=["POST"])
+@limiter.limit("3 per hour", methods=["POST"], key_func=ip_rate_limit_key)
 def register():
     next_url = _safe_next_url(request.values.get("next"))
 
@@ -54,7 +55,7 @@ def register():
 
 
 @auth.route("/login", methods=["GET", "POST"])
-@limiter.limit("5 per minute; 20 per hour", methods=["POST"])
+@limiter.limit("5 per 15 minutes", methods=["POST"], key_func=ip_rate_limit_key)
 def login():
     next_url = _safe_next_url(request.values.get("next"))
 
@@ -71,6 +72,8 @@ def login():
                 next_url=next_url,
             )
 
+        session.clear()
+        session.permanent = True
         session["user_id"] = user.id
         session["user_name"] = user.nombre
         session["user_role"] = user.rol

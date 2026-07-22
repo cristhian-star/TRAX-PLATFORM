@@ -6,6 +6,8 @@ from app.services.whatsapp_contact_service import (
     generar_url,
 )
 from app.models.whatsapp_contact_session import WhatsAppContactSession
+from app import limiter
+from app.utils.security import user_or_ip_rate_limit_key
 
 
 whatsapp = Blueprint("whatsapp", __name__)
@@ -29,6 +31,7 @@ def _parse_optional_int(value):
 
 
 @whatsapp.route("/whatsapp/iniciar", methods=["POST"])
+@limiter.limit("10 per hour", key_func=user_or_ip_rate_limit_key)
 def iniciar_whatsapp():
     if request.form.get("whatsapp_consent") != "on":
         return "Debes aceptar el consentimiento para continuar", 400

@@ -1,4 +1,5 @@
-from flask import Flask, session
+from flask import Flask, jsonify, request, session
+from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -95,6 +96,44 @@ def create_app(config_class=None, initialize_schema=False):
             "navbar_unread_notifications": obtener_no_leidas(user_id),
         }
 
+    def _safe_error_response(status_code, message):
+        if app.config.get("TESTING") or request.accept_mimetypes.best == "application/json" or request.is_json:
+            return jsonify({"error": message}), status_code
+
+        return f"{status_code} - {message}", status_code
+
+    @app.errorhandler(400)
+    def handle_bad_request(error):
+        return _safe_error_response(400, "Solicitud invalida")
+
+    @app.errorhandler(403)
+    def handle_forbidden(error):
+        return _safe_error_response(403, "Acceso no autorizado")
+
+    @app.errorhandler(404)
+    def handle_not_found(error):
+        return _safe_error_response(404, "Recurso no encontrado")
+
+    @app.errorhandler(413)
+    def handle_request_entity_too_large(error):
+        return _safe_error_response(413, "La solicitud supera el limite permitido")
+
+    @app.errorhandler(429)
+    def handle_rate_limit(error):
+        return _safe_error_response(429, "Se excedio el limite de solicitudes")
+
+    @app.errorhandler(500)
+    def handle_internal_error(error):
+        return _safe_error_response(500, "Error interno")
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(error):
+        if isinstance(error, HTTPException):
+            return error
+
+        app.logger.error("Error inesperado procesando la solicitud")
+        return handle_internal_error(error)
+
     @app.after_request
     def add_security_headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -112,6 +151,8 @@ def create_app(config_class=None, initialize_schema=False):
             "base-uri 'self'; "
             "form-action 'self';"
         )
+        if app.config.get("ENV_NAME") == "production" and request.is_secure:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
     return app
