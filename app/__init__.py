@@ -1,11 +1,10 @@
-import os
-from datetime import timedelta
 from flask import Flask, session
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from app.config.config import get_config_class
 
 load_dotenv()
 
@@ -14,24 +13,13 @@ csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address)
 
 
-def create_app(initialize_schema=True):
+def create_app(config_class=None, initialize_schema=False):
     app = Flask(__name__)
 
-    # Config
-    app.config["SECRET_KEY"] = os.environ.get(
-        "SECRET_KEY",
-        "dev-only-insecure-secret-key"
-    )
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-        "DATABASE_URL",
-        "sqlite:///trax.db"
-    )
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SESSION_COOKIE_HTTPONLY"] = True
-    app.config["SESSION_COOKIE_SECURE"] = os.environ.get("FLASK_ENV") == "production"
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
-    app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+    config_class = config_class or get_config_class()
+    config_class.validate()
+    app.config.from_object(config_class)
+    config_class.apply_runtime_config(app.config)
 
     # Inicializar DB
     db.init_app(app)
@@ -54,8 +42,9 @@ def create_app(initialize_schema=True):
     from app.routes.whatsapp_routes import whatsapp
     app.register_blueprint(whatsapp)
 
-    from app.routes.dev_routes import dev
-    app.register_blueprint(dev)
+    if app.config.get("REGISTER_DEV_ROUTES"):
+        from app.routes.dev_routes import dev
+        app.register_blueprint(dev)
     
     from app.models.user import User
     from app.models.professional import Professional
@@ -79,6 +68,11 @@ def create_app(initialize_schema=True):
     from app.models.whatsapp_contact_session import WhatsAppContactSession
 
     if initialize_schema:
+        if not app.config.get("ALLOW_SCHEMA_CREATE_ALL"):
+            raise RuntimeError(
+                "db.create_all() solo esta permitido en tests o desarrollo explicito. "
+                "Usa Alembic para administrar el esquema."
+            )
         with app.app_context():
             db.create_all()
 

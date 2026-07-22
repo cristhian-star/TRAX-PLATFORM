@@ -9,7 +9,6 @@ from app.services.budget_service import (
     create_budget_offer,
     create_budget_request,
     get_budget_offers,
-    get_budget_request_by_id,
     get_open_budget_requests,
     get_offer_allowance,
 )
@@ -35,7 +34,6 @@ from app.services.proposal_service import (
     create_proposal_request,
     discard_application,
     get_open_proposals,
-    get_proposal_by_id,
 )
 from app.services.professional_service import (
     get_professional_by_id,
@@ -51,6 +49,11 @@ from app.services.operation_notification_service import (
     notify_proposal_cancelled,
     notify_proposal_created,
     notify_proposal_discarded,
+)
+from app.services.operation_policy_service import (
+    get_budget_request_or_error,
+    get_proposal_or_error,
+    require_budget_owner,
 )
 from app.services.operation_request_service import (
     build_budget_form_data,
@@ -391,10 +394,12 @@ def marketplace_presupuestos():
 @login_required
 @role_required("CLIENTE")
 def confirmacion_presupuesto(id):
-    budget_request = get_budget_request_by_id(id)
-    if budget_request is None:
+    try:
+        budget_request = get_budget_request_or_error(id)
+        require_budget_owner(budget_request, session["user_id"])
+    except LookupError:
         abort(404)
-    if budget_request.cliente_id != session["user_id"]:
+    except PermissionError:
         abort(403)
 
     offer_count = len(get_budget_offers(id))
@@ -410,8 +415,9 @@ def confirmacion_presupuesto(id):
 @operations.route("/presupuestos/<int:id>", methods=["GET"])
 @login_required
 def detalle_presupuesto(id):
-    budget_request = get_budget_request_by_id(id)
-    if budget_request is None:
+    try:
+        budget_request = get_budget_request_or_error(id)
+    except LookupError:
         abort(404)
 
     current_user_id = session["user_id"]
@@ -658,8 +664,9 @@ def marketplace_propuestas():
 
 @operations.route("/propuestas/<int:id>", methods=["GET"])
 def detalle_propuesta(id):
-    proposal = get_proposal_by_id(id)
-    if proposal is None:
+    try:
+        proposal = get_proposal_or_error(id)
+    except LookupError:
         abort(404)
 
     return render_template(

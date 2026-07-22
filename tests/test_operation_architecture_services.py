@@ -8,7 +8,9 @@ os.environ["SECRET_KEY"] = "test-secret"
 
 from app import create_app, db
 from app.models.contract_request import ContractRequest
+from app.models.budget_request import BudgetRequest
 from app.models.professional import Professional
+from app.models.proposal_request import ProposalRequest
 from app.models.user import User
 from app.services.contract_service import (
     get_contract_detail_context,
@@ -20,6 +22,11 @@ from app.services.operation_request_service import (
     build_proposal_form_data,
     validate_budget_form_data,
     validate_proposal_form_data,
+)
+from app.services.operation_policy_service import (
+    proposal_owner_id,
+    require_budget_owner,
+    require_proposal_owner,
 )
 from app.services.operation_view_service import build_budget_offer_data
 
@@ -107,12 +114,32 @@ class OperationRouteAndOwnershipTest(unittest.TestCase):
                 servicio="Electricidad",
                 estado="CREADA",
             )
+            self.budget_request = BudgetRequest(
+                cliente_id=self.client_user.id,
+                categoria="Electricidad",
+                titulo="Tablero",
+                descripcion="Revisar tablero",
+                zona="CABA",
+                estado="ABIERTO",
+            )
+            self.proposal = ProposalRequest(
+                cliente_id=self.client_user.id,
+                owner_user_id=self.client_user.id,
+                categoria="Electricidad",
+                titulo="Mantenimiento",
+                descripcion="Trabajo",
+                estado="PUBLICADA",
+            )
             db.session.add(self.contract)
+            db.session.add(self.budget_request)
+            db.session.add(self.proposal)
             db.session.commit()
             self.client_user_id = self.client_user.id
             self.other_user_id = self.other_user.id
             self.professional_user_id = self.professional_user.id
             self.contract_id = self.contract.id
+            self.budget_request_id = self.budget_request.id
+            self.proposal_id = self.proposal.id
 
     def tearDown(self):
         with self.app.app_context():
@@ -176,6 +203,23 @@ class OperationRouteAndOwnershipTest(unittest.TestCase):
 
             self.assertFalse(context["is_client"])
             self.assertTrue(context["is_professional"])
+
+    def test_budget_owner_policy_rejects_other_user(self):
+        with self.app.app_context():
+            budget_request = db.session.get(BudgetRequest, self.budget_request_id)
+
+            require_budget_owner(budget_request, self.client_user_id)
+            with self.assertRaises(PermissionError):
+                require_budget_owner(budget_request, self.other_user_id)
+
+    def test_proposal_owner_policy_rejects_other_user(self):
+        with self.app.app_context():
+            proposal = db.session.get(ProposalRequest, self.proposal_id)
+
+            self.assertEqual(proposal_owner_id(proposal), self.client_user_id)
+            require_proposal_owner(proposal, self.client_user_id)
+            with self.assertRaises(PermissionError):
+                require_proposal_owner(proposal, self.other_user_id)
 
 
 class OperationViewServiceTest(unittest.TestCase):
