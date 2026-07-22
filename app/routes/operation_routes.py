@@ -1,61 +1,32 @@
-from datetime import datetime
-import re
-
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 
 from app import db
 from app.models.user import User
-from app.services.audit_service import create_audit_log
-from app.models.professional import Professional
 from app.services.budget_service import (
     MAX_OFFERS_PER_REQUEST,
     award_budget_offer,
     cancel_budget_request,
     create_budget_offer,
     create_budget_request,
-    get_client_budget_requests_with_counts,
     get_budget_offers,
-    get_budget_request_by_id,
     get_open_budget_requests,
     get_offer_allowance,
-    get_professional_budget_offers,
 )
 from app.services.contract_service import (
+    audit_contract_action,
     accept_contract,
     cancel_contract,
     complete_contract,
     confirm_contract,
     create_contract,
-    get_contract_by_id,
+    get_contract_detail_context,
+    get_contract_or_error,
+    require_assigned_professional,
+    require_client_owner,
     reject_contract,
     start_contract,
 )
 from app.services.emergency_service import create_emergency_request
-from app.services.geographic_matching_service import (
-    normalizar_coordenadas,
-    obtener_resultado_cobertura,
-)
-from app.services.notification_service import (
-    CATEGORIA_EMERGENCIAS,
-    CATEGORIA_PRESUPUESTOS,
-    CATEGORIA_PROPUESTAS,
-    PRIORIDAD_ACCION_REQUERIDA,
-    PRIORIDAD_INFO,
-    TIPO_EMERGENCIA_PUBLICADA,
-    TIPO_PRESUPUESTO_ADJUDICADO_CLIENTE,
-    TIPO_PRESUPUESTO_ADJUDICADO_PROFESIONAL,
-    TIPO_PRESUPUESTO_CANCELADO,
-    TIPO_PRESUPUESTO_OFERTA_ENVIADA,
-    TIPO_PRESUPUESTO_OFERTA_RECIBIDA,
-    TIPO_PRESUPUESTO_PUBLICADO,
-    TIPO_PROPUESTA_CANCELADA,
-    TIPO_PROPUESTA_POSTULACION_ACEPTADA,
-    TIPO_PROPUESTA_POSTULACION_DESCARTADA,
-    TIPO_PROPUESTA_POSTULACION_ENVIADA,
-    TIPO_PROPUESTA_POSTULACION_RECIBIDA,
-    TIPO_PROPUESTA_PUBLICADA,
-    registrar_evento,
-)
 from app.services.proposal_service import (
     accept_application,
     apply_to_proposal,
@@ -63,402 +34,57 @@ from app.services.proposal_service import (
     create_proposal_request,
     discard_application,
     get_open_proposals,
-    get_professional_application,
-    get_proposal_applications,
-    get_proposal_by_id,
 )
 from app.services.professional_service import (
     get_professional_by_id,
-    search_emergency_professionals,
 )
-from app.services.review_service import (
-    get_professional_average_rating,
-    get_professional_reviews,
+from app.services.operation_notification_service import (
+    notify_budget_awarded,
+    notify_budget_cancelled,
+    notify_budget_created,
+    notify_budget_offer_created,
+    notify_emergency_created,
+    notify_proposal_accepted,
+    notify_proposal_application_created,
+    notify_proposal_cancelled,
+    notify_proposal_created,
+    notify_proposal_discarded,
 )
-from app.services.subscription_service import has_pro_access
-from app.services.taxonomy_service import (
-    obtener_categorias,
-    obtener_especialidades,
-    obtener_industrias,
-    obtener_rubros,
+from app.services.operation_policy_service import (
+    get_budget_request_or_error,
+    get_proposal_or_error,
+    require_budget_owner,
+)
+from app.services.operation_request_service import (
+    build_budget_form_data,
+    build_proposal_form_data,
+    empty_to_none,
+    get_query_prefill,
+    get_request_coordinates,
+    parse_date,
+    parse_datetime,
+    validate_budget_form_data,
+    validate_proposal_form_data,
+)
+from app.services.operation_view_service import (
+    build_budget_detail_context,
+    build_client_budget_request_rows,
+    build_emergency_directory_rows,
+    build_professional_budget_offer_rows,
+    build_proposal_detail_context,
+    build_proposal_taxonomy_options,
 )
 from app.services.user_service import is_user_active
-from app.services.verification_service import has_approved_verification
-from app.utils.decorators import login_required, pro_required, profile_complete_required, role_required, verified_required
+from app.utils.decorators import login_required, profile_complete_required, role_required
 
 operations = Blueprint("operations", __name__)
 
 
-def _empty_to_none(value):
-    if value is None:
-        return None
-
-    value = value.strip()
-    return value or None
-
-
-def _parse_datetime(value):
-    value = _empty_to_none(value)
-
-    if value is None:
-        return None
-
-    return datetime.fromisoformat(value)
-
-
-def _parse_date(value):
-    value = _empty_to_none(value)
-
-    if value is None:
-        return None
-
-    return datetime.strptime(value, "%Y-%m-%d").date()
-
-
-def _get_query_prefill(*field_names):
-    return {
-        field_name: _empty_to_none(request.args.get(field_name)) or ""
-        for field_name in field_names
-    }
-
-
-def _get_request_coordinates(source):
-    latitude = source.get("latitude") or source.get("latitud") or source.get("lat")
-    longitude = source.get("longitude") or source.get("longitud") or source.get("lng")
-    return normalizar_coordenadas(latitude, longitude)
-
-
-def _get_emergency_professional_data(professional, coordinates=None):
-    user_id = professional.user_id
-    phone_digits = re.sub(r"\D", "", professional.telefono or "")
-    is_pro = has_pro_access(user_id) if user_id else False
-    is_verified = has_approved_verification(user_id) if user_id else False
-    reviews = get_professional_reviews(professional.id)
-    average_rating = get_professional_average_rating(professional.id)
-    latitude = coordinates[0] if coordinates is not None else None
-    longitude = coordinates[1] if coordinates is not None else None
-    coverage_match = obtener_resultado_cobertura(professional, latitude, longitude)
-
-    return {
-        "professional": professional,
-        "badges": {
-            "work": True,
-            "pro": is_pro,
-            "verified": is_verified,
-        },
-        "rating": {
-            "average": average_rating,
-            "count": len(reviews),
-        },
-        "phone": {
-            "whatsapp": phone_digits or None,
-            "call": f"+{phone_digits}" if phone_digits else None,
-        },
-        "availability": {
-            "primary": "Disponible segun perfil",
-            "secondary": "Guardia no configurada",
-            "priority": "Prioridad PRO" if is_pro else None,
-        },
-        "coverage_match": coverage_match,
-        "sort": {
-            "coverage": coverage_match["sort_rank"],
-            "pro": 1 if is_pro else 0,
-            "verified": 1 if is_verified else 0,
-            "rating": average_rating or 0,
-            "distance": coverage_match["distance_km"],
-        },
-    }
-
-
-def _get_budget_offer_data(offer):
-    professional = offer.professional
-    reviews = get_professional_reviews(professional.id)
-    user_id = professional.user_id
-    phone_digits = re.sub(r"\D", "", professional.telefono or "")
-
-    return {
-        "offer": offer,
-        "professional": professional,
-        "badges": {
-            "work": True,
-            "pro": has_pro_access(user_id) if user_id else False,
-            "verified": has_approved_verification(user_id) if user_id else False,
-        },
-        "rating": {
-            "average": get_professional_average_rating(professional.id),
-            "count": len(reviews),
-        },
-        "phone": {
-            "whatsapp": phone_digits or None,
-        },
-    }
-
-
-def _audit_contract_action(action, contract, description):
-    target_user_id = (
-        contract.cliente_id
-        if session["user_id"] == contract.professional_user_id
-        else contract.professional_user_id
-    )
-    create_audit_log(
-        actor_user_id=session["user_id"],
-        target_user_id=target_user_id,
-        action=action,
-        description=description,
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-    )
-
-
-def _user_display_name(user_id, fallback="Usuario TRAX"):
-    user = db.session.get(User, user_id) if user_id else None
-    return user.nombre if user and user.nombre else fallback
-
-
-def _notify_budget_created(budget_request):
-    registrar_evento(
-        user_id=budget_request.cliente_id,
-        actor_user_id=budget_request.cliente_id,
-        tipo=TIPO_PRESUPUESTO_PUBLICADO,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Publicaste una solicitud de presupuesto",
-        mensaje=f"{budget_request.titulo} quedo disponible para recibir ofertas.",
-        url_destino=f"/presupuestos/{budget_request.id}",
-        entity_type="BudgetRequest",
-        entity_id=budget_request.id,
-    )
-
-
-def _notify_budget_offer_created(offer):
-    budget_request = offer.budget_request
-    professional_name = _user_display_name(offer.professional_user_id, "Un profesional")
-
-    registrar_evento(
-        user_id=offer.professional_user_id,
-        actor_user_id=offer.professional_user_id,
-        tipo=TIPO_PRESUPUESTO_OFERTA_ENVIADA,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Enviaste un presupuesto preliminar",
-        mensaje=f"Tu oferta para {budget_request.titulo} quedo registrada.",
-        url_destino=f"/presupuestos/{budget_request.id}",
-        entity_type="BudgetOffer",
-        entity_id=offer.id,
-    )
-    registrar_evento(
-        user_id=budget_request.cliente_id,
-        actor_user_id=offer.professional_user_id,
-        tipo=TIPO_PRESUPUESTO_OFERTA_RECIBIDA,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Recibiste un nuevo presupuesto",
-        mensaje=f"{professional_name} envio una oferta para {budget_request.titulo}.",
-        url_destino=f"/presupuestos/{budget_request.id}",
-        entity_type="BudgetOffer",
-        entity_id=offer.id,
-        prioridad=PRIORIDAD_ACCION_REQUERIDA,
-        requiere_accion=True,
-    )
-
-
-def _notify_budget_awarded(offer):
-    budget_request = offer.budget_request
-    professional_name = _user_display_name(offer.professional_user_id, "el profesional")
-
-    registrar_evento(
-        user_id=budget_request.cliente_id,
-        actor_user_id=budget_request.cliente_id,
-        tipo=TIPO_PRESUPUESTO_ADJUDICADO_CLIENTE,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Adjudicaste una oferta",
-        mensaje=f"Seleccionaste a {professional_name} para {budget_request.titulo}.",
-        url_destino=f"/presupuestos/{budget_request.id}",
-        entity_type="BudgetOffer",
-        entity_id=offer.id,
-    )
-    registrar_evento(
-        user_id=offer.professional_user_id,
-        actor_user_id=budget_request.cliente_id,
-        tipo=TIPO_PRESUPUESTO_ADJUDICADO_PROFESIONAL,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Tu presupuesto fue adjudicado",
-        mensaje=f"Fuiste seleccionado para {budget_request.titulo}.",
-        url_destino=f"/presupuestos/{budget_request.id}",
-        entity_type="BudgetOffer",
-        entity_id=offer.id,
-        prioridad=PRIORIDAD_ACCION_REQUERIDA,
-        requiere_accion=True,
-    )
-
-
-def _notify_budget_cancelled(budget_request):
-    registrar_evento(
-        user_id=budget_request.cliente_id,
-        actor_user_id=budget_request.cliente_id,
-        tipo=TIPO_PRESUPUESTO_CANCELADO,
-        categoria=CATEGORIA_PRESUPUESTOS,
-        titulo="Cancelaste una solicitud de presupuesto",
-        mensaje=f"{budget_request.titulo} ya no recibira nuevas ofertas.",
-        url_destino="/presupuestos/mis-solicitudes?estado=canceladas",
-        entity_type="BudgetRequest",
-        entity_id=budget_request.id,
-    )
-
-    notified_professionals = {
-        offer.professional_user_id
-        for offer in budget_request.offers
-        if offer.professional_user_id
-    }
-    for professional_user_id in notified_professionals:
-        registrar_evento(
-            user_id=professional_user_id,
-            actor_user_id=budget_request.cliente_id,
-            tipo=TIPO_PRESUPUESTO_CANCELADO,
-            categoria=CATEGORIA_PRESUPUESTOS,
-            titulo="Una solicitud fue cancelada",
-            mensaje=f"La solicitud {budget_request.titulo} fue cancelada por el cliente.",
-            url_destino=f"/presupuestos/{budget_request.id}",
-            entity_type="BudgetRequest",
-            entity_id=budget_request.id,
-        )
-
-
-def _notify_emergency_created(emergency_request):
-    registrar_evento(
-        user_id=emergency_request.cliente_id,
-        actor_user_id=emergency_request.cliente_id,
-        tipo=TIPO_EMERGENCIA_PUBLICADA,
-        categoria=CATEGORIA_EMERGENCIAS,
-        titulo="Publicaste una emergencia",
-        mensaje=f"Tu emergencia de {emergency_request.categoria} en {emergency_request.zona} quedo registrada.",
-        url_destino="/emergencias/directorio",
-        entity_type="EmergencyRequest",
-        entity_id=emergency_request.id,
-        prioridad=PRIORIDAD_ACCION_REQUERIDA,
-        requiere_accion=True,
-    )
-
-
-def _notify_proposal_created(proposal):
-    registrar_evento(
-        user_id=proposal.owner_user_id or proposal.cliente_id,
-        actor_user_id=proposal.owner_user_id or proposal.cliente_id,
-        tipo=TIPO_PROPUESTA_PUBLICADA,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo="Publicaste una propuesta",
-        mensaje=f"{proposal.titulo} ya puede recibir postulaciones.",
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalRequest",
-        entity_id=proposal.id,
-    )
-
-
-def _notify_proposal_application_created(application):
-    proposal = application.proposal
-    owner_id = proposal.owner_user_id or proposal.cliente_id
-    professional_name = _user_display_name(application.professional_user_id, "Un profesional")
-
-    registrar_evento(
-        user_id=application.professional_user_id,
-        actor_user_id=application.professional_user_id,
-        tipo=TIPO_PROPUESTA_POSTULACION_ENVIADA,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo="Te postulaste a una propuesta",
-        mensaje=f"Tu postulacion para {proposal.titulo} quedo registrada.",
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalApplication",
-        entity_id=application.id,
-    )
-    registrar_evento(
-        user_id=owner_id,
-        actor_user_id=application.professional_user_id,
-        tipo=TIPO_PROPUESTA_POSTULACION_RECIBIDA,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo="Recibiste una postulacion",
-        mensaje=f"{professional_name} se postulo a {proposal.titulo}.",
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalApplication",
-        entity_id=application.id,
-        prioridad=PRIORIDAD_ACCION_REQUERIDA,
-        requiere_accion=True,
-    )
-
-
-def _notify_proposal_application_status(application, tipo, title, message):
-    proposal = application.proposal
-    owner_id = proposal.owner_user_id or proposal.cliente_id
-
-    registrar_evento(
-        user_id=owner_id,
-        actor_user_id=owner_id,
-        tipo=tipo,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo=title,
-        mensaje=message,
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalApplication",
-        entity_id=application.id,
-    )
-    registrar_evento(
-        user_id=application.professional_user_id,
-        actor_user_id=owner_id,
-        tipo=tipo,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo=title,
-        mensaje=message,
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalApplication",
-        entity_id=application.id,
-        prioridad=PRIORIDAD_INFO,
-    )
-
-
-def _notify_proposal_cancelled(proposal):
-    owner_id = proposal.owner_user_id or proposal.cliente_id
-    registrar_evento(
-        user_id=owner_id,
-        actor_user_id=owner_id,
-        tipo=TIPO_PROPUESTA_CANCELADA,
-        categoria=CATEGORIA_PROPUESTAS,
-        titulo="Cancelaste una propuesta",
-        mensaje=f"{proposal.titulo} ya no recibira postulaciones.",
-        url_destino=f"/propuestas/{proposal.id}",
-        entity_type="ProposalRequest",
-        entity_id=proposal.id,
-    )
-
-    notified_professionals = {
-        application.professional_user_id
-        for application in proposal.applications
-        if application.professional_user_id
-    }
-    for professional_user_id in notified_professionals:
-        registrar_evento(
-            user_id=professional_user_id,
-            actor_user_id=owner_id,
-            tipo=TIPO_PROPUESTA_CANCELADA,
-            categoria=CATEGORIA_PROPUESTAS,
-            titulo="Una propuesta fue cancelada",
-            mensaje=f"La propuesta {proposal.titulo} fue cancelada por el publicador.",
-            url_destino=f"/propuestas/{proposal.id}",
-            entity_type="ProposalRequest",
-            entity_id=proposal.id,
-        )
-
-
 def _load_contract_or_404(contract_id):
-    contract = get_contract_by_id(contract_id)
-    if contract is None:
+    try:
+        return get_contract_or_error(contract_id)
+    except LookupError:
         abort(404)
-    return contract
-
-
-def _require_assigned_professional(contract):
-    if contract.professional_user_id != session["user_id"]:
-        abort(403)
-
-
-def _require_client_owner(contract):
-    if contract.cliente_id != session["user_id"]:
-        abort(403)
 
 
 @operations.route("/contratacion/nueva", methods=["GET", "POST"])
@@ -488,10 +114,10 @@ def nueva_contratacion():
             professional_id=professional.id,
             professional_user_id=professional.user_id,
             servicio=request.form.get("servicio"),
-            descripcion=_empty_to_none(request.form.get("descripcion")),
-            precio_acordado=_empty_to_none(request.form.get("precio_acordado")),
-            fecha_inicio=_parse_datetime(request.form.get("fecha_inicio")),
-            fecha_fin=_parse_datetime(request.form.get("fecha_fin"))
+            descripcion=empty_to_none(request.form.get("descripcion")),
+            precio_acordado=empty_to_none(request.form.get("precio_acordado")),
+            fecha_inicio=parse_datetime(request.form.get("fecha_inicio")),
+            fecha_fin=parse_datetime(request.form.get("fecha_fin"))
         )
 
         return redirect(f"/contratacion/{contract.id}")
@@ -503,19 +129,14 @@ def nueva_contratacion():
 @login_required
 def contract_detail(id):
     contract = _load_contract_or_404(id)
-    is_client = contract.cliente_id == session["user_id"]
-    is_professional = contract.professional_user_id == session["user_id"]
-
-    if not is_client and not is_professional:
+    try:
+        context = get_contract_detail_context(contract, session["user_id"])
+    except PermissionError:
         abort(403)
 
     return render_template(
         "contract_detail.html",
-        contract=contract,
-        client_user=User.query.filter_by(id=contract.cliente_id).first(),
-        professional_user=User.query.filter_by(id=contract.professional_user_id).first(),
-        is_client=is_client,
-        is_professional=is_professional,
+        **context,
     )
 
 
@@ -524,12 +145,21 @@ def contract_detail(id):
 @role_required("PROFESIONAL")
 def aceptar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_assigned_professional(contract)
     try:
+        require_assigned_professional(contract, session["user_id"])
         contract = accept_contract(id, session["user_id"])
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_ACCEPTED", contract, f"Contratacion #{id} aceptada.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_ACCEPTED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} aceptada.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -538,12 +168,21 @@ def aceptar_contratacion(id):
 @role_required("PROFESIONAL")
 def rechazar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_assigned_professional(contract)
     try:
+        require_assigned_professional(contract, session["user_id"])
         contract = reject_contract(id, session["user_id"])
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_REJECTED", contract, f"Contratacion #{id} rechazada.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_REJECTED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} rechazada.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -552,12 +191,21 @@ def rechazar_contratacion(id):
 @role_required("PROFESIONAL")
 def iniciar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_assigned_professional(contract)
     try:
+        require_assigned_professional(contract, session["user_id"])
         contract = start_contract(id)
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_STARTED", contract, f"Contratacion #{id} iniciada.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_STARTED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} iniciada.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -566,12 +214,21 @@ def iniciar_contratacion(id):
 @role_required("PROFESIONAL")
 def completar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_assigned_professional(contract)
     try:
+        require_assigned_professional(contract, session["user_id"])
         contract = complete_contract(id)
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_COMPLETED", contract, f"Contratacion #{id} completada.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_COMPLETED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} completada.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -579,12 +236,21 @@ def completar_contratacion(id):
 @login_required
 def confirmar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_client_owner(contract)
     try:
+        require_client_owner(contract, session["user_id"])
         contract = confirm_contract(id)
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_CONFIRMED", contract, f"Contratacion #{id} confirmada por cliente.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_CONFIRMED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} confirmada por cliente.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -592,12 +258,21 @@ def confirmar_contratacion(id):
 @login_required
 def cancelar_contratacion(id):
     contract = _load_contract_or_404(id)
-    _require_client_owner(contract)
     try:
+        require_client_owner(contract, session["user_id"])
         contract = cancel_contract(id)
     except ValueError as error:
         return str(error), 400
-    _audit_contract_action("CONTRACT_CANCELLED", contract, f"Contratacion #{id} cancelada por cliente.")
+    except PermissionError:
+        abort(403)
+    audit_contract_action(
+        "CONTRACT_CANCELLED",
+        contract,
+        session["user_id"],
+        ip_address=request.remote_addr,
+        user_agent=request.user_agent.string,
+        description=f"Contratacion #{id} cancelada por cliente.",
+    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -611,36 +286,18 @@ def nuevo_presupuesto():
     is_anonymous = not is_user_active(current_user)
 
     if request.method == "POST":
-        form_data = {
-            "categoria": _empty_to_none(request.form.get("categoria")) or "",
-            "zona": _empty_to_none(request.form.get("zona")) or "",
-            "titulo": _empty_to_none(request.form.get("titulo")) or "",
-            "descripcion": _empty_to_none(request.form.get("descripcion")) or "",
-            "fecha_estimada": _empty_to_none(request.form.get("fecha_estimada")) or "",
-            "urgencia": _empty_to_none(request.form.get("urgencia")) or "NORMAL",
-        }
-
-        if not all(
-            form_data[field]
-            for field in ("categoria", "zona", "titulo", "descripcion")
-        ):
+        form_data = build_budget_form_data(request.form)
+        form_error = validate_budget_form_data(form_data)
+        if form_error:
             return render_template(
                 "nuevo_presupuesto.html",
                 form_data=form_data,
-                error="Completa categoria, zona, titulo y descripcion.",
-                is_anonymous=is_anonymous,
-            ), 400
-
-        if form_data["urgencia"] not in ("BAJA", "NORMAL", "ALTA"):
-            return render_template(
-                "nuevo_presupuesto.html",
-                form_data=form_data,
-                error="Selecciona una urgencia valida.",
+                error=form_error,
                 is_anonymous=is_anonymous,
             ), 400
 
         try:
-            estimated_date = _parse_date(form_data["fecha_estimada"])
+            estimated_date = parse_date(form_data["fecha_estimada"])
         except ValueError:
             return render_template(
                 "nuevo_presupuesto.html",
@@ -659,7 +316,7 @@ def nuevo_presupuesto():
                 fecha_estimada=estimated_date,
                 urgencia=form_data["urgencia"],
             )
-            _notify_budget_created(budget_request)
+            notify_budget_created(budget_request)
 
             return redirect(url_for("operations.confirmacion_presupuesto", id=budget_request.id))
 
@@ -680,9 +337,9 @@ def nuevo_presupuesto():
     return render_template(
         "nuevo_presupuesto.html",
         form_data={
-            **_get_query_prefill("categoria", "zona", "titulo", "descripcion"),
-            "fecha_estimada": _empty_to_none(request.args.get("fecha_estimada")) or "",
-            "urgencia": _empty_to_none(request.args.get("urgencia")) or "NORMAL",
+            **get_query_prefill(request.args, "categoria", "zona", "titulo", "descripcion"),
+            "fecha_estimada": empty_to_none(request.args.get("fecha_estimada")) or "",
+            "urgencia": empty_to_none(request.args.get("urgencia")) or "NORMAL",
         },
         is_anonymous=is_anonymous,
     )
@@ -692,26 +349,10 @@ def nuevo_presupuesto():
 @login_required
 @role_required("CLIENTE")
 def mis_solicitudes_presupuesto():
-    estado_filtro = _empty_to_none(request.args.get("estado")) or "activas"
-    estados_por_filtro = {
-        "activas": ("ABIERTO", "COTIZANDO"),
-        "adjudicadas": ("ADJUDICADA",),
-        "canceladas": ("CANCELADA",),
-        "todas": None,
-    }
-    if estado_filtro not in estados_por_filtro:
-        estado_filtro = "activas"
-
-    request_rows = [
-        {
-            "budget_request": budget_request,
-            "offer_count": offer_count,
-        }
-        for budget_request, offer_count in get_client_budget_requests_with_counts(
-            session["user_id"],
-            estados=estados_por_filtro[estado_filtro],
-        )
-    ]
+    request_rows, estado_filtro = build_client_budget_request_rows(
+        session["user_id"],
+        empty_to_none(request.args.get("estado")) or "activas",
+    )
 
     return render_template(
         "mis_solicitudes_presupuesto.html",
@@ -725,21 +366,9 @@ def mis_solicitudes_presupuesto():
 @login_required
 @role_required("PROFESIONAL")
 def mis_presupuestos_enviados():
-    offer_rows = []
-
-    for offer in get_professional_budget_offers(session["user_id"]):
-        budget_request = offer.budget_request
-        client = db.session.get(User, budget_request.cliente_id)
-        offer_rows.append({
-            "offer": offer,
-            "budget_request": budget_request,
-            "client": client,
-            "offer_count": len(budget_request.offers),
-        })
-
     return render_template(
         "mis_presupuestos_enviados.html",
-        offer_rows=offer_rows,
+        offer_rows=build_professional_budget_offer_rows(session["user_id"]),
         max_offers=MAX_OFFERS_PER_REQUEST,
     )
 
@@ -748,8 +377,8 @@ def mis_presupuestos_enviados():
 @login_required
 @role_required("PROFESIONAL")
 def marketplace_presupuestos():
-    categoria = _empty_to_none(request.args.get("categoria")) or ""
-    zona = _empty_to_none(request.args.get("zona")) or ""
+    categoria = empty_to_none(request.args.get("categoria")) or ""
+    zona = empty_to_none(request.args.get("zona")) or ""
     budget_requests = get_open_budget_requests(categoria, zona)
 
     return render_template(
@@ -765,10 +394,12 @@ def marketplace_presupuestos():
 @login_required
 @role_required("CLIENTE")
 def confirmacion_presupuesto(id):
-    budget_request = get_budget_request_by_id(id)
-    if budget_request is None:
+    try:
+        budget_request = get_budget_request_or_error(id)
+        require_budget_owner(budget_request, session["user_id"])
+    except LookupError:
         abort(404)
-    if budget_request.cliente_id != session["user_id"]:
+    except PermissionError:
         abort(403)
 
     offer_count = len(get_budget_offers(id))
@@ -784,42 +415,16 @@ def confirmacion_presupuesto(id):
 @operations.route("/presupuestos/<int:id>", methods=["GET"])
 @login_required
 def detalle_presupuesto(id):
-    budget_request = get_budget_request_by_id(id)
-    if budget_request is None:
+    try:
+        budget_request = get_budget_request_or_error(id)
+    except LookupError:
         abort(404)
 
     current_user_id = session["user_id"]
-    current_user = db.session.get(User, current_user_id)
-    is_owner = budget_request.cliente_id == current_user_id
-    current_professional = Professional.query.filter_by(user_id=current_user_id).first()
-    is_professional = (
-        current_user is not None
-        and current_user.rol == "PROFESIONAL"
-        and current_professional is not None
-    )
-    offers = get_budget_offers(id)
-    own_offer = next(
-        (
-            offer
-            for offer in offers
-            if offer.professional_user_id == current_user_id
-        ),
-        None,
-    )
 
     return render_template(
         "detalle_presupuesto.html",
-        budget_request=budget_request,
-        offer_rows=[_get_budget_offer_data(offer) for offer in offers] if is_owner else [],
-        offer_count=len(offers),
-        max_offers=MAX_OFFERS_PER_REQUEST,
-        is_owner=is_owner,
-        is_professional=is_professional,
-        own_offer=own_offer,
-        offer_allowance=get_offer_allowance(current_user_id) if is_professional else None,
-        offer_error=request.args.get("error"),
-        offer_sent=request.args.get("enviado") == "1",
-        awarded=request.args.get("adjudicado") == "1",
+        **build_budget_detail_context(budget_request, current_user_id, request.args),
     )
 
 
@@ -828,12 +433,12 @@ def detalle_presupuesto(id):
 @role_required("PROFESIONAL")
 @profile_complete_required
 def ofertar_presupuesto(id):
-    cobra_visita = _empty_to_none(request.form.get("cobra_visita")) or "no"
-    precio_visita = _empty_to_none(request.form.get("precio_visita"))
-    monto_desde = _empty_to_none(request.form.get("monto_desde"))
-    monto_hasta = _empty_to_none(request.form.get("monto_hasta"))
-    plazo_estimado = _empty_to_none(request.form.get("plazo_estimado"))
-    condiciones = _empty_to_none(request.form.get("condiciones"))
+    cobra_visita = empty_to_none(request.form.get("cobra_visita")) or "no"
+    precio_visita = empty_to_none(request.form.get("precio_visita"))
+    monto_desde = empty_to_none(request.form.get("monto_desde"))
+    monto_hasta = empty_to_none(request.form.get("monto_hasta"))
+    plazo_estimado = empty_to_none(request.form.get("plazo_estimado"))
+    condiciones = empty_to_none(request.form.get("condiciones"))
 
     if not monto_desde or not monto_hasta or not plazo_estimado:
         return redirect(url_for(
@@ -853,7 +458,7 @@ def ofertar_presupuesto(id):
             plazo_estimado=plazo_estimado,
             condiciones=condiciones,
         )
-        _notify_budget_offer_created(offer)
+        notify_budget_offer_created(offer)
     except ValueError as error:
         return redirect(url_for(
             "operations.detalle_presupuesto",
@@ -876,7 +481,7 @@ def adjudicar_presupuesto(id, presupuesto_id):
             offer_id=presupuesto_id,
             cliente_id=session["user_id"],
         )
-        _notify_budget_awarded(offer)
+        notify_budget_awarded(offer)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -902,7 +507,7 @@ def cancelar_presupuesto(id):
             budget_request_id=id,
             cliente_id=session["user_id"],
         )
-        _notify_budget_cancelled(budget_request)
+        notify_budget_cancelled(budget_request)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -918,9 +523,9 @@ def cancelar_presupuesto(id):
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
 def nueva_emergencia():
     if request.method == "POST":
-        categoria = _empty_to_none(request.form.get("categoria"))
-        zona = _empty_to_none(request.form.get("zona"))
-        descripcion = _empty_to_none(request.form.get("descripcion"))
+        categoria = empty_to_none(request.form.get("categoria"))
+        zona = empty_to_none(request.form.get("zona"))
+        descripcion = empty_to_none(request.form.get("descripcion"))
 
         if not categoria or not zona or not descripcion:
             return "Categoria, zona y descripcion son requeridas", 400
@@ -929,7 +534,7 @@ def nueva_emergencia():
             "categoria": categoria,
             "zona": zona,
         }
-        coordinates = _get_request_coordinates(request.form)
+        coordinates = get_request_coordinates(request.form)
         if coordinates is not None:
             redirect_values["latitude"] = coordinates[0]
             redirect_values["longitude"] = coordinates[1]
@@ -944,7 +549,7 @@ def nueva_emergencia():
                 zona=zona,
                 prioridad=request.form.get("prioridad") or "ALTA",
             )
-            _notify_emergency_created(emergency_request)
+            notify_emergency_created(emergency_request)
             redirect_values["solicitud"] = emergency_request.id
         else:
             redirect_values["consulta_anonima"] = "1"
@@ -958,29 +563,16 @@ def nueva_emergencia():
 
     return render_template(
         "nueva_emergencia.html",
-        form_data=_get_query_prefill("categoria", "zona", "descripcion"),
+        form_data=get_query_prefill(request.args, "categoria", "zona", "descripcion"),
     )
 
 
 @operations.route("/emergencias/directorio", methods=["GET"])
 def directorio_emergencias():
-    categoria = _empty_to_none(request.args.get("categoria")) or ""
-    zona = _empty_to_none(request.args.get("zona")) or ""
-    coordinates = _get_request_coordinates(request.args)
-    professionals = search_emergency_professionals(categoria, zona)
-    professional_rows = sorted(
-        (_get_emergency_professional_data(professional, coordinates) for professional in professionals),
-        key=lambda row: (
-            row["sort"]["coverage"] if coordinates is not None else 0,
-            -row["sort"]["pro"],
-            -row["sort"]["verified"],
-            -row["sort"]["rating"],
-            row["sort"]["distance"]
-            if coordinates is not None and row["sort"]["distance"] is not None
-            else float("inf"),
-            row["professional"].nombre.casefold(),
-        ),
-    )
+    categoria = empty_to_none(request.args.get("categoria")) or ""
+    zona = empty_to_none(request.args.get("zona")) or ""
+    coordinates = get_request_coordinates(request.args)
+    professional_rows = build_emergency_directory_rows(categoria, zona, coordinates)
 
     return render_template(
         "directorio_emergencias.html",
@@ -997,30 +589,17 @@ def directorio_emergencias():
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
 @login_required
 def nueva_propuesta():
-    taxonomy_options = {
-        "industrias": obtener_industrias(),
-        "categorias": obtener_categorias(),
-        "rubros": obtener_rubros(),
-        "especialidades": obtener_especialidades(),
-    }
+    taxonomy_options = build_proposal_taxonomy_options()
 
     if request.method == "POST":
-        required_fields = ("industria", "categoria", "rubro", "titulo", "descripcion", "ubicacion", "modalidad")
-        form_data = {field: _empty_to_none(request.form.get(field)) or "" for field in required_fields}
-        form_data.update({
-            "especialidad": _empty_to_none(request.form.get("especialidad")) or "",
-            "cantidad_profesionales": _empty_to_none(request.form.get("cantidad_profesionales")) or "1",
-            "presupuesto_estimado": _empty_to_none(request.form.get("presupuesto_estimado")) or "",
-            "fecha_inicio_estimada": _empty_to_none(request.form.get("fecha_inicio_estimada")) or "",
-            "fecha_limite_postulacion": _empty_to_none(request.form.get("fecha_limite_postulacion")) or "",
-        })
-
-        if any(not form_data[field] for field in required_fields):
+        form_data = build_proposal_form_data(request.form)
+        form_error = validate_proposal_form_data(form_data)
+        if form_error:
             return render_template(
                 "nueva_propuesta.html",
                 form_data=form_data,
                 taxonomy=taxonomy_options,
-                error="Completa industria, categoria, rubro, titulo, descripcion, ubicacion y modalidad.",
+                error=form_error,
             ), 400
 
         try:
@@ -1036,10 +615,10 @@ def nueva_propuesta():
                 modalidad=form_data["modalidad"],
                 cantidad_profesionales=int(form_data["cantidad_profesionales"] or 1),
                 presupuesto_estimado=form_data["presupuesto_estimado"],
-                fecha_inicio_estimada=_parse_date(form_data["fecha_inicio_estimada"]),
-                fecha_limite_postulacion=_parse_date(form_data["fecha_limite_postulacion"]),
+                fecha_inicio_estimada=parse_date(form_data["fecha_inicio_estimada"]),
+                fecha_limite_postulacion=parse_date(form_data["fecha_limite_postulacion"]),
             )
-            _notify_proposal_created(proposal_request)
+            notify_proposal_created(proposal_request)
         except ValueError as error:
             return render_template(
                 "nueva_propuesta.html",
@@ -1052,17 +631,17 @@ def nueva_propuesta():
 
     return render_template(
         "nueva_propuesta.html",
-        form_data=_get_query_prefill("categoria", "ubicacion"),
+        form_data=get_query_prefill(request.args, "categoria", "ubicacion"),
         taxonomy=taxonomy_options,
     )
 
 
 @operations.route("/propuestas", methods=["GET"])
 def marketplace_propuestas():
-    industria = _empty_to_none(request.args.get("industria")) or ""
-    categoria = _empty_to_none(request.args.get("categoria")) or ""
-    rubro = _empty_to_none(request.args.get("rubro")) or ""
-    ubicacion = _empty_to_none(request.args.get("ubicacion")) or ""
+    industria = empty_to_none(request.args.get("industria")) or ""
+    categoria = empty_to_none(request.args.get("categoria")) or ""
+    rubro = empty_to_none(request.args.get("rubro")) or ""
+    ubicacion = empty_to_none(request.args.get("ubicacion")) or ""
     proposals = get_open_proposals(
         industria=industria,
         categoria=categoria,
@@ -1079,45 +658,20 @@ def marketplace_propuestas():
             "rubro": rubro,
             "ubicacion": ubicacion,
         },
-        taxonomy={
-            "industrias": obtener_industrias(),
-            "categorias": obtener_categorias(),
-            "rubros": obtener_rubros(),
-        },
+        taxonomy=build_proposal_taxonomy_options(include_specialties=False),
     )
 
 
 @operations.route("/propuestas/<int:id>", methods=["GET"])
 def detalle_propuesta(id):
-    proposal = get_proposal_by_id(id)
-    if proposal is None:
+    try:
+        proposal = get_proposal_or_error(id)
+    except LookupError:
         abort(404)
-
-    current_user_id = session.get("user_id")
-    current_user = db.session.get(User, current_user_id) if current_user_id else None
-    is_owner = current_user_id is not None and (proposal.owner_user_id or proposal.cliente_id) == current_user_id
-    current_professional = Professional.query.filter_by(user_id=current_user_id).first() if current_user_id else None
-    is_professional = current_user is not None and current_user.rol == "PROFESIONAL" and current_professional is not None
-    own_application = (
-        get_professional_application(proposal.id, current_user_id)
-        if is_professional
-        else None
-    )
-    applications = get_proposal_applications(proposal.id) if is_owner else []
-    owner = db.session.get(User, proposal.owner_user_id or proposal.cliente_id)
 
     return render_template(
         "detalle_propuesta.html",
-        proposal=proposal,
-        owner=owner,
-        applications=applications,
-        is_owner=is_owner,
-        is_professional=is_professional,
-        own_application=own_application,
-        current_user=current_user,
-        error=request.args.get("error"),
-        applied=request.args.get("postulada") == "1",
-        published=request.args.get("publicada") == "1",
+        **build_proposal_detail_context(proposal, session.get("user_id"), request.args),
     )
 
 
@@ -1126,10 +680,10 @@ def detalle_propuesta(id):
 @role_required("PROFESIONAL")
 @profile_complete_required
 def postular_propuesta(id):
-    mensaje = _empty_to_none(request.form.get("mensaje"))
-    experiencia_relevante = _empty_to_none(request.form.get("experiencia_relevante"))
-    disponibilidad = _empty_to_none(request.form.get("disponibilidad"))
-    pretension_economica = _empty_to_none(request.form.get("pretension_economica"))
+    mensaje = empty_to_none(request.form.get("mensaje"))
+    experiencia_relevante = empty_to_none(request.form.get("experiencia_relevante"))
+    disponibilidad = empty_to_none(request.form.get("disponibilidad"))
+    pretension_economica = empty_to_none(request.form.get("pretension_economica"))
 
     if not mensaje:
         return redirect(url_for("operations.detalle_propuesta", id=id, error="Completa un mensaje para postularte."))
@@ -1143,7 +697,7 @@ def postular_propuesta(id):
             disponibilidad=disponibilidad,
             pretension_economica=pretension_economica,
         )
-        _notify_proposal_application_created(application)
+        notify_proposal_application_created(application)
     except ValueError as error:
         return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
 
@@ -1155,12 +709,7 @@ def postular_propuesta(id):
 def aceptar_postulacion(id, application_id):
     try:
         application = accept_application(id, application_id, session["user_id"])
-        _notify_proposal_application_status(
-            application,
-            TIPO_PROPUESTA_POSTULACION_ACEPTADA,
-            "Postulacion aceptada",
-            f"La postulacion para {application.proposal.titulo} fue aceptada.",
-        )
+        notify_proposal_accepted(application)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -1174,12 +723,7 @@ def aceptar_postulacion(id, application_id):
 def descartar_postulacion(id, application_id):
     try:
         application = discard_application(id, application_id, session["user_id"])
-        _notify_proposal_application_status(
-            application,
-            TIPO_PROPUESTA_POSTULACION_DESCARTADA,
-            "Postulacion descartada",
-            f"La postulacion para {application.proposal.titulo} fue descartada.",
-        )
+        notify_proposal_discarded(application)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -1193,7 +737,7 @@ def descartar_postulacion(id, application_id):
 def cancelar_propuesta(id):
     try:
         proposal = cancel_proposal(id, session["user_id"])
-        _notify_proposal_cancelled(proposal)
+        notify_proposal_cancelled(proposal)
     except PermissionError:
         abort(403)
     except ValueError as error:

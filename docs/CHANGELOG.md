@@ -1,5 +1,24 @@
 # CHANGELOG TRAX
 
+## 2026-07-21 - Consolidacion Arquitectonica v1
+
+### Agregado
+
+- Se agregaron servicios internos para separar view models, permisos, formularios y notificaciones operativas de las rutas principales.
+- Se agregaron pruebas de configuracion por entorno, ownership y servicios extraidos.
+
+### Mejorado
+
+- `main_routes.py` y `operation_routes.py` redujeron responsabilidades y quedaron orientados a request, permisos, servicios y render.
+- Se consolidaron `DevelopmentConfig`, `TestingConfig` y `ProductionConfig`.
+- Se establecio Alembic como autoridad del esquema fuera de tests.
+- Se documento Docker como flujo principal de ejecucion local.
+
+### Corregido
+
+- Se elimino el fallback inseguro de `SECRET_KEY` para produccion.
+- Se restringio `db.create_all()` a tests o desarrollo explicitamente habilitado.
+
 ## 2026-07-15 - WhatsApp Contact Privacy v1
 
 ### Agregado
