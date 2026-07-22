@@ -196,4 +196,4 @@ def obtener_centro_publico_aproximado(professional):
     if not professional or professional.latitude is None or professional.longitude is None:
         return None, None
 
-    return round(professional.latitude + 0.004, 5), round(professional.longitude - 0.004, 5)
+    return round(professional.latitude + 0.004, 2), round(professional.longitude - 0.004, 2)

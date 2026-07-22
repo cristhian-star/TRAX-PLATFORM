@@ -22,6 +22,12 @@ from app.services.professional_service import (
     get_professional_by_id
 )
 from app.utils.decorators import login_required, profile_complete_required, role_required
+from app.utils.security import (
+    ip_rate_limit_key,
+    normalize_limited_text,
+    paginate_items,
+    user_rate_limit_key,
+)
 from app import limiter
 from app.models.user import User
 from app.models.review import Review
@@ -228,9 +234,10 @@ def home():
 
 
 @main.route("/buscar", methods=["GET"])
+@limiter.limit("60 per minute", key_func=ip_rate_limit_key)
 def buscar():
-    servicio = request.args.get("servicio", "")
-    zona = request.args.get("zona", "")
+    servicio = normalize_limited_text(request.args.get("servicio", ""))
+    zona = normalize_limited_text(request.args.get("zona", ""))
 
     resultados = search_professionals(servicio, zona)
     coordinates = _get_query_coordinates()
@@ -244,6 +251,7 @@ def buscar():
         matching_results,
         coordinates,
     )
+    resultados = paginate_items(resultados)
 
     return render_template(
         "resultados.html",
@@ -258,9 +266,10 @@ def buscar():
 
 
 @main.route("/resultados")
+@limiter.limit("60 per minute", key_func=ip_rate_limit_key)
 def listado_profesionales():
-    servicio = request.args.get("servicio", "")
-    zona = request.args.get("zona", "")
+    servicio = normalize_limited_text(request.args.get("servicio", ""))
+    zona = normalize_limited_text(request.args.get("zona", ""))
 
     resultados = search_professionals(servicio, zona)
     coordinates = _get_query_coordinates()
@@ -274,6 +283,7 @@ def listado_profesionales():
         matching_results,
         coordinates,
     )
+    resultados = paginate_items(resultados)
 
     return render_template(
         "listado_profesionales.html",
@@ -288,9 +298,10 @@ def listado_profesionales():
 
 
 @main.route("/explorar")
+@limiter.limit("60 per minute", key_func=ip_rate_limit_key)
 def explorar_rubros():
-    industria = request.args.get("industria", "").strip()
-    rubro_seleccionado = request.args.get("rubro", "").strip()
+    industria = normalize_limited_text(request.args.get("industria", ""))
+    rubro_seleccionado = normalize_limited_text(request.args.get("rubro", ""))
     rubros_disponibles = get_explorable_categories()
     rubros = rubros_disponibles
 
@@ -310,7 +321,7 @@ def explorar_rubros():
 
     return render_template(
         "explorar_rubros.html",
-        rubros=rubros,
+        rubros=paginate_items(rubros),
         rubros_disponibles=rubros_disponibles,
         industria=industria,
         rubro_seleccionado=rubro_seleccionado,
@@ -589,6 +600,7 @@ def admin_dashboard():
 
 @main.route("/reportar/usuario/<int:id>", methods=["GET", "POST"])
 @login_required
+@limiter.limit("5 per day", methods=["POST"], key_func=user_rate_limit_key)
 def reportar_usuario(id):
     profesional = get_professional_by_id(id)
 
@@ -753,7 +765,7 @@ def guardar_profesional():
 
 
 @main.route("/rubros/solicitar", methods=["POST"])
-@limiter.limit("5 per hour")
+@limiter.limit("5 per hour", key_func=ip_rate_limit_key)
 def guardar_solicitud_rubro():
     nombre_rubro = request.form.get("nombre_rubro")
     descripcion = request.form.get("descripcion_rubro")
@@ -784,24 +796,28 @@ def admin_usuarios():
 
 @main.route("/admin/usuarios/<int:id>/rol/cliente", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_rol_cliente(id):
     return _update_admin_user_role(id, "CLIENTE")
 
 
 @main.route("/admin/usuarios/<int:id>/rol/profesional", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_rol_profesional(id):
     return _update_admin_user_role(id, "PROFESIONAL")
 
 
 @main.route("/admin/usuarios/<int:id>/rol/super-admin", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_rol_super_admin(id):
     return _update_admin_user_role(id, "SUPER_ADMIN")
 
 
 @main.route("/admin/usuarios/<int:id>/suspender", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_suspender(id):
     if id == session.get("user_id"):
         return "No podes suspender tu propia cuenta", 400
@@ -816,6 +832,7 @@ def admin_usuario_suspender(id):
 
 @main.route("/admin/usuarios/<int:id>/reactivar", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_reactivar(id):
     if reactivate_user(id) is None:
         return "Usuario no encontrado", 404
@@ -826,6 +843,7 @@ def admin_usuario_reactivar(id):
 
 @main.route("/admin/usuarios/<int:id>/banear", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_banear(id):
     if id == session.get("user_id"):
         return "No podes banear tu propia cuenta", 400
@@ -840,6 +858,7 @@ def admin_usuario_banear(id):
 
 @main.route("/admin/usuarios/<int:id>/activar-pro", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_activar_pro(id):
     if User.query.get(id) is None:
         return "Usuario no encontrado", 404
@@ -851,6 +870,7 @@ def admin_usuario_activar_pro(id):
 
 @main.route("/admin/usuarios/<int:id>/quitar-pro", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_usuario_quitar_pro(id):
     if User.query.get(id) is None:
         return "Usuario no encontrado", 404
@@ -879,6 +899,7 @@ def admin_moderacion():
 
 @main.route("/admin/reportes/<int:id>/resolver", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_resolver_reporte(id):
     report = update_report_status(id, "RESUELTO", reviewed_by=session.get("user_id"))
     if report is not None:
@@ -888,6 +909,7 @@ def admin_resolver_reporte(id):
 
 @main.route("/admin/reportes/<int:id>/descartar", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_descartar_reporte(id):
     report = update_report_status(id, "DESCARTADO", reviewed_by=session.get("user_id"))
     if report is not None:
@@ -897,6 +919,7 @@ def admin_descartar_reporte(id):
 
 @main.route("/admin/verificaciones/<int:id>/aprobar", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_aprobar_verificacion(id):
     verification = update_verification_status(id, "APROBADO", reviewer_id=session.get("user_id"))
     if verification is not None:
@@ -906,6 +929,7 @@ def admin_aprobar_verificacion(id):
 
 @main.route("/admin/verificaciones/<int:id>/observar", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_observar_verificacion(id):
     verification = update_verification_status(id, "OBSERVADO", reviewer_id=session.get("user_id"))
     if verification is not None:
@@ -915,6 +939,7 @@ def admin_observar_verificacion(id):
 
 @main.route("/admin/verificaciones/<int:id>/rechazar", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_rechazar_verificacion(id):
     verification = update_verification_status(id, "RECHAZADO", reviewer_id=session.get("user_id"))
     if verification is not None:
@@ -929,6 +954,7 @@ def admin_rubros():
 
 @main.route("/admin/rubros/aprobar/<nombre_rubro>", methods=["POST"])
 @role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
 def admin_aprobar_rubro(nombre_rubro):
     approve_category(nombre_rubro)
     return redirect("/admin/rubros")

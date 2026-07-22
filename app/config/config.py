@@ -6,6 +6,14 @@ _TRUE_VALUES = {"1", "true", "yes", "on"}
 _PRODUCTION_VALUES = {"production", "prod"}
 _DEVELOPMENT_VALUES = {"development", "dev", "local"}
 _TESTING_VALUES = {"testing", "test"}
+_INSECURE_SECRET_VALUES = {
+    "dev-only-insecure-secret-key",
+    "tu_clave_aqui",
+    "changeme",
+    "change-me",
+    "secret",
+    "password",
+}
 
 
 def _env(name, default=None):
@@ -47,6 +55,10 @@ class Config:
     REGISTER_DEV_ROUTES = False
     ALLOW_SCHEMA_CREATE_ALL = False
     WTF_CSRF_ENABLED = True
+    MAX_CONTENT_LENGTH = 1024 * 1024
+    MAX_FORM_MEMORY_SIZE = 1024 * 1024
+    RATELIMIT_STORAGE_URI = "memory://"
+    RATELIMIT_HEADERS_ENABLED = True
 
     REQUIRED_ENV_VARS = ()
 
@@ -63,6 +75,9 @@ class Config:
     def apply_runtime_config(cls, app_config):
         app_config["SECRET_KEY"] = _env("SECRET_KEY") or "dev-only-insecure-secret-key"
         app_config["SQLALCHEMY_DATABASE_URI"] = _env("DATABASE_URL") or "sqlite:///trax.db"
+        app_config["MAX_CONTENT_LENGTH"] = int(_env("MAX_CONTENT_LENGTH_BYTES", str(cls.MAX_CONTENT_LENGTH)))
+        app_config["MAX_FORM_MEMORY_SIZE"] = int(_env("MAX_FORM_MEMORY_SIZE_BYTES", str(cls.MAX_FORM_MEMORY_SIZE)))
+        app_config["RATELIMIT_STORAGE_URI"] = _env("RATELIMIT_STORAGE_URI") or cls.RATELIMIT_STORAGE_URI
 
 
 class DevelopmentConfig(Config):
@@ -96,11 +111,12 @@ class ProductionConfig(Config):
     @classmethod
     def validate(cls):
         super().validate()
-        if _env("SECRET_KEY") == "dev-only-insecure-secret-key":
+        if (_env("SECRET_KEY") or "").strip().lower() in _INSECURE_SECRET_VALUES:
             raise RuntimeError("SECRET_KEY de desarrollo no permitido en produccion")
 
     @classmethod
     def apply_runtime_config(cls, app_config):
+        super().apply_runtime_config(app_config)
         app_config["SECRET_KEY"] = _env("SECRET_KEY")
         app_config["SQLALCHEMY_DATABASE_URI"] = _env("DATABASE_URL")
 

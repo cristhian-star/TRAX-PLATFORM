@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 
-from app import db
+from app import db, limiter
 from app.models.user import User
 from app.services.budget_service import (
     MAX_OFFERS_PER_REQUEST,
@@ -76,6 +76,13 @@ from app.services.operation_view_service import (
 )
 from app.services.user_service import is_user_active
 from app.utils.decorators import login_required, profile_complete_required, role_required
+from app.utils.security import (
+    ip_rate_limit_key,
+    normalize_limited_text,
+    paginate_items,
+    user_or_ip_rate_limit_key,
+    user_rate_limit_key,
+)
 
 operations = Blueprint("operations", __name__)
 
@@ -277,6 +284,7 @@ def cancelar_contratacion(id):
 
 
 @operations.route("/presupuestos/nuevo", methods=["GET", "POST"])
+@limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nuevo_presupuesto():
     current_user = (
         db.session.get(User, session.get("user_id"))
@@ -377,9 +385,10 @@ def mis_presupuestos_enviados():
 @login_required
 @role_required("PROFESIONAL")
 def marketplace_presupuestos():
-    categoria = empty_to_none(request.args.get("categoria")) or ""
-    zona = empty_to_none(request.args.get("zona")) or ""
+    categoria = normalize_limited_text(request.args.get("categoria", ""))
+    zona = normalize_limited_text(request.args.get("zona", ""))
     budget_requests = get_open_budget_requests(categoria, zona)
+    budget_requests = paginate_items(budget_requests)
 
     return render_template(
         "listado_presupuestos.html",
@@ -521,6 +530,7 @@ def cancelar_presupuesto(id):
 
 
 @operations.route("/emergencias/nueva", methods=["GET", "POST"])
+@limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nueva_emergencia():
     if request.method == "POST":
         categoria = empty_to_none(request.form.get("categoria"))
@@ -569,10 +579,11 @@ def nueva_emergencia():
 
 @operations.route("/emergencias/directorio", methods=["GET"])
 def directorio_emergencias():
-    categoria = empty_to_none(request.args.get("categoria")) or ""
-    zona = empty_to_none(request.args.get("zona")) or ""
+    categoria = normalize_limited_text(request.args.get("categoria", ""))
+    zona = normalize_limited_text(request.args.get("zona", ""))
     coordinates = get_request_coordinates(request.args)
     professional_rows = build_emergency_directory_rows(categoria, zona, coordinates)
+    professional_rows = paginate_items(professional_rows)
 
     return render_template(
         "directorio_emergencias.html",
@@ -588,6 +599,7 @@ def directorio_emergencias():
 
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
 @login_required
+@limiter.limit("30 per day", methods=["POST"], key_func=user_rate_limit_key)
 def nueva_propuesta():
     taxonomy_options = build_proposal_taxonomy_options()
 
@@ -638,16 +650,17 @@ def nueva_propuesta():
 
 @operations.route("/propuestas", methods=["GET"])
 def marketplace_propuestas():
-    industria = empty_to_none(request.args.get("industria")) or ""
-    categoria = empty_to_none(request.args.get("categoria")) or ""
-    rubro = empty_to_none(request.args.get("rubro")) or ""
-    ubicacion = empty_to_none(request.args.get("ubicacion")) or ""
+    industria = normalize_limited_text(request.args.get("industria", ""))
+    categoria = normalize_limited_text(request.args.get("categoria", ""))
+    rubro = normalize_limited_text(request.args.get("rubro", ""))
+    ubicacion = normalize_limited_text(request.args.get("ubicacion", ""))
     proposals = get_open_proposals(
         industria=industria,
         categoria=categoria,
         rubro=rubro,
         ubicacion=ubicacion,
     )
+    proposals = paginate_items(proposals)
 
     return render_template(
         "listado_propuestas.html",
@@ -679,6 +692,7 @@ def detalle_propuesta(id):
 @login_required
 @role_required("PROFESIONAL")
 @profile_complete_required
+@limiter.limit("30 per day", key_func=user_rate_limit_key)
 def postular_propuesta(id):
     mensaje = empty_to_none(request.form.get("mensaje"))
     experiencia_relevante = empty_to_none(request.form.get("experiencia_relevante"))

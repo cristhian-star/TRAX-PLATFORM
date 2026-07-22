@@ -1,5 +1,29 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-22
+
+Se decidio incorporar una base de seguridad transversal sin cambiar URLs, modelos ni experiencia visible.
+
+Motivo:
+
+TRAX ya cuenta con flujos operativos sensibles: autenticacion, presupuestos, propuestas, contratos, WhatsApp, cobertura geografica y administracion. La plataforma necesita controles preventivos de abuso, errores seguros y criterios productivos antes de escalar.
+
+Alcance:
+
+- Aplicar rate limits especificos por endpoint usando Flask-Limiter.
+- Usar claves por IP, usuario o combinacion IP+usuario segun sensibilidad.
+- Mantener almacenamiento en memoria solo para desarrollo/testing y preparar `RATELIMIT_STORAGE_URI` para Redis futuro.
+- Agregar limites configurables de request y formularios.
+- Responder errores `400`, `403`, `404`, `413`, `429` y `500` sin detalles internos.
+- Reforzar CSP, headers de seguridad y HSTS solo en produccion HTTPS.
+- Evitar placeholders inseguros de `SECRET_KEY` en produccion.
+- Reducir precision de coordenadas publicas aproximadas.
+- Usar `TermsAcceptance` como base versionada inicial de aceptacion.
+
+Criterio:
+
+La seguridad base debe ser incremental y compatible con el monolito modular existente. Redis, WSGI, Cloudflare/WAF y revision legal quedan como requisitos productivos, no como dependencias de esta fase.
+
 ## 2026-07-21
 
 Se decidio consolidar TRAX como monolito modular con servicios internos concretos para reglas de negocio, view models, permisos operativos y notificaciones.
