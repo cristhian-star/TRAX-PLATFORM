@@ -1,4 +1,3 @@
-﻿import os
 from urllib.parse import urlsplit
 
 from flask import Blueprint, render_template, request, redirect, session
@@ -70,6 +69,7 @@ from app.services.coverage_service import (
 from app.services.geographic_matching_service import (
     normalizar_coordenadas,
 )
+from app.services.google_maps_config_service import obtener_google_maps_api_key
 from app.services.whatsapp_contact_service import (
     normalizar_preferencia_contacto,
     normalizar_whatsapp_username,
@@ -486,7 +486,7 @@ def completar_perfil_profesional():
         review_count=len(get_professional_reviews(professional.id)) if professional else 0,
         coverage=obtener_cobertura_profesional(professional),
         coverage_radius_options=obtener_opciones_radio(),
-        google_maps_api_key=os.environ.get("GOOGLE_MAPS_API_KEY"),
+        google_maps_api_key=obtener_google_maps_api_key(),
         profile_completion=calculate_private_profile_completion(
             professional,
             has_approved_verification(user_id),
@@ -726,7 +726,7 @@ def perfil_profesional(id):
         review_count=len(reviews),
         can_review=can_review,
         coverage=obtener_cobertura_profesional(profesional),
-        google_maps_api_key=os.environ.get("GOOGLE_MAPS_API_KEY"),
+        google_maps_api_key=obtener_google_maps_api_key(),
         report_created=request.args.get("reported") == "1"
     )
 

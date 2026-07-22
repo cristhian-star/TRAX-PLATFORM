@@ -3,6 +3,8 @@
     const DEFAULT_RADIUS_KM = 10;
     const initializedMaps = new WeakSet();
     const publicMaps = new WeakMap();
+    const MAP_LOAD_TIMEOUT_MS = 5000;
+    let authFailureDetected = false;
 
     const toNumber = (value, fallback = null) => {
         const parsed = Number.parseFloat(value);
@@ -113,6 +115,15 @@
         }
     };
 
+    const setFallbackForPendingMaps = (message) => {
+        document.querySelectorAll("[data-coverage-map]").forEach((root) => {
+            if (!initializedMaps.has(root) || !root.classList.contains("is-map-ready")) {
+                setFallbackState(root, message);
+                initializedMaps.add(root);
+            }
+        });
+    };
+
     const initPrivateMap = (root, map, center) => {
         const marker = new google.maps.Marker({
             position: center,
@@ -204,24 +215,28 @@
             return;
         }
 
-        const map = new google.maps.Map(canvas, {
-            center,
-            clickableIcons: false,
-            fullscreenControl: false,
-            gestureHandling: root.closest("dialog") ? "greedy" : "cooperative",
-            mapTypeControl: false,
-            streetViewControl: false,
-            zoom: 11,
-            zoomControl: true,
-        });
+        try {
+            const map = new google.maps.Map(canvas, {
+                center,
+                clickableIcons: false,
+                fullscreenControl: false,
+                gestureHandling: root.closest("dialog") ? "greedy" : "cooperative",
+                mapTypeControl: false,
+                streetViewControl: false,
+                zoom: 11,
+                zoomControl: true,
+            });
 
-        if (root.dataset.mapMode === "private") {
-            initPrivateMap(root, map, center);
-        } else {
-            initPublicMap(root, map, center);
+            if (root.dataset.mapMode === "private") {
+                initPrivateMap(root, map, center);
+            } else {
+                initPublicMap(root, map, center);
+            }
+
+            setMapReady(root);
+        } catch (error) {
+            setFallbackState(root, "Mapa interactivo no disponible en este entorno.");
         }
-
-        setMapReady(root);
     };
 
     const initAllCoverageMaps = () => {
@@ -261,10 +276,25 @@
         });
     };
 
-    window.traxInitCoverageMaps = initAllCoverageMaps;
+    window.gm_authFailure = () => {
+        authFailureDetected = true;
+        setFallbackForPendingMaps("Mapa interactivo no disponible en este entorno.");
+    };
+
+    window.traxInitCoverageMaps = () => {
+        if (!authFailureDetected) {
+            initAllCoverageMaps();
+        }
+    };
 
     document.addEventListener("DOMContentLoaded", () => {
         initAllCoverageMaps();
         initCoverageModal();
+
+        window.setTimeout(() => {
+            if (!window.google?.maps && document.querySelector("[data-coverage-map][data-has-api-key='true']")) {
+                setFallbackForPendingMaps("Mapa interactivo no disponible en este entorno.");
+            }
+        }, MAP_LOAD_TIMEOUT_MS);
     });
 }());

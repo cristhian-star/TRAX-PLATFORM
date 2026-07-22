@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, redirect, request, session
+from flask import Blueprint, abort, jsonify, redirect, request, session
 
 from app.services.whatsapp_contact_service import (
     actualizar_estado,
@@ -30,11 +30,26 @@ def _parse_optional_int(value):
     return int(value)
 
 
+def _wants_json_response():
+    return (
+        request.accept_mimetypes.best == "application/json"
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or request.is_json
+    )
+
+
+def _error_response(message, status_code):
+    if _wants_json_response():
+        return jsonify({"error": message}), status_code
+
+    return message, status_code
+
+
 @whatsapp.route("/whatsapp/iniciar", methods=["POST"])
 @limiter.limit("10 per hour", key_func=user_or_ip_rate_limit_key)
 def iniciar_whatsapp():
     if request.form.get("whatsapp_consent") != "on":
-        return "Debes aceptar el consentimiento para continuar", 400
+        return _error_response("Debes aceptar el consentimiento para continuar", 400)
 
     try:
         contact_session = crear_sesion(
@@ -58,6 +73,12 @@ def iniciar_whatsapp():
     except PermissionError:
         abort(403)
     except (TypeError, ValueError) as error:
-        return str(error), 400
+        return _error_response(str(error), 400)
+
+    if _wants_json_response():
+        return jsonify({
+            "whatsapp_url": whatsapp_url,
+            "status": contact_session.status,
+        })
 
     return redirect(whatsapp_url)
