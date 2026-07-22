@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from app import db
+from app.models.user import User
 from app.models.contract_request import ContractRequest
+from app.services.audit_service import create_audit_log
 
 
 TRANSITIONS = {
@@ -43,6 +45,56 @@ def create_contract(
 
 def get_contract_by_id(contract_id):
     return ContractRequest.query.get(contract_id)
+
+
+def get_contract_or_error(contract_id):
+    contract = get_contract_by_id(contract_id)
+    if contract is None:
+        raise LookupError("Contratacion no encontrada")
+
+    return contract
+
+
+def get_contract_detail_context(contract, user_id):
+    is_client = contract.cliente_id == user_id
+    is_professional = contract.professional_user_id == user_id
+
+    if not is_client and not is_professional:
+        raise PermissionError("No tenes permiso para ver esta contratacion")
+
+    return {
+        "contract": contract,
+        "client_user": User.query.filter_by(id=contract.cliente_id).first(),
+        "professional_user": User.query.filter_by(id=contract.professional_user_id).first(),
+        "is_client": is_client,
+        "is_professional": is_professional,
+    }
+
+
+def require_assigned_professional(contract, user_id):
+    if contract.professional_user_id != user_id:
+        raise PermissionError("Profesional no asignado a la contratacion")
+
+
+def require_client_owner(contract, user_id):
+    if contract.cliente_id != user_id:
+        raise PermissionError("Solo el cliente dueno puede operar esta contratacion")
+
+
+def audit_contract_action(action, contract, actor_user_id, ip_address=None, user_agent=None, description=""):
+    target_user_id = (
+        contract.cliente_id
+        if actor_user_id == contract.professional_user_id
+        else contract.professional_user_id
+    )
+    create_audit_log(
+        actor_user_id=actor_user_id,
+        target_user_id=target_user_id,
+        action=action,
+        description=description,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
 
 
 def get_client_contracts(cliente_id):
