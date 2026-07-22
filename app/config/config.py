@@ -6,6 +6,14 @@ _TRUE_VALUES = {"1", "true", "yes", "on"}
 _PRODUCTION_VALUES = {"production", "prod"}
 _DEVELOPMENT_VALUES = {"development", "dev", "local"}
 _TESTING_VALUES = {"testing", "test"}
+_INSECURE_SECRET_VALUES = {
+    "dev-only-insecure-secret-key",
+    "tu_clave_aqui",
+    "changeme",
+    "change-me",
+    "secret",
+    "password",
+}
 
 
 def _env(name, default=None):
@@ -103,7 +111,7 @@ class ProductionConfig(Config):
     @classmethod
     def validate(cls):
         super().validate()
-        if _env("SECRET_KEY") == "dev-only-insecure-secret-key":
+        if (_env("SECRET_KEY") or "").strip().lower() in _INSECURE_SECRET_VALUES:
             raise RuntimeError("SECRET_KEY de desarrollo no permitido en produccion")
 
     @classmethod

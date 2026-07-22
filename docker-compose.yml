@@ -1,4 +1,5 @@
 services:
+  # Credenciales locales de desarrollo. No reutilizar en staging ni produccion.
   postgres:
     image: postgres:16-alpine
     container_name: trax-postgres
@@ -27,7 +28,9 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=0
+      # SECRET_KEY debe venir desde .env local y no debe versionarse.
       - SECRET_KEY=${SECRET_KEY}
+      # DATABASE_URL local de Docker Compose. Usar secretos externos en produccion.
       - DATABASE_URL=postgresql+psycopg2://trax_user:trax_password@postgres:5432/trax_db
     depends_on:
       postgres:

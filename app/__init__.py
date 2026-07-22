@@ -138,15 +138,17 @@ def create_app(config_class=None, initialize_schema=False):
     def add_security_headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
+        response.headers.pop("X-Powered-By", None)
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' https://maps.googleapis.com; "
+            "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: https:; "
             "font-src 'self'; "
             "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; "
+            "object-src 'none'; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
             "form-action 'self';"
