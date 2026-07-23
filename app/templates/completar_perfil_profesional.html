@@ -12,12 +12,14 @@
 {% set profile_specialty = (professional.especialidad or professional.servicio) if professional else "Rubro no informado" %}
 {% set profile_zone = professional.zona if professional else "Zona no informada" %}
 {% set public_profile_url = "/profesional/" ~ professional.id if professional else "/profesional/dashboard" %}
+{% set professional_media = professional_media if professional_media is defined else {"avatar_url": none, "cover_url": none, "gallery": []} %}
+{% set private_media_items = private_media_items if private_media_items is defined else [] %}
 
 <main class="private-profile" data-private-profile>
     <section class="private-profile__hero">
         <div class="private-profile__cover">
-            {% if professional and professional.cover_url %}
-                <img src="{{ professional.cover_url }}" alt="Portada profesional de {{ profile_name }}">
+            {% if professional_media.cover_url %}
+                <img src="{{ professional_media.cover_url }}" alt="{{ professional_media.cover_alt or 'Portada profesional de ' ~ profile_name }}">
             {% else %}
                 <span>Portada profesional</span>
             {% endif %}
@@ -25,8 +27,8 @@
 
         <div class="private-profile__identity">
             <div class="private-profile__avatar">
-                {% if professional and professional.logo_url %}
-                    <img src="{{ professional.logo_url }}" alt="Avatar o logo de {{ profile_name }}">
+                {% if professional_media.avatar_url %}
+                    <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt }}">
                 {% else %}
                     <span>{{ profile_name[:1] }}</span>
                 {% endif %}
@@ -111,8 +113,91 @@
                         <span class="private-profile__eyebrow">Visual</span>
                         <h2>Fotos y Portfolio</h2>
                     </div>
-                    <small>Solo URLs. No se suben archivos en esta etapa.</small>
+                    <small>Imagenes seguras con fallback temporal por URLs legacy.</small>
                 </div>
+
+                <div class="private-profile__section-block">
+                    <h3>Subir imagenes</h3>
+                    <p>Formatos permitidos: JPG, PNG y WEBP. Maximo 5 MB por archivo.</p>
+                    <div class="private-profile__field-grid">
+                        <label>
+                            Foto de perfil
+                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" form="professional-media-upload-avatar">
+                        </label>
+                        <label>
+                            Texto alternativo
+                            <input type="text" name="alt_text" maxlength="180" placeholder="Ej: Logo de mi marca profesional" form="professional-media-upload-avatar">
+                        </label>
+                    </div>
+                    <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-upload-avatar">Subir avatar</button>
+
+                    <div class="private-profile__field-grid">
+                        <label>
+                            Portada
+                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" form="professional-media-upload-cover">
+                        </label>
+                        <label>
+                            Texto alternativo
+                            <input type="text" name="alt_text" maxlength="180" placeholder="Ej: Trabajo terminado en obra" form="professional-media-upload-cover">
+                        </label>
+                    </div>
+                    <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-upload-cover">Subir portada</button>
+
+                    <div class="private-profile__field-grid">
+                        <label>
+                            Imagen de galeria
+                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" form="professional-media-upload-gallery">
+                        </label>
+                        <label>
+                            Titulo
+                            <input type="text" name="title" maxlength="140" placeholder="Ej: Instalacion completa" form="professional-media-upload-gallery">
+                        </label>
+                        <label>
+                            Categoria
+                            <input type="text" name="category" maxlength="80" placeholder="Ej: Electricidad" form="professional-media-upload-gallery">
+                        </label>
+                        <label>
+                            Texto alternativo
+                            <input type="text" name="alt_text" maxlength="180" placeholder="Describe brevemente la imagen" form="professional-media-upload-gallery">
+                        </label>
+                    </div>
+                    <label>
+                        Descripcion
+                        <textarea name="description" maxlength="1000" placeholder="Contexto del trabajo realizado" form="professional-media-upload-gallery"></textarea>
+                    </label>
+                    <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-upload-gallery">Agregar a galeria</button>
+                </div>
+
+                {% if private_media_items %}
+                    <div class="private-profile__section-block">
+                        <h3>Imagenes cargadas</h3>
+                        <p>Solo las imagenes publicadas se muestran en el perfil publico.</p>
+                        <div class="private-profile__timeline">
+                            {% for media in private_media_items %}
+                                <article>
+                                    <span>{{ media.media_type|title }} / {{ media.status|replace("_", " ")|title }}</span>
+                                    <strong>{{ media.title or media.original_filename or "Imagen profesional" }}</strong>
+                                    <small>{{ media.content_type }} / {{ (media.file_size_bytes / 1024)|round|int }} KB</small>
+                                    <input type="text" name="title" maxlength="140" placeholder="Titulo" value="{{ media.title or '' }}" form="professional-media-edit-{{ media.id }}">
+                                    <input type="text" name="category" maxlength="80" placeholder="Categoria" value="{{ media.category or '' }}" form="professional-media-edit-{{ media.id }}">
+                                    <input type="text" name="alt_text" maxlength="180" placeholder="Texto alternativo" value="{{ media.alt_text or '' }}" form="professional-media-edit-{{ media.id }}">
+                                    <textarea name="description" maxlength="1000" placeholder="Descripcion" form="professional-media-edit-{{ media.id }}">{{ media.description or '' }}</textarea>
+                                    {% if media.media_type == "GALLERY" %}
+                                        <input type="hidden" name="media_ids" value="{{ media.id }}" form="professional-media-reorder">
+                                    {% endif %}
+                                    <div class="private-profile__actions">
+                                        <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-edit-{{ media.id }}">Guardar metadata</button>
+                                        {% if media.media_type == "GALLERY" %}
+                                            <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-primary-{{ media.id }}">Marcar principal</button>
+                                        {% endif %}
+                                        <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-delete-{{ media.id }}">Eliminar</button>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                        <button class="private-profile__button private-profile__button--secondary" type="submit" form="professional-media-reorder">Guardar orden de galeria</button>
+                    </div>
+                {% endif %}
 
                 <div class="private-profile__field-grid">
                     <label>
@@ -513,6 +598,30 @@
             </div>
         </section>
     </form>
+
+    <form id="professional-media-upload-avatar" action="/profesional/media/avatar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    <form id="professional-media-upload-cover" action="/profesional/media/portada" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    <form id="professional-media-upload-gallery" action="/profesional/media/galeria" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    <form id="professional-media-reorder" action="/profesional/media/reordenar" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    {% for media in private_media_items %}
+        <form id="professional-media-edit-{{ media.id }}" action="/profesional/media/{{ media.id }}/editar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+        <form id="professional-media-primary-{{ media.id }}" action="/profesional/media/{{ media.id }}/principal" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+        <form id="professional-media-delete-{{ media.id }}" action="/profesional/media/{{ media.id }}/eliminar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+    {% endfor %}
 </main>
 {% endblock %}
 

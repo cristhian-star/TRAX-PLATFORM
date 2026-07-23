@@ -30,6 +30,7 @@ from app.utils.security import (
 from app import limiter
 from app.models.user import User
 from app.models.review import Review
+from app.models.professional_media import ProfessionalMedia
 from app.services.subscription_service import cancel_subscription, has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
     create_or_update_professional_verification_request,
@@ -70,6 +71,18 @@ from app.services.geographic_matching_service import (
     normalizar_coordenadas,
 )
 from app.services.google_maps_config_service import obtener_google_maps_api_key
+from app.services.professional_media_service import (
+    build_professional_media_context,
+    get_pending_media,
+    get_private_media_items,
+    get_professionals_avatar_context,
+    moderate_professional_media,
+    reorder_professional_gallery,
+    set_gallery_primary,
+    soft_delete_professional_media,
+    update_professional_media_metadata,
+    upload_professional_media,
+)
 from app.services.whatsapp_contact_service import (
     normalizar_preferencia_contacto,
     normalizar_whatsapp_username,
@@ -164,6 +177,21 @@ def _build_evidence_text(form):
     return "\n".join(evidence_lines) or None
 
 
+def _parse_ordered_ids(values):
+    ordered_ids = []
+    for value in values:
+        value = _empty_to_none(value)
+        if value is None:
+            continue
+        ordered_ids.append(int(value))
+
+    return ordered_ids
+
+
+def _profile_media_redirect():
+    return redirect("/profesional/perfil/completar?media=1")
+
+
 def _get_query_coordinates():
     latitude = request.args.get("latitude") or request.args.get("latitud") or request.args.get("lat")
     longitude = request.args.get("longitude") or request.args.get("longitud") or request.args.get("lng")
@@ -252,6 +280,7 @@ def buscar():
         coordinates,
     )
     resultados = paginate_items(resultados)
+    professional_media = get_professionals_avatar_context(resultados)
 
     return render_template(
         "resultados.html",
@@ -261,6 +290,7 @@ def buscar():
         professional_badges=professional_badges,
         professional_ratings=professional_ratings,
         matching_results=matching_results,
+        professional_media=professional_media,
         has_geographic_context=coordinates is not None,
     )
 
@@ -284,6 +314,7 @@ def listado_profesionales():
         coordinates,
     )
     resultados = paginate_items(resultados)
+    professional_media = get_professionals_avatar_context(resultados)
 
     return render_template(
         "listado_profesionales.html",
@@ -293,6 +324,7 @@ def listado_profesionales():
         professional_badges=professional_badges,
         professional_ratings=professional_ratings,
         matching_results=matching_results,
+        professional_media=professional_media,
         has_geographic_context=coordinates is not None,
     )
 
@@ -487,11 +519,163 @@ def completar_perfil_profesional():
         coverage=obtener_cobertura_profesional(professional),
         coverage_radius_options=obtener_opciones_radio(),
         google_maps_api_key=obtener_google_maps_api_key(),
+        professional_media=build_professional_media_context(professional),
+        private_media_items=get_private_media_items(professional),
         profile_completion=calculate_private_profile_completion(
             professional,
             has_approved_verification(user_id),
         ),
     )
+
+
+@main.route("/profesional/media/avatar", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("20 per hour", key_func=user_rate_limit_key)
+def subir_avatar_profesional():
+    image = request.files.get("image")
+    if image is None:
+        return "Imagen requerida", 400
+
+    try:
+        upload_professional_media(
+            session["user_id"],
+            image,
+            ProfessionalMedia.TYPE_AVATAR,
+            title=request.form.get("title"),
+            description=request.form.get("description"),
+            alt_text=request.form.get("alt_text"),
+            category=request.form.get("category"),
+        )
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/portada", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("20 per hour", key_func=user_rate_limit_key)
+def subir_portada_profesional():
+    image = request.files.get("image")
+    if image is None:
+        return "Imagen requerida", 400
+
+    try:
+        upload_professional_media(
+            session["user_id"],
+            image,
+            ProfessionalMedia.TYPE_COVER,
+            title=request.form.get("title"),
+            description=request.form.get("description"),
+            alt_text=request.form.get("alt_text"),
+            category=request.form.get("category"),
+        )
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/galeria", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def subir_galeria_profesional():
+    image = request.files.get("image")
+    if image is None:
+        return "Imagen requerida", 400
+
+    try:
+        upload_professional_media(
+            session["user_id"],
+            image,
+            ProfessionalMedia.TYPE_GALLERY,
+            title=request.form.get("title"),
+            description=request.form.get("description"),
+            alt_text=request.form.get("alt_text"),
+            category=request.form.get("category"),
+        )
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/<int:id>/editar", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("60 per hour", key_func=user_rate_limit_key)
+def editar_media_profesional(id):
+    try:
+        update_professional_media_metadata(
+            session["user_id"],
+            id,
+            title=request.form.get("title"),
+            description=request.form.get("description"),
+            alt_text=request.form.get("alt_text"),
+            category=request.form.get("category"),
+        )
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/reordenar", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def reordenar_media_profesional():
+    try:
+        ordered_ids = _parse_ordered_ids(request.form.getlist("media_ids"))
+        reorder_professional_gallery(session["user_id"], ordered_ids)
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/<int:id>/principal", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def marcar_media_principal(id):
+    try:
+        set_gallery_primary(session["user_id"], id)
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
+
+@main.route("/profesional/media/<int:id>/eliminar", methods=["POST"])
+@login_required
+@role_required("PROFESIONAL")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def eliminar_media_profesional(id):
+    try:
+        soft_delete_professional_media(session["user_id"], id)
+    except PermissionError:
+        return "No autorizado", 403
+    except ValueError as error:
+        return str(error), 400
+
+    return _profile_media_redirect()
+
 
 @main.route("/profesional/verificacion/solicitar", methods=["GET", "POST"])
 @login_required
@@ -727,6 +911,7 @@ def perfil_profesional(id):
         can_review=can_review,
         coverage=obtener_cobertura_profesional(profesional),
         google_maps_api_key=obtener_google_maps_api_key(),
+        professional_media=build_professional_media_context(profesional),
         report_created=request.args.get("reported") == "1"
     )
 
@@ -893,7 +1078,8 @@ def admin_moderacion():
     return render_template(
         "admin_moderacion.html",
         reportes=get_open_reports(),
-        verificaciones=get_pending_verifications()
+        verificaciones=get_pending_verifications(),
+        media_pendientes=get_pending_media(),
     )
 
 
@@ -914,6 +1100,66 @@ def admin_descartar_reporte(id):
     report = update_report_status(id, "DESCARTADO", reviewed_by=session.get("user_id"))
     if report is not None:
         _audit_admin_action("REPORT_DISCARDED", report.reported_user_id, f"Reporte #{id} descartado.")
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/media/<int:id>/publicar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def admin_publicar_media(id):
+    media = moderate_professional_media(
+        id,
+        ProfessionalMedia.STATUS_PUBLISHED,
+        admin_user_id=session.get("user_id"),
+        reason=request.form.get("motivo"),
+    )
+    if media is not None:
+        _audit_admin_action("PROFESSIONAL_MEDIA_PUBLISHED", media.professional.user_id, f"Media #{id} publicada.")
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/media/<int:id>/rechazar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def admin_rechazar_media(id):
+    media = moderate_professional_media(
+        id,
+        ProfessionalMedia.STATUS_REJECTED,
+        admin_user_id=session.get("user_id"),
+        reason=request.form.get("motivo"),
+    )
+    if media is not None:
+        _audit_admin_action("PROFESSIONAL_MEDIA_REJECTED", media.professional.user_id, f"Media #{id} rechazada.")
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/media/<int:id>/ocultar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def admin_ocultar_media(id):
+    media = moderate_professional_media(
+        id,
+        ProfessionalMedia.STATUS_HIDDEN,
+        admin_user_id=session.get("user_id"),
+        reason=request.form.get("motivo"),
+    )
+    if media is not None:
+        _audit_admin_action("PROFESSIONAL_MEDIA_HIDDEN", media.professional.user_id, f"Media #{id} ocultada.")
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/media/<int:id>/restaurar", methods=["POST"])
+@role_required("SUPER_ADMIN")
+@limiter.limit("30 per hour", key_func=user_rate_limit_key)
+def admin_restaurar_media(id):
+    media = moderate_professional_media(
+        id,
+        ProfessionalMedia.STATUS_PUBLISHED,
+        admin_user_id=session.get("user_id"),
+        reason=request.form.get("motivo"),
+    )
+    if media is not None:
+        _audit_admin_action("PROFESSIONAL_MEDIA_RESTORED", media.professional.user_id, f"Media #{id} restaurada.")
     return redirect("/admin/moderacion")
 
 

@@ -59,6 +59,11 @@ class Config:
     MAX_FORM_MEMORY_SIZE = 1024 * 1024
     RATELIMIT_STORAGE_URI = "memory://"
     RATELIMIT_HEADERS_ENABLED = True
+    MEDIA_STORAGE_PROVIDER = "local"
+    LOCAL_MEDIA_UPLOAD_ROOT = "app/static/uploads/professional_media"
+    LOCAL_MEDIA_PUBLIC_BASE_URL = "/static/uploads/professional_media"
+    CLOUDINARY_FOLDER = "trax/professional_media"
+    MEDIA_AUTO_PUBLISH = True
 
     REQUIRED_ENV_VARS = ()
 
@@ -78,6 +83,14 @@ class Config:
         app_config["MAX_CONTENT_LENGTH"] = int(_env("MAX_CONTENT_LENGTH_BYTES", str(cls.MAX_CONTENT_LENGTH)))
         app_config["MAX_FORM_MEMORY_SIZE"] = int(_env("MAX_FORM_MEMORY_SIZE_BYTES", str(cls.MAX_FORM_MEMORY_SIZE)))
         app_config["RATELIMIT_STORAGE_URI"] = _env("RATELIMIT_STORAGE_URI") or cls.RATELIMIT_STORAGE_URI
+        app_config["MEDIA_STORAGE_PROVIDER"] = (_env("MEDIA_STORAGE_PROVIDER") or cls.MEDIA_STORAGE_PROVIDER).lower()
+        app_config["LOCAL_MEDIA_UPLOAD_ROOT"] = _env("LOCAL_MEDIA_UPLOAD_ROOT") or cls.LOCAL_MEDIA_UPLOAD_ROOT
+        app_config["LOCAL_MEDIA_PUBLIC_BASE_URL"] = _env("LOCAL_MEDIA_PUBLIC_BASE_URL") or cls.LOCAL_MEDIA_PUBLIC_BASE_URL
+        app_config["CLOUDINARY_CLOUD_NAME"] = _env("CLOUDINARY_CLOUD_NAME")
+        app_config["CLOUDINARY_API_KEY"] = _env("CLOUDINARY_API_KEY")
+        app_config["CLOUDINARY_API_SECRET"] = _env("CLOUDINARY_API_SECRET")
+        app_config["CLOUDINARY_FOLDER"] = _env("CLOUDINARY_FOLDER") or cls.CLOUDINARY_FOLDER
+        app_config["MEDIA_AUTO_PUBLISH"] = _env_bool("MEDIA_AUTO_PUBLISH", cls.MEDIA_AUTO_PUBLISH)
 
 
 class DevelopmentConfig(Config):

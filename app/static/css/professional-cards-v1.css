@@ -183,6 +183,12 @@
     letter-spacing: 0.04em;
 }
 
+.professional-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .professional-card__title {
     min-width: 0;
 }

@@ -16,15 +16,16 @@
 {% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
 {% set gallery_entries = pro.gallery_urls.splitlines() if pro.gallery_urls else [] %}
 {% set public_google_maps_api_key = google_maps_api_key if google_maps_api_key and google_maps_api_key != "tu_clave_real" else none %}
+{% set professional_media = professional_media if professional_media is defined else {"avatar_url": pro.logo_url, "cover_url": pro.cover_url, "gallery": []} %}
 
 <main class="professional-profile">
     <section class="professional-profile__cover" aria-label="Portada profesional">
-        {% if pro.cover_url %}
-            <img class="professional-profile__cover-image" src="{{ pro.cover_url }}" alt="">
+        {% if professional_media.cover_url %}
+            <img class="professional-profile__cover-image" src="{{ professional_media.cover_url }}" alt="{{ professional_media.cover_alt or '' }}">
         {% endif %}
         <div class="professional-profile__cover-grid"></div>
         <div class="shell professional-profile__cover-content">
-            {% if not pro.cover_url %}
+            {% if not professional_media.cover_url %}
                 <span>Portada profesional</span>
                 <small>Agrega una portada desde la edicion de tu perfil</small>
             {% endif %}
@@ -33,8 +34,8 @@
 
     <section class="shell professional-profile__identity">
         <div class="professional-profile__brand" aria-label="Logo o marca profesional">
-            {% if pro.logo_url %}
-                <img src="{{ pro.logo_url }}" alt="Logo de {{ nombre }}">
+            {% if professional_media.avatar_url %}
+                <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt or 'Logo de ' ~ nombre }}">
             {% else %}
                 <span>{{ nombre[:2]|upper }}</span>
                 <small>Marca</small>
@@ -42,7 +43,11 @@
         </div>
 
         <div class="professional-profile__avatar" aria-label="Avatar de {{ nombre }}">
-            {{ nombre[:2]|upper }}
+            {% if professional_media.avatar_url %}
+                <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt or 'Avatar de ' ~ nombre }}">
+            {% else %}
+                {{ nombre[:2]|upper }}
+            {% endif %}
         </div>
 
         <div class="professional-profile__headline">
