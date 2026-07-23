@@ -1,5 +1,6 @@
 {% set media = namespace(count=0) %}
 {% set gallery_source = gallery_entries if gallery_entries else portfolio_entries %}
+{% set uploaded_gallery = professional_media.gallery if professional_media is defined and professional_media.gallery else [] %}
 
 <section class="profile-section" aria-labelledby="gallery-title">
     <div class="profile-section__heading profile-section__heading--split">
@@ -11,7 +12,24 @@
     </div>
 
     <div class="profile-gallery-v2">
-        {% for raw_url in gallery_source %}
+        {% for media_item in uploaded_gallery %}
+            {% if media.count < 6 %}
+                <a
+                    class="profile-gallery-v2__item profile-gallery-v2__item--image"
+                    href="{{ media_item.secure_url or media_item.public_url }}"
+                    target="_blank"
+                    rel="noreferrer">
+                    <img
+                        src="{{ media_item.thumbnail_url or media_item.secure_url or media_item.public_url }}"
+                        alt="{{ media_item.alt_text or media_item.title or 'Trabajo de ' ~ nombre }}"
+                        loading="lazy">
+                </a>
+                {% set media.count = media.count + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        {% if not uploaded_gallery %}
+            {% for raw_url in gallery_source %}
             {% set media_url = raw_url|trim %}
             {% set media_lower = media_url|lower %}
             {% set is_explicit_gallery_image = gallery_entries and media_url.startswith("https://") %}
@@ -22,11 +40,12 @@
                     href="{{ media_url }}"
                     target="_blank"
                     rel="noreferrer">
-                    <img src="{{ media_url }}" alt="Trabajo de {{ nombre }}">
+                    <img src="{{ media_url }}" alt="Trabajo de {{ nombre }}" loading="lazy">
                 </a>
                 {% set media.count = media.count + 1 %}
             {% endif %}
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
 
         {% for position in range(media.count, 6) %}
             <div class="profile-gallery-v2__item profile-gallery-v2__item--placeholder">

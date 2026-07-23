@@ -63,6 +63,66 @@
 
     <section class="moderation-section">
         <div class="panel-title compact-title">
+            <span class="kicker">Imagenes profesionales</span>
+            <h3>Media en revision</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Profesional</th>
+                    <th>Tipo</th>
+                    <th>Archivo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for media in media_pendientes %}
+                <tr>
+                    <td>{{ media.id }}</td>
+                    <td>{{ media.professional_id }}</td>
+                    <td>{{ media.media_type }}</td>
+                    <td>
+                        <a href="{{ media.secure_url or media.public_url }}" target="_blank" rel="noreferrer">
+                            {{ media.title or media.original_filename or "Ver imagen" }}
+                        </a>
+                    </td>
+                    <td>{{ media.status }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/media/{{ media.id }}/publicar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Publicar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/rechazar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="No cumple politicas de imagen.">
+                            <button type="submit">Rechazar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/ocultar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="Retiro preventivo de imagen.">
+                            <button type="submit">Ocultar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/restaurar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="Restaurada por administracion.">
+                            <button type="submit">Restaurar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No hay imagenes en revision.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
             <span class="kicker">Verificaciones pendientes</span>
             <h3>Solicitudes de validacion</h3>
         </div>

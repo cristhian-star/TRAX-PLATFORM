@@ -88,3 +88,29 @@ Reglas:
 - Configurar cuotas y alertas en Google Cloud.
 - Mantener fallback visual cuando la key falte, sea placeholder, invalida o falle la carga del script.
 - Mostrar coordenadas publicas aproximadas; nunca exponer el punto exacto profesional.
+
+## Identidad y portfolio profesional
+
+La identidad visual profesional se gestiona mediante `ProfessionalMedia`.
+
+Alcance actual:
+
+- Avatar, portada y galeria de trabajos.
+- Procesamiento con Pillow para validar imagen real, extension, MIME, tamano y dimensiones.
+- Re-encode de imagen y thumbnail para retirar metadatos EXIF/GPS.
+- Borrado logico y estados de moderacion.
+- Campos legacy de `Professional` usados solo como fallback.
+
+Storage:
+
+- Desarrollo/testing: `MEDIA_STORAGE_PROVIDER=local`.
+- Staging/produccion: `MEDIA_STORAGE_PROVIDER=cloudinary` con `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` y `CLOUDINARY_FOLDER`.
+- No versionar credenciales ni almacenar binarios/base64 en PostgreSQL.
+
+Validar en staging antes de produccion:
+
+- Subida real a Cloudinary.
+- URL segura y thumbnail.
+- Reemplazo de avatar/portada.
+- Eliminacion y rollback ante error.
+- Ausencia de secretos en HTML, logs y errores.

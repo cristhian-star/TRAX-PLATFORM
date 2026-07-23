@@ -11,6 +11,7 @@ node_modules/
 logs/
 *.log
 uploads/
+app/static/uploads/
 instance/
 *.sqlite3
 *.sqlite

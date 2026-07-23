@@ -38,6 +38,8 @@
 
 [x] Cierre de WhatsApp y Geolocalizacion
 
+[x] Identidad y Portfolio Profesional
+
 [x] Consolidacion Arquitectonica v1
 
 [ ] Agenda
@@ -83,6 +85,8 @@
 [x] Security & Compliance Foundation v1
 
 [x] WhatsApp y Google Maps configurables con fallback seguro
+
+[x] Storage profesional local y Cloudinary configurable
 
 [ ] WSGI productivo
 

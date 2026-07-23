@@ -67,6 +67,7 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.audit_log import AuditLog
     from app.models.activity_notification import ActivityNotification
     from app.models.whatsapp_contact_session import WhatsAppContactSession
+    from app.models.professional_media import ProfessionalMedia
 
     if initialize_schema:
         if not app.config.get("ALLOW_SCHEMA_CREATE_ALL"):

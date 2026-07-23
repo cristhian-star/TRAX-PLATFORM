@@ -7,11 +7,16 @@
 {% set professional_availability = professional.disponibilidad|default(none) %}
 {% set rating_average = rating.average if rating.average is not none else none %}
 {% set review_count = rating.count or 0 %}
+{% set card_media = professional_media.get(profile_id, {}) if professional_media is defined else {} %}
 
 <article class="professional-card">
     <div class="professional-card__identity">
-        <div class="professional-card__avatar" aria-hidden="true">
-            {{ professional_name[:2]|upper }}
+        <div class="professional-card__avatar">
+            {% if card_media.avatar_url %}
+                <img src="{{ card_media.avatar_url }}" alt="{{ card_media.avatar_alt or 'Avatar de ' ~ professional_name }}" loading="lazy">
+            {% else %}
+                {{ professional_name[:2]|upper }}
+            {% endif %}
         </div>
         <div class="professional-card__title">
             <div class="professional-card__badges" aria-label="Distinciones">

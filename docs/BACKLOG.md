@@ -19,6 +19,12 @@
 - Restringir la clave de Google Maps por origen autorizado, API permitida y cuotas.
 - Validar Google Maps con una API key real restringida en staging.
 - Confirmar apertura de WhatsApp en Chrome escritorio y dispositivo movil fisico antes de produccion.
+- Validar Cloudinary con credenciales reales de staging, URLs seguras, thumbnails, reemplazo, eliminacion y rollback.
+- Incorporar escaneo antivirus o analisis externo de imagenes antes de produccion publica.
+- Implementar limpieza asincronica de imagenes huerfanas en storage.
+- Evaluar `PortfolioItem` futuro si el portfolio necesita agrupar trabajos con multiples imagenes y narrativa propia.
+- Evaluar soporte de videos solo si producto define moderacion, storage y costos.
+- Evaluar moderacion automatica de imagenes cuando exista politica aprobada y proveedor definido.
 - Implementar geocoding de ubicaciones base.
 - Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
 - Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.

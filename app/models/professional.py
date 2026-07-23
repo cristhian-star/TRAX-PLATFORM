@@ -25,6 +25,11 @@ class Professional(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), unique=True, nullable=True)
     user = db.relationship("User", back_populates="professional_profile")
+    media_items = db.relationship(
+        "ProfessionalMedia",
+        back_populates="professional",
+        lazy="selectin",
+    )
     nombre = db.Column(db.String(120), nullable=False)
     servicio = db.Column(db.String(120), nullable=False)
     zona = db.Column(db.String(120), nullable=False)
