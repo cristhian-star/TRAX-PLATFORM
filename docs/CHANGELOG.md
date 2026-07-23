@@ -1,5 +1,28 @@
 # CHANGELOG TRAX
 
+## 2026-07-23 - Identidad y Portfolio Profesional
+
+### Agregado
+
+- Se agrego el modelo `ProfessionalMedia` para gestionar avatar, portada y galeria profesional.
+- Se creo la migracion Alembic `20260723_01_professional_media_v1`.
+- Se agregaron servicios para procesar imagenes, almacenar archivos y administrar media profesional.
+- Se agregaron rutas privadas para subir, reemplazar, editar, reordenar, marcar principal y eliminar media.
+- Se agregaron acciones de moderacion administrativa para publicar, rechazar, ocultar y restaurar imagenes.
+- Se agregaron pruebas de validacion de imagenes, ownership, CSRF, moderacion, fallback legacy y almacenamiento.
+
+### Mejorado
+
+- El perfil privado profesional incorpora gestion basica de identidad visual y portfolio sin redisenar la UX general.
+- El perfil publico, galeria y cards profesionales priorizan media publicada y mantienen campos legacy como fallback.
+- Las imagenes se reprocesan para eliminar EXIF/GPS y generar miniaturas.
+- El almacenamiento local queda validado para desarrollo y Cloudinary queda configurable por entorno sin secretos versionados.
+
+### Corregido
+
+- Se evita exponer imagenes rechazadas, ocultas o eliminadas en el perfil publico.
+- Se rechazan archivos corruptos, MIME falso, extensiones no permitidas, tamanos excesivos y dimensiones invalidas.
+
 ## 2026-07-22 - Cierre de WhatsApp y Geolocalizacion
 
 ### Agregado

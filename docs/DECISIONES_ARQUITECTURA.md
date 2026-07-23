@@ -1,5 +1,27 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-23
+
+Se decidio modelar la identidad visual y portfolio profesional con una tabla separada `ProfessionalMedia`, manteniendo los campos legacy de `Professional` solo como fallback de compatibilidad.
+
+Motivo:
+
+Avatar, portada y galeria requieren metadatos, orden, estados de moderacion, auditoria, storage externo y borrado logico. Guardar nuevas URLs directamente en `Professional` no escala para portfolio ni moderacion.
+
+Alcance:
+
+- Usar `ProfessionalMedia` para avatar, portada y galeria.
+- Procesar imagenes en backend para validar formato real, MIME, tamano, dimensiones y eliminar EXIF/GPS.
+- Guardar archivos en storage local para desarrollo/testing y preparar Cloudinary por variables de entorno.
+- No almacenar binarios ni base64 en PostgreSQL.
+- Usar estados de moderacion antes de exponer imagenes publicamente.
+- Mantener campos legacy como fallback hasta una migracion funcional posterior.
+- No crear `PortfolioItem`, videos ni moderacion automatica en esta fase.
+
+Criterio:
+
+Las futuras mejoras del portfolio deberan extender el servicio de media o crear un modelo de trabajos solo si el producto necesita agrupar varias imagenes, descripciones avanzadas y orden editorial.
+
 ## 2026-07-22
 
 Se decidio cerrar el flujo de WhatsApp con una estrategia mixta: `POST /whatsapp/iniciar` sigue siendo la autoridad del backend y el frontend solicita una respuesta JSON segura para abrir la URL autorizada desde la interaccion del usuario.
