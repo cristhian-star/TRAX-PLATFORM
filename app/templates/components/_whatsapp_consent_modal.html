@@ -1,18 +1,28 @@
-<dialog class="whatsapp-consent-modal" data-whatsapp-consent-modal>
-    <form method="dialog" class="whatsapp-consent-modal__content">
-        <h2>Contacto por WhatsApp</h2>
-        <p>
-            Estas por comunicarte directamente con un profesional mediante WhatsApp.
-            La conversacion se realizara fuera de TRAX.
-        </p>
-        <p>No compartas datos bancarios sensibles.</p>
+<dialog
+    class="trax-modal whatsapp-consent-modal"
+    data-whatsapp-consent-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="whatsapp-consent-title"
+    aria-describedby="whatsapp-consent-description">
+    <form method="dialog" class="trax-modal__dialog whatsapp-consent-modal__content">
+        <div class="trax-modal__header">
+            <h2 class="trax-modal__title" id="whatsapp-consent-title">Contacto por WhatsApp</h2>
+        </div>
+        <div class="trax-modal__body" id="whatsapp-consent-description">
+            <p>
+                Estas por comunicarte directamente con un profesional mediante WhatsApp.
+                La conversacion se realizara fuera de TRAX.
+            </p>
+            <p>No compartas datos bancarios sensibles.</p>
+        </div>
         <label class="whatsapp-consent-modal__check">
-            <input type="checkbox" data-whatsapp-consent-checkbox>
+            <input class="trax-checkbox" type="checkbox" data-whatsapp-consent-checkbox>
             <span>Acepto continuar.</span>
         </label>
-        <div class="whatsapp-consent-modal__actions">
-            <button type="button" data-whatsapp-consent-cancel>Cancelar</button>
-            <button type="button" data-whatsapp-consent-confirm disabled>Continuar</button>
+        <div class="trax-modal__footer whatsapp-consent-modal__actions">
+            <button class="trax-button trax-button--secondary" type="button" data-whatsapp-consent-cancel>Cancelar</button>
+            <button class="trax-button trax-button--primary" type="button" data-whatsapp-consent-confirm disabled>Continuar</button>
         </div>
     </form>
 </dialog>

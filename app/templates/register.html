@@ -6,9 +6,9 @@
 
 {% block content %}
 
-<main class="auth-page auth-page--register">
-    <section class="auth-shell" aria-labelledby="register-title">
-        <div class="auth-panel auth-panel--story">
+<main class="trax-page auth-page auth-page--register">
+    <section class="trax-container auth-shell" aria-labelledby="register-title">
+        <div class="trax-card trax-card--elevated auth-panel auth-panel--story">
             <p class="auth-eyebrow">Nueva cuenta TRAX</p>
             <h1 id="register-title">Empezá simple. Completá lo importante después.</h1>
             <p class="auth-lead" data-role-copy>
@@ -24,24 +24,25 @@
             </div>
         </div>
 
-        <form action="/register" method="POST" class="auth-card" data-auth-form novalidate>
+        <form action="/register" method="POST" class="trax-card auth-card" data-auth-form novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if next_url %}
                 <input type="hidden" name="next" value="{{ next_url }}">
             {% endif %}
 
-            <div class="auth-card__head">
+            <div class="trax-card__header auth-card__head">
                 <p>Crear cuenta</p>
                 <h2>Sumate a TRAX</h2>
             </div>
 
             {% if error %}
-                <p class="auth-alert" id="register-form-error" role="alert">{{ error }}</p>
+                <p class="trax-alert trax-alert--danger auth-alert" id="register-form-error" role="alert">{{ error }}</p>
             {% endif %}
 
-            <div class="auth-field">
-                <label for="register-name">Nombre completo</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-name">Nombre completo</label>
                 <input
+                    class="trax-input"
                     id="register-name"
                     type="text"
                     name="nombre"
@@ -51,15 +52,16 @@
                     required
                     aria-describedby="register-name-help{% if errors and errors.nombre %} register-name-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.nombre else 'false' }}">
-                <small id="register-name-help">Como querés que te identifiquemos dentro de TRAX.</small>
+                <small class="trax-field__help" id="register-name-help">Como querés que te identifiquemos dentro de TRAX.</small>
                 {% if errors and errors.nombre %}
-                    <p class="auth-field-error" id="register-name-error">{{ errors.nombre }}</p>
+                    <p class="trax-field__error auth-field-error" id="register-name-error">{{ errors.nombre }}</p>
                 {% endif %}
             </div>
 
-            <div class="auth-field">
-                <label for="register-email">Email</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-email">Email</label>
                 <input
+                    class="trax-input"
                     id="register-email"
                     type="email"
                     name="email"
@@ -70,16 +72,17 @@
                     required
                     aria-describedby="register-email-help{% if errors and errors.email %} register-email-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.email else 'false' }}">
-                <small id="register-email-help">Lo usaremos para iniciar sesión y futuras verificaciones.</small>
+                <small class="trax-field__help" id="register-email-help">Lo usaremos para iniciar sesión y futuras verificaciones.</small>
                 {% if errors and errors.email %}
-                    <p class="auth-field-error" id="register-email-error">{{ errors.email }}</p>
+                    <p class="trax-field__error auth-field-error" id="register-email-error">{{ errors.email }}</p>
                 {% endif %}
             </div>
 
-            <div class="auth-field">
-                <label for="register-password">Contraseña</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-password">Contraseña</label>
                 <div class="auth-password">
                     <input
+                        class="trax-input"
                         id="register-password"
                         type="password"
                         name="password"
@@ -89,21 +92,22 @@
                         data-password-strength
                         aria-describedby="register-password-help register-password-strength{% if errors and errors.password %} register-password-error{% endif %}"
                         aria-invalid="{{ 'true' if errors and errors.password else 'false' }}">
-                    <button type="button" data-password-toggle aria-controls="register-password" aria-label="Mostrar contraseña">Mostrar</button>
+                    <button class="trax-button trax-button--secondary" type="button" data-password-toggle aria-controls="register-password" aria-label="Mostrar contraseña">Mostrar</button>
                 </div>
-                <small id="register-password-help">Mínimo 8 caracteres.</small>
+                <small class="trax-field__help" id="register-password-help">Mínimo 8 caracteres.</small>
                 <div class="auth-strength" id="register-password-strength" aria-live="polite">
                     <span></span>
                     <small>Fortaleza pendiente</small>
                 </div>
                 {% if errors and errors.password %}
-                    <p class="auth-field-error" id="register-password-error">{{ errors.password }}</p>
+                    <p class="trax-field__error auth-field-error" id="register-password-error">{{ errors.password }}</p>
                 {% endif %}
             </div>
 
-            <div class="auth-field">
-                <label for="register-password-confirm">Confirmar contraseña</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-password-confirm">Confirmar contraseña</label>
                 <input
+                    class="trax-input"
                     id="register-password-confirm"
                     type="password"
                     name="password_confirm"
@@ -111,16 +115,17 @@
                     required
                     aria-describedby="register-password-confirm-help{% if errors and errors.password_confirm %} register-password-confirm-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.password_confirm else 'false' }}">
-                <small id="register-password-confirm-help">Debe coincidir con la contraseña anterior.</small>
+                <small class="trax-field__help" id="register-password-confirm-help">Debe coincidir con la contraseña anterior.</small>
                 {% if errors and errors.password_confirm %}
-                    <p class="auth-field-error" id="register-password-confirm-error">{{ errors.password_confirm }}</p>
+                    <p class="trax-field__error auth-field-error" id="register-password-confirm-error">{{ errors.password_confirm }}</p>
                 {% endif %}
             </div>
 
-            <fieldset class="auth-role-group" aria-describedby="register-role-help{% if errors and errors.rol %} register-role-error{% endif %}">
+            <fieldset class="trax-field auth-role-group" aria-describedby="register-role-help{% if errors and errors.rol %} register-role-error{% endif %}">
                 <legend>Tipo de cuenta</legend>
                 <label class="auth-role-option">
                     <input
+                        class="trax-radio"
                         type="radio"
                         name="rol"
                         value="CLIENTE"
@@ -133,6 +138,7 @@
                 </label>
                 <label class="auth-role-option">
                     <input
+                        class="trax-radio"
                         type="radio"
                         name="rol"
                         value="PROFESIONAL"
@@ -143,14 +149,15 @@
                         <small>Completar perfil, cobertura y portfolio después.</small>
                     </span>
                 </label>
-                <small id="register-role-help">Podés operar sólo con los permisos de tu tipo de cuenta.</small>
+                <small class="trax-field__help" id="register-role-help">Podés operar sólo con los permisos de tu tipo de cuenta.</small>
                 {% if errors and errors.rol %}
-                    <p class="auth-field-error" id="register-role-error">{{ errors.rol }}</p>
+                    <p class="trax-field__error auth-field-error" id="register-role-error">{{ errors.rol }}</p>
                 {% endif %}
             </fieldset>
 
             <label class="auth-terms">
                 <input
+                    class="trax-checkbox"
                     type="checkbox"
                     name="terms_accepted"
                     {% if form_values and form_values.terms_accepted %}checked{% endif %}
@@ -158,12 +165,12 @@
                     aria-invalid="{{ 'true' if errors and errors.terms_accepted else 'false' }}">
                 <span>Acepto los términos y la política de privacidad de TRAX.</span>
             </label>
-            <small class="auth-terms-help" id="register-terms-help">Registramos esta aceptación para trazabilidad de cumplimiento.</small>
+            <small class="trax-field__help auth-terms-help" id="register-terms-help">Registramos esta aceptación para trazabilidad de cumplimiento.</small>
             {% if errors and errors.terms_accepted %}
-                <p class="auth-field-error" id="register-terms-error">{{ errors.terms_accepted }}</p>
+                <p class="trax-field__error auth-field-error" id="register-terms-error">{{ errors.terms_accepted }}</p>
             {% endif %}
 
-            <button type="submit" class="auth-submit" data-auth-submit>
+            <button type="submit" class="trax-button trax-button--primary trax-button--large auth-submit" data-auth-submit>
                 <span>Crear cuenta</span>
                 <span class="auth-submit__loading" aria-hidden="true">Creando...</span>
             </button>

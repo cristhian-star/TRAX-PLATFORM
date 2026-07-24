@@ -5,17 +5,17 @@
 {% endblock %}
 
 {% block content %}
-<main class="notifications-page">
-    <section class="notifications-page__shell">
-        <header class="notifications-page__header">
+<main class="trax-page notifications-page">
+    <section class="trax-container trax-page__content notifications-page__shell">
+        <header class="trax-page__header notifications-page__header">
             <div>
                 <span class="notifications-page__eyebrow">Centro de actividad</span>
-                <h1>Notificaciones</h1>
-                <p>Actividad historica y novedades internas de tu cuenta TRAX.</p>
+                <h1 class="trax-page__title">Notificaciones</h1>
+                <p class="trax-page__description">Actividad historica y novedades internas de tu cuenta TRAX.</p>
             </div>
-            <form action="/notificaciones/marcar-todas-leidas" method="POST">
+            <form class="trax-page__actions" action="/notificaciones/marcar-todas-leidas" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Marcar todas como leidas</button>
+                <button class="trax-button trax-button--secondary" type="submit">Marcar todas como leidas</button>
             </form>
         </header>
 
@@ -30,11 +30,11 @@
         {% if notifications %}
             <section class="notifications-page__list" aria-label="Listado de notificaciones">
                 {% for notification in notifications %}
-                    <article class="notification-card {{ 'is-unread' if not notification.leida else 'is-read' }}">
+                    <article class="trax-card notification-card {{ 'is-unread' if not notification.leida else 'is-read' }}">
                         <div class="notification-card__meta">
-                            <span>{{ notification.categoria }}</span>
-                            <span>{{ notification.prioridad|replace("_", " ")|title }}</span>
-                            <time datetime="{{ notification.created_at.isoformat() }}">
+                            <span class="trax-badge trax-badge--info">{{ notification.categoria }}</span>
+                            <span class="trax-badge {{ 'trax-badge--warning' if notification.requiere_accion else 'trax-badge--info' }}">{{ notification.prioridad|replace("_", " ")|title }}</span>
+                            <time class="trax-badge" datetime="{{ notification.created_at.isoformat() }}">
                                 {{ format_notification_date(notification.created_at) }}
                             </time>
                         </div>
@@ -42,25 +42,26 @@
                         <p>{{ notification.mensaje }}</p>
                         <div class="notification-card__actions">
                             {% if notification.url_destino %}
-                                <a href="{{ notification.url_destino }}">Abrir destino</a>
+                                <a class="trax-button trax-button--ghost trax-button--small" href="{{ notification.url_destino }}">Abrir destino</a>
                             {% endif %}
                             {% if not notification.leida %}
                                 <form action="/notificaciones/{{ notification.id }}/leer" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="next" value="{{ request.full_path }}">
-                                    <button type="submit">Marcar como leida</button>
+                                    <button class="trax-button trax-button--secondary trax-button--small" type="submit">Marcar como leida</button>
                                 </form>
                             {% else %}
-                                <span>Leida</span>
+                                <span class="trax-badge trax-badge--success">Leida</span>
                             {% endif %}
                         </div>
                     </article>
                 {% endfor %}
             </section>
         {% else %}
-            <div class="notifications-page__empty">
-                <strong>No tenes novedades por el momento.</strong>
-                <span>Cuando exista actividad relevante, aparecera en este centro.</span>
+            <div class="trax-empty-state notifications-page__empty">
+                <span class="trax-empty-state__icon" aria-hidden="true">0</span>
+                <strong class="trax-empty-state__title">No tenes novedades por el momento.</strong>
+                <span class="trax-empty-state__description">Cuando exista actividad relevante, aparecera en este centro. Podes volver a revisar mas tarde.</span>
             </div>
         {% endif %}
     </section>

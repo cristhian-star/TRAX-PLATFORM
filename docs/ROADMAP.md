@@ -72,9 +72,11 @@
 
 [x] Design System v2 - Fase 1
 
-[ ] Auditoria visual completa de todas las pantallas secundarias
+[x] UX/UI General & Design System v2
 
 [ ] Design System v2 - Componentes avanzados
+
+[ ] Auditoria visual completa de pantallas complejas restantes
 
 ## Arquitectura y Plataforma
 

@@ -2,10 +2,15 @@
 
 {% block content %}
 
-<section class="form-section">
-    <div class="section-container">
-        <div class="form-card">
-            <h2>Solicitud recibida</h2>
+<main class="trax-page">
+    <section class="trax-container trax-page__content">
+        <div class="trax-card trax-card--compact">
+            <div class="trax-card__header">
+                <p class="trax-badge trax-badge--success">Rubro solicitado</p>
+                <h2 class="trax-page__title">Solicitud recibida</h2>
+            </div>
+
+            <div class="trax-card__body">
 
             <p>
                 Estamos trabajando para enlistar tu rubro o actividad:
@@ -21,14 +26,17 @@
             </p>
 
             {% if cantidad >= 10 %}
-                <p class="admin-alert">
+                <p class="trax-alert trax-alert--warning">
                     Este rubro alcanzó el mínimo de solicitudes. Se notificará al administrador.
                 </p>
             {% endif %}
+            </div>
 
-            <a href="/" class="volver-btn">Volver al inicio</a>
+            <div class="trax-card__footer">
+                <a href="/" class="trax-button trax-button--secondary">Volver al inicio</a>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+</main>
 
 {% endblock %}

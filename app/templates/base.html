@@ -6,6 +6,7 @@
     <title>TRAX Marketplace</title>
     <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system-v2.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visitor-navbar-v1.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switch-v1.css') }}">
@@ -182,6 +183,32 @@
         </div>
     </header>
 
+    {% set flash_messages = get_flashed_messages(with_categories=true) %}
+    {% if flash_messages %}
+        <section class="trax-toast-region" aria-label="Mensajes del sistema">
+            {% for category, message in flash_messages %}
+                {% set normalized_category = category if category else "info" %}
+                {% set alert_variant = "success" if normalized_category in ["success", "exito"] else "warning" if normalized_category in ["warning", "advertencia"] else "danger" if normalized_category in ["danger", "error"] else "info" %}
+                {% set alert_role = "alert" if alert_variant == "danger" else "status" %}
+                <div
+                    class="trax-alert trax-alert--{{ alert_variant }} trax-alert--dismissible"
+                    role="{{ alert_role }}"
+                    aria-live="{{ 'assertive' if alert_role == 'alert' else 'polite' }}">
+                    <div class="trax-alert__content">
+                        <p class="trax-alert__body">{{ message }}</p>
+                    </div>
+                    <button
+                        class="trax-alert__dismiss"
+                        type="button"
+                        data-trax-alert-dismiss
+                        aria-label="Cerrar mensaje">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
+
     {% block content %}{% endblock %}
 
     <footer class="footer">
@@ -190,6 +217,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/design-system-v2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme-switch-v1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/whatsapp-consent-v1.js') }}"></script>
     {% block extra_scripts %}{% endblock %}

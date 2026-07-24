@@ -80,6 +80,25 @@ Reglas actuales:
 - Los usuarios suspendidos o inactivos no pueden iniciar sesion.
 - No hay recuperacion de contraseña ni login social hasta que exista backend real.
 
+## Design System v2
+
+La capa visual canonica esta en `app/static/css/design-system-v2.css`.
+
+Orden de carga:
+
+1. `design-tokens.css`: tokens legacy v1.
+2. `design-system-v2.css`: contrato canonico `--trax-ds-*` y componentes `.trax-*`.
+3. `styles.css`: estilos globales historicos y compatibilidad.
+4. CSS por modulo: composicion puntual de cada pantalla.
+
+Reglas:
+
+- Las pantallas nuevas deben consumir variables `--trax-ds-*`.
+- Los componentes reutilizables deben usar namespace `.trax-*`.
+- Las clases legacy pueden convivir con `.trax-*` durante la migracion.
+- No migrar pantallas complejas sin validacion visual especifica.
+- Navbar, tablas/admin, marketplace, emergencias y perfil profesional completo mantienen migracion pendiente.
+
 ## WhatsApp
 
 Toda apertura de WhatsApp debe pasar por `POST /whatsapp/iniciar`.

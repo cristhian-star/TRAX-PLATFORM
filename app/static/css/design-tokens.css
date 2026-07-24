@@ -1,8 +1,8 @@
 /*
  * TRAX Design System v1
  *
- * Foundation tokens only. This file is intentionally not linked from base.html
- * yet, so it does not alter existing screens.
+ * Foundation tokens legacy. La capa canonica actual es design-system-v2.css
+ * y sus variables --trax-ds-*. Este archivo permanece por compatibilidad.
  */
 
 :root {
