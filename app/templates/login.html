@@ -6,9 +6,9 @@
 
 {% block content %}
 
-<main class="auth-page auth-page--login">
-    <section class="auth-shell" aria-labelledby="auth-title">
-        <div class="auth-panel auth-panel--story">
+<main class="trax-page auth-page auth-page--login">
+    <section class="trax-container auth-shell" aria-labelledby="auth-title">
+        <div class="trax-card trax-card--elevated auth-panel auth-panel--story">
             <p class="auth-eyebrow">Acceso seguro TRAX</p>
             <h1 id="auth-title">Volvé a operar con claridad.</h1>
             <p class="auth-lead">Gestioná solicitudes, contactos y oportunidades desde un solo lugar, con tus datos protegidos.</p>
@@ -28,24 +28,25 @@
             </dl>
         </div>
 
-        <form action="/login" method="POST" class="auth-card" data-auth-form novalidate>
+        <form action="/login" method="POST" class="trax-card auth-card" data-auth-form novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if next_url %}
                 <input type="hidden" name="next" value="{{ next_url }}">
             {% endif %}
 
-            <div class="auth-card__head">
+            <div class="trax-card__header auth-card__head">
                 <p>Ingresar</p>
                 <h2>Entrá a tu cuenta</h2>
             </div>
 
             {% if error %}
-                <p class="auth-alert" id="login-form-error" role="alert">{{ error }}</p>
+                <p class="trax-alert trax-alert--danger auth-alert" id="login-form-error" role="alert">{{ error }}</p>
             {% endif %}
 
-            <div class="auth-field">
-                <label for="login-email">Email</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="login-email">Email</label>
                 <input
+                    class="trax-input"
                     id="login-email"
                     type="email"
                     name="email"
@@ -55,16 +56,17 @@
                     required
                     aria-describedby="login-email-help{% if errors and errors.email %} login-email-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.email else 'false' }}">
-                <small id="login-email-help">Usá el email con el que creaste tu cuenta.</small>
+                <small class="trax-field__help" id="login-email-help">Usá el email con el que creaste tu cuenta.</small>
                 {% if errors and errors.email %}
-                    <p class="auth-field-error" id="login-email-error">{{ errors.email }}</p>
+                    <p class="trax-field__error auth-field-error" id="login-email-error">{{ errors.email }}</p>
                 {% endif %}
             </div>
 
-            <div class="auth-field">
-                <label for="login-password">Contraseña</label>
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="login-password">Contraseña</label>
                 <div class="auth-password">
                     <input
+                        class="trax-input"
                         id="login-password"
                         type="password"
                         name="password"
@@ -72,18 +74,18 @@
                         required
                         aria-describedby="login-password-help{% if errors and errors.password %} login-password-error{% endif %}{% if errors and errors.credentials %} login-credentials-error{% endif %}"
                         aria-invalid="{{ 'true' if errors and (errors.password or errors.credentials) else 'false' }}">
-                    <button type="button" data-password-toggle aria-controls="login-password" aria-label="Mostrar contraseña">Mostrar</button>
+                    <button class="trax-button trax-button--secondary" type="button" data-password-toggle aria-controls="login-password" aria-label="Mostrar contraseña">Mostrar</button>
                 </div>
-                <small id="login-password-help">No compartas tu contraseña con terceros.</small>
+                <small class="trax-field__help" id="login-password-help">No compartas tu contraseña con terceros.</small>
                 {% if errors and errors.password %}
-                    <p class="auth-field-error" id="login-password-error">{{ errors.password }}</p>
+                    <p class="trax-field__error auth-field-error" id="login-password-error">{{ errors.password }}</p>
                 {% endif %}
                 {% if errors and errors.credentials %}
-                    <p class="auth-field-error" id="login-credentials-error">{{ errors.credentials }}</p>
+                    <p class="trax-field__error auth-field-error" id="login-credentials-error">{{ errors.credentials }}</p>
                 {% endif %}
             </div>
 
-            <button type="submit" class="auth-submit" data-auth-submit>
+            <button type="submit" class="trax-button trax-button--primary trax-button--large auth-submit" data-auth-submit>
                 <span>Ingresar</span>
                 <span class="auth-submit__loading" aria-hidden="true">Validando...</span>
             </button>
