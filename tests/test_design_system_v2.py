@@ -94,6 +94,18 @@ class DesignSystemV2Test(unittest.TestCase):
         register_template = Path("app/templates/register.html").read_text(encoding="utf-8")
         self.assertIn("trax-field__error auth-field-error", register_template)
 
+    def test_base_loads_design_system_before_legacy_styles(self):
+        base = Path("app/templates/base.html").read_text(encoding="utf-8")
+        styles = Path("app/static/css/styles.css").read_text(encoding="utf-8")
+
+        design_tokens_index = base.index("css/design-tokens.css")
+        design_system_index = base.index("css/design-system-v2.css")
+        legacy_styles_index = base.index("css/styles.css")
+
+        self.assertLess(design_tokens_index, design_system_index)
+        self.assertLess(design_system_index, legacy_styles_index)
+        self.assertNotIn("@import url(\"design-system-v2.css\")", styles)
+
     def test_auth_css_delegates_core_controls_to_design_system(self):
         css = Path("app/static/css/auth-ux-v1.css").read_text(encoding="utf-8")
 

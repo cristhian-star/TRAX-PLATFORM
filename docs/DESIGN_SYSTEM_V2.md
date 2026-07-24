@@ -21,6 +21,17 @@ Reglas permanentes:
 | `app/static/css/styles.css` | Legacy amplio | Estilos globales historicos y compatibilidad. |
 | CSS por modulo | Legacy / piloto | Composicion especifica de cada pantalla. |
 
+Orden de carga desde `base.html`:
+
+1. `design-tokens.css`.
+2. `design-system-v2.css`.
+3. `styles.css`.
+4. CSS especifico de cada template.
+
+Decision de cierre:
+
+Se elimina la carga mediante `@import` desde `styles.css`. La carga explicita reduce acoplamiento con CSS legacy, mejora trazabilidad en navegador y evita ambiguedades de orden.
+
 ## Tokens Canonicos
 
 Los tokens principales usan el prefijo `--trax-ds-*`.
@@ -290,6 +301,24 @@ Estado actual:
 | Home, Perfil profesional, Marketplace, Emergencias | Alto | No migrar en fases parciales sin validacion visual especifica. |
 | Admin y tablas | Alto | Pendiente por complejidad responsive y densidad operativa. |
 
+## Cierre Del Sprint UX/UI General
+
+Estado validado:
+
+- Contrato `--trax-ds-*` estable para temas Light/Dark.
+- Componentes `.trax-*` documentados y disponibles para nuevas pantallas.
+- Login, registro, rubro solicitado, flash messages, notificaciones y modal WhatsApp migrados como superficies piloto.
+- Compatibilidad legacy mantenida sin cambiar rutas, templates complejos ni logica de negocio.
+- `design-system-v2.css` carga explicitamente antes de `styles.css`.
+- `design-system-v2.js` se limita al cierre de alertas descartables.
+
+Estrategia futura:
+
+- Migrar una superficie por sprint o por grupo de riesgo.
+- Mantener clases legacy solo para composicion especifica.
+- Agregar tests de contrato antes de eliminar CSS antiguo.
+- Priorizar pantallas con bajo riesgo visual antes de dashboards, admin y tablas.
+
 ## Reglas Para CSS Por Modulo
 
 - Usar CSS por modulo solo para layout o composicion propia de la pantalla.
@@ -306,3 +335,5 @@ Estado actual:
 - Auditar breakpoints legacy.
 - Reducir `styles.css` una vez que existan pruebas visuales por pantalla.
 - Definir estrategia para navbar sin alterar su comportamiento actual.
+- Migrar Home, Resultados, Presupuestos, Propuestas y Emergencias por fases.
+- Separar deuda de Design System de deuda backend como `Query.get()` y `datetime.utcnow()`.

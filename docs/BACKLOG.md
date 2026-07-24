@@ -12,6 +12,12 @@
 
 ## Media prioridad
 
+- Migrar navbar completo a Design System v2 en un sprint especifico sin cambiar rutas ni comportamiento.
+- Migrar Home, Resultados y Perfil Profesional completo a Design System v2 con validacion visual dedicada.
+- Migrar Dashboards, Presupuestos, Propuestas, Emergencias, Admin y tablas a componentes `.trax-*` por fases.
+- Reducir `styles.css` legacy despues de cubrir visualmente las pantallas migradas.
+- Unificar breakpoints dispersos bajo tokens `--trax-ds-breakpoint-*`.
+- Eliminar CSS muerto cuando exista mapa de cobertura por pantalla.
 - Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
@@ -35,7 +41,6 @@
 - Evaluar estilos avanzados de Google Maps si TRAX define un mapa de marca propio.
 - Crear listado dedicado de emergencias del cliente para reemplazar enlaces operativos provisorios.
 - Crear vista consolidada de solicitudes del cliente que incluya presupuestos, emergencias y propuestas.
-- Realizar auditoria visual completa de pantallas secundarias para Design System v2 Fase 2.
 - Implementar Agenda.
 - Implementar canal Email para notificaciones transaccionales.
 - Integrar WhatsApp Business API cuando exista definicion de producto y proveedor.

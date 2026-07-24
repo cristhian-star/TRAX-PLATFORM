@@ -1,5 +1,3 @@
-@import url("design-system-v2.css");
-
 :root {
     --navy: var(--trax-ds-text-strong);
     --navy-2: var(--trax-ds-bg-muted);

@@ -1,5 +1,25 @@
 # CHANGELOG TRAX
 
+## 2026-07-24 - UX/UI General & Design System v2
+
+### Agregado
+
+- Se agrego carga explicita de `design-system-v2.css` desde `base.html`.
+- Se agrego `design-system-v2.js` para cierre accesible de alertas globales.
+- Se agregaron componentes canonicos para flashes, estados vacios, layout utilities y modal compartido.
+- Se creo la documentacion de cierre del sprint en `docs/SPRINTS/2026-07-24_UX_UI_General_Design_System_v2.md`.
+
+### Mejorado
+
+- Login, registro, rubro solicitado, notificaciones, flashes globales y modal WhatsApp quedaron alineados al contrato `.trax-*`.
+- `styles.css` dejo de importar el Design System v2 y queda como capa legacy posterior.
+- `DESIGN_SYSTEM_V2.md` documenta jerarquia CSS, mapa de impacto, deuda pendiente y estrategia de migracion futura.
+
+### Corregido
+
+- Se redujo duplicacion visual en notificaciones y modal WhatsApp sin cambiar rutas ni logica de negocio.
+- Se protegio por tests la carga del Design System v2 antes de estilos legacy.
+
 ## 2026-07-24 - Rediseño de Login y Registro
 
 ### Agregado

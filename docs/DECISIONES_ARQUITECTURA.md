@@ -2,6 +2,25 @@
 
 ## 2026-07-24
 
+Se decidio cargar `design-system-v2.css` de forma explicita desde `base.html`, despues de `design-tokens.css` y antes de `styles.css`.
+
+Motivo:
+
+El Design System v2 es la capa canonica actual y debe tener una jerarquia visible, testeable y sin dependencia de `@import` dentro de CSS legacy.
+
+Alcance:
+
+- `design-tokens.css` permanece como compatibilidad v1.
+- `design-system-v2.css` define tokens `--trax-ds-*` y componentes `.trax-*`.
+- `styles.css` queda como capa legacy posterior.
+- Los CSS por modulo solo deben resolver composicion especifica.
+
+Criterio:
+
+Las futuras migraciones deben consumir primero componentes `.trax-*` y reducir duplicacion legacy por superficie, sin eliminar CSS historico de forma masiva.
+
+## 2026-07-24
+
 Se decidio rediseñar login y registro manteniendo las URLs actuales y adoptando un flujo de cuenta basica primero.
 
 Motivo:
