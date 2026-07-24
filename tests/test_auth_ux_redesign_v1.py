@@ -162,9 +162,9 @@ class AuthUxRedesignTest(unittest.TestCase):
         self.assertIn("Ingresa tu nombre", body)
         self.assertIn("Ingresa un email valido", body)
         self.assertIn("al menos 8 caracteres", body)
-        self.assertIn("Las contrasenas no coinciden", body)
+        self.assertIn("Las contraseñas no coinciden", body)
         self.assertIn("tipo de cuenta valido", body)
-        self.assertIn("Acepta los terminos", body)
+        self.assertIn("Acepta los términos", body)
 
     def test_register_blocks_external_next(self):
         response = self.client.post(

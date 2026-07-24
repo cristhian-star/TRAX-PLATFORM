@@ -96,7 +96,7 @@ def login():
         if user is None:
             return render_template(
                 "login.html",
-                error="No pudimos validar esos datos. Revisa el email o la contrasena.",
+                error="No pudimos validar esos datos. Revisá el email o la contraseña.",
                 errors={"credentials": "No pudimos validar esos datos."},
                 form_values={"email": result.values["email"]},
                 next_url=next_url,

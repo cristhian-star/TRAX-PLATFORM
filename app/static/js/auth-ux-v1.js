@@ -9,7 +9,7 @@
         var isPassword = input.type === "password";
         input.type = isPassword ? "text" : "password";
         button.textContent = isPassword ? "Ocultar" : "Mostrar";
-        button.setAttribute("aria-label", isPassword ? "Ocultar contrasena" : "Mostrar contrasena");
+        button.setAttribute("aria-label", isPassword ? "Ocultar contraseña" : "Mostrar contraseña");
     }
 
     function passwordScore(value) {

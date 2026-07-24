@@ -34,7 +34,7 @@ def normalize_email(email):
 def validate_password(password):
     password = password or ""
     if len(password) < MIN_PASSWORD_LENGTH:
-        return "La contrasena debe tener al menos 8 caracteres."
+        return "La contraseña debe tener al menos 8 caracteres."
 
     return None
 
@@ -50,7 +50,7 @@ def validate_login_form(form):
         errors["email"] = "Ingresa un email valido."
 
     if not password:
-        errors["password"] = "Ingresa tu contrasena."
+        errors["password"] = "Ingresa tu contraseña."
 
     return AuthValidationResult(
         valid=not errors,
@@ -83,15 +83,15 @@ def validate_registration_form(form):
         errors["password"] = password_error
 
     if not password_confirm:
-        errors["password_confirm"] = "Confirma tu contrasena."
+        errors["password_confirm"] = "Confirma tu contraseña."
     elif password and password_confirm != password:
-        errors["password_confirm"] = "Las contrasenas no coinciden."
+        errors["password_confirm"] = "Las contraseñas no coinciden."
 
     if rol not in ALLOWED_PUBLIC_REGISTRATION_ROLES:
         errors["rol"] = "Selecciona un tipo de cuenta valido."
 
     if not terms_accepted:
-        errors["terms_accepted"] = "Acepta los terminos y la privacidad para continuar."
+        errors["terms_accepted"] = "Acepta los términos y la privacidad para continuar."
 
     values = {
         "nombre": nombre,
@@ -155,7 +155,7 @@ def register_user_from_form(form, ip_address=None, user_agent=None):
     if User.query.filter_by(email=result.values["email"]).first():
         result.valid = False
         result.errors["email"] = "No pudimos crear la cuenta con esos datos."
-        result.general_error = "Revisa los datos ingresados o inicia sesion si ya tenes cuenta."
+        result.general_error = "Revisá los datos ingresados o iniciá sesión si ya tenés cuenta."
         return result, None
 
     user = register_user(

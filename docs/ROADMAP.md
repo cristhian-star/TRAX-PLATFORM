@@ -6,6 +6,8 @@
 
 [x] Registro
 
+[x] Rediseño de Login y Registro
+
 [x] Directorio
 
 [x] Perfil Profesional

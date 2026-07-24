@@ -1,5 +1,30 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-24
+
+Se decidio rediseñar login y registro manteniendo las URLs actuales y adoptando un flujo de cuenta basica primero.
+
+Motivo:
+
+TRAX necesita reducir friccion inicial sin pedir datos profesionales avanzados antes de tiempo. El profesional puede completar rubro, cobertura, verificacion y portfolio despues de crear la cuenta.
+
+Alcance:
+
+- Mantener `POST /login`, `POST /register` y `POST /logout`.
+- Centralizar validacion de autenticacion en `auth_service.py`.
+- Registrar `TermsAcceptance` en la misma transaccion de creacion de usuario.
+- Iniciar sesion inmediatamente despues del registro.
+- Redirigir clientes a `next` seguro o inicio.
+- Redirigir profesionales a `/profesional/perfil/completar`.
+- No crear `Professional` automaticamente en el alta inicial.
+- Rechazar usuarios suspendidos o inactivos antes de crear sesion.
+- Usar mensaje neutral ante email duplicado para reducir enumeracion.
+- No simular recuperacion de contraseña ni login social sin backend real.
+
+Criterio:
+
+Las futuras mejoras de auth deberan sumar recuperacion de contraseña, verificacion de email o login social como capacidades reales de backend, no como enlaces o botones ficticios.
+
 ## 2026-07-23
 
 Se decidio modelar la identidad visual y portfolio profesional con una tabla separada `ProfessionalMedia`, manteniendo los campos legacy de `Professional` solo como fallback de compatibilidad.

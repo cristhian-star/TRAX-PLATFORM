@@ -72,7 +72,7 @@
                         required
                         aria-describedby="login-password-help{% if errors and errors.password %} login-password-error{% endif %}{% if errors and errors.credentials %} login-credentials-error{% endif %}"
                         aria-invalid="{{ 'true' if errors and (errors.password or errors.credentials) else 'false' }}">
-                    <button type="button" data-password-toggle aria-controls="login-password" aria-label="Mostrar contrasena">Mostrar</button>
+                    <button type="button" data-password-toggle aria-controls="login-password" aria-label="Mostrar contraseña">Mostrar</button>
                 </div>
                 <small id="login-password-help">No compartas tu contraseña con terceros.</small>
                 {% if errors and errors.password %}

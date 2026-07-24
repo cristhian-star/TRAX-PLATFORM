@@ -60,6 +60,26 @@ Antes de promover TRAX a staging o produccion validar:
 - Politicas legales revisadas por profesional: terminos, privacidad, cookies y consentimientos.
 - Escaneo de dependencias y secretos antes de cada release.
 
+## Autenticacion y registro
+
+El flujo de auth mantiene las URLs publicas actuales:
+
+- `GET/POST /login`
+- `GET/POST /register`
+- `POST /logout`
+
+Reglas actuales:
+
+- Login y registro usan CSRF y rate limiting.
+- `next` se acepta solo si es una ruta interna segura.
+- El registro crea una cuenta basica con nombre, email, contraseña, rol y aceptacion de terminos/privacidad.
+- `TermsAcceptance` se registra en la misma transaccion que el usuario.
+- Cliente registrado inicia sesion y va a `next` seguro o inicio.
+- Profesional registrado inicia sesion y va a `/profesional/perfil/completar`.
+- No se crea `Professional` automaticamente durante el alta inicial.
+- Los usuarios suspendidos o inactivos no pueden iniciar sesion.
+- No hay recuperacion de contraseña ni login social hasta que exista backend real.
+
 ## WhatsApp
 
 Toda apertura de WhatsApp debe pasar por `POST /whatsapp/iniciar`.
