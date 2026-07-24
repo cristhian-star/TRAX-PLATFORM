@@ -2717,35 +2717,18 @@ input, select, textarea):focus {
 
 .whatsapp-consent-modal {
     width: min(92vw, 30rem);
-    padding: 0;
-    border: 0;
-    border-radius: var(--trax-radius-xl, 16px);
-    color: var(--trax-color-text, #1f2937);
-    background: var(--trax-color-surface, #ffffff);
-    box-shadow: var(--trax-shadow-lg, 0 24px 80px rgba(15, 23, 42, 0.22));
-}
-
-.whatsapp-consent-modal::backdrop {
-    background: rgba(15, 23, 42, 0.58);
 }
 
 .whatsapp-consent-modal__content {
-    display: grid;
-    gap: var(--trax-space-4, 1rem);
-    margin: 0;
     padding: var(--trax-space-6, 1.5rem);
 }
 
 .whatsapp-consent-modal h2 {
-    margin: 0;
-    color: var(--trax-color-brand-strong, #0f172a);
     font-size: var(--trax-font-size-24, 1.5rem);
 }
 
 .whatsapp-consent-modal p {
-    margin: 0;
-    color: var(--trax-color-text-muted, #64748b);
-    line-height: var(--trax-line-height-body, 1.55);
+    max-width: 42ch;
 }
 
 .whatsapp-consent-modal__check {
@@ -2761,52 +2744,10 @@ input, select, textarea):focus {
 }
 
 .whatsapp-consent-modal__check input {
-    width: 1.1rem;
-    height: 1.1rem;
     margin-top: 0.2rem;
-    accent-color: var(--trax-color-action-primary, #0ea5b7);
-}
-
-.whatsapp-consent-modal__actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: var(--trax-space-3, 0.75rem);
-}
-
-.whatsapp-consent-modal__actions button {
-    min-height: var(--trax-control-height-md, 2.75rem);
-    padding: 0 var(--trax-space-5, 1.25rem);
-    border: 1px solid var(--trax-color-border, #cbd5e1);
-    border-radius: var(--trax-radius-pill, 999px);
-    background: var(--trax-color-surface, #ffffff);
-    color: var(--trax-color-brand-strong, #0f172a);
-    font-weight: var(--trax-font-weight-bold, 700);
-    cursor: pointer;
-}
-
-.whatsapp-consent-modal__actions button[data-whatsapp-consent-confirm] {
-    border-color: var(--trax-color-action-primary, #0ea5b7);
-    background: var(--trax-color-action-primary, #0ea5b7);
-    color: var(--trax-color-text-inverse, #ffffff);
-}
-
-.whatsapp-consent-modal__actions button:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
-}
-
-.whatsapp-consent-modal__actions button:focus-visible,
-.whatsapp-consent-modal__check input:focus-visible {
-    outline: 0;
-    box-shadow: var(--trax-focus-ring, 0 0 0 3px rgba(14, 165, 183, 0.25));
 }
 
 @media (max-width: 42rem) {
-    .whatsapp-consent-modal__actions {
-        display: grid;
-    }
-
     .whatsapp-consent-modal__actions button {
         width: 100%;
     }

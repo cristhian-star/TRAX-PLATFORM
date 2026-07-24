@@ -6,10 +6,12 @@ from pathlib import Path
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["SECRET_KEY"] = "test-secret"
 
-from flask import render_template
+from flask import flash, render_template
 
 from app import create_app, db
 from app.config.config import TestingConfig
+from app.models.activity_notification import ActivityNotification
+from app.models.user import User
 
 
 class DesignSystemV2Test(unittest.TestCase):
@@ -59,6 +61,9 @@ class DesignSystemV2Test(unittest.TestCase):
             ".trax-badge",
             ".trax-alert",
             ".trax-empty-state",
+            ".trax-toast-region",
+            ".trax-modal",
+            ".trax-modal__dialog",
         ]
 
         for token in required_tokens:
@@ -110,6 +115,104 @@ class DesignSystemV2Test(unittest.TestCase):
         self.assertIn("trax-alert trax-alert--warning", html)
         self.assertIn("trax-button trax-button--secondary", html)
         self.assertIn("Domotica", html)
+
+    def test_base_flash_messages_render_canonical_alerts_by_category(self):
+        @self.app.route("/_test/ds/flash")
+        def _test_ds_flash():
+            flash("Operacion completada", "success")
+            flash("Revisar datos", "warning")
+            flash("No autorizado", "error")
+            return render_template(
+                "rubro_solicitado.html",
+                nombre_rubro="Electricidad",
+                cantidad=1,
+            )
+
+        html = self.client.get("/_test/ds/flash").get_data(as_text=True)
+
+        self.assertIn("trax-toast-region", html)
+        self.assertIn("trax-alert trax-alert--success trax-alert--dismissible", html)
+        self.assertIn("trax-alert trax-alert--warning trax-alert--dismissible", html)
+        self.assertIn("trax-alert trax-alert--danger trax-alert--dismissible", html)
+        self.assertIn('aria-live="assertive"', html)
+        self.assertIn('data-trax-alert-dismiss', html)
+
+    def test_notifications_page_uses_canonical_components_without_route_regression(self):
+        with self.app.app_context():
+            user = User(
+                nombre="Cliente Notificaciones",
+                email="cliente-notificaciones@trax.test",
+                password="hash",
+                rol="CLIENTE",
+            )
+            db.session.add(user)
+            db.session.commit()
+            db.session.add(
+                ActivityNotification(
+                    user_id=user.id,
+                    tipo="CUENTA_VERIFICADA",
+                    categoria="CUENTA",
+                    titulo="Cuenta activa",
+                    mensaje="Tu cuenta esta lista para operar.",
+                    prioridad="ACCION_REQUERIDA",
+                    requiere_accion=True,
+                    url_destino="/",
+                )
+            )
+            db.session.commit()
+            user_id = user.id
+
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = user_id
+            sess["user_role"] = "CLIENTE"
+            sess["user_name"] = "Cliente Notificaciones"
+
+        response = self.client.get("/notificaciones")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("trax-page notifications-page", html)
+        self.assertIn("trax-card notification-card", html)
+        self.assertIn("trax-badge trax-badge--info", html)
+        self.assertIn("trax-badge trax-badge--warning", html)
+        self.assertIn("trax-button trax-button--secondary", html)
+        self.assertIn("Accion Requerida", html)
+
+    def test_notifications_empty_state_uses_canonical_component(self):
+        with self.app.app_context():
+            user = User(
+                nombre="Cliente Sin Novedades",
+                email="sin-novedades@trax.test",
+                password="hash",
+                rol="CLIENTE",
+            )
+            db.session.add(user)
+            db.session.commit()
+            user_id = user.id
+
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = user_id
+            sess["user_role"] = "CLIENTE"
+            sess["user_name"] = "Cliente Sin Novedades"
+
+        html = self.client.get("/notificaciones").get_data(as_text=True)
+
+        self.assertIn("trax-empty-state notifications-page__empty", html)
+        self.assertIn("trax-empty-state__title", html)
+        self.assertIn("Podes volver a revisar mas tarde", html)
+
+    def test_whatsapp_modal_uses_canonical_modal_and_keeps_data_selectors(self):
+        with self.app.test_request_context("/"):
+            html = render_template("components/_whatsapp_consent_modal.html")
+
+        self.assertIn("trax-modal whatsapp-consent-modal", html)
+        self.assertIn('role="dialog"', html)
+        self.assertIn('aria-modal="true"', html)
+        self.assertIn('aria-labelledby="whatsapp-consent-title"', html)
+        self.assertIn('aria-describedby="whatsapp-consent-description"', html)
+        self.assertIn("trax-modal__dialog whatsapp-consent-modal__content", html)
+        self.assertIn("data-whatsapp-consent-checkbox", html)
+        self.assertIn("data-whatsapp-consent-confirm", html)
 
 
 if __name__ == "__main__":

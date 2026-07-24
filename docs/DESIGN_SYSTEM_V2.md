@@ -172,6 +172,27 @@ Variantes:
 - `.trax-alert--danger`
 - `.trax-alert--info`
 
+Para mensajes descartables usar:
+
+```html
+<div class="trax-alert trax-alert--info trax-alert--dismissible" role="status" aria-live="polite">
+    <div class="trax-alert__content">
+        <p class="trax-alert__body">Mensaje del sistema.</p>
+    </div>
+    <button class="trax-alert__dismiss" type="button" data-trax-alert-dismiss aria-label="Cerrar mensaje">&times;</button>
+</div>
+```
+
+Mapa semantico recomendado:
+
+| Estado | Variante |
+| --- | --- |
+| Activo, publicado, aprobado, leido | `success` |
+| Pendiente, en revision, accion requerida | `warning` |
+| Rechazado, suspendido, error, bloqueado | `danger` |
+| Borrador, inactivo, historico | neutral |
+| Informacion general | `info` |
+
 ### Estados Vacios
 
 ```html
@@ -181,6 +202,34 @@ Variantes:
     <p class="trax-empty-state__description">Ajusta los filtros para intentar nuevamente.</p>
 </div>
 ```
+
+### Modal
+
+```html
+<dialog class="trax-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <form method="dialog" class="trax-modal__dialog">
+        <div class="trax-modal__header">
+            <h2 class="trax-modal__title" id="modal-title">Titulo</h2>
+        </div>
+        <div class="trax-modal__body">...</div>
+        <div class="trax-modal__footer">...</div>
+    </form>
+</dialog>
+```
+
+Requisitos:
+
+- `aria-labelledby` obligatorio.
+- `aria-describedby` recomendado cuando el cuerpo explica consecuencias.
+- Mantener cierre con Escape mediante `<dialog>`.
+- Retornar foco al disparador desde el JavaScript del flujo.
+- No mover logica de negocio al modal.
+
+### Layout Utilities
+
+- `.trax-stack`: apila contenido con gap canonico.
+- `.trax-cluster`: agrupa acciones en linea con wrap.
+- `.trax-divider`: separador visual basado en token de borde.
 
 ## Modo Oscuro
 
@@ -217,12 +266,29 @@ Estado actual:
 | Login | Piloto | Page shell, card, field, input, button, alert. |
 | Registro | Piloto | Page shell, card, field, input, radio, checkbox, button, alert. |
 | Rubro solicitado | Piloto | Card compacta, badge, alerta y boton. |
+| Flash messages globales | Piloto | Region `trax-toast-region`, alertas por categoria y cierre accesible. |
+| Notificaciones | Piloto | Page shell, cards, badges, botones y empty state. |
+| Modal WhatsApp | Piloto | API `trax-modal` y atributos accesibles sin cambiar flujo. |
 | Navbar | Legacy estable | No migrado en esta fase. |
 | Home | Pendiente | No migrar hasta estabilizar componentes. |
 | Perfil profesional | Pendiente | Riesgo medio por mapa, portfolio y modales. |
 | Marketplace de presupuestos | Pendiente | Riesgo alto por flujos y cards densas. |
 | Emergencias | Pendiente | Riesgo medio/alto por estados y filtros. |
 | Admin y tablas | Pendiente | Requiere estrategia especifica. |
+
+## Mapa De Impacto Fase 3
+
+| Superficie | Riesgo | Decision |
+| --- | --- | --- |
+| Flash messages globales | Bajo | Migrado con `.trax-alert` y dismiss accesible. |
+| Notificaciones | Bajo | Migrado parcialmente sin cambiar endpoints ni estado leida/no leida. |
+| Rubro solicitado | Bajo | Conservado como piloto limpio. |
+| Login y Registro | Bajo | Conservados como piloto de Fase 2. |
+| Modal WhatsApp | Medio controlado | Migrado a estructura canonica manteniendo selectores `data-*` y JS existente. |
+| Navbar | Medio | Auditada; pendiente migracion total. Solo debe avanzar con foco, contraste y tokens. |
+| Coverage modal | Medio | Compatible conceptualmente con `.trax-modal`; pendiente por estar dentro de perfil profesional. |
+| Home, Perfil profesional, Marketplace, Emergencias | Alto | No migrar en fases parciales sin validacion visual especifica. |
+| Admin y tablas | Alto | Pendiente por complejidad responsive y densidad operativa. |
 
 ## Reglas Para CSS Por Modulo
 
@@ -234,7 +300,7 @@ Estado actual:
 ## Pendientes
 
 - Normalizar tablas.
-- Crear modal canonico.
+- Extender modal canonico a cobertura cuando se autorice intervenir perfil profesional.
 - Crear loader canonico.
 - Migrar empty states existentes.
 - Auditar breakpoints legacy.
