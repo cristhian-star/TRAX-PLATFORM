@@ -1,5 +1,27 @@
 # CHANGELOG TRAX
 
+## 2026-07-24 - Rediseño de Login y Registro
+
+### Agregado
+
+- Se agrego una experiencia dedicada de autenticacion con `auth-ux-v1.css` y `auth-ux-v1.js`.
+- Se agregaron labels visibles, errores inline accesibles, toggle de contraseña, estado de carga y feedback de fortaleza.
+- Se agrego validacion centralizada de login y registro en `auth_service.py`.
+- Se conecto `TermsAcceptance` al registro con version centralizada.
+- Se agregaron pruebas de login, registro, CSRF, rate limiting, redirects, roles, terminos y accesibilidad basica.
+
+### Mejorado
+
+- `auth_routes.py` quedo orientado a request, servicio, sesion y redirect.
+- El registro crea cuenta basica y redirige por rol: cliente al destino seguro, profesional a completar perfil.
+- El login rechaza usuarios suspendidos o inactivos antes de crear sesion.
+- Los mensajes de registro evitan confirmar explicitamente si un email ya existe.
+
+### Corregido
+
+- Se evita dejar una cuenta parcialmente creada si falla el registro de consentimiento.
+- Se bloqueo `next` externo tambien en el flujo de registro con sesion inmediata.
+
 ## 2026-07-23 - Identidad y Portfolio Profesional
 
 ### Agregado

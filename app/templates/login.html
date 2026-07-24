@@ -1,30 +1,105 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-ux-v1.css') }}">
+{% endblock %}
+
 {% block content %}
 
-<section class="form-section">
-    <div class="section-container">
-        <form action="/login" method="POST" class="form-card">
+<main class="auth-page auth-page--login">
+    <section class="auth-shell" aria-labelledby="auth-title">
+        <div class="auth-panel auth-panel--story">
+            <p class="auth-eyebrow">Acceso seguro TRAX</p>
+            <h1 id="auth-title">Volvé a operar con claridad.</h1>
+            <p class="auth-lead">Gestioná solicitudes, contactos y oportunidades desde un solo lugar, con tus datos protegidos.</p>
+            <dl class="auth-trust-list">
+                <div>
+                    <dt>Sesión protegida</dt>
+                    <dd>Usamos CSRF, límites de abuso y cookies seguras.</dd>
+                </div>
+                <div>
+                    <dt>Contacto controlado</dt>
+                    <dd>WhatsApp y datos privados pasan por flujos auditables.</dd>
+                </div>
+                <div>
+                    <dt>Roles claros</dt>
+                    <dd>Clientes y profesionales ven sólo lo que corresponde.</dd>
+                </div>
+            </dl>
+        </div>
+
+        <form action="/login" method="POST" class="auth-card" data-auth-form novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if next_url %}
                 <input type="hidden" name="next" value="{{ next_url }}">
             {% endif %}
-            <h2>Ingresar</h2>
+
+            <div class="auth-card__head">
+                <p>Ingresar</p>
+                <h2>Entrá a tu cuenta</h2>
+            </div>
 
             {% if error %}
-                <p class="form-alert">{{ error }}</p>
+                <p class="auth-alert" id="login-form-error" role="alert">{{ error }}</p>
             {% endif %}
 
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Contraseña" required>
+            <div class="auth-field">
+                <label for="login-email">Email</label>
+                <input
+                    id="login-email"
+                    type="email"
+                    name="email"
+                    value="{{ form_values.email if form_values and form_values.email else '' }}"
+                    autocomplete="email"
+                    inputmode="email"
+                    required
+                    aria-describedby="login-email-help{% if errors and errors.email %} login-email-error{% endif %}"
+                    aria-invalid="{{ 'true' if errors and errors.email else 'false' }}">
+                <small id="login-email-help">Usá el email con el que creaste tu cuenta.</small>
+                {% if errors and errors.email %}
+                    <p class="auth-field-error" id="login-email-error">{{ errors.email }}</p>
+                {% endif %}
+            </div>
 
-            <button type="submit">Ingresar</button>
-            <p class="form-helper">
-                ¿No tenés cuenta?
-                <a href="/register{% if next_url %}?next={{ next_url|urlencode }}{% endif %}">Registrate</a>
+            <div class="auth-field">
+                <label for="login-password">Contraseña</label>
+                <div class="auth-password">
+                    <input
+                        id="login-password"
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                        aria-describedby="login-password-help{% if errors and errors.password %} login-password-error{% endif %}{% if errors and errors.credentials %} login-credentials-error{% endif %}"
+                        aria-invalid="{{ 'true' if errors and (errors.password or errors.credentials) else 'false' }}">
+                    <button type="button" data-password-toggle aria-controls="login-password" aria-label="Mostrar contraseña">Mostrar</button>
+                </div>
+                <small id="login-password-help">No compartas tu contraseña con terceros.</small>
+                {% if errors and errors.password %}
+                    <p class="auth-field-error" id="login-password-error">{{ errors.password }}</p>
+                {% endif %}
+                {% if errors and errors.credentials %}
+                    <p class="auth-field-error" id="login-credentials-error">{{ errors.credentials }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="auth-submit" data-auth-submit>
+                <span>Ingresar</span>
+                <span class="auth-submit__loading" aria-hidden="true">Validando...</span>
+            </button>
+
+            <p class="auth-muted-note">La recuperación de contraseña se habilitará cuando el backend de tokens esté disponible.</p>
+
+            <p class="auth-switch">
+                ¿Primera vez en TRAX?
+                <a href="/register{% if next_url %}?next={{ next_url|urlencode }}{% endif %}">Creá tu cuenta</a>
             </p>
         </form>
-    </div>
-</section>
+    </section>
+</main>
 
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/auth-ux-v1.js') }}"></script>
 {% endblock %}

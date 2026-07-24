@@ -7,6 +7,8 @@
 - Revisar politicas legales con profesional: terminos, privacidad, cookies y consentimientos.
 - Configurar Cloudflare/WAF o equivalente antes de exposicion publica.
 - Implementar checklist productivo en staging con secretos reales, HTTPS, backups, monitoreo y prueba de restauracion.
+- Implementar recuperacion de contraseña con tokens seguros y expiracion.
+- Implementar verificacion de email antes de activar flujos sensibles.
 
 ## Media prioridad
 
@@ -25,6 +27,7 @@
 - Evaluar `PortfolioItem` futuro si el portfolio necesita agrupar trabajos con multiples imagenes y narrativa propia.
 - Evaluar soporte de videos solo si producto define moderacion, storage y costos.
 - Evaluar moderacion automatica de imagenes cuando exista politica aprobada y proveedor definido.
+- Evaluar rol o flujo `EMPRESA` cuando exista definicion funcional y modelo de permisos.
 - Implementar geocoding de ubicaciones base.
 - Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
 - Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.
