@@ -44,6 +44,8 @@
 
 [x] Consolidacion Arquitectonica v1
 
+[x] Sprint 7 - Contracting Core Fase 1
+
 [ ] Agenda
 
 [ ] WhatsApp Business API

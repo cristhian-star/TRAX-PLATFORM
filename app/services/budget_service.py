@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
@@ -6,12 +7,22 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.budget_offer import BudgetOffer
 from app.models.budget_request import BudgetRequest
+from app.models.contract_request import ContractRequest
 from app.models.professional import Professional
+from app.services.contracting_core_service import create_contract_from_budget_offer
 from app.services.subscription_service import has_pro_access
 
 
 MAX_OFFERS_PER_REQUEST = 6
 WORK_MONTHLY_OFFER_LIMIT = 9
+
+
+@dataclass(frozen=True)
+class BudgetAwardResult:
+    offer: BudgetOffer
+    contract: object
+    created: bool
+    state_changed: bool
 
 
 def create_budget_request(
@@ -45,7 +56,7 @@ def get_budget_request_by_id(budget_request_id):
 
 def get_open_budget_requests(categoria=None, zona=None):
     query = BudgetRequest.query.filter(
-        BudgetRequest.estado.in_(("ABIERTO", "COTIZANDO")),
+        BudgetRequest.estado.in_(("ABIERTO", "PUBLICADA", "COTIZANDO")),
     )
 
     if categoria:
@@ -189,7 +200,7 @@ def create_budget_offer(
         raise ValueError("Solicitud de presupuesto no encontrada")
     if budget_request.cliente_id == professional_user_id:
         raise ValueError("No podes presupuestar tu propia solicitud")
-    if budget_request.estado not in ("ABIERTO", "COTIZANDO"):
+    if budget_request.estado not in ("ABIERTO", "PUBLICADA", "COTIZANDO"):
         raise ValueError("Esta solicitud ya no recibe presupuestos")
 
     existing_offer = BudgetOffer.query.filter_by(
@@ -235,33 +246,65 @@ def create_budget_offer(
 
 
 def award_budget_offer(budget_request_id, offer_id, cliente_id):
-    budget_request = (
-        BudgetRequest.query
-        .filter_by(id=budget_request_id)
-        .with_for_update()
-        .first()
-    )
-    if budget_request is None:
-        raise ValueError("Solicitud de presupuesto no encontrada")
-    if budget_request.cliente_id != cliente_id:
-        raise PermissionError("Solo el cliente dueño puede adjudicar esta solicitud")
-    if budget_request.estado == "ADJUDICADA":
-        raise ValueError("Esta solicitud ya fue adjudicada")
-    if budget_request.estado not in ("ABIERTO", "COTIZANDO"):
-        raise ValueError("Esta solicitud ya no permite adjudicar presupuestos")
+    try:
+        budget_request = (
+            BudgetRequest.query
+            .filter_by(id=budget_request_id)
+            .with_for_update()
+            .first()
+        )
+        if budget_request is None:
+            raise ValueError("Solicitud de presupuesto no encontrada")
+        if budget_request.cliente_id != cliente_id:
+            raise PermissionError("Solo el cliente dueno puede adjudicar esta solicitud")
 
-    offer = BudgetOffer.query.filter_by(
-        id=offer_id,
-        budget_request_id=budget_request.id,
-    ).first()
-    if offer is None:
-        raise ValueError("El presupuesto seleccionado no pertenece a esta solicitud")
+        offer = BudgetOffer.query.filter_by(
+            id=offer_id,
+            budget_request_id=budget_request.id,
+        ).first()
+        if offer is None:
+            raise ValueError("El presupuesto seleccionado no pertenece a esta solicitud")
 
-    offer.estado = "ADJUDICADO"
-    budget_request.estado = "ADJUDICADA"
-    db.session.commit()
+        if budget_request.estado == "ADJUDICADA":
+            if offer.estado == "ADJUDICADO":
+                contract_result = create_contract_from_budget_offer(offer.id, actor_user_id=cliente_id)
+                db.session.commit()
+                return BudgetAwardResult(
+                    offer=offer,
+                    contract=contract_result.contract,
+                    created=contract_result.created,
+                    state_changed=False,
+                )
+            raise ValueError("Esta solicitud ya fue adjudicada")
+        if budget_request.estado not in ("ABIERTO", "PUBLICADA", "COTIZANDO"):
+            raise ValueError("Esta solicitud ya no permite adjudicar presupuestos")
 
-    return offer
+        offer.estado = "ADJUDICADO"
+        budget_request.estado = "ADJUDICADA"
+        contract_result = create_contract_from_budget_offer(offer.id, actor_user_id=cliente_id)
+        db.session.commit()
+
+        return BudgetAwardResult(
+            offer=offer,
+            contract=contract_result.contract,
+            created=contract_result.created,
+            state_changed=True,
+        )
+    except IntegrityError:
+        db.session.rollback()
+        existing = ContractRequest.query.filter_by(budget_offer_id=offer_id).first()
+        if existing is not None and existing.cliente_id == cliente_id:
+            offer = db.session.get(BudgetOffer, offer_id)
+            return BudgetAwardResult(
+                offer=offer,
+                contract=existing,
+                created=False,
+                state_changed=False,
+            )
+        raise
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def cancel_budget_request(budget_request_id, cliente_id):

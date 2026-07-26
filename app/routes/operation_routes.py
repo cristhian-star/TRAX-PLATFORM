@@ -13,7 +13,6 @@ from app.services.budget_service import (
     get_offer_allowance,
 )
 from app.services.contract_service import (
-    audit_contract_action,
     accept_contract,
     cancel_contract,
     complete_contract,
@@ -39,12 +38,10 @@ from app.services.professional_service import (
     get_professional_by_id,
 )
 from app.services.operation_notification_service import (
-    notify_budget_awarded,
     notify_budget_cancelled,
     notify_budget_created,
     notify_budget_offer_created,
     notify_emergency_created,
-    notify_proposal_accepted,
     notify_proposal_application_created,
     notify_proposal_cancelled,
     notify_proposal_created,
@@ -159,14 +156,6 @@ def aceptar_contratacion(id):
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_ACCEPTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} aceptada.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -182,14 +171,6 @@ def rechazar_contratacion(id):
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_REJECTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} rechazada.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -200,19 +181,11 @@ def iniciar_contratacion(id):
     contract = _load_contract_or_404(id)
     try:
         require_assigned_professional(contract, session["user_id"])
-        contract = start_contract(id)
+        contract = start_contract(id, actor_user_id=session["user_id"])
     except ValueError as error:
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_STARTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} iniciada.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -223,19 +196,11 @@ def completar_contratacion(id):
     contract = _load_contract_or_404(id)
     try:
         require_assigned_professional(contract, session["user_id"])
-        contract = complete_contract(id)
+        contract = complete_contract(id, actor_user_id=session["user_id"])
     except ValueError as error:
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_COMPLETED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} completada.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -245,19 +210,11 @@ def confirmar_contratacion(id):
     contract = _load_contract_or_404(id)
     try:
         require_client_owner(contract, session["user_id"])
-        contract = confirm_contract(id)
+        contract = confirm_contract(id, actor_user_id=session["user_id"])
     except ValueError as error:
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_CONFIRMED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} confirmada por cliente.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -267,19 +224,11 @@ def cancelar_contratacion(id):
     contract = _load_contract_or_404(id)
     try:
         require_client_owner(contract, session["user_id"])
-        contract = cancel_contract(id)
+        contract = cancel_contract(id, actor_user_id=session["user_id"])
     except ValueError as error:
         return str(error), 400
     except PermissionError:
         abort(403)
-    audit_contract_action(
-        "CONTRACT_CANCELLED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} cancelada por cliente.",
-    )
     return redirect(f"/contratacion/{id}")
 
 
@@ -485,12 +434,11 @@ def ofertar_presupuesto(id):
 @login_required
 def adjudicar_presupuesto(id, presupuesto_id):
     try:
-        offer = award_budget_offer(
+        award_budget_offer(
             budget_request_id=id,
             offer_id=presupuesto_id,
             cliente_id=session["user_id"],
         )
-        notify_budget_awarded(offer)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -722,8 +670,7 @@ def postular_propuesta(id):
 @login_required
 def aceptar_postulacion(id, application_id):
     try:
-        application = accept_application(id, application_id, session["user_id"])
-        notify_proposal_accepted(application)
+        accept_application(id, application_id, session["user_id"])
     except PermissionError:
         abort(403)
     except ValueError as error:

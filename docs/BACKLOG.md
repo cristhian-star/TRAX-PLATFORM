@@ -2,6 +2,9 @@
 
 ## Alta prioridad
 
+- Definir Fase 2 del Sprint 7: negociacion, habilitacion eventual de `hiring_mode = MULTIPLE` y politica de cancelacion.
+- Vincular `Review` y `ReputationEvent` directamente a `ContractRequest` para trazabilidad completa.
+- Diseñar hitos, evidencias, disputas y modificaciones de contrato sin implementar pagos todavia.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
 - Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
 - Revisar politicas legales con profesional: terminos, privacidad, cookies y consentimientos.
@@ -12,6 +15,8 @@
 
 ## Media prioridad
 
+- Implementar oferta profesional como segundo tipo de publicacion de propuestas.
+- Preparar facturacion TRAX Pro sobre el nucleo de contratacion sin integrar ARCA hasta aprobacion funcional.
 - Migrar navbar completo a Design System v2 en un sprint especifico sin cambiar rutas ni comportamiento.
 - Migrar Home, Resultados y Perfil Profesional completo a Design System v2 con validacion visual dedicada.
 - Migrar Dashboards, Presupuestos, Propuestas, Emergencias, Admin y tablas a componentes `.trax-*` por fases.

@@ -1,5 +1,30 @@
 # CHANGELOG TRAX
 
+## 2026-07-26 - Sprint 7 Contracting Core Fase 1
+
+### Agregado
+
+- Se agrego `ContractEvent` como historial de dominio para contrataciones.
+- Se agrego `contracting_core_service.py` como puerta central para crear contratos desde presupuestos y propuestas.
+- Se agrego trazabilidad de origen en `ContractRequest` para `DIRECT`, `BUDGET` y `PROPOSAL`.
+- Se agrego migracion Alembic `20260726_01_sprint7_contracting_core`.
+- Se agregaron pruebas de contratacion directa, presupuesto a contrato y propuesta a contrato.
+
+### Mejorado
+
+- Una `BudgetOffer` adjudicada crea un `ContractRequest` canonico en estado `CREADA`.
+- Una `ProposalApplication` aceptada crea un `ContractRequest` canonico en estado `CREADA`.
+- Las creaciones derivadas son idempotentes y conservan referencias a la entidad origen.
+- Los reintentos de adjudicacion o aceptacion no duplican eventos, auditorias ni notificaciones.
+- Las propuestas usan `hiring_mode = SINGLE` por defecto: la primera postulacion aceptada cierra la propuesta y descarta otras activas.
+- La migracion incorpora checks de consistencia de origen y bloqueo seguro de downgrade si ya existe trazabilidad contractual.
+- Las transiciones de contrato generan eventos de dominio.
+
+### Corregido
+
+- Se corrigio el contrato de estados de `BudgetRequest` para incluir `CANCELADA` y estados canonicos de publicacion.
+- Se normaliza el estado legacy `CERRADO` de presupuestos a `CERRADA`.
+
 ## 2026-07-24 - UX/UI General & Design System v2
 
 ### Agregado

@@ -6,6 +6,14 @@ from app import db
 class ProposalRequest(db.Model):
     __tablename__ = "proposal_requests"
 
+    HIRING_MODE_SINGLE = "SINGLE"
+    HIRING_MODE_MULTIPLE = "MULTIPLE"
+
+    HIRING_MODES = (
+        HIRING_MODE_SINGLE,
+        HIRING_MODE_MULTIPLE,
+    )
+
     ESTADOS = (
         "PUBLICADA",
         "CERRADA",
@@ -28,6 +36,7 @@ class ProposalRequest(db.Model):
     fecha_inicio_estimada = db.Column(db.Date)
     fecha_limite_postulacion = db.Column(db.Date)
     fecha_limite = db.Column(db.DateTime)
+    hiring_mode = db.Column(db.String(20), nullable=False, default=HIRING_MODE_SINGLE)
     estado = db.Column(db.String(50), nullable=False, default="PUBLICADA")
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

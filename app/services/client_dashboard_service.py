@@ -150,7 +150,7 @@ def build_client_dashboard_context(user_id):
 
     active_budget_count = len([
         request_item for request_item in budget_requests
-        if request_item.estado in ("ABIERTO", "COTIZANDO")
+        if request_item.estado in ("ABIERTO", "PUBLICADA", "COTIZANDO")
     ])
     active_emergency_count = len([
         request_item for request_item in emergency_requests

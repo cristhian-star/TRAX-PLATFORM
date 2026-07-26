@@ -1,5 +1,29 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-26
+
+Se decidio refactorizar `ContractRequest` como nucleo canonico de contratacion en lugar de crear un segundo modelo de contrato.
+
+Motivo:
+
+Presupuestos y Propuestas tienen origenes diferentes, pero ambos deben producir una contratacion comun para ejecucion, conformidad, reputacion y futuras integraciones de facturacion o pagos.
+
+Alcance:
+
+- `BudgetOffer` adjudicada crea un `ContractRequest` en estado `CREADA`.
+- `ProposalApplication` aceptada crea un `ContractRequest` en estado `CREADA`.
+- La creacion derivada es idempotente por `budget_offer_id` o `proposal_application_id`.
+- En reintentos no se duplican `ContractEvent`, `AuditLog` ni `ActivityNotification`.
+- `source_id` debe coincidir con la entidad origen concreta: `budget_offer_id` para Presupuestos y `proposal_application_id` para Propuestas.
+- Propuestas adopta `hiring_mode = SINGLE` por defecto hasta definir reglas de contratacion multiple.
+- `ContractEvent` conserva historial de dominio.
+- `AuditLog` conserva trazabilidad administrativa y de seguridad.
+- Las contrataciones directas existentes quedan como `source_type = DIRECT`.
+
+Criterio:
+
+Presupuestos y Propuestas seguiran siendo dominios separados. Ningun modulo externo, WhatsApp, MCP, IA, pagos o facturacion debe controlar directamente la logica de contratacion.
+
 ## 2026-07-24
 
 Se decidio cargar `design-system-v2.css` de forma explicita desde `base.html`, despues de `design-tokens.css` y antes de `styles.css`.

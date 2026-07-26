@@ -9,6 +9,7 @@ class ProposalApplication(db.Model):
     ESTADOS = (
         "POSTULADA",
         "ACEPTADA",
+        "RECHAZADA",
         "DESCARTADA",
     )
 

@@ -53,6 +53,7 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.category import Category
     from app.models.category_request import CategoryRequest
     from app.models.contract_request import ContractRequest
+    from app.models.contract_event import ContractEvent
     from app.models.budget_request import BudgetRequest
     from app.models.budget_offer import BudgetOffer
     from app.models.emergency_request import EmergencyRequest
