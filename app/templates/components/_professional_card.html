@@ -8,6 +8,7 @@
 {% set rating_average = rating.average if rating.average is not none else none %}
 {% set review_count = rating.count or 0 %}
 {% set card_media = professional_media.get(profile_id, {}) if professional_media is defined else {} %}
+{% set formal_negotiation_allowed = formal_negotiation_eligibility.get(profile_id, false) if formal_negotiation_eligibility is defined else false %}
 
 <article class="professional-card">
     <div class="professional-card__identity">
@@ -113,6 +114,13 @@
                 href="/contratacion/nueva?professional_id={{ profile_id }}&servicio={{ professional_service|urlencode }}">
                 Contactar
             </a>
+            {% if formal_negotiation_allowed %}
+                <a
+                    class="professional-card__button"
+                    href="/negociacion/nueva?professional_id={{ profile_id }}&servicio={{ professional_service|urlencode }}">
+                    Formalizar condiciones
+                </a>
+            {% endif %}
         </div>
     </div>
 </article>

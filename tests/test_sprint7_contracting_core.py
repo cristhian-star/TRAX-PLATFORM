@@ -18,7 +18,6 @@ from app.services.contract_service import (
     reject_contract,
     start_contract,
 )
-from app.services.contracting_core_service import create_contract_event
 
 
 class Sprint7ContractingCoreTest(unittest.TestCase):
@@ -65,6 +64,8 @@ class Sprint7ContractingCoreTest(unittest.TestCase):
                 professional_id=self.professional_id,
                 professional_user_id=self.professional_user_id,
                 servicio="Instalacion",
+                actor_user_id=self.client_id,
+                idempotency_key="core-direct-create-0001",
             )
 
             self.assertEqual(contract.source_type, ContractRequest.SOURCE_DIRECT)
@@ -79,6 +80,8 @@ class Sprint7ContractingCoreTest(unittest.TestCase):
                 professional_id=self.professional_id,
                 professional_user_id=self.professional_user_id,
                 servicio="Instalacion",
+                actor_user_id=self.client_id,
+                idempotency_key="core-direct-create-0002",
             )
             contract_id = contract.id
             self.assertEqual(contract.estado, "CREADA")
@@ -113,6 +116,7 @@ class Sprint7ContractingCoreTest(unittest.TestCase):
             data={
                 "professional_id": str(self.professional_id),
                 "servicio": "Instalacion",
+                "idempotency_key": "core-direct-route-0001",
             },
         )
 
@@ -131,6 +135,8 @@ class Sprint7ContractingCoreTest(unittest.TestCase):
                 professional_id=self.professional_id,
                 professional_user_id=self.professional_user_id,
                 servicio="Instalacion",
+                actor_user_id=self.client_id,
+                idempotency_key="core-direct-create-0003",
             )
 
             with self.assertRaises(PermissionError):
@@ -144,26 +150,12 @@ class Sprint7ContractingCoreTest(unittest.TestCase):
 
             self.assertEqual(ContractRequest.query.get(contract.id).estado, "CREADA")
 
-    def test_contract_event_metadata_uses_closed_non_sensitive_schema(self):
+    def test_generic_contract_event_helper_is_not_public(self):
         with self.app.app_context():
-            contract = create_contract(
-                cliente_id=self.client_id,
-                professional_id=self.professional_id,
-                professional_user_id=self.professional_user_id,
-                servicio="Instalacion",
-            )
-            event = create_contract_event(
-                contract,
-                ContractEvent.CONTRACT_STARTED,
-                actor_user_id=self.professional_user_id,
-                metadata_json={
-                    "source_type": ContractRequest.SOURCE_DIRECT,
-                    "token": "secreto",
-                    "nested": {"password": "no"},
-                },
-            )
+            from app.services import contracting_core_service
 
-            self.assertEqual(event.metadata_json, {"source_type": ContractRequest.SOURCE_DIRECT})
+            self.assertNotIn("create_contract_event", contracting_core_service.__all__)
+            self.assertFalse(hasattr(contracting_core_service, "create_contract_event"))
 
 
 if __name__ == "__main__":

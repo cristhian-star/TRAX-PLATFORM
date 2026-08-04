@@ -103,6 +103,16 @@
                 href="/contratacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
                 Contactar
             </a>
+            {% if formal_negotiation_allowed %}
+                <a
+                    class="profile-action profile-action--secondary"
+                    href="/negociacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
+                    Formalizar condiciones
+                </a>
+                <p class="professional-profile__contact-privacy">
+                    Las condiciones son definidas y aceptadas por las partes. TRAX registra el acuerdo y aporta trazabilidad, pero no garantiza su cumplimiento.
+                </p>
+            {% endif %}
             <button class="profile-action profile-action--secondary" type="button" data-share-profile>
                 Compartir perfil
             </button>

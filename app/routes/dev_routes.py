@@ -1,6 +1,11 @@
-import os
-
-from flask import Blueprint, abort, redirect, render_template, session
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    session,
+)
 
 from app.models.user import User
 from app.services.subscription_service import has_pro_access
@@ -9,27 +14,12 @@ from app.services.verification_service import has_approved_verification
 dev = Blueprint("dev", __name__)
 
 
-_TRUE_VALUES = {"1", "true", "yes", "on"}
-_PRODUCTION_VALUES = {"production", "prod"}
-
-
-def _env_value(name):
-    return os.environ.get(name, "").strip().lower()
-
-
 def _is_dev_qa_panel_enabled():
-    explicitly_enabled = _env_value("ENABLE_DEV_QA_PANEL") in _TRUE_VALUES
-
-    if not explicitly_enabled:
-        return False
-
-    if _env_value("FLASK_ENV") in _PRODUCTION_VALUES:
-        return False
-
-    if _env_value("APP_ENV") in _PRODUCTION_VALUES:
-        return False
-
-    return True
+    return bool(
+        current_app.config.get("ENABLE_DEV_QA_PANEL")
+        and current_app.config.get("ENV_NAME")
+        in ("development", "testing")
+    )
 
 
 def _require_dev_qa_panel():
@@ -49,8 +39,17 @@ def _user_row(user):
         "has_professional_profile": professional is not None,
         "professional_profile_complete": bool(professional and professional.perfil_completo),
         "professional_service": professional.servicio if professional else None,
+        "professional_profile_id": professional.id if professional else None,
+        "professional_profile_url": (
+            f"/profesional/{professional.id}" if professional else None
+        ),
         "is_pro": has_pro_access(user.id),
         "is_verified": has_approved_verification(user.id),
+        "login_allowed": bool(
+            user.estado == "ACTIVO"
+            and user.rol in ("CLIENTE", "PROFESIONAL")
+            and (user.rol != "PROFESIONAL" or professional is not None)
+        ),
     }
 
 
@@ -74,12 +73,21 @@ def qa_login(user_id):
     _require_dev_qa_panel()
 
     user = User.query.get_or_404(user_id)
+    professional = user.professional_profile
+    if (
+        user.estado != "ACTIVO"
+        or user.rol not in ("CLIENTE", "PROFESIONAL")
+        or (user.rol == "PROFESIONAL" and professional is None)
+    ):
+        abort(403)
     session.clear()
     session["user_id"] = user.id
     session["user_name"] = user.nombre
     session["user_role"] = user.rol
 
-    return redirect("/")
+    if user.rol == "PROFESIONAL":
+        return redirect(f"/profesional/{professional.id}")
+    return redirect("/resultados")
 
 
 @dev.route("/dev/qa/logout", methods=["POST"])

@@ -46,6 +46,10 @@
 
 [x] Sprint 7 - Contracting Core Fase 1
 
+[x] Sprint 7 - Contracting Core Fase 2A - Fundaciones transversales
+
+[ ] Sprint 7 - Contracting Core Fases 2B-2F
+
 [ ] Agenda
 
 [ ] WhatsApp Business API

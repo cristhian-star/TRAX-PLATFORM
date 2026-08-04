@@ -7,7 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.budget_offer import BudgetOffer
 from app.models.budget_request import BudgetRequest
-from app.models.contract_request import ContractRequest
 from app.models.professional import Professional
 from app.services.contracting_core_service import create_contract_from_budget_offer
 from app.services.subscription_service import has_pro_access
@@ -292,15 +291,6 @@ def award_budget_offer(budget_request_id, offer_id, cliente_id):
         )
     except IntegrityError:
         db.session.rollback()
-        existing = ContractRequest.query.filter_by(budget_offer_id=offer_id).first()
-        if existing is not None and existing.cliente_id == cliente_id:
-            offer = db.session.get(BudgetOffer, offer_id)
-            return BudgetAwardResult(
-                offer=offer,
-                contract=existing,
-                created=False,
-                state_changed=False,
-            )
         raise
     except Exception:
         db.session.rollback()

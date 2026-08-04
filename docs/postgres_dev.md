@@ -57,6 +57,26 @@ python run.py
 
 La aplicacion volvera a leer `instance/trax.db`. En caso de necesitar restaurar manualmente datos DEV, el backup existente es `instance/trax_backup_before_postgres.db`; no se reemplaza automaticamente.
 
+## Gate PostgreSQL obligatorio de Contracting Core
+
+La concurrencia real de Sprint 7 se valida en una base exclusivamente
+descartable. La suite aplica `alembic upgrade head` y trunca las tablas TRAX
+entre casos, por lo que nunca debe apuntarse a una base compartida:
+
+```powershell
+$env:TRAX_POSTGRES_TEST_URL = "postgresql+psycopg2://usuario:clave@localhost/trax_contracting_test"
+$env:TRAX_POSTGRES_TEST_ALLOW_RESET = "1"
+.\.venv\Scripts\python.exe tests\postgresql_contracting_concurrency_e2e.py
+.\.venv\Scripts\python.exe tests\postgresql_negotiation_concurrency_e2e.py
+.\.venv\Scripts\python.exe tests\postgresql_operation_command_migration_partial.py
+```
+
+Estos comandos deben ser jobs requeridos de CI. Las suites fallan, en vez de
+omitirse, si falta la URL, si el motor no es PostgreSQL, si no se autorizo el
+reset o si Alembic no queda en `20260726_05`. El gate de negociacion 2B
+comprueba dos conexiones y sesiones independientes, aceptaciones y
+finalizaciones concurrentes, conteos exactos y rollback por constraint real.
+
 ## Advertencias
 
 - No borrar `instance/trax.db`, `instance/trax_backup_before_postgres.db` ni el volumen `trax_instance`.

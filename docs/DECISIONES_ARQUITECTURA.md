@@ -1,5 +1,33 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-07-26 - Contracting Core Fase 2A
+
+Se decidio que `CONFIRMADA` sea el unico estado terminal exitoso de contratos nuevos.
+
+Motivo:
+
+`COMPLETADA` representa la declaracion del profesional y `CONFIRMADA` el consentimiento expreso del cliente sobre la finalizacion. Una transicion automatica posterior a `CERRADA` no agrega informacion de dominio y debilita el significado del consentimiento. `CERRADA` queda como valor legacy y se migra a `CONFIRMADA`.
+
+Se decidio separar `contracting_mode` de `hiring_mode`.
+
+- `contracting_mode` describe la modalidad legal y solo admite `EXTERNAL`.
+- `hiring_mode` describe cuantos profesionales puede contratar una propuesta y permanece en `SINGLE` durante Fase 2A.
+- `PROTECTED` no se admite ni se reserva como comportamiento ejecutable.
+
+Se decidio que toda transicion contractual sensible use:
+
+- operacion explicita, nunca un estado destino libre;
+- actor autenticado, rol y ownership;
+- lock `SELECT FOR UPDATE`;
+- version esperada;
+- `OperationCommand` con unicidad por actor, operacion y key;
+- un `correlation_id` comun;
+- un unico commit para contrato, evento, auditoria, notificacion y resultado.
+
+`AuditLog` conserva evidencia, pero no es la fuente primaria de idempotencia. Las correlaciones historicas imposibles de deducir se mantienen nulas para no inventar trazabilidad.
+
+El downgrade de Fase 2A se bloquea cuando existen comandos o datos correlacionados que el esquema anterior no puede representar. Se prefiere forward fix.
+
 ## 2026-07-26
 
 Se decidio refactorizar `ContractRequest` como nucleo canonico de contratacion en lugar de crear un segundo modelo de contrato.

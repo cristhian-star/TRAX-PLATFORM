@@ -2,7 +2,10 @@
 
 ## Alta prioridad
 
-- Definir Fase 2 del Sprint 7: negociacion, habilitacion eventual de `hiring_mode = MULTIPLE` y politica de cancelacion.
+- Implementar Sprint 7 Fase 2B: negociacion contractual basica sobre las fundaciones de idempotencia y correlacion.
+- Implementar Sprint 7 Fase 2C: `hiring_mode = MULTIPLE` con cupos protegidos por PostgreSQL.
+- Implementar Sprint 7 Fase 2D: correcciones, cancelaciones trazables y finalizacion ampliada.
+- Implementar Sprint 7 Fases 2E-2F: reviews contractuales y reputacion derivada.
 - Vincular `Review` y `ReputationEvent` directamente a `ContractRequest` para trazabilidad completa.
 - Diseñar hitos, evidencias, disputas y modificaciones de contrato sin implementar pagos todavia.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
@@ -26,6 +29,8 @@
 - Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
+- Evaluar una outbox transaccional cuando se habilite el primer canal externo; `INTERNAL` permanece sin dispatcher.
+- Definir politica de retencion y limpieza de `OperationCommand` sin perder capacidad de auditoria.
 - Agregar `source` explicito al modelo de consentimientos si producto requiere trazabilidad separada del contexto tecnico.
 - Incorporar escaneo automatizado de dependencias y secretos en CI.
 - Evaluar Redis futuro para rate limiting, cache o colas cuando el volumen lo justifique.

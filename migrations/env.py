@@ -32,16 +32,19 @@ def run_migrations_offline():
 
 def run_migrations_online():
     with app.app_context():
-        with db.engine.connect() as connection:
-            context.configure(
-                connection=connection,
-                target_metadata=db.metadata,
-                compare_type=True,
-                render_as_batch=connection.dialect.name == "sqlite",
-            )
+        try:
+            with db.engine.connect() as connection:
+                context.configure(
+                    connection=connection,
+                    target_metadata=db.metadata,
+                    compare_type=True,
+                    render_as_batch=connection.dialect.name == "sqlite",
+                )
 
-            with context.begin_transaction():
-                context.run_migrations()
+                with context.begin_transaction():
+                    context.run_migrations()
+        finally:
+            db.engine.dispose()
 
 
 if context.is_offline_mode():

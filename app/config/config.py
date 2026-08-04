@@ -53,6 +53,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
     SESSION_REFRESH_EACH_REQUEST = False
     REGISTER_DEV_ROUTES = False
+    ENABLE_DEV_QA_PANEL = False
     ALLOW_SCHEMA_CREATE_ALL = False
     WTF_CSRF_ENABLED = True
     MAX_CONTENT_LENGTH = 1024 * 1024
@@ -102,6 +103,10 @@ class DevelopmentConfig(Config):
         super().apply_runtime_config(app_config)
         app_config["DEBUG"] = _env_bool("FLASK_DEBUG", False)
         app_config["ALLOW_SCHEMA_CREATE_ALL"] = _env_bool("ALLOW_DEV_CREATE_ALL", False)
+        app_config["ENABLE_DEV_QA_PANEL"] = _env_bool(
+            "ENABLE_DEV_QA_PANEL",
+            False,
+        )
 
 
 class TestingConfig(Config):
@@ -109,11 +114,16 @@ class TestingConfig(Config):
     TESTING = True
     WTF_CSRF_ENABLED = False
     ALLOW_SCHEMA_CREATE_ALL = True
+    REGISTER_DEV_ROUTES = True
 
     @classmethod
     def apply_runtime_config(cls, app_config):
         app_config["SECRET_KEY"] = _env("SECRET_KEY") or "test-secret-key"
         app_config["SQLALCHEMY_DATABASE_URI"] = _env("DATABASE_URL") or "sqlite:///:memory:"
+        app_config["ENABLE_DEV_QA_PANEL"] = _env_bool(
+            "ENABLE_DEV_QA_PANEL",
+            False,
+        )
 
 
 class ProductionConfig(Config):

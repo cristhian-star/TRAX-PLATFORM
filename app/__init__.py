@@ -67,6 +67,11 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.reputation_event import ReputationEvent
     from app.models.audit_log import AuditLog
     from app.models.activity_notification import ActivityNotification
+    from app.models.operation_command import OperationCommand
+    from app.models.contract_negotiation import ContractNegotiation
+    from app.models.contract_negotiation_version import ContractNegotiationVersion
+    from app.models.negotiation_acceptance import NegotiationAcceptance
+    from app.models.negotiation_event import NegotiationEvent
     from app.models.whatsapp_contact_session import WhatsAppContactSession
     from app.models.professional_media import ProfessionalMedia
 

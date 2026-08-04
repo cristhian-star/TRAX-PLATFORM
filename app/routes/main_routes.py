@@ -88,6 +88,10 @@ from app.services.whatsapp_contact_service import (
     normalizar_whatsapp_username,
     obtener_contactos_profesional,
 )
+from app.services.formal_negotiation_policy import (
+    build_formal_negotiation_eligibility_map,
+    evaluate_formal_negotiation_eligibility,
+)
 from app.services.client_dashboard_service import build_client_dashboard_context
 from app.services.professional_view_service import (
     build_matching_results,
@@ -281,6 +285,12 @@ def buscar():
     )
     resultados = paginate_items(resultados)
     professional_media = get_professionals_avatar_context(resultados)
+    formal_negotiation_eligibility = (
+        build_formal_negotiation_eligibility_map(
+            resultados,
+            session.get("user_id"),
+        )
+    )
 
     return render_template(
         "resultados.html",
@@ -291,6 +301,7 @@ def buscar():
         professional_ratings=professional_ratings,
         matching_results=matching_results,
         professional_media=professional_media,
+        formal_negotiation_eligibility=formal_negotiation_eligibility,
         has_geographic_context=coordinates is not None,
     )
 
@@ -315,6 +326,12 @@ def listado_profesionales():
     )
     resultados = paginate_items(resultados)
     professional_media = get_professionals_avatar_context(resultados)
+    formal_negotiation_eligibility = (
+        build_formal_negotiation_eligibility_map(
+            resultados,
+            session.get("user_id"),
+        )
+    )
 
     return render_template(
         "listado_profesionales.html",
@@ -325,6 +342,7 @@ def listado_profesionales():
         professional_ratings=professional_ratings,
         matching_results=matching_results,
         professional_media=professional_media,
+        formal_negotiation_eligibility=formal_negotiation_eligibility,
         has_geographic_context=coordinates is not None,
     )
 
@@ -900,6 +918,12 @@ def perfil_profesional(id):
                 professional_id=id
             ).first() is None
         )
+    formal_negotiation_allowed = (
+        evaluate_formal_negotiation_eligibility(
+            session.get("user_id"),
+            profesional,
+        ).allowed
+    )
 
     return render_template(
         "perfil_profesional.html",
@@ -912,6 +936,7 @@ def perfil_profesional(id):
         coverage=obtener_cobertura_profesional(profesional),
         google_maps_api_key=obtener_google_maps_api_key(),
         professional_media=build_professional_media_context(profesional),
+        formal_negotiation_allowed=formal_negotiation_allowed,
         report_created=request.args.get("reported") == "1"
     )
 

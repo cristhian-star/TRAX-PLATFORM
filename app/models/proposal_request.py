@@ -5,13 +5,17 @@ from app import db
 
 class ProposalRequest(db.Model):
     __tablename__ = "proposal_requests"
+    __table_args__ = (
+        db.CheckConstraint(
+            "hiring_mode = 'SINGLE'",
+            name="ck_proposal_requests_hiring_mode_single_phase2a",
+        ),
+    )
 
     HIRING_MODE_SINGLE = "SINGLE"
-    HIRING_MODE_MULTIPLE = "MULTIPLE"
 
     HIRING_MODES = (
         HIRING_MODE_SINGLE,
-        HIRING_MODE_MULTIPLE,
     )
 
     ESTADOS = (

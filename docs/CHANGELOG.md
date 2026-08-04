@@ -1,5 +1,62 @@
 # CHANGELOG TRAX
 
+## 2026-07-26 - Sprint 7 Contracting Core Fase 2A
+
+### Agregado
+
+- Se agrego `OperationCommand` como fuente canonica de idempotencia para comandos contractuales sensibles.
+- Se agregaron `contracting_mode = EXTERNAL` y `version` a `ContractRequest`.
+- Se agregaron secuencia, correlacion, causacion e idempotencia a `ContractEvent`.
+- Se agrego correlacion estructurada a `AuditLog` y `ActivityNotification`.
+- Se agrego la migracion Alembic `20260726_02_sprint7_contracting_foundations`.
+- Se agrego la migracion Alembic `20260726_03_sprint7_single_hiring_mode`.
+- Se agregaron pruebas de estados, ownership, idempotencia, rollback y
+  constraints; la validacion de locks reales queda pendiente de PostgreSQL.
+- Se agrego un gate PostgreSQL E2E explicito para carreras de comandos,
+  transiciones y creaciones derivadas con dos sesiones independientes.
+- Se agregaron pruebas integradas de reparacion y bloqueo de esquemas parciales
+  de `operation_commands`.
+- Se valido el gate contra PostgreSQL 16: 8 escenarios E2E, 4 pruebas
+  legacy y 21 escenarios de migracion parcial aprobados sin omisiones.
+- Se agregaron pruebas negativas para impedir la fabricacion externa de
+  eventos contractuales y para validar o reparar el generador PostgreSQL de
+  `operation_commands.id`.
+
+### Mejorado
+
+- `CONFIRMADA` es el unico estado terminal exitoso para contratos nuevos.
+- `CERRADA` contractual se migra a `CONFIRMADA` y deja de ser un estado valido de escritura.
+- Las transiciones contractuales usan operaciones explicitas, lock pesimista y version esperada.
+- Evento, auditoria, notificacion interna y resultado idempotente se confirman en una unica transaccion.
+- Las notificaciones contractuales obligatorias quedan listas para una futura outbox sin implementar canales externos.
+- La creacion derivada de contratos conserva correlacion comun entre eventos, auditoria y notificaciones.
+- Las creaciones derivadas autorizan al actor owner antes del replay y recuperan
+  colisiones unicas mediante savepoint sin commits internos.
+- `hiring_mode = MULTIPLE` queda bloqueado tambien por constraint hasta Fase 2C.
+- La migracion ya no considera completa una `operation_commands` solo porque
+  exista la tabla: valida estructura, datos, constraints e indices antes de
+  reparar.
+- El preflight PostgreSQL valida identity/default, ownership y permisos de la
+  secuencia de `operation_commands.id`; sincroniza el generador por encima de
+  `MAX(id)` o bloquea antes de otras mutaciones si no puede repararlo.
+- La validacion del generador incluye incremento ascendente, `NO CYCLE`,
+  limites compatibles con `INTEGER`, siguiente valor efectivo y ausencia de
+  consumidores compartidos. Las secuencias propias reparables se normalizan a
+  incremento 1 y se reinician en `MAX(id) + 1`.
+- Las secuencias creadas por la migracion quedan marcadas; el downgrade
+  preserva secuencias preexistentes o ajenas.
+
+### Corregido
+
+- Se retiro el mutador generico `update_contract_status`.
+- Se elimino la transicion posterior `CONFIRMADA -> CERRADA`.
+- Los servicios validan rol y ownership sin depender exclusivamente de las rutas.
+- Los actores ausentes, inexistentes, suspendidos, inactivos, con rol incorrecto
+  o sin ownership no pueden crear ni consultar por replay un contrato derivado.
+- Se elimino la API generica publica `create_contract_event`: los eventos
+  iniciales de presupuesto y propuesta solo se emiten dentro de sus operaciones
+  cerradas, junto con auditoria y notificacion correlacionadas.
+
 ## 2026-07-26 - Sprint 7 Contracting Core Fase 1
 
 ### Agregado

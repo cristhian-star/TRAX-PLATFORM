@@ -112,10 +112,19 @@
 
                     <form action="/dev/qa/login/{{ user.id }}" method="POST" class="dev-qa-card__action">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button class="dev-qa-button dev-qa-button--primary" type="submit">
-                            Iniciar como este usuario
-                        </button>
+                        {% if user.login_allowed %}
+                            <button class="dev-qa-button dev-qa-button--primary" type="submit">
+                                Iniciar como este usuario
+                            </button>
+                        {% else %}
+                            <span class="dev-qa-pill dev-qa-pill--blocked">Acceso QA no habilitado</span>
+                        {% endif %}
                     </form>
+                    {% if user.professional_profile_url %}
+                        <a class="dev-qa-button dev-qa-button--secondary" href="{{ user.professional_profile_url }}">
+                            Abrir perfil profesional #{{ user.professional_profile_id }}
+                        </a>
+                    {% endif %}
                 </article>
             {% else %}
                 <div class="dev-qa-empty">

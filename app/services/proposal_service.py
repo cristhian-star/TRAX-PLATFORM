@@ -4,7 +4,6 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.exc import IntegrityError
 
 from app import db
-from app.models.contract_request import ContractRequest
 from app.models.professional import Professional
 from app.models.proposal_application import ProposalApplication
 from app.models.proposal_request import ProposalRequest
@@ -14,6 +13,11 @@ from app.services.contracting_core_service import create_contract_from_proposal_
 OPEN_STATUSES = (
     "PUBLICADA",
 )
+
+
+def _require_single_hiring_mode(proposal):
+    if proposal.hiring_mode != ProposalRequest.HIRING_MODE_SINGLE:
+        raise ValueError("hiring_mode MULTIPLE queda bloqueado hasta Fase 2C")
 
 
 @dataclass(frozen=True)
@@ -72,6 +76,7 @@ def create_proposal_request(
         fecha_inicio_estimada=fecha_inicio_estimada,
         fecha_limite_postulacion=fecha_limite_postulacion,
         estado="PUBLICADA",
+        hiring_mode=ProposalRequest.HIRING_MODE_SINGLE,
     )
 
     db.session.add(proposal_request)
@@ -164,9 +169,11 @@ def apply_to_proposal(
 
 def accept_application(proposal_id, application_id, owner_user_id):
     try:
-        proposal = ProposalRequest.query.filter_by(id=proposal_id).with_for_update().first()
+        with db.session.no_autoflush:
+            proposal = ProposalRequest.query.filter_by(id=proposal_id).with_for_update().first()
         if proposal is None:
             raise ValueError("Propuesta no encontrada")
+        _require_single_hiring_mode(proposal)
         if (proposal.owner_user_id or proposal.cliente_id) != owner_user_id:
             raise PermissionError("Solo el publicador puede gestionar postulaciones")
 
@@ -208,15 +215,6 @@ def accept_application(proposal_id, application_id, owner_user_id):
         )
     except IntegrityError:
         db.session.rollback()
-        existing = ContractRequest.query.filter_by(proposal_application_id=application_id).first()
-        if existing is not None and existing.cliente_id == owner_user_id:
-            application = db.session.get(ProposalApplication, application_id)
-            return ProposalAcceptanceResult(
-                application=application,
-                contract=existing,
-                created=False,
-                state_changed=False,
-            )
         raise
     except Exception:
         db.session.rollback()

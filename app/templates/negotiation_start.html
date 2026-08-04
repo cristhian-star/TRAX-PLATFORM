@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set entry_professional_id = request.args.get("professional_id", "") %}
+{% set entry_service = request.args.get("servicio", "") %}
+
+<section class="form-section">
+    <div class="section-container">
+        <span class="kicker">Acuerdo formal opcional</span>
+        <h2>Formalizar condiciones</h2>
+        <p class="form-helper">
+            Las condiciones son definidas y aceptadas por las partes. TRAX
+            registra el acuerdo y aporta trazabilidad, pero no garantiza su
+            cumplimiento. El pago se acuerda y realiza externamente.
+        </p>
+
+        <form action="/negociacion/nueva" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
+
+            <label>
+                Profesional
+                <input type="text" value="{{ professional.nombre }}" readonly>
+                <input type="hidden" name="professional_id" value="{{ professional.id }}">
+            </label>
+            <label>
+                Servicio
+                <input type="text" name="servicio" maxlength="120" value="{{ entry_service }}" required>
+            </label>
+            <label>
+                Descripcion
+                <textarea name="description" maxlength="5000" required></textarea>
+            </label>
+            <label>
+                Alcance
+                <textarea name="scope" maxlength="5000" required></textarea>
+            </label>
+            <label>
+                Precio acordado externamente
+                <input type="number" name="external_price" min="0" max="99999999.99" step="0.01" required>
+            </label>
+            <label>
+                Inicio estimado
+                <input type="datetime-local" name="estimated_start_at">
+            </label>
+            <label>
+                Finalizacion estimada
+                <input type="datetime-local" name="estimated_end_at">
+            </label>
+            <label>
+                Observaciones
+                <textarea name="observations" maxlength="3000"></textarea>
+            </label>
+
+            <button type="submit">Iniciar acuerdo formal</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

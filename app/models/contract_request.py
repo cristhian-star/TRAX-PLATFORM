@@ -22,6 +22,19 @@ class ContractRequest(db.Model):
             ")",
             name="ck_contract_requests_source_consistency",
         ),
+        db.CheckConstraint(
+            "estado in ('CREADA', 'ACEPTADA', 'EN_PROGRESO', 'COMPLETADA', "
+            "'CORRECCION_SOLICITADA', 'CONFIRMADA', 'RECHAZADA', 'CANCELADA')",
+            name="ck_contract_requests_estado",
+        ),
+        db.CheckConstraint(
+            "contracting_mode = 'EXTERNAL'",
+            name="ck_contract_requests_contracting_mode",
+        ),
+        db.CheckConstraint(
+            "version >= 1",
+            name="ck_contract_requests_version",
+        ),
     )
 
     SOURCE_DIRECT = "DIRECT"
@@ -39,13 +52,18 @@ class ContractRequest(db.Model):
     ESTADOS = (
         "CREADA",
         "ACEPTADA",
-        "RECHAZADA",
         "EN_PROGRESO",
         "COMPLETADA",
+        "CORRECCION_SOLICITADA",
         "CONFIRMADA",
+        "RECHAZADA",
         "CANCELADA",
-        "CERRADA",
     )
+    TERMINAL_STATES = ("CONFIRMADA", "RECHAZADA", "CANCELADA")
+    LEGACY_CLOSED_STATE = "CERRADA"
+
+    CONTRACTING_MODE_EXTERNAL = "EXTERNAL"
+    CONTRACTING_MODES = (CONTRACTING_MODE_EXTERNAL,)
 
     id = db.Column(db.Integer, primary_key=True)
     cliente_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -72,6 +90,13 @@ class ContractRequest(db.Model):
     descripcion = db.Column(db.Text)
     precio_acordado = db.Column(db.Numeric(10, 2))
     estado = db.Column(db.String(50), nullable=False, default="CREADA")
+    contracting_mode = db.Column(
+        db.String(20),
+        nullable=False,
+        default=CONTRACTING_MODE_EXTERNAL,
+        server_default=CONTRACTING_MODE_EXTERNAL,
+    )
+    version = db.Column(db.Integer, nullable=False, default=1, server_default="1")
     fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     fecha_inicio = db.Column(db.DateTime)
     fecha_fin = db.Column(db.DateTime)
