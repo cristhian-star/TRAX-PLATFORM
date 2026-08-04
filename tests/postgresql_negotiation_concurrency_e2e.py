@@ -75,7 +75,7 @@ class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
             revision = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
             ).scalar_one()
-            if revision != "20260726_05":
+            if revision != "20260726_06":
                 raise RuntimeError(f"Revision Alembic inesperada: {revision}")
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("El gate 2B no esta ejecutando PostgreSQL")
@@ -690,7 +690,7 @@ class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
             revision = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
             ).scalar_one()
-            self.assertEqual(revision, "20260726_05")
+            self.assertEqual(revision, "20260726_06")
             trigger_names = {
                 row[0]
                 for row in db.session.execute(

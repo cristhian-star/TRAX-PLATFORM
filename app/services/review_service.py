@@ -1,76 +1,104 @@
-from app import db
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
 from app.models.contract_request import ContractRequest
-from app.models.professional import Professional
 from app.models.review import Review
+from app.domain.reputation_metrics import (
+    ContractMetricFact,
+    ReviewMetricFact,
+    build_neutral_reputation_metrics,
+)
 
 
-def can_user_review_professional(cliente_id, professional_id):
-    professional = Professional.query.get(professional_id)
+@dataclass(frozen=True)
+class PublicReviewView:
+    id: int
+    rating: int
+    comment_public: Optional[str]
+    origin: str
+    label: str
+    comment_visibility_status: str
+    created_at: Optional[datetime]
 
-    if professional is None or professional.user_id is None:
-        return False
 
-    if cliente_id == professional.user_id:
-        return False
-
-    return (
-        ContractRequest.query
-        .filter(
-            ContractRequest.cliente_id == cliente_id,
-            ContractRequest.professional_id == professional.id,
-            ContractRequest.estado.in_(("CONFIRMADA", "CERRADA")),
-        )
-        .first()
-        is not None
+def _verified_review_query(professional_id):
+    return Review.query.filter(
+        Review.professional_id == professional_id,
+        Review.contract_id.isnot(None),
+        Review.verification_status == Review.VERIFICATION_VERIFIED,
+        Review.rating_eligibility_status == Review.RATING_ELIGIBLE,
+        Review.rating.in_((1, 2, 3, 4, 5)),
     )
-
-
-def create_review(cliente_id, professional_id, rating, comentario=None):
-    review = Review(
-        cliente_id=cliente_id,
-        professional_id=professional_id,
-        rating=rating,
-        comentario=comentario
-    )
-
-    db.session.add(review)
-    db.session.commit()
-
-    return review
 
 
 def get_professional_reviews(professional_id):
-    return (
-        Review.query
-        .filter_by(professional_id=professional_id, estado="VISIBLE")
-        .order_by(Review.created_at.desc())
-        .all()
+    reviews = _verified_review_query(professional_id).order_by(
+        Review.created_at.desc(),
+        Review.id.desc(),
+    ).all()
+    public_statuses = (Review.COMMENT_VISIBLE, Review.COMMENT_REDACTED)
+    return [
+        PublicReviewView(
+            id=review.id,
+            rating=review.rating,
+            comment_public=(
+                review.comment_public
+                if review.comment_visibility_status in public_statuses
+                else None
+            ),
+            origin=review.origin,
+            label=(
+                "Review contractual verificada"
+                if review.origin == Review.ORIGIN_CONTRACTUAL
+                else "Review legacy verificada"
+            ),
+            comment_visibility_status=review.comment_visibility_status,
+            created_at=review.created_at,
+        )
+        for review in reviews
+    ]
+
+
+def get_professional_reputation_metrics(professional_id):
+    reviews = Review.query.filter_by(professional_id=professional_id).all()
+    contracts = ContractRequest.query.filter_by(
+        professional_id=professional_id
+    ).all()
+    return build_neutral_reputation_metrics(
+        professional_id,
+        tuple(
+            ReviewMetricFact(
+                id=review.id,
+                professional_id=review.professional_id,
+                contract_id=review.contract_id,
+                origin=review.origin,
+                verification_status=review.verification_status,
+                rating_eligibility_status=review.rating_eligibility_status,
+                rating=review.rating,
+            )
+            for review in reviews
+        ),
+        tuple(
+            ContractMetricFact(
+                id=contract.id,
+                professional_id=contract.professional_id,
+                estado=contract.estado,
+            )
+            for contract in contracts
+        ),
     )
 
 
 def get_professional_average_rating(professional_id):
-    average = (
-        db.session.query(db.func.avg(Review.rating))
-        .filter_by(professional_id=professional_id, estado="VISIBLE")
-        .scalar()
-    )
-
-    if average is None:
-        return None
-
-    return round(float(average), 2)
+    return get_professional_reputation_metrics(
+        professional_id
+    ).average_eligible_rating
 
 
-def update_review_status(review_id, estado):
-    if estado not in Review.ESTADOS:
-        raise ValueError("Estado de review invalido")
-
-    review = Review.query.get(review_id)
-
-    if review is None:
-        return None
-
-    review.estado = estado
-    db.session.commit()
-
-    return review
+__all__ = (
+    "PublicReviewView",
+    "get_professional_average_rating",
+    "get_professional_reputation_metrics",
+    "get_professional_reviews",
+)

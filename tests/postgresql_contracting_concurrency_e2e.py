@@ -78,7 +78,7 @@ class Sprint7ContractingPostgreSQLConcurrencyE2E(unittest.TestCase):
             self_revision = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
             ).scalar_one()
-            if self_revision != "20260726_05":
+            if self_revision != "20260726_06":
                 raise RuntimeError(f"Revision Alembic inesperada: {self_revision}")
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("La suite E2E no esta ejecutando PostgreSQL")

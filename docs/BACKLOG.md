@@ -2,11 +2,9 @@
 
 ## Alta prioridad
 
-- Implementar Sprint 7 Fase 2B: negociacion contractual basica sobre las fundaciones de idempotencia y correlacion.
-- Implementar Sprint 7 Fase 2C: `hiring_mode = MULTIPLE` con cupos protegidos por PostgreSQL.
-- Implementar Sprint 7 Fase 2D: correcciones, cancelaciones trazables y finalizacion ampliada.
-- Implementar Sprint 7 Fases 2E-2F: reviews contractuales y reputacion derivada.
-- Vincular `Review` y `ReputationEvent` directamente a `ContractRequest` para trazabilidad completa.
+- Diseñar en una fase futura `hiring_mode = MULTIPLE`; Sprint 7 conserva exclusivamente `SINGLE`.
+- Diseñar en una fase futura cancelaciones consensuadas y correcciones ampliadas sin alterar el cierre exitoso `CONFIRMADA`.
+- Definir, mediante decisión de producto futura, si TRAX necesita badges plata/oro o una proyección propietaria; no forman parte de la reputación neutral.
 - Diseñar hitos, evidencias, disputas y modificaciones de contrato sin implementar pagos todavia.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
 - Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
@@ -29,6 +27,8 @@
 - Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
+- Auditar la lectura administrativa de comentarios originales con un evento de acceso si el volumen y la política de privacidad lo requieren.
+- Reemplazar los lectores históricos de puntos usados por elegibilidad PRO cuando producto apruebe una política neutral sustituta.
 - Evaluar una outbox transaccional cuando se habilite el primer canal externo; `INTERNAL` permanece sin dispatcher.
 - Definir politica de retencion y limpieza de `OperationCommand` sin perder capacidad de auditoria.
 - Agregar `source` explicito al modelo de consentimientos si producto requiere trazabilidad separada del contexto tecnico.

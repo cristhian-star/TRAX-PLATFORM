@@ -80,13 +80,7 @@
     {% endif %}
 
     <div class="professional-card__footer">
-        {% if badges.reputation_score %}
-            <span class="professional-card__reputation">
-                Reputacion TRAX: <strong>{{ badges.reputation_score }}</strong>
-            </span>
-        {% else %}
-            <span class="professional-card__reputation">Perfil disponible en TRAX</span>
-        {% endif %}
+        <span class="professional-card__reputation">Perfil disponible en TRAX</span>
         <div class="professional-card__actions">
             <a class="professional-card__button professional-card__button--secondary" href="/profesional/{{ profile_id }}">
                 Ver perfil

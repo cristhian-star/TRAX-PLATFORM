@@ -92,6 +92,25 @@
         </form>
         {% endif %}
     </section>
+
+    {% if can_create_contract_review %}
+        <section class="contract-panel">
+            <h3>Evaluacion del trabajo</h3>
+            <p>La evaluacion quedara vinculada a este trabajo confirmado.</p>
+            <a href="/contratacion/{{ contract.id }}/review">Calificar trabajo realizado</a>
+        </section>
+    {% elif contract_review %}
+        <section class="contract-panel">
+            <h3>Evaluacion del trabajo</h3>
+            <a href="/profesional/{{ contract.professional_id }}#review-{{ contract_review.id }}">
+                Ver review vinculada
+            </a>
+            <form action="/reviews/{{ contract_review.id }}/reportar" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="secondary-action" type="submit">Reportar comentario</button>
+            </form>
+        </section>
+    {% endif %}
 </section>
 
 {% endblock %}

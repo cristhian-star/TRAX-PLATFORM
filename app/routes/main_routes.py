@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, abort, render_template, request, redirect, session
 from app.services.audit_service import create_audit_log, get_recent_audit_logs
 from app.services.abuse_report_service import (
     create_abuse_report,
@@ -29,7 +29,6 @@ from app.utils.security import (
 )
 from app import limiter
 from app.models.user import User
-from app.models.review import Review
 from app.models.professional_media import ProfessionalMedia
 from app.services.subscription_service import cancel_subscription, has_pro_access, upgrade_to_pro
 from app.services.verification_service import (
@@ -39,7 +38,7 @@ from app.services.verification_service import (
     has_approved_verification,
     update_verification_status
 )
-from app.services.reputation_service import add_reputation_event, get_user_reputation_score
+from app.services.reputation_service import get_user_reputation_score
 from app.services.user_service import (
     ban_user,
     get_all_users,
@@ -49,10 +48,16 @@ from app.services.user_service import (
     update_user_role,
 )
 from app.services.review_service import (
-    can_user_review_professional,
-    create_review,
     get_professional_average_rating,
-    get_professional_reviews
+    get_professional_reputation_metrics,
+    get_professional_reviews,
+)
+from app.services.contract_review_moderation_service import (
+    MODERATION_REASONS,
+    exclude_contract_review_rating,
+    get_pending_contract_review_moderation,
+    moderate_contract_review_comment,
+    report_contract_review,
 )
 from app.services.budget_service import (
     get_offer_allowance,
@@ -834,71 +839,11 @@ def reportar_usuario(id):
     )
 
 @main.route("/profesional/<int:id>/review", methods=["GET", "POST"])
-@login_required
 def crear_review(id):
-    profesional = get_professional_by_id(id)
-
-    if profesional is None:
-        return "Profesional no encontrado", 404
-
-    if not can_user_review_professional(session["user_id"], id):
-        return "Solo podes dejar una resena con una contratacion confirmada o cerrada", 403
-
-    if request.method == "POST":
-        professional_user_id = get_professional_user_id(profesional)
-
-        if not professional_user_id:
-            return "Perfil profesional sin propietario asociado", 409
-
-        if professional_user_id == session["user_id"]:
-            return "No podes reseÃ±ar tu propio perfil", 400
-
-        try:
-            rating = int(request.form.get("rating", 0))
-        except (TypeError, ValueError):
-            return "Rating invalido", 400
-
-        if rating not in (1, 2, 3, 4, 5):
-            return "Rating invalido", 400
-
-        existing_review = Review.query.filter_by(
-            cliente_id=session["user_id"],
-            professional_id=id
-        ).first()
-
-        if existing_review is not None:
-            return "Ya dejaste una reseÃ±a para este profesional", 400
-
-        comentario = request.form.get("comentario")
-
-        create_review(
-            cliente_id=session["user_id"],
-            professional_id=id,
-            rating=rating,
-            comentario=comentario
-        )
-
-        if rating >= 4:
-            add_reputation_event(
-                professional_user_id,
-                "REVIEW_POSITIVA",
-                10,
-                "Review positiva recibida"
-            )
-        elif rating <= 2:
-            add_reputation_event(
-                professional_user_id,
-                "REVIEW_NEGATIVA",
-                -5,
-                "Review negativa recibida"
-            )
-
-        return redirect(f"/profesional/{id}")
-
-    return render_template(
-        "crear_review.html",
-        profesional=profesional,
-        professional_id=id
+    return (
+        "El flujo legacy de resenas fue retirado. "
+        "Las reviews se crean desde una contratacion confirmada.",
+        410,
     )
 
 @main.route("/profesional/<int:id>")
@@ -909,15 +854,7 @@ def perfil_profesional(id):
         return "Profesional no encontrado", 404
 
     reviews = get_professional_reviews(id)
-    can_review = False
-    if session.get("user_id"):
-        can_review = (
-            can_user_review_professional(session["user_id"], id)
-            and Review.query.filter_by(
-                cliente_id=session["user_id"],
-                professional_id=id
-            ).first() is None
-        )
+    reputation_metrics = get_professional_reputation_metrics(id)
     formal_negotiation_allowed = (
         evaluate_formal_negotiation_eligibility(
             session.get("user_id"),
@@ -930,9 +867,9 @@ def perfil_profesional(id):
         profesional=profesional,
         profile_badges=get_professional_badges(profesional),
         reviews=reviews,
-        average_rating=get_professional_average_rating(id),
-        review_count=len(reviews),
-        can_review=can_review,
+        average_rating=reputation_metrics.average_eligible_rating,
+        review_count=reputation_metrics.eligible_rating_count,
+        reputation_metrics=reputation_metrics,
         coverage=obtener_cobertura_profesional(profesional),
         google_maps_api_key=obtener_google_maps_api_key(),
         professional_media=build_professional_media_context(profesional),
@@ -1105,7 +1042,63 @@ def admin_moderacion():
         reportes=get_open_reports(),
         verificaciones=get_pending_verifications(),
         media_pendientes=get_pending_media(),
+        contract_reviews=get_pending_contract_review_moderation(
+            actor_user_id=session["user_id"]
+        ),
+        contract_review_moderation_reasons=sorted(MODERATION_REASONS),
     )
+
+
+@main.route("/reviews/<int:id>/reportar", methods=["POST"])
+@login_required
+def reportar_review_contractual(id):
+    try:
+        review = report_contract_review(id, actor_user_id=session["user_id"])
+    except LookupError:
+        abort(404)
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return str(error), 400
+    return redirect(f"/profesional/{review.professional_id}#review-{review.id}")
+
+
+@main.route("/admin/reviews/<int:id>/comentario", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_moderar_comentario_review(id):
+    try:
+        moderate_contract_review_comment(
+            id,
+            actor_user_id=session["user_id"],
+            action=request.form.get("action"),
+            reason=request.form.get("reason"),
+            redacted_comment=request.form.get("redacted_comment"),
+        )
+    except LookupError:
+        abort(404)
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return str(error), 400
+    return redirect("/admin/moderacion")
+
+
+@main.route("/admin/reviews/<int:id>/rating/excluir", methods=["POST"])
+@role_required("SUPER_ADMIN")
+def admin_excluir_rating_review(id):
+    try:
+        exclude_contract_review_rating(
+            id,
+            actor_user_id=session["user_id"],
+            reason=request.form.get("reason"),
+        )
+    except LookupError:
+        abort(404)
+    except PermissionError:
+        abort(403)
+    except ValueError as error:
+        return str(error), 400
+    return redirect("/admin/moderacion")
 
 
 @main.route("/admin/reportes/<int:id>/resolver", methods=["POST"])

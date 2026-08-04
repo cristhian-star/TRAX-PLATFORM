@@ -1,5 +1,4 @@
 from app.services.geographic_matching_service import obtener_resultado_cobertura
-from app.services.reputation_service import get_user_reputation_score
 from app.services.review_service import (
     get_professional_average_rating,
     get_professional_reviews,
@@ -27,14 +26,12 @@ def get_professional_badges(professional):
             "work": True,
             "pro": False,
             "verified": False,
-            "reputation_score": 0,
         }
 
     return {
         "work": True,
         "pro": has_pro_access(user_id),
         "verified": has_approved_verification(user_id),
-        "reputation_score": get_user_reputation_score(user_id),
     }
 
 

@@ -1,5 +1,33 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-08-04 - Reviews contractuales y reputación neutral
+
+Se decidió que toda review nueva nace de un contrato canónico en estado exactamente `CONFIRMADA`.
+
+Alcance:
+
+- `CONFIRMADA` es el terminal exitoso; `CERRADA` sólo conserva interpretación histórica.
+- El servicio deriva cliente y profesional desde el contrato, exige actor explícito, bloquea el contrato y autoriza antes del replay.
+- Existe una review por contrato. Dos contratos confirmados pueden originar dos reviews independientes.
+- Review, evento reputacional neutral, auditoría, notificación y comando se confirman en una sola transacción.
+- El comentario original se preserva para auditoría; el perfil público sólo recibe `comment_public` mediante un DTO sin el campo original.
+- Ocultar o redactar el comentario no excluye automáticamente el rating. La exclusión es una operación administrativa separada y auditada.
+- La fuente de verdad reputacional son hechos verificables: ratings elegibles, distribución, contratos confirmados y cobertura de reviews.
+- No existe un score propietario nuevo ni mutadores públicos de puntos.
+- Los registros legacy inequívocos se conservan como `LEGACY`; los ambiguos permanecen `UNVERIFIED` y no se vinculan heurísticamente.
+
+Criterio:
+
+La reputación pública debe poder reconstruirse desde `Review`, `ReputationEvent` y contratos confirmados. Badges plata/oro, rankings y fórmulas propietarias requieren una decisión futura de producto.
+
+## 2026-08-04 - Alcance final del Contracting Core MVP
+
+Se decidió cerrar el Sprint 7 con `hiring_mode = SINGLE` y `contracting_mode = EXTERNAL`.
+
+Quedan fuera del Sprint 7: `MULTIPLE`, pagos, custodia, facturación, garantías, disputas financieras, producción y despliegue. Estas exclusiones no alteran la máquina contractual canónica ni el terminal exitoso `CONFIRMADA`.
+
+El cierre documentado es técnico sobre la rama estabilizada. La integración a `develop` y cualquier despliegue son pasos posteriores sujetos a aprobación independiente.
+
 ## 2026-07-26 - Contracting Core Fase 2A
 
 Se decidio que `CONFIRMADA` sea el unico estado terminal exitoso de contratos nuevos.

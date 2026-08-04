@@ -600,16 +600,25 @@ def get_contract_or_error(contract_id):
 
 
 def get_contract_detail_context(contract, user_id):
+    from app.models.review import Review
+
     is_client = contract.cliente_id == user_id
     is_professional = contract.professional_user_id == user_id
     if not is_client and not is_professional:
         raise PermissionError("No tenes permiso para ver esta contratacion")
+    contract_review = Review.query.filter_by(contract_id=contract.id).first()
     return {
         "contract": contract,
         "client_user": db.session.get(User, contract.cliente_id),
         "professional_user": db.session.get(User, contract.professional_user_id),
         "is_client": is_client,
         "is_professional": is_professional,
+        "contract_review": contract_review,
+        "can_create_contract_review": (
+            is_client
+            and contract.estado == "CONFIRMADA"
+            and contract_review is None
+        ),
     }
 
 

@@ -49,7 +49,6 @@ class ProfessionalViewServiceTest(unittest.TestCase):
                 "work": True,
                 "pro": False,
                 "verified": False,
-                "reputation_score": 0,
             },
         )
 

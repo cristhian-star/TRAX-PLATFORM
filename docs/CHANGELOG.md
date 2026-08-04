@@ -1,5 +1,38 @@
 # CHANGELOG TRAX
 
+## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F y cierre
+
+### Agregado
+
+- Se vincularon las reviews nuevas a un único `ContractRequest` confirmado.
+- Se agregó `create_contract_review()` como operación cerrada, atómica e idempotente.
+- Se agregó `ReputationEvent` neutral con rating observado y `puntos = NULL`.
+- Se agregaron visibilidad pública separada, elegibilidad del rating y moderación cerrada.
+- Se agregó la migración Alembic `20260726_06` con constraints y triggers físicos para reviews y reputación.
+- Se agregaron gates PostgreSQL para concurrencia, rutas, CSRF, privacidad, moderación y rollback.
+
+### Mejorado
+
+- El perfil público consume exclusivamente `comment_public` y métricas neutrales reconstruibles.
+- Las reviews contractuales y legacy verificadas se distinguen explícitamente.
+- La lectura de comentarios originales pendientes exige `SUPER_ADMIN` activo también dentro del servicio.
+- PostgreSQL y SQLite impiden nuevas filas reputacionales con puntos, preservando las filas históricas existentes.
+
+### Corregido
+
+- Se bloqueó con `410` la ruta legacy de creación de reviews.
+- Se retiró `add_reputation_event()` como API pública y no quedan callers productivos.
+- Se eliminó la presentación pública del score histórico como reputación contractual.
+- Se verificó que el flujo nuevo no crea `ContractEvent` ni puntos arbitrarios.
+
+### Validación
+
+- PostgreSQL 16.14, Alembic `20260726_06`: 57/57 pruebas finales aprobadas.
+- Gate contractual 8/8; negociación 8/8; reviews 8/8; rutas/moderación 8/8; migración parcial 21/21; legacy 4/4.
+- Suite Sprint 7: 145 ejecutadas, 140 aprobadas y 5 omitidas por ausencia deliberada de PostgreSQL en el runner SQLite.
+- Suite completa: 246 ejecutadas, 241 aprobadas y las mismas 5 omisiones; cero fallos.
+- Los warnings por `Query.get()` y `datetime.utcnow()` quedan como deuda no bloqueante.
+
 ## 2026-07-26 - Sprint 7 Contracting Core Fase 2A
 
 ### Agregado

@@ -27,6 +27,12 @@ from app.services.contract_service import (
     reject_contract,
     start_contract,
 )
+from app.services.contract_review_service import (
+    ContractReviewConflictError,
+    ContractReviewIdempotencyConflictError,
+    ContractReviewIntegrityError,
+    create_contract_review,
+)
 from app.services.emergency_service import create_emergency_request
 from app.services.negotiation_service import (
     NegotiationConflictError,
@@ -415,6 +421,74 @@ def contract_detail(id):
             "cancel": secrets.token_urlsafe(24),
         },
     )
+
+
+@operations.route("/contratacion/<int:id>/review", methods=["GET", "POST"])
+@login_required
+@role_required("CLIENTE")
+def create_contractual_review(id):
+    contract = _load_contract_or_404(id)
+    try:
+        context = get_contract_detail_context(contract, session["user_id"])
+    except PermissionError:
+        abort(403)
+
+    if not context["is_client"]:
+        abort(403)
+    if contract.estado != "CONFIRMADA":
+        return "La contratacion debe estar CONFIRMADA", 400
+    if request.method == "GET" and context["contract_review"] is not None:
+        return "La contratacion ya tiene una review", 409
+
+    idempotency_key = (
+        request.form.get("idempotency_key")
+        if request.method == "POST"
+        else secrets.token_urlsafe(24)
+    )
+    error_message = None
+    status_code = 200
+
+    if request.method == "POST":
+        try:
+            rating = int(request.form.get("rating", ""))
+        except (TypeError, ValueError):
+            rating = request.form.get("rating")
+        try:
+            review = create_contract_review(
+                actor_user_id=session["user_id"],
+                contract_id=id,
+                rating=rating,
+                comment=request.form.get("comment"),
+                idempotency_key=idempotency_key,
+            )
+        except ContractReviewIdempotencyConflictError as error:
+            error_message, status_code = str(error), 409
+        except ContractReviewConflictError as error:
+            error_message, status_code = str(error), 409
+        except ContractReviewIntegrityError as error:
+            error_message, status_code = str(error), 409
+        except PermissionError:
+            abort(403)
+        except ValueError as error:
+            error_message, status_code = str(error), 400
+        else:
+            return redirect(
+                f"/profesional/{review.professional_id}#review-{review.id}"
+            )
+
+    return render_template(
+        "contract_review_form.html",
+        contract=contract,
+        professional_user=context["professional_user"],
+        idempotency_key=idempotency_key,
+        error_message=error_message,
+        submitted_rating=(
+            request.form.get("rating") if request.method == "POST" else None
+        ),
+        submitted_comment=(
+            request.form.get("comment") if request.method == "POST" else None
+        ),
+    ), status_code
 
 
 @operations.route("/contratacion/<int:id>/aceptar", methods=["POST"])
