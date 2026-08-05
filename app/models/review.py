@@ -12,6 +12,10 @@ class Review(db.Model):
             name="ck_reviews_origin",
         ),
         db.CheckConstraint(
+            "origin IS NOT NULL",
+            name="ck_reviews_origin_required_v2",
+        ),
+        db.CheckConstraint(
             "verification_status IS NULL OR verification_status IN "
             "('VERIFIED', 'UNVERIFIED')",
             name="ck_reviews_verification_status",

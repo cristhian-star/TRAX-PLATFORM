@@ -42,9 +42,14 @@ def build_neutral_reputation_metrics(
     professional_reviews = tuple(
         review for review in reviews if review.professional_id == professional_id
     )
-    verified_reviews = tuple(
+    admitted_reviews = tuple(
         review
         for review in professional_reviews
+        if review.origin in ("CONTRACTUAL", "LEGACY")
+    )
+    verified_reviews = tuple(
+        review
+        for review in admitted_reviews
         if review.verification_status == "VERIFIED"
         and review.contract_id is not None
     )

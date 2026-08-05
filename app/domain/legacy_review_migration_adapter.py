@@ -36,10 +36,12 @@ def _contract_data(row: Mapping):
         estado=row["estado"],
         created_at=row["fecha_creacion"],
         confirmed_at=row["confirmed_at"],
+        professional_user_id=row["professional_user_id"],
+        profile_user_id=row["profile_user_id"],
     )
 
 
-def classify_legacy_review_rows(
+def classify_legacy_review_rows_fail_closed(
     review_rows: Sequence[Mapping],
     contract_rows: Sequence[Mapping],
 ) -> Tuple[LegacyReviewMigrationDecision, ...]:
@@ -86,7 +88,27 @@ def classify_legacy_review_rows(
     return tuple(decisions)
 
 
+def _classify_legacy_review_rows_20260726_06_compat(review_rows, contract_rows):
+    """Delegate to the immutable semantic snapshot required by Alembic _06.
+
+    This is architectural compatibility, not a Python security boundary. It
+    remains importable by arbitrary in-process code, but is intentionally
+    unexported and dependency tests prohibit productive callers.
+    """
+    from migrations.compat._legacy_review_20260726_06_snapshot import (
+        _classify_legacy_review_rows_20260726_06,
+    )
+
+    return _classify_legacy_review_rows_20260726_06(review_rows, contract_rows)
+
+
+# Immutable revision 20260726_06 imports this historical name. Keep the alias
+# byte-compatible for that revision; modern callers must use the exported
+# fail-closed entry point instead.
+classify_legacy_review_rows = _classify_legacy_review_rows_20260726_06_compat
+
+
 __all__ = (
     "LegacyReviewMigrationDecision",
-    "classify_legacy_review_rows",
+    "classify_legacy_review_rows_fail_closed",
 )

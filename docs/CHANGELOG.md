@@ -1,6 +1,9 @@
 # CHANGELOG TRAX
 
-## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F y cierre
+## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (reabierto por P1)
+
+Estado: la corrección está validada localmente, pero el cierre permanece
+suspendido hasta su aprobación por auditoría independiente.
 
 ### Agregado
 
@@ -9,6 +12,8 @@
 - Se agregó `ReputationEvent` neutral con rating observado y `puntos = NULL`.
 - Se agregaron visibilidad pública separada, elegibilidad del rating y moderación cerrada.
 - Se agregó la migración Alembic `20260726_06` con constraints y triggers físicos para reviews y reputación.
+- Se agregó `20260726_07` como head para exigir discriminadores explícitos,
+  reparar ownership profesional legacy y preservar `_06` sin reescribirla.
 - Se agregaron gates PostgreSQL para concurrencia, rutas, CSRF, privacidad, moderación y rollback.
 
 ### Mejorado
@@ -24,13 +29,28 @@
 - Se retiró `add_reputation_event()` como API pública y no quedan callers productivos.
 - Se eliminó la presentación pública del score histórico como reputación contractual.
 - Se verificó que el flujo nuevo no crea `ContractEvent` ni puntos arbitrarios.
+- Se cerró el bypass de `NULL`/orígenes desconocidos en `Review` y
+  `ReputationEvent` mediante checks requeridos y triggers `v2` de inserción
+  y actualización en PostgreSQL y SQLite.
+- Las métricas admiten sólo `CONTRACTUAL` y `LEGACY` verificada; ningún
+  origen nulo o desconocido se interpreta como legacy.
+- El seed de desarrollo dejó de fabricar eventos reputacionales legacy con puntos.
+- `20260726_06` conserva su clasificación histórica mediante un snapshot
+  migratorio versionado y autocontenido. No es una API productiva: su
+  aislamiento es un contrato arquitectónico verificado por dependencias, no
+  una frontera contra imports de Python arbitrarios. El adaptador vigente
+  exige ambos IDs de ownership y falla ante payloads incompletos.
+  `20260726_07` usa exclusivamente esa API fail-closed y es el
+  único estado operativo soportado. Un downgrade a `_06`
+  reinstala defensas históricas más débiles y no equivale a `_07` para
+  operación normal.
 
 ### Validación
 
-- PostgreSQL 16.14, Alembic `20260726_06`: 57/57 pruebas finales aprobadas.
-- Gate contractual 8/8; negociación 8/8; reviews 8/8; rutas/moderación 8/8; migración parcial 21/21; legacy 4/4.
-- Suite Sprint 7: 145 ejecutadas, 140 aprobadas y 5 omitidas por ausencia deliberada de PostgreSQL en el runner SQLite.
-- Suite completa: 246 ejecutadas, 241 aprobadas y las mismas 5 omisiones; cero fallos.
+- PostgreSQL 16.14, Alembic `20260726_07`: 59/59 pruebas finales aprobadas.
+- Gate contractual 8/8; negociación 8/8; reviews 10/10; rutas/moderación 8/8; migración parcial 21/21; legacy 4/4.
+- Suite Sprint 7 con PostgreSQL habilitado: 165 ejecutadas, 164 aprobadas y 1 omisión deliberada; cero fallos.
+- Suite completa con PostgreSQL habilitado: 266 ejecutadas, 265 aprobadas y la misma omisión deliberada; cero fallos.
 - Los warnings por `Query.get()` y `datetime.utcnow()` quedan como deuda no bloqueante.
 
 ## 2026-07-26 - Sprint 7 Contracting Core Fase 2A

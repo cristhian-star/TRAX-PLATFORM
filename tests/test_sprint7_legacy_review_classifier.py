@@ -1,21 +1,32 @@
 import ast
 import copy
 import inspect
+import re
 import unittest
+from dataclasses import fields
 from datetime import timedelta
+from pathlib import Path
 
 from app.domain import legacy_review_classifier
+from app.domain import legacy_review_migration_adapter
 from app.domain.legacy_review_classifier import (
+    CandidateContractData,
     CompetingLegacyReviewData,
     LegacyReviewClassificationCode,
     LegacyReviewData,
     classify_legacy_review,
+)
+from app.domain.legacy_review_migration_adapter import (
+    classify_legacy_review_rows_fail_closed,
 )
 from tests.fixtures.legacy_review_cases import (
     CLASSIFICATION_CASES,
     REVIEW_TIME,
     confirmed_contract,
     legacy_review,
+)
+from migrations.compat._legacy_review_20260726_06_snapshot import (
+    _classify_legacy_review_rows_20260726_06,
 )
 
 
@@ -146,6 +157,325 @@ class LegacyReviewClassifierTest(unittest.TestCase):
             legacy_review(id=700),
             (confirmed_contract(id=701),),
             (CompetingLegacyReviewData(700, (701,)),),
+        )
+        self.assertEqual(
+            result.code,
+            LegacyReviewClassificationCode.LINKED_UNIQUE,
+        )
+
+    def test_professional_ownership_mismatch_is_identity_inconsistent(self):
+        result = classify_legacy_review(
+            legacy_review(),
+            (confirmed_contract(professional_user_id=30, profile_user_id=31),),
+        )
+        self.assertEqual(
+            result.code,
+            LegacyReviewClassificationCode.IDENTITY_INCONSISTENT,
+        )
+
+    def test_professional_profile_without_user_is_identity_inconsistent(self):
+        result = classify_legacy_review(
+            legacy_review(),
+            (confirmed_contract(profile_user_id=None),),
+        )
+        self.assertEqual(
+            result.code,
+            LegacyReviewClassificationCode.IDENTITY_INCONSISTENT,
+        )
+
+    def test_contract_without_professional_user_is_identity_inconsistent(self):
+        result = classify_legacy_review(
+            legacy_review(),
+            (confirmed_contract(professional_user_id=None),),
+        )
+        self.assertEqual(
+            result.code,
+            LegacyReviewClassificationCode.IDENTITY_INCONSISTENT,
+        )
+
+    def test_both_professional_user_ids_missing_is_identity_inconsistent(self):
+        result = classify_legacy_review(
+            legacy_review(),
+            (
+                confirmed_contract(
+                    professional_user_id=None,
+                    profile_user_id=None,
+                ),
+            ),
+        )
+        self.assertEqual(
+            result.code,
+            LegacyReviewClassificationCode.IDENTITY_INCONSISTENT,
+        )
+
+    def test_candidate_cannot_be_constructed_without_ownership_evidence(self):
+        values = {
+            "id": 900,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "estado": "CONFIRMADA",
+            "created_at": REVIEW_TIME,
+            "confirmed_at": REVIEW_TIME,
+        }
+        with self.assertRaises(TypeError):
+            CandidateContractData(**values)
+
+    def test_candidate_api_contains_only_current_required_fields(self):
+        self.assertEqual(
+            tuple(field.name for field in fields(CandidateContractData)),
+            (
+                "id",
+                "cliente_id",
+                "professional_id",
+                "estado",
+                "created_at",
+                "confirmed_at",
+                "professional_user_id",
+                "profile_user_id",
+            ),
+        )
+
+    def test_current_migration_adapter_rejects_rows_without_ownership_keys(self):
+        review_row = {
+            "id": 100,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "rating": 5,
+            "created_at": REVIEW_TIME,
+        }
+        contract_row = {
+            "id": 200,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "estado": "CONFIRMADA",
+            "fecha_creacion": REVIEW_TIME,
+            "confirmed_at": REVIEW_TIME,
+        }
+        with self.assertRaises(KeyError):
+            classify_legacy_review_rows_fail_closed((review_row,), (contract_row,))
+
+    def test_historical_alias_is_unexported_and_matches_snapshot(self):
+        review_row = {
+            "id": 100,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "rating": 5,
+            "created_at": REVIEW_TIME,
+        }
+        contract_row = {
+            "id": 200,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "estado": "CONFIRMADA",
+            "fecha_creacion": REVIEW_TIME - timedelta(days=2),
+            "confirmed_at": REVIEW_TIME - timedelta(days=1),
+        }
+        through_alias = legacy_review_migration_adapter.classify_legacy_review_rows(
+            (review_row,),
+            (contract_row,),
+        )
+        through_snapshot = _classify_legacy_review_rows_20260726_06(
+            (review_row,),
+            (contract_row,),
+        )
+        self.assertEqual(through_alias, through_snapshot)
+        self.assertEqual(through_alias[0].classification_code, "LINKED_UNIQUE")
+        self.assertNotIn(
+            "classify_legacy_review_rows",
+            legacy_review_migration_adapter.__all__,
+        )
+
+    def test_historical_snapshot_is_deterministic_pure_and_self_contained(self):
+        review_rows = (
+            {
+                "id": 100,
+                "cliente_id": 10,
+                "professional_id": 20,
+                "rating": 5,
+                "created_at": REVIEW_TIME,
+            },
+        )
+        contract_rows = (
+            {
+                "id": 200,
+                "cliente_id": 10,
+                "professional_id": 20,
+                "estado": "CONFIRMADA",
+                "fecha_creacion": REVIEW_TIME - timedelta(days=2),
+                "confirmed_at": REVIEW_TIME - timedelta(days=1),
+            },
+        )
+        original = copy.deepcopy((review_rows, contract_rows))
+        first = _classify_legacy_review_rows_20260726_06(
+            review_rows,
+            contract_rows,
+        )
+        second = _classify_legacy_review_rows_20260726_06(
+            review_rows,
+            contract_rows,
+        )
+        self.assertEqual(first, second)
+        self.assertEqual((review_rows, contract_rows), original)
+        self.assertEqual(
+            set(first[0].__dict__),
+            {
+                "review_id",
+                "classification_code",
+                "contract_id",
+                "original_rating",
+            },
+        )
+
+        snapshot_source = inspect.getsource(
+            __import__(
+                "migrations.compat._legacy_review_20260726_06_snapshot",
+                fromlist=["*"],
+            )
+        )
+        tree = ast.parse(snapshot_source)
+        imported_roots = {
+            node.module.split(".")[0]
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module
+        }
+        self.assertTrue(imported_roots.isdisjoint({"app", "sqlalchemy", "flask"}))
+        self.assertNotIn("commit(", snapshot_source)
+        self.assertNotIn("execute(", snapshot_source)
+
+    def test_historical_dependencies_are_confined_to_migrations_contract(self):
+        project_root = Path(__file__).resolve().parents[1]
+        exact_alias = re.compile(r"\bclassify_legacy_review_rows\b")
+        production_references = []
+        for root_name in ("app", "migrations", "scripts"):
+            for path in (project_root / root_name).rglob("*.py"):
+                relative = path.relative_to(project_root).as_posix()
+                source = path.read_text(encoding="utf-8")
+                if exact_alias.search(source):
+                    production_references.append(relative)
+        self.assertEqual(
+            sorted(production_references),
+            [
+                "app/domain/legacy_review_migration_adapter.py",
+                "migrations/versions/20260726_06_contract_reviews_reputation_integrity.py",
+            ],
+        )
+
+        revision_07 = (
+            project_root
+            / "migrations/versions/20260726_07_contract_review_discriminator_hardening.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("classify_legacy_review_rows_fail_closed", revision_07)
+        self.assertNotIn("_legacy_review_20260726_06_snapshot", revision_07)
+
+    def test_migration_adapter_rejects_partial_ownership_payload(self):
+        review_row = {
+            "id": 100,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "rating": 5,
+            "created_at": REVIEW_TIME,
+        }
+        base_contract = {
+            "id": 200,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "estado": "CONFIRMADA",
+            "fecha_creacion": REVIEW_TIME,
+            "confirmed_at": REVIEW_TIME,
+        }
+        for partial in (
+            {**base_contract, "professional_user_id": 30},
+            {**base_contract, "profile_user_id": 30},
+        ):
+            with self.subTest(keys=tuple(sorted(partial))):
+                with self.assertRaises(KeyError):
+                    classify_legacy_review_rows_fail_closed(
+                        (review_row,),
+                        (partial,),
+                    )
+
+    def test_current_adapter_requires_complete_coherent_ownership(self):
+        review_row = {
+            "id": 100,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "rating": 5,
+            "created_at": REVIEW_TIME,
+        }
+        base_contract = {
+            "id": 200,
+            "cliente_id": 10,
+            "professional_id": 20,
+            "estado": "CONFIRMADA",
+            "fecha_creacion": REVIEW_TIME - timedelta(days=2),
+            "confirmed_at": REVIEW_TIME - timedelta(days=1),
+        }
+        coherent = classify_legacy_review_rows_fail_closed(
+            (review_row,),
+            (
+                {
+                    **base_contract,
+                    "professional_user_id": 30,
+                    "profile_user_id": 30,
+                },
+            ),
+        )[0]
+        self.assertEqual(coherent.classification_code, "LINKED_UNIQUE")
+        self.assertEqual(coherent.contract_id, 200)
+
+        invalid_pairs = (
+            (None, None),
+            (30, None),
+            (None, 30),
+            (30, 31),
+            (True, True),
+            (0, 0),
+            ("30", "30"),
+        )
+        for contract_owner, profile_owner in invalid_pairs:
+            with self.subTest(
+                contract_owner=contract_owner,
+                profile_owner=profile_owner,
+            ):
+                decision = classify_legacy_review_rows_fail_closed(
+                    (review_row,),
+                    (
+                        {
+                            **base_contract,
+                            "professional_user_id": contract_owner,
+                            "profile_user_id": profile_owner,
+                        },
+                    ),
+                )[0]
+                self.assertEqual(
+                    decision.classification_code,
+                    "IDENTITY_INCONSISTENT",
+                )
+                self.assertIsNone(decision.contract_id)
+
+    def test_invalid_professional_identifiers_are_always_inconsistent(self):
+        invalid_values = (None, 0, -1, True, False, "1", "abc", 1.0)
+        for field_name in ("professional_user_id", "profile_user_id"):
+            for invalid_value in invalid_values:
+                with self.subTest(field=field_name, value=invalid_value):
+                    values = {
+                        "professional_user_id": 30,
+                        "profile_user_id": 30,
+                        field_name: invalid_value,
+                    }
+                    result = classify_legacy_review(
+                        legacy_review(),
+                        (confirmed_contract(**values),),
+                    )
+                    self.assertEqual(
+                        result.code,
+                        LegacyReviewClassificationCode.IDENTITY_INCONSISTENT,
+                    )
+
+    def test_consistent_professional_ownership_remains_linkable(self):
+        result = classify_legacy_review(
+            legacy_review(),
+            (confirmed_contract(professional_user_id=30, profile_user_id=30),),
         )
         self.assertEqual(
             result.code,

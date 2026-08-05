@@ -72,7 +72,7 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
             revision = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
             ).scalar_one()
-            if revision != "20260726_06":
+            if revision != "20260726_07":
                 raise RuntimeError(f"Revision Alembic inesperada: {revision}")
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("El gate no esta ejecutando PostgreSQL")
@@ -252,8 +252,8 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
             self.assertEqual(
                 trigger_names,
                 {
-                    "trg_reviews_contract_integrity_v1",
-                    "trg_reputation_events_integrity_v1",
+                    "trg_reviews_contract_integrity_v2",
+                    "trg_reputation_events_integrity_v2",
                 },
             )
             constraint_names = {
@@ -271,6 +271,8 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
                     "uq_reputation_events_review_id",
                     "ck_reviews_contractual_integrity",
                     "ck_reputation_events_contract_review_integrity",
+                    "ck_reviews_origin_required_v2",
+                    "ck_reputation_events_discriminators_required_v2",
                 }.issubset(constraint_names)
             )
             review = self._create("pg-review-physical-success-0001")
@@ -431,6 +433,231 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
             self.assertEqual(self._counts(), baseline)
             self.assertEqual(User.query.count(), 3)
 
+    def test_null_and_unknown_discriminator_attacks_are_physically_rejected(self):
+        with self.app.app_context():
+            created_contract = ContractRequest(
+                cliente_id=self.client_id,
+                professional_id=self.professional_id,
+                professional_user_id=self.professional_user_id,
+                source_type=ContractRequest.SOURCE_DIRECT,
+                servicio="Contrato no confirmado",
+                estado="CREADA",
+                contracting_mode="EXTERNAL",
+                version=1,
+            )
+            completed_contract = ContractRequest(
+                cliente_id=self.client_id,
+                professional_id=self.professional_id,
+                professional_user_id=self.professional_user_id,
+                source_type=ContractRequest.SOURCE_DIRECT,
+                servicio="Contrato completado",
+                estado="COMPLETADA",
+                contracting_mode="EXTERNAL",
+                version=1,
+            )
+            cancelled_contract = ContractRequest(
+                cliente_id=self.client_id,
+                professional_id=self.professional_id,
+                professional_user_id=self.professional_user_id,
+                source_type=ContractRequest.SOURCE_DIRECT,
+                servicio="Contrato cancelado",
+                estado="CANCELADA",
+                contracting_mode="EXTERNAL",
+                version=1,
+            )
+            db.session.add_all(
+                [created_contract, completed_contract, cancelled_contract]
+            )
+            crossed_user = User(
+                nombre="PG Crossed Professional",
+                email=f"crossed-{uuid4().hex}@test.local",
+                password="hash",
+                rol="PROFESIONAL",
+                estado="ACTIVO",
+            )
+            db.session.add(crossed_user)
+            db.session.flush()
+            crossed_professional = Professional(
+                user_id=crossed_user.id,
+                nombre="PG Crossed Professional",
+                servicio="Otro servicio",
+                zona="CABA",
+                perfil_completo=True,
+            )
+            db.session.add(crossed_professional)
+            db.session.flush()
+            mismatched_owner_contract = ContractRequest(
+                cliente_id=self.client_id,
+                professional_id=self.professional_id,
+                professional_user_id=crossed_user.id,
+                source_type=ContractRequest.SOURCE_DIRECT,
+                servicio="Contrato con ownership incoherente",
+                estado="CONFIRMADA",
+                contracting_mode="EXTERNAL",
+                version=1,
+            )
+            db.session.add(mismatched_owner_contract)
+            db.session.commit()
+            review_sql = sa.text(
+                "INSERT INTO reviews (contract_id, cliente_id, professional_id, "
+                "rating, comentario, comment_public, origin, verification_status, "
+                "comment_visibility_status, rating_eligibility_status, "
+                "correlation_id, payload_hash, estado, created_at) VALUES "
+                "(:contract, :client, :professional, 5, 'Attack', 'Attack', "
+                ":origin, 'VERIFIED', 'VISIBLE', 'ELIGIBLE', :correlation, "
+                ":payload_hash, 'VISIBLE', NOW())"
+            )
+            review_common = {
+                "contract": self.contract_id,
+                "client": self.client_id,
+                "professional": self.professional_id,
+                "origin": "CONTRACTUAL",
+                "correlation": "00000000-0000-4000-8000-000000000730",
+                "payload_hash": "a" * 64,
+            }
+            for attack in (
+                {"contract": None, "origin": None},
+                {"contract": created_contract.id, "origin": None},
+                {"origin": None},
+                {"origin": None, "client": self.other_client_id},
+                {"contract": created_contract.id},
+                {"contract": completed_contract.id},
+                {"contract": cancelled_contract.id},
+                {"contract": mismatched_owner_contract.id},
+                {"client": self.other_client_id},
+                {"professional": crossed_professional.id},
+                {"origin": "UNKNOWN"},
+                {"origin": "LEGACY"},
+            ):
+                with self.subTest(review_attack=attack):
+                    with self.assertRaises(IntegrityError):
+                        db.session.execute(review_sql, {**review_common, **attack})
+                        db.session.commit()
+                    db.session.rollback()
+                    self.assertEqual(Review.query.count(), 0)
+                    self.assertEqual(User.query.count(), 4)
+                    self.assertEqual(
+                        db.session.execute(
+                            sa.text("SELECT version_num FROM alembic_version")
+                        ).scalar_one(),
+                        "20260726_07",
+                    )
+
+            orm_attack = Review(
+                contract_id=self.contract_id,
+                cliente_id=self.client_id,
+                professional_id=self.professional_id,
+                rating=5,
+                comentario="ORM null",
+                comment_public="ORM null",
+                origin=None,
+                verification_status="VERIFIED",
+                comment_visibility_status="VISIBLE",
+                rating_eligibility_status="ELIGIBLE",
+                correlation_id="00000000-0000-4000-8000-000000000731",
+                payload_hash="b" * 64,
+                estado="VISIBLE",
+            )
+            db.session.add(orm_attack)
+            with self.assertRaises(IntegrityError):
+                db.session.commit()
+            db.session.rollback()
+            self.assertEqual(User.query.count(), 4)
+
+            db.session.execute(review_sql, review_common)
+            db.session.commit()
+            review = Review.query.one()
+            for invalid_origin in (None, "UNKNOWN"):
+                with self.subTest(review_update_origin=invalid_origin):
+                    with self.assertRaises(IntegrityError):
+                        db.session.execute(
+                            sa.text("UPDATE reviews SET origin=:origin WHERE id=:id"),
+                            {"origin": invalid_origin, "id": review.id},
+                        )
+                        db.session.commit()
+                    db.session.rollback()
+                    self.assertEqual(Review.query.one().origin, "CONTRACTUAL")
+                    self.assertEqual(User.query.count(), 4)
+
+            event_sql = sa.text(
+                "INSERT INTO reputation_events (user_id, review_id, contract_id, "
+                "source_type, event_type, event_value, origin, correlation_id, "
+                "tipo_evento, puntos, created_at) VALUES (:user, :review, "
+                ":contract, :source, :event_type, :event_value, :origin, "
+                ":correlation, 'REVIEW_RECORDED', :points, NOW())"
+            )
+            event_common = {
+                "user": self.professional_user_id,
+                "review": review.id,
+                "contract": self.contract_id,
+                "source": "CONTRACT_REVIEW",
+                "event_type": "REVIEW_RECORDED",
+                "event_value": 5,
+                "origin": "CONTRACTUAL",
+                "correlation": review.correlation_id,
+                "points": None,
+            }
+            for attack in (
+                {"source": None},
+                {"origin": None},
+                {"event_type": None},
+                {"event_value": None},
+                {"event_type": "UNKNOWN"},
+                {"event_value": 0},
+                {"event_value": 6},
+                {"contract": None},
+                {"review": None},
+                {"review": None, "contract": None},
+                {"points": 5},
+                {"source": "LEGACY_EVENT", "origin": "LEGACY"},
+                {"source": "UNKNOWN"},
+                {"origin": "UNKNOWN"},
+            ):
+                with self.subTest(event_attack=attack):
+                    with self.assertRaises(IntegrityError):
+                        db.session.execute(event_sql, {**event_common, **attack})
+                        db.session.commit()
+                    db.session.rollback()
+                    self.assertEqual(ReputationEvent.query.count(), 0)
+                    self.assertEqual(User.query.count(), 4)
+                    self.assertEqual(
+                        db.session.execute(
+                            sa.text("SELECT version_num FROM alembic_version")
+                        ).scalar_one(),
+                        "20260726_07",
+                    )
+
+            db.session.execute(event_sql, event_common)
+            db.session.commit()
+            event = ReputationEvent.query.one()
+            for column, value in (
+                ("source_type", None),
+                ("origin", None),
+                ("source_type", "UNKNOWN"),
+                ("origin", "UNKNOWN"),
+            ):
+                with self.subTest(event_update=column, value=value):
+                    with self.assertRaises(IntegrityError):
+                        db.session.execute(
+                            sa.text(
+                                f"UPDATE reputation_events SET {column}=:value WHERE id=:id"
+                            ),
+                            {"value": value, "id": event.id},
+                        )
+                        db.session.commit()
+                    db.session.rollback()
+                    self.assertEqual(ReputationEvent.query.count(), 1)
+                    self.assertEqual(User.query.count(), 4)
+                    self.assertEqual(
+                        db.session.execute(
+                            sa.text("SELECT version_num FROM alembic_version")
+                        ).scalar_one(),
+                        "20260726_07",
+                    )
+            self.assertEqual(Review.query.count(), 1)
+            self.assertEqual(ReputationEvent.query.count(), 1)
+            self.assertEqual(User.query.count(), 4)
+
     def test_postgresql_legacy_upgrade_downgrade_reupgrade_preserves_rating(self):
         with self.app.app_context():
             db.session.remove()
@@ -495,6 +722,111 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
                 )
             command.upgrade(self.config, "head")
         finally:
+            engine.dispose()
+
+    def test_postgresql_06_historical_then_07_converges_with_direct_head(self):
+        with self.app.app_context():
+            db.session.remove()
+        command.downgrade(self.config, "20260726_05")
+        engine = sa.create_engine(POSTGRES_URL)
+        try:
+            with engine.begin() as connection:
+                replacement_user = connection.execute(
+                    sa.text(
+                        "INSERT INTO users (nombre, email, password, rol, estado) "
+                        "VALUES ('Replacement owner', :email, 'hash', "
+                        "'PROFESIONAL', 'ACTIVO') RETURNING id"
+                    ),
+                    {"email": f"replacement-owner-{uuid4().hex}@test.local"},
+                ).scalar_one()
+                connection.execute(
+                    sa.text("UPDATE professionals SET user_id=:user WHERE id=:id"),
+                    {"user": replacement_user, "id": self.professional_id},
+                )
+                legacy_review = connection.execute(
+                    sa.text(
+                        "INSERT INTO reviews (cliente_id, professional_id, "
+                        "rating, comentario, estado, created_at) VALUES "
+                        "(:client, :professional, 5, 'Ownership convergence', "
+                        "'VISIBLE', NOW()) RETURNING id"
+                    ),
+                    {
+                        "client": self.client_id,
+                        "professional": self.professional_id,
+                    },
+                ).scalar_one()
+
+            command.upgrade(self.config, "20260726_06")
+            with engine.connect() as connection:
+                historical = connection.execute(
+                    sa.text(
+                        "SELECT contract_id, legacy_metadata_json FROM reviews "
+                        "WHERE id=:id"
+                    ),
+                    {"id": legacy_review},
+                ).one()
+                self.assertEqual(historical.contract_id, self.contract_id)
+                self.assertEqual(
+                    historical.legacy_metadata_json["classification_code"],
+                    "LINKED_UNIQUE",
+                )
+
+            command.upgrade(self.config, "20260726_07")
+
+            def snapshot():
+                with engine.connect() as connection:
+                    row = connection.execute(
+                        sa.text(
+                            "SELECT contract_id, verification_status, "
+                            "rating_eligibility_status, legacy_metadata_json "
+                            "FROM reviews WHERE id=:id"
+                        ),
+                        {"id": legacy_review},
+                    ).one()
+                    triggers = tuple(
+                        connection.execute(
+                            sa.text(
+                                "SELECT tgname FROM pg_trigger "
+                                "WHERE NOT tgisinternal AND tgname LIKE '%_v2' "
+                                "ORDER BY tgname"
+                            )
+                        ).scalars()
+                    )
+                    checks = tuple(
+                        connection.execute(
+                            sa.text(
+                                "SELECT conname FROM pg_constraint "
+                                "WHERE conname IN "
+                                "('ck_reviews_origin_required_v2', "
+                                "'ck_reputation_events_discriminators_required_v2') "
+                                "ORDER BY conname"
+                            )
+                        ).scalars()
+                    )
+                    revision = connection.execute(
+                        sa.text("SELECT version_num FROM alembic_version")
+                    ).scalar_one()
+                    event_count = connection.execute(
+                        sa.text("SELECT COUNT(*) FROM reputation_events")
+                    ).scalar_one()
+                    return tuple(row), triggers, checks, revision, event_count
+
+            scenario_a = snapshot()
+            self.assertIsNone(scenario_a[0][0])
+            self.assertEqual(scenario_a[0][1:3], ("UNVERIFIED", "EXCLUDED"))
+            self.assertEqual(
+                scenario_a[0][3]["classification_code"],
+                "IDENTITY_INCONSISTENT",
+            )
+            self.assertEqual(scenario_a[3], "20260726_07")
+            self.assertEqual(scenario_a[4], 0)
+
+            command.downgrade(self.config, "20260726_05")
+            command.upgrade(self.config, "head")
+            scenario_b = snapshot()
+            self.assertEqual(scenario_b, scenario_a)
+        finally:
+            command.upgrade(self.config, "head")
             engine.dispose()
 
 

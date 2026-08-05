@@ -297,33 +297,6 @@ def _ensure_client_verification(verification_model, user_id):
     return True
 
 
-def _ensure_reputation_events(reputation_model, user_id, event_specs):
-    created = 0
-
-    for event_type, points, label in event_specs:
-        description = f"{DEMO_MARKER} {label}"
-        existing = reputation_model.query.filter_by(
-            user_id=user_id,
-            tipo_evento=event_type,
-            descripcion=description,
-        ).first()
-
-        if existing is not None:
-            continue
-
-        db.session.add(
-            reputation_model(
-                user_id=user_id,
-                tipo_evento=event_type,
-                puntos=points,
-                descripcion=description,
-            )
-        )
-        created += 1
-
-    return created
-
-
 def seed_professionals():
     optional_models = _load_optional_models()
     summary = {
@@ -368,14 +341,6 @@ def seed_professionals():
         if verification_model is not None:
             summary["verifications_created"] += int(
                 _ensure_verification(verification_model, user.id, data)
-            )
-
-        reputation_model = optional_models.get("reputation")
-        if reputation_model is not None:
-            summary["reputation_events_created"] += _ensure_reputation_events(
-                reputation_model,
-                user.id,
-                data["reputation_events"],
             )
 
         print(

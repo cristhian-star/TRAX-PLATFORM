@@ -33,6 +33,8 @@ class CandidateContractData:
     estado: str
     created_at: Optional[datetime]
     confirmed_at: Optional[datetime]
+    professional_user_id: Optional[int]
+    profile_user_id: Optional[int]
 
 
 @dataclass(frozen=True)
@@ -79,12 +81,23 @@ def classify_legacy_review(
             LegacyReviewClassificationCode.INVALID_RATING
         )
 
-    identity_matches = tuple(
+    raw_identity_matches = tuple(
         contract
         for contract in candidate_contracts
         if contract.cliente_id == review.cliente_id
         and contract.professional_id == review.professional_id
     )
+    if any(
+        not _is_positive_identifier(contract.professional_user_id)
+        or not _is_positive_identifier(contract.profile_user_id)
+        or contract.professional_user_id != contract.profile_user_id
+        for contract in raw_identity_matches
+    ):
+        return LegacyReviewClassification(
+            LegacyReviewClassificationCode.IDENTITY_INCONSISTENT
+        )
+
+    identity_matches = raw_identity_matches
     if not identity_matches:
         partial_identity_match = any(
             contract.cliente_id == review.cliente_id

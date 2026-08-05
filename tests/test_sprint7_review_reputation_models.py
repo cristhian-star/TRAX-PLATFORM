@@ -96,12 +96,15 @@ class ReviewReputationModelPreparationTest(unittest.TestCase):
                 professional_id=professional.id,
                 rating=5,
                 comentario="Review anterior al bloque contractual",
+                origin=Review.ORIGIN_LEGACY,
             )
             event = ReputationEvent(
                 user_id=professional_user.id,
                 tipo_evento="REVIEW_POSITIVA",
                 puntos=10,
                 descripcion="Evento legacy preservado",
+                source_type=ReputationEvent.SOURCE_LEGACY_EVENT,
+                origin=ReputationEvent.ORIGIN_LEGACY,
             )
             db.session.add_all((review, event))
             db.session.commit()

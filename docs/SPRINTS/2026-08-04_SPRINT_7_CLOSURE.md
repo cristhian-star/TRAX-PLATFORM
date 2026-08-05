@@ -1,4 +1,7 @@
-# Sprint 7 - Cierre Contracting Core
+# Sprint 7 - Cierre Contracting Core (reabierto por P1)
+
+> Estado: abierto hasta que una auditoría independiente apruebe el
+> endurecimiento físico de discriminadores y ownership profesional legacy.
 
 ## Alcance cerrado
 
@@ -16,23 +19,33 @@ La única modalidad habilitada es `hiring_mode = SINGLE`. `contracting_mode = EX
 
 ## Reviews y reputación
 
-Las reviews nuevas requieren un contrato `CONFIRMADA`, actor cliente explícito y ownership. Una review por contrato se protege en servicio y base. La reputación pública se reconstruye desde hechos neutrales y no usa un score nuevo. Los registros legacy se preservan sin vinculación heurística cuando son ambiguos.
+Las reviews nuevas requieren un contrato `CONFIRMADA`, actor cliente explícito y ownership. Una review por contrato se protege en servicio y base. La reputación pública se reconstruye desde hechos neutrales y no usa un score nuevo. Los registros legacy se preservan sin vinculación heurística cuando son ambiguos. Los lectores admiten exclusivamente orígenes `CONTRACTUAL` y `LEGACY` verificada.
+
+`20260726_06` conserva su semántica mediante un snapshot migratorio versionado
+y autocontenido. No es una API productiva: no existen callers productivos y
+ese contrato se verifica mediante pruebas de dependencias, sin presentarlo
+como una frontera contra imports arbitrarios dentro de Python. El adaptador
+vigente exige ambos IDs de ownership y falla ante payloads incompletos.
+`20260726_07` usa exclusivamente esa API fail-closed y es el único estado
+operativo soportado. Un downgrade a `_06`
+reinstala defensas históricas más débiles y no equivale a `_07` para operación
+normal.
 
 ## Validación final
 
-Entorno PostgreSQL 16.14 descartable, Alembic `20260726_06`:
+Entorno PostgreSQL 16.14 descartable, Alembic `20260726_07`:
 
 - Contratación y concurrencia: 8/8.
 - Negociación 2B: 8/8.
-- Reviews y concurrencia: 8/8.
+- Reviews, concurrencia, convergencia y ataques aislados: 10/10.
 - Rutas, privacidad y moderación: 8/8.
 - Migración parcial de comandos: 21/21.
 - PostgreSQL legacy: 4/4.
-- Total PostgreSQL: 57/57, sin omisiones.
-- Suite Sprint 7 SQLite: 145 ejecutadas, 140 aprobadas, 5 omitidas.
-- Suite completa: 246 ejecutadas, 241 aprobadas, 5 omitidas, cero fallos.
+- Total PostgreSQL: 59/59, sin omisiones.
+- Suite Sprint 7 con PostgreSQL habilitado: 165 ejecutadas, 164 aprobadas, 1 omitida.
+- Suite completa con PostgreSQL habilitado: 266 ejecutadas, 265 aprobadas, 1 omitida, cero fallos.
 
-Las cinco omisiones del runner SQLite corresponden a cuatro pruebas legacy que exigen `TRAX_POSTGRES_TEST_URL` y una prueba marcada porque SQLite no ofrece locks de fila ni sesiones independientes equivalentes. Esos comportamientos quedaron cubiertos por los 57 gates PostgreSQL ejecutados sin omisiones. SQLite no se usa como evidencia de locks ni triggers PostgreSQL.
+La única omisión es el placeholder SQLite que documenta que ese motor no ofrece locks de fila ni sesiones independientes equivalentes. Esos comportamientos quedaron cubiertos por 59 pruebas PostgreSQL ejecutadas sin omisiones. SQLite no se usa como evidencia de locks ni triggers PostgreSQL.
 
 ## Fuera de alcance
 
@@ -49,4 +62,4 @@ Quedan fuera del Sprint 7: `MULTIPLE`, badges plata/oro, ranking propietario, pa
 
 El cierre formal requiere cero P0/P1, todos los gates verdes, suite completa aprobada, documentación reconciliada y limpieza del entorno descartable. El informe de auditoría del Bloque 5 registra la evidencia final.
 
-Este documento representa cierre técnico en la rama de feature. No representa merge a `develop`, publicación ni despliegue.
+La evidencia local no restablece por sí sola el cierre: falta auditoría independiente. Este documento no representa aptitud para merge, publicación ni despliegue.

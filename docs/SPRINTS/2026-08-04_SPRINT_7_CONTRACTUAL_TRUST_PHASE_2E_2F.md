@@ -25,7 +25,7 @@ Vincular reviews nuevas a trabajos confirmados y derivar reputación pública ne
 
 ## Reputación neutral
 
-Las métricas públicas son promedio elegible, distribución por estrellas, cantidad de reviews verificadas, contratos confirmados y cobertura de reviews. Contractuales y legacy verificadas se distinguen. `UNVERIFIED` y ratings `EXCLUDED` quedan fuera.
+Las métricas públicas son promedio elegible, distribución por estrellas, cantidad de reviews verificadas, contratos confirmados y cobertura de reviews. Sólo se admiten orígenes explícitos `CONTRACTUAL` y `LEGACY` verificada. Orígenes nulos o desconocidos, `UNVERIFIED` y ratings `EXCLUDED` quedan fuera.
 
 No existe score propietario nuevo. Plata/oro, rankings y fórmulas reputacionales quedan para una decisión futura.
 
@@ -35,14 +35,28 @@ No existe score propietario nuevo. Plata/oro, rankings y fórmulas reputacionale
 - `add_reputation_event()` fue retirado y no tiene callers productivos.
 - Los eventos y reviews históricos no se eliminan.
 - PostgreSQL y SQLite bloquean nuevas filas reputacionales con puntos.
+- `20260726_07` revalida `ContractRequest.professional_user_id` contra
+  `Professional.user_id`; faltantes o diferencias quedan
+  `IDENTITY_INCONSISTENT` y sin vínculo automático.
+- `20260726_06` conserva su comportamiento histórico mediante un snapshot
+  migratorio versionado y autocontenido. No es una API productiva: el
+  aislamiento se sostiene por contrato arquitectónico y pruebas de
+  dependencias, no por una frontera contra imports arbitrarios de Python. El
+  adaptador vigente exige ambos IDs y falla ante payloads incompletos. `_07`
+  usa exclusivamente el adaptador fail-closed y es el head
+  operativo soportado; bajar a `_06` reinstala defensas históricas más débiles
+  y no representa un estado operativo equivalente.
 
 ## Validación PostgreSQL
 
-PostgreSQL 16.14, Alembic `20260726_06`, base exclusiva descartable:
+PostgreSQL 16.14, Alembic `20260726_07`, base exclusiva descartable:
 
-- Reviews/concurrencia: 8/8.
+- Reviews/concurrencia/discriminadores/convergencia: 10/10.
 - Rutas, CSRF, privacidad y moderación: 8/8.
 - Se demostraron replay, conflictos, conteos exactos, rollback, sesión reutilizable, inmutabilidad del original, redacción pública, exclusión separada, cero puntos y cero `ContractEvent`.
+- Total PostgreSQL: 59/59; suite Sprint 7: 165 ejecutadas, 164 aprobadas y 1
+  omitida; suite completa: 266 ejecutadas, 265 aprobadas y la misma omisión
+  deliberada.
 
 ## Deuda no bloqueante
 

@@ -16,6 +16,10 @@ class ReputationEvent(db.Model):
             name="ck_reputation_events_origin",
         ),
         db.CheckConstraint(
+            "source_type IS NOT NULL AND origin IS NOT NULL",
+            name="ck_reputation_events_discriminators_required_v2",
+        ),
+        db.CheckConstraint(
             "source_type <> 'CONTRACT_REVIEW' OR ("
             "review_id IS NOT NULL AND contract_id IS NOT NULL "
             "AND user_id IS NOT NULL AND correlation_id IS NOT NULL "

@@ -69,7 +69,7 @@ class ContractReviewRoutesModerationPostgreSQLGate(unittest.TestCase):
             raise RuntimeError(
                 "TRAX_POSTGRES_TEST_ALLOW_RESET=1 es obligatorio"
             )
-        command.upgrade(Config(str(PROJECT_ROOT / "alembic.ini")), "20260726_06")
+        command.upgrade(Config(str(PROJECT_ROOT / "alembic.ini")), "head")
         cls.app = create_app(initialize_schema=False)
         cls.app.config.update(
             TESTING=True,
@@ -80,7 +80,7 @@ class ContractReviewRoutesModerationPostgreSQLGate(unittest.TestCase):
                 sa.text("SELECT version_num FROM alembic_version")
             ).scalar_one()
             version = db.session.execute(sa.text("SHOW server_version")).scalar_one()
-            if revision != "20260726_06":
+            if revision != "20260726_07":
                 raise RuntimeError(f"Revision inesperada: {revision}")
             print(
                 f"PostgreSQL server_version={version} alembic={revision}",

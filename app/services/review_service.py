@@ -26,6 +26,7 @@ def _verified_review_query(professional_id):
     return Review.query.filter(
         Review.professional_id == professional_id,
         Review.contract_id.isnot(None),
+        Review.origin.in_((Review.ORIGIN_CONTRACTUAL, Review.ORIGIN_LEGACY)),
         Review.verification_status == Review.VERIFICATION_VERIFIED,
         Review.rating_eligibility_status == Review.RATING_ELIGIBLE,
         Review.rating.in_((1, 2, 3, 4, 5)),
@@ -38,6 +39,10 @@ def get_professional_reviews(professional_id):
         Review.id.desc(),
     ).all()
     public_statuses = (Review.COMMENT_VISIBLE, Review.COMMENT_REDACTED)
+    labels = {
+        Review.ORIGIN_CONTRACTUAL: "Review contractual verificada",
+        Review.ORIGIN_LEGACY: "Review legacy verificada",
+    }
     return [
         PublicReviewView(
             id=review.id,
@@ -48,11 +53,7 @@ def get_professional_reviews(professional_id):
                 else None
             ),
             origin=review.origin,
-            label=(
-                "Review contractual verificada"
-                if review.origin == Review.ORIGIN_CONTRACTUAL
-                else "Review legacy verificada"
-            ),
+            label=labels[review.origin],
             comment_visibility_status=review.comment_visibility_status,
             created_at=review.created_at,
         )
@@ -61,7 +62,10 @@ def get_professional_reviews(professional_id):
 
 
 def get_professional_reputation_metrics(professional_id):
-    reviews = Review.query.filter_by(professional_id=professional_id).all()
+    reviews = Review.query.filter(
+        Review.professional_id == professional_id,
+        Review.origin.in_((Review.ORIGIN_CONTRACTUAL, Review.ORIGIN_LEGACY)),
+    ).all()
     contracts = ContractRequest.query.filter_by(
         professional_id=professional_id
     ).all()

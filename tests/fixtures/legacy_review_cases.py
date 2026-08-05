@@ -31,6 +31,8 @@ def confirmed_contract(**overrides):
         "estado": "CONFIRMADA",
         "created_at": REVIEW_TIME - timedelta(days=10),
         "confirmed_at": REVIEW_TIME - timedelta(days=1),
+        "professional_user_id": 30,
+        "profile_user_id": 30,
     }
     values.update(overrides)
     return CandidateContractData(**values)
