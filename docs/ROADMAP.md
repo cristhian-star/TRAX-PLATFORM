@@ -54,6 +54,15 @@
 
 [x] Sprint 7 - Contracting Core MVP cerrado en `CONFIRMADA`
 
+[x] Sprint 7 - Auditoria independiente de integracion aprobada
+
+[x] Sprint 7 - Cierre tecnico aprobado para PR hacia `develop`
+
+Estado operativo soportado: Alembic `20260726_07`. Un downgrade a
+`20260726_06` restaura defensas historicas mas debiles. El cierre tecnico no
+autoriza despliegue productivo. P0/P1/P2: ninguno. P3 no bloqueante: contrasena
+demo predecible pendiente de endurecimiento futuro.
+
 [ ] Agenda
 
 [ ] WhatsApp Business API

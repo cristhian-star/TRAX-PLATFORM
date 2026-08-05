@@ -1,7 +1,8 @@
-# Sprint 7 - Cierre Contracting Core (reabierto por P1)
+# Sprint 7 - Cierre Contracting Core aprobado
 
-> Estado: abierto hasta que una auditoría independiente apruebe el
-> endurecimiento físico de discriminadores y ownership profesional legacy.
+> Estado: auditoría independiente de integración aprobada. Sprint 7 está
+> técnicamente cerrado y aprobado para PR hacia `develop`. Este cierre no
+> autoriza publicación ni despliegue productivo.
 
 ## Alcance cerrado
 
@@ -35,6 +36,10 @@ normal.
 
 Entorno PostgreSQL 16.14 descartable, Alembic `20260726_07`:
 
+- Auditoría independiente de integración: aprobada.
+- Hallazgos abiertos P0/P1/P2: ninguno.
+- P3 no bloqueante: contraseña demo predecible pendiente de endurecimiento futuro.
+
 - Contratación y concurrencia: 8/8.
 - Negociación 2B: 8/8.
 - Reviews, concurrencia, convergencia y ataques aislados: 10/10.
@@ -60,6 +65,11 @@ Quedan fuera del Sprint 7: `MULTIPLE`, badges plata/oro, ranking propietario, pa
 
 ## Veredicto
 
-El cierre formal requiere cero P0/P1, todos los gates verdes, suite completa aprobada, documentación reconciliada y limpieza del entorno descartable. El informe de auditoría del Bloque 5 registra la evidencia final.
+La auditoría independiente de integración aprobó el cierre con cero P0/P1/P2.
+Sprint 7 queda técnicamente cerrado y aprobado para preparar PR hacia
+`develop`. `20260726_07` es el único estado operativo soportado; un downgrade
+a `_06` restaura defensas históricas más débiles.
 
-La evidencia local no restablece por sí sola el cierre: falta auditoría independiente. Este documento no representa aptitud para merge, publicación ni despliegue.
+La aprobación técnica y la aptitud para PR no autorizan merge automático,
+publicación ni despliegue productivo. Permanece como P3 no bloqueante el
+endurecimiento futuro de la contraseña demo predecible.

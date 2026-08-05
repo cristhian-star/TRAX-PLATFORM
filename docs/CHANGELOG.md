@@ -1,9 +1,10 @@
 # CHANGELOG TRAX
 
-## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (reabierto por P1)
+## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (cierre aprobado)
 
-Estado: la corrección está validada localmente, pero el cierre permanece
-suspendido hasta su aprobación por auditoría independiente.
+Estado: la auditoría independiente de integración fue aprobada. Sprint 7 está
+técnicamente cerrado y aprobado para PR hacia `develop`. Esta aprobación no
+autoriza publicación ni despliegue productivo.
 
 ### Agregado
 
@@ -47,11 +48,16 @@ suspendido hasta su aprobación por auditoría independiente.
 
 ### Validación
 
+- Auditoría independiente de integración: aprobada.
+- Hallazgos abiertos: P0/P1/P2 ninguno. P3 no bloqueante: contraseña demo
+  predecible pendiente de endurecimiento futuro.
 - PostgreSQL 16.14, Alembic `20260726_07`: 59/59 pruebas finales aprobadas.
 - Gate contractual 8/8; negociación 8/8; reviews 10/10; rutas/moderación 8/8; migración parcial 21/21; legacy 4/4.
 - Suite Sprint 7 con PostgreSQL habilitado: 165 ejecutadas, 164 aprobadas y 1 omisión deliberada; cero fallos.
 - Suite completa con PostgreSQL habilitado: 266 ejecutadas, 265 aprobadas y la misma omisión deliberada; cero fallos.
 - Los warnings por `Query.get()` y `datetime.utcnow()` quedan como deuda no bloqueante.
+- `20260726_07` es el único estado operativo soportado. Un downgrade a `_06`
+  restaura defensas históricas más débiles.
 
 ## 2026-07-26 - Sprint 7 Contracting Core Fase 2A
 
