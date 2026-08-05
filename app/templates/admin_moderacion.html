@@ -16,6 +16,71 @@
 
     <section class="moderation-section">
         <div class="panel-title compact-title">
+            <span class="kicker">Reviews contractuales</span>
+            <h3>Comentarios pendientes</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Review</th>
+                    <th>Contrato</th>
+                    <th>Comentario original</th>
+                    <th>Rating</th>
+                    <th>Acciones cerradas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in contract_reviews %}
+                <tr>
+                    <td>#{{ review.id }}</td>
+                    <td>#{{ review.contract_id }}</td>
+                    <td>{{ review.comentario or "Sin comentario" }}</td>
+                    <td>{{ review.rating }}/5 ({{ review.rating_eligibility_status }})</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="SHOW">
+                            <select name="reason" required aria-label="Motivo para mostrar comentario">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Mostrar</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="HIDE">
+                            <select name="reason" required aria-label="Motivo para ocultar comentario">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Ocultar</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="REDACT">
+                            <input type="text" name="redacted_comment" placeholder="Version publica" required aria-label="Versión pública redactada">
+                            <select name="reason" required aria-label="Motivo para publicar versión redactada">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Publicar redactada</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/rating/excluir" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select name="reason" required aria-label="Motivo para excluir rating">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Excluir rating</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No hay comentarios contractuales pendientes.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
             <span class="kicker">Denuncias abiertas</span>
             <h3>Reportes de usuarios</h3>
         </div>

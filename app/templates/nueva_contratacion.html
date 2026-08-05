@@ -16,6 +16,7 @@
 
         <form action="/contratacion/nueva" method="POST" class="form-card">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
             <input
                 type="number"
                 name="professional_id"

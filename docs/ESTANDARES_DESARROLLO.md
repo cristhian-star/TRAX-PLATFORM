@@ -42,7 +42,8 @@ Reglas:
 - `develop` concentra trabajo validado antes de produccion.
 - `main` representa estado estable.
 - No mergear a `main` sin validacion previa en `develop`.
-- No cerrar un sprint sin commit, merge a `develop` y validacion posterior.
+- El cierre tecnico puede quedar validado y documentado en la rama de feature antes de su aprobacion independiente.
+- El cierre integrado y publicable requiere commit, merge a `develop` y validacion posterior; un cierre tecnico no implica despliegue.
 
 ## Estructura de carpetas
 
@@ -79,6 +80,17 @@ Estructura principal:
 - No exponer secretos, tokens ni credenciales en el repositorio.
 - Validar entradas del usuario antes de persistir o ejecutar acciones.
 - Evitar cambios que amplien permisos sin decision explicita.
+- Exigir actor explicito y activo también dentro de servicios sensibles; la ruta no reemplaza RBAC ni ownership de dominio.
+- Autorizar antes de resolver replays idempotentes.
+- No exponer modelos ORM con campos privados a templates o respuestas públicas; usar DTOs públicos mínimos.
+- Separar contenido original auditable, contenido público y elegibilidad de métricas.
+
+## Integridad transaccional
+
+- Las operaciones sensibles deben concentrar comando, entidad, auditoría, notificación y hechos derivados en una sola transacción.
+- Ningún helper interno puede ejecutar `commit()` si participa de una operación atómica superior.
+- PostgreSQL real es obligatorio para validar locks, carreras, triggers y recuperación de sesiones; SQLite no sustituye ese gate.
+- Los gates destructivos sólo pueden usar bases exclusivas y descartables con autorización explícita de reset.
 
 ## Docker
 

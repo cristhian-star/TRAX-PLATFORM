@@ -1,5 +1,85 @@
 # DECISIONES DE ARQUITECTURA TRAX
 
+## 2026-08-04 - Reviews contractuales y reputación neutral
+
+Se decidió que toda review nueva nace de un contrato canónico en estado exactamente `CONFIRMADA`.
+
+Alcance:
+
+- `CONFIRMADA` es el terminal exitoso; `CERRADA` sólo conserva interpretación histórica.
+- El servicio deriva cliente y profesional desde el contrato, exige actor explícito, bloquea el contrato y autoriza antes del replay.
+- Existe una review por contrato. Dos contratos confirmados pueden originar dos reviews independientes.
+- Review, evento reputacional neutral, auditoría, notificación y comando se confirman en una sola transacción.
+- El comentario original se preserva para auditoría; el perfil público sólo recibe `comment_public` mediante un DTO sin el campo original.
+- Ocultar o redactar el comentario no excluye automáticamente el rating. La exclusión es una operación administrativa separada y auditada.
+- La fuente de verdad reputacional son hechos verificables: ratings elegibles, distribución, contratos confirmados y cobertura de reviews.
+- No existe un score propietario nuevo ni mutadores públicos de puntos.
+- Los registros legacy inequívocos se conservan como `LEGACY`; los ambiguos permanecen `UNVERIFIED` y no se vinculan heurísticamente.
+
+Criterio:
+
+La reputación pública debe poder reconstruirse desde `Review`, `ReputationEvent` y contratos confirmados. Badges plata/oro, rankings y fórmulas propietarias requieren una decisión futura de producto.
+
+## 2026-08-04 - Alcance final del Contracting Core MVP
+
+Se decidió cerrar el Sprint 7 con `hiring_mode = SINGLE` y `contracting_mode = EXTERNAL`.
+
+Quedan fuera del Sprint 7: `MULTIPLE`, pagos, custodia, facturación, garantías, disputas financieras, producción y despliegue. Estas exclusiones no alteran la máquina contractual canónica ni el terminal exitoso `CONFIRMADA`.
+
+El cierre documentado es técnico sobre la rama estabilizada. La integración a `develop` y cualquier despliegue son pasos posteriores sujetos a aprobación independiente.
+
+## 2026-07-26 - Contracting Core Fase 2A
+
+Se decidio que `CONFIRMADA` sea el unico estado terminal exitoso de contratos nuevos.
+
+Motivo:
+
+`COMPLETADA` representa la declaracion del profesional y `CONFIRMADA` el consentimiento expreso del cliente sobre la finalizacion. Una transicion automatica posterior a `CERRADA` no agrega informacion de dominio y debilita el significado del consentimiento. `CERRADA` queda como valor legacy y se migra a `CONFIRMADA`.
+
+Se decidio separar `contracting_mode` de `hiring_mode`.
+
+- `contracting_mode` describe la modalidad legal y solo admite `EXTERNAL`.
+- `hiring_mode` describe cuantos profesionales puede contratar una propuesta y permanece en `SINGLE` durante Fase 2A.
+- `PROTECTED` no se admite ni se reserva como comportamiento ejecutable.
+
+Se decidio que toda transicion contractual sensible use:
+
+- operacion explicita, nunca un estado destino libre;
+- actor autenticado, rol y ownership;
+- lock `SELECT FOR UPDATE`;
+- version esperada;
+- `OperationCommand` con unicidad por actor, operacion y key;
+- un `correlation_id` comun;
+- un unico commit para contrato, evento, auditoria, notificacion y resultado.
+
+`AuditLog` conserva evidencia, pero no es la fuente primaria de idempotencia. Las correlaciones historicas imposibles de deducir se mantienen nulas para no inventar trazabilidad.
+
+El downgrade de Fase 2A se bloquea cuando existen comandos o datos correlacionados que el esquema anterior no puede representar. Se prefiere forward fix.
+
+## 2026-07-26
+
+Se decidio refactorizar `ContractRequest` como nucleo canonico de contratacion en lugar de crear un segundo modelo de contrato.
+
+Motivo:
+
+Presupuestos y Propuestas tienen origenes diferentes, pero ambos deben producir una contratacion comun para ejecucion, conformidad, reputacion y futuras integraciones de facturacion o pagos.
+
+Alcance:
+
+- `BudgetOffer` adjudicada crea un `ContractRequest` en estado `CREADA`.
+- `ProposalApplication` aceptada crea un `ContractRequest` en estado `CREADA`.
+- La creacion derivada es idempotente por `budget_offer_id` o `proposal_application_id`.
+- En reintentos no se duplican `ContractEvent`, `AuditLog` ni `ActivityNotification`.
+- `source_id` debe coincidir con la entidad origen concreta: `budget_offer_id` para Presupuestos y `proposal_application_id` para Propuestas.
+- Propuestas adopta `hiring_mode = SINGLE` por defecto hasta definir reglas de contratacion multiple.
+- `ContractEvent` conserva historial de dominio.
+- `AuditLog` conserva trazabilidad administrativa y de seguridad.
+- Las contrataciones directas existentes quedan como `source_type = DIRECT`.
+
+Criterio:
+
+Presupuestos y Propuestas seguiran siendo dominios separados. Ningun modulo externo, WhatsApp, MCP, IA, pagos o facturacion debe controlar directamente la logica de contratacion.
+
 ## 2026-07-24
 
 Se decidio cargar `design-system-v2.css` de forma explicita desde `base.html`, despues de `design-tokens.css` y antes de `styles.css`.

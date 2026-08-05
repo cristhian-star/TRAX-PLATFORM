@@ -48,38 +48,69 @@
         {% if is_professional and contract.estado == "CREADA" %}
         <form action="/contratacion/{{ contract.id }}/aceptar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.accept }}">
             <button type="submit">Aceptar</button>
         </form>
         <form action="/contratacion/{{ contract.id }}/rechazar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.reject }}">
             <button class="secondary-action" type="submit">Rechazar</button>
         </form>
         {% endif %}
         {% if is_professional and contract.estado == "ACEPTADA" %}
         <form action="/contratacion/{{ contract.id }}/iniciar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.start }}">
             <button type="submit">Iniciar trabajo</button>
         </form>
         {% endif %}
         {% if is_professional and contract.estado == "EN_PROGRESO" %}
         <form action="/contratacion/{{ contract.id }}/completar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.complete }}">
             <button type="submit">Marcar completada</button>
         </form>
         {% endif %}
         {% if is_client and contract.estado == "COMPLETADA" %}
         <form action="/contratacion/{{ contract.id }}/confirmar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.confirm }}">
             <button type="submit">Confirmar finalizacion</button>
         </form>
         {% endif %}
-        {% if is_client and contract.estado in ("CREADA", "ACEPTADA", "EN_PROGRESO") %}
+        {% if is_client and contract.estado in ("CREADA", "ACEPTADA", "EN_PROGRESO", "COMPLETADA") %}
         <form action="/contratacion/{{ contract.id }}/cancelar" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ contract.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.cancel }}">
             <button class="secondary-action" type="submit">Cancelar</button>
         </form>
         {% endif %}
     </section>
+
+    {% if can_create_contract_review %}
+        <section class="contract-panel">
+            <h3>Evaluacion del trabajo</h3>
+            <p>La evaluacion quedara vinculada a este trabajo confirmado.</p>
+            <a href="/contratacion/{{ contract.id }}/review">Calificar trabajo realizado</a>
+        </section>
+    {% elif contract_review %}
+        <section class="contract-panel">
+            <h3>Evaluacion del trabajo</h3>
+            <a href="/profesional/{{ contract.professional_id }}#review-{{ contract_review.id }}">
+                Ver review vinculada
+            </a>
+            <form action="/reviews/{{ contract_review.id }}/reportar" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="secondary-action" type="submit">Reportar comentario</button>
+            </form>
+        </section>
+    {% endif %}
 </section>
 
 {% endblock %}

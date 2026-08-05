@@ -196,7 +196,7 @@
                                                 </span>
                                             {% endif %}
                                             <span class="budget-awarded">Adjudicado</span>
-                                        {% elif budget_request.estado in ("ABIERTO", "COTIZANDO") %}
+                                        {% elif budget_request.estado in ("ABIERTO", "PUBLICADA", "COTIZANDO") %}
                                             <form action="/presupuestos/{{ budget_request.id }}/adjudicar/{{ offer.id }}" method="POST">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button class="budget-button budget-button--primary" type="submit">
@@ -250,7 +250,7 @@
                             {% endif %}
                             <span>Plazo: {{ own_offer.plazo_estimado }}</span>
                         </div>
-                    {% elif budget_request.estado in ("ABIERTO", "COTIZANDO") and offer_count < max_offers %}
+                    {% elif budget_request.estado in ("ABIERTO", "PUBLICADA", "COTIZANDO") and offer_count < max_offers %}
                         <div class="budget-section-heading">
                             <span class="budget-eyebrow">Oportunidad profesional</span>
                             <h2>Envia tu presupuesto</h2>

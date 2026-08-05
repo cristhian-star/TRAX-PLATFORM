@@ -12,7 +12,7 @@
 {% set zona = pro.zona %}
 {% set telefono = pro.telefono %}
 {% set descripcion = pro.descripcion %}
-{% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
+{% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false} %}
 {% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
 {% set gallery_entries = pro.gallery_urls.splitlines() if pro.gallery_urls else [] %}
 {% set public_google_maps_api_key = google_maps_api_key if google_maps_api_key and google_maps_api_key != "tu_clave_real" else none %}
@@ -103,6 +103,16 @@
                 href="/contratacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
                 Contactar
             </a>
+            {% if formal_negotiation_allowed %}
+                <a
+                    class="profile-action profile-action--secondary"
+                    href="/negociacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
+                    Formalizar condiciones
+                </a>
+                <p class="professional-profile__contact-privacy">
+                    Las condiciones son definidas y aceptadas por las partes. TRAX registra el acuerdo y aporta trazabilidad, pero no garantiza su cumplimiento.
+                </p>
+            {% endif %}
             <button class="profile-action profile-action--secondary" type="button" data-share-profile>
                 Compartir perfil
             </button>
@@ -175,8 +185,8 @@
                         <dd>{{ zona }}</dd>
                     </div>
                     <div>
-                        <dt>Reputacion TRAX</dt>
-                        <dd>{{ badges.reputation_score or 0 }}</dd>
+                        <dt>Reviews verificadas</dt>
+                        <dd>{{ reputation_metrics.eligible_rating_count if reputation_metrics is defined else 0 }}</dd>
                     </div>
                     {% if pro.estado_perfil %}
                         <div>

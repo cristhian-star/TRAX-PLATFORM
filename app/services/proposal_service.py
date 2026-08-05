@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
 from sqlalchemy.exc import IntegrityError
@@ -6,11 +7,25 @@ from app import db
 from app.models.professional import Professional
 from app.models.proposal_application import ProposalApplication
 from app.models.proposal_request import ProposalRequest
+from app.services.contracting_core_service import create_contract_from_proposal_application
 
 
 OPEN_STATUSES = (
     "PUBLICADA",
 )
+
+
+def _require_single_hiring_mode(proposal):
+    if proposal.hiring_mode != ProposalRequest.HIRING_MODE_SINGLE:
+        raise ValueError("hiring_mode MULTIPLE queda bloqueado hasta Fase 2C")
+
+
+@dataclass(frozen=True)
+class ProposalAcceptanceResult:
+    application: ProposalApplication
+    contract: object
+    created: bool
+    state_changed: bool
 
 
 def _parse_decimal(value, field_label, required=False):
@@ -61,6 +76,7 @@ def create_proposal_request(
         fecha_inicio_estimada=fecha_inicio_estimada,
         fecha_limite_postulacion=fecha_limite_postulacion,
         estado="PUBLICADA",
+        hiring_mode=ProposalRequest.HIRING_MODE_SINGLE,
     )
 
     db.session.add(proposal_request)
@@ -152,24 +168,57 @@ def apply_to_proposal(
 
 
 def accept_application(proposal_id, application_id, owner_user_id):
-    proposal = ProposalRequest.query.filter_by(id=proposal_id).with_for_update().first()
-    if proposal is None:
-        raise ValueError("Propuesta no encontrada")
-    if (proposal.owner_user_id or proposal.cliente_id) != owner_user_id:
-        raise PermissionError("Solo el publicador puede gestionar postulaciones")
-    if proposal.estado == "CANCELADA":
-        raise ValueError("La propuesta esta cancelada")
+    try:
+        with db.session.no_autoflush:
+            proposal = ProposalRequest.query.filter_by(id=proposal_id).with_for_update().first()
+        if proposal is None:
+            raise ValueError("Propuesta no encontrada")
+        _require_single_hiring_mode(proposal)
+        if (proposal.owner_user_id or proposal.cliente_id) != owner_user_id:
+            raise PermissionError("Solo el publicador puede gestionar postulaciones")
 
-    application = ProposalApplication.query.filter_by(
-        id=application_id,
-        proposal_id=proposal.id,
-    ).first()
-    if application is None:
-        raise ValueError("Postulacion no encontrada")
+        application = ProposalApplication.query.filter_by(
+            id=application_id,
+            proposal_id=proposal.id,
+        ).first()
+        if application is None:
+            raise ValueError("Postulacion no encontrada")
 
-    application.estado = "ACEPTADA"
-    db.session.commit()
-    return application
+        if application.estado == "ACEPTADA":
+            contract_result = create_contract_from_proposal_application(application.id, actor_user_id=owner_user_id)
+            db.session.commit()
+            return ProposalAcceptanceResult(
+                application=application,
+                contract=contract_result.contract,
+                created=contract_result.created,
+                state_changed=False,
+            )
+        if proposal.estado in ("CANCELADA", "CERRADA"):
+            raise ValueError("Esta propuesta ya no permite aceptar postulaciones")
+        if application.estado in ("DESCARTADA", "RECHAZADA"):
+            raise ValueError("No se puede aceptar una postulacion descartada")
+
+        application.estado = "ACEPTADA"
+        if proposal.hiring_mode == ProposalRequest.HIRING_MODE_SINGLE:
+            for other_application in proposal.applications:
+                if other_application.id != application.id and other_application.estado == "POSTULADA":
+                    other_application.estado = "DESCARTADA"
+            proposal.estado = "CERRADA"
+
+        contract_result = create_contract_from_proposal_application(application.id, actor_user_id=owner_user_id)
+        db.session.commit()
+        return ProposalAcceptanceResult(
+            application=application,
+            contract=contract_result.contract,
+            created=contract_result.created,
+            state_changed=True,
+        )
+    except IntegrityError:
+        db.session.rollback()
+        raise
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def discard_application(proposal_id, application_id, owner_user_id):

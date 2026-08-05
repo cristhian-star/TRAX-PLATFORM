@@ -1,5 +1,146 @@
 # CHANGELOG TRAX
 
+## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (cierre aprobado)
+
+Estado: la auditoría independiente de integración fue aprobada. Sprint 7 está
+técnicamente cerrado y aprobado para PR hacia `develop`. Esta aprobación no
+autoriza publicación ni despliegue productivo.
+
+### Agregado
+
+- Se vincularon las reviews nuevas a un único `ContractRequest` confirmado.
+- Se agregó `create_contract_review()` como operación cerrada, atómica e idempotente.
+- Se agregó `ReputationEvent` neutral con rating observado y `puntos = NULL`.
+- Se agregaron visibilidad pública separada, elegibilidad del rating y moderación cerrada.
+- Se agregó la migración Alembic `20260726_06` con constraints y triggers físicos para reviews y reputación.
+- Se agregó `20260726_07` como head para exigir discriminadores explícitos,
+  reparar ownership profesional legacy y preservar `_06` sin reescribirla.
+- Se agregaron gates PostgreSQL para concurrencia, rutas, CSRF, privacidad, moderación y rollback.
+
+### Mejorado
+
+- El perfil público consume exclusivamente `comment_public` y métricas neutrales reconstruibles.
+- Las reviews contractuales y legacy verificadas se distinguen explícitamente.
+- La lectura de comentarios originales pendientes exige `SUPER_ADMIN` activo también dentro del servicio.
+- PostgreSQL y SQLite impiden nuevas filas reputacionales con puntos, preservando las filas históricas existentes.
+
+### Corregido
+
+- Se bloqueó con `410` la ruta legacy de creación de reviews.
+- Se retiró `add_reputation_event()` como API pública y no quedan callers productivos.
+- Se eliminó la presentación pública del score histórico como reputación contractual.
+- Se verificó que el flujo nuevo no crea `ContractEvent` ni puntos arbitrarios.
+- Se cerró el bypass de `NULL`/orígenes desconocidos en `Review` y
+  `ReputationEvent` mediante checks requeridos y triggers `v2` de inserción
+  y actualización en PostgreSQL y SQLite.
+- Las métricas admiten sólo `CONTRACTUAL` y `LEGACY` verificada; ningún
+  origen nulo o desconocido se interpreta como legacy.
+- El seed de desarrollo dejó de fabricar eventos reputacionales legacy con puntos.
+- `20260726_06` conserva su clasificación histórica mediante un snapshot
+  migratorio versionado y autocontenido. No es una API productiva: su
+  aislamiento es un contrato arquitectónico verificado por dependencias, no
+  una frontera contra imports de Python arbitrarios. El adaptador vigente
+  exige ambos IDs de ownership y falla ante payloads incompletos.
+  `20260726_07` usa exclusivamente esa API fail-closed y es el
+  único estado operativo soportado. Un downgrade a `_06`
+  reinstala defensas históricas más débiles y no equivale a `_07` para
+  operación normal.
+
+### Validación
+
+- Auditoría independiente de integración: aprobada.
+- Hallazgos abiertos: P0/P1/P2 ninguno. P3 no bloqueante: contraseña demo
+  predecible pendiente de endurecimiento futuro.
+- PostgreSQL 16.14, Alembic `20260726_07`: 59/59 pruebas finales aprobadas.
+- Gate contractual 8/8; negociación 8/8; reviews 10/10; rutas/moderación 8/8; migración parcial 21/21; legacy 4/4.
+- Suite Sprint 7 con PostgreSQL habilitado: 165 ejecutadas, 164 aprobadas y 1 omisión deliberada; cero fallos.
+- Suite completa con PostgreSQL habilitado: 266 ejecutadas, 265 aprobadas y la misma omisión deliberada; cero fallos.
+- Los warnings por `Query.get()` y `datetime.utcnow()` quedan como deuda no bloqueante.
+- `20260726_07` es el único estado operativo soportado. Un downgrade a `_06`
+  restaura defensas históricas más débiles.
+
+## 2026-07-26 - Sprint 7 Contracting Core Fase 2A
+
+### Agregado
+
+- Se agrego `OperationCommand` como fuente canonica de idempotencia para comandos contractuales sensibles.
+- Se agregaron `contracting_mode = EXTERNAL` y `version` a `ContractRequest`.
+- Se agregaron secuencia, correlacion, causacion e idempotencia a `ContractEvent`.
+- Se agrego correlacion estructurada a `AuditLog` y `ActivityNotification`.
+- Se agrego la migracion Alembic `20260726_02_sprint7_contracting_foundations`.
+- Se agrego la migracion Alembic `20260726_03_sprint7_single_hiring_mode`.
+- Se agregaron pruebas de estados, ownership, idempotencia, rollback y
+  constraints; la validacion de locks reales queda pendiente de PostgreSQL.
+- Se agrego un gate PostgreSQL E2E explicito para carreras de comandos,
+  transiciones y creaciones derivadas con dos sesiones independientes.
+- Se agregaron pruebas integradas de reparacion y bloqueo de esquemas parciales
+  de `operation_commands`.
+- Se valido el gate contra PostgreSQL 16: 8 escenarios E2E, 4 pruebas
+  legacy y 21 escenarios de migracion parcial aprobados sin omisiones.
+- Se agregaron pruebas negativas para impedir la fabricacion externa de
+  eventos contractuales y para validar o reparar el generador PostgreSQL de
+  `operation_commands.id`.
+
+### Mejorado
+
+- `CONFIRMADA` es el unico estado terminal exitoso para contratos nuevos.
+- `CERRADA` contractual se migra a `CONFIRMADA` y deja de ser un estado valido de escritura.
+- Las transiciones contractuales usan operaciones explicitas, lock pesimista y version esperada.
+- Evento, auditoria, notificacion interna y resultado idempotente se confirman en una unica transaccion.
+- Las notificaciones contractuales obligatorias quedan listas para una futura outbox sin implementar canales externos.
+- La creacion derivada de contratos conserva correlacion comun entre eventos, auditoria y notificaciones.
+- Las creaciones derivadas autorizan al actor owner antes del replay y recuperan
+  colisiones unicas mediante savepoint sin commits internos.
+- `hiring_mode = MULTIPLE` queda bloqueado tambien por constraint hasta Fase 2C.
+- La migracion ya no considera completa una `operation_commands` solo porque
+  exista la tabla: valida estructura, datos, constraints e indices antes de
+  reparar.
+- El preflight PostgreSQL valida identity/default, ownership y permisos de la
+  secuencia de `operation_commands.id`; sincroniza el generador por encima de
+  `MAX(id)` o bloquea antes de otras mutaciones si no puede repararlo.
+- La validacion del generador incluye incremento ascendente, `NO CYCLE`,
+  limites compatibles con `INTEGER`, siguiente valor efectivo y ausencia de
+  consumidores compartidos. Las secuencias propias reparables se normalizan a
+  incremento 1 y se reinician en `MAX(id) + 1`.
+- Las secuencias creadas por la migracion quedan marcadas; el downgrade
+  preserva secuencias preexistentes o ajenas.
+
+### Corregido
+
+- Se retiro el mutador generico `update_contract_status`.
+- Se elimino la transicion posterior `CONFIRMADA -> CERRADA`.
+- Los servicios validan rol y ownership sin depender exclusivamente de las rutas.
+- Los actores ausentes, inexistentes, suspendidos, inactivos, con rol incorrecto
+  o sin ownership no pueden crear ni consultar por replay un contrato derivado.
+- Se elimino la API generica publica `create_contract_event`: los eventos
+  iniciales de presupuesto y propuesta solo se emiten dentro de sus operaciones
+  cerradas, junto con auditoria y notificacion correlacionadas.
+
+## 2026-07-26 - Sprint 7 Contracting Core Fase 1
+
+### Agregado
+
+- Se agrego `ContractEvent` como historial de dominio para contrataciones.
+- Se agrego `contracting_core_service.py` como puerta central para crear contratos desde presupuestos y propuestas.
+- Se agrego trazabilidad de origen en `ContractRequest` para `DIRECT`, `BUDGET` y `PROPOSAL`.
+- Se agrego migracion Alembic `20260726_01_sprint7_contracting_core`.
+- Se agregaron pruebas de contratacion directa, presupuesto a contrato y propuesta a contrato.
+
+### Mejorado
+
+- Una `BudgetOffer` adjudicada crea un `ContractRequest` canonico en estado `CREADA`.
+- Una `ProposalApplication` aceptada crea un `ContractRequest` canonico en estado `CREADA`.
+- Las creaciones derivadas son idempotentes y conservan referencias a la entidad origen.
+- Los reintentos de adjudicacion o aceptacion no duplican eventos, auditorias ni notificaciones.
+- Las propuestas usan `hiring_mode = SINGLE` por defecto: la primera postulacion aceptada cierra la propuesta y descarta otras activas.
+- La migracion incorpora checks de consistencia de origen y bloqueo seguro de downgrade si ya existe trazabilidad contractual.
+- Las transiciones de contrato generan eventos de dominio.
+
+### Corregido
+
+- Se corrigio el contrato de estados de `BudgetRequest` para incluir `CANCELADA` y estados canonicos de publicacion.
+- Se normaliza el estado legacy `CERRADO` de presupuestos a `CERRADA`.
+
 ## 2026-07-24 - UX/UI General & Design System v2
 
 ### Agregado

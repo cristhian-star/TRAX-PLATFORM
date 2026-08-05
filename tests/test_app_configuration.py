@@ -30,7 +30,7 @@ class AppConfigurationTest(unittest.TestCase):
 
         self.assertIn("desarrollo", str(context.exception))
 
-    def test_dev_routes_are_registered_only_in_development(self):
+    def test_dev_routes_are_registered_in_development_and_testing(self):
         with patch.dict(
             os.environ,
             {"APP_ENV": "development", "SECRET_KEY": "dev", "DATABASE_URL": "sqlite:///:memory:"},
@@ -46,7 +46,24 @@ class AppConfigurationTest(unittest.TestCase):
             testing_app = create_app()
 
         self.assertIn("dev", development_app.blueprints)
-        self.assertNotIn("dev", testing_app.blueprints)
+        self.assertIn("dev", testing_app.blueprints)
+        self.assertEqual(testing_app.test_client().get("/dev/qa").status_code, 404)
+
+    def test_production_never_registers_qa_routes(self):
+        with patch.dict(
+            os.environ,
+            {
+                "APP_ENV": "production",
+                "SECRET_KEY": "production-secret-not-for-development",
+                "DATABASE_URL": "sqlite:///:memory:",
+                "ENABLE_DEV_QA_PANEL": "true",
+            },
+            clear=True,
+        ):
+            production_app = create_app()
+
+        self.assertNotIn("dev", production_app.blueprints)
+        self.assertEqual(production_app.test_client().get("/dev/qa").status_code, 404)
 
     def test_create_all_requires_allowed_environment(self):
         with patch.dict(

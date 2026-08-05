@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container contract-review-screen">
+    <span class="kicker">Review contractual</span>
+    <h2>Calificar trabajo realizado</h2>
+    <p>
+        Tu evaluación quedará vinculada a este trabajo confirmado.
+        Las partes definen las condiciones; TRAX registra la evaluación y aporta trazabilidad.
+    </p>
+
+    {% if error_message %}
+        <p role="alert">{{ error_message }}</p>
+    {% endif %}
+
+    <form action="/contratacion/{{ contract.id }}/review" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
+
+        <label for="rating">Calificación</label>
+        <select id="rating" name="rating" required>
+            <option value="">Seleccionar</option>
+            {% for value in range(1, 6) %}
+                <option value="{{ value }}"{% if submitted_rating|string == value|string %} selected{% endif %}>
+                    {{ value }} de 5
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="comment">Comentario opcional</label>
+        <textarea id="comment" name="comment" rows="5">{{ submitted_comment or "" }}</textarea>
+
+        <button type="submit">Publicar evaluación</button>
+        <a href="/contratacion/{{ contract.id }}">Volver al contrato</a>
+    </form>
+</section>
+{% endblock %}

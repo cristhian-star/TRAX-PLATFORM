@@ -58,7 +58,7 @@
                             <a class="budget-button budget-button--primary budget-card__cta" href="/presupuestos/{{ item.id }}">
                                 Ver detalle
                             </a>
-                            {% if item.estado in ("ABIERTO", "COTIZANDO", "CERRADO") %}
+                            {% if item.estado in ("ABIERTO", "PUBLICADA", "COTIZANDO", "CERRADA") %}
                                 <form action="/presupuestos/{{ item.id }}/cancelar" method="POST" onsubmit="return confirm('&iquest;Seguro que quer&eacute;s cancelar esta solicitud? Los profesionales ya no podr&aacute;n enviar presupuestos.');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button class="budget-button budget-button--secondary budget-card__cta" type="submit">

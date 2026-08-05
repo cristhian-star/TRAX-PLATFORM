@@ -2,6 +2,10 @@
 
 ## Alta prioridad
 
+- Diseñar en una fase futura `hiring_mode = MULTIPLE`; Sprint 7 conserva exclusivamente `SINGLE`.
+- Diseñar en una fase futura cancelaciones consensuadas y correcciones ampliadas sin alterar el cierre exitoso `CONFIRMADA`.
+- Definir, mediante decisión de producto futura, si TRAX necesita badges plata/oro o una proyección propietaria; no forman parte de la reputación neutral.
+- Diseñar hitos, evidencias, disputas y modificaciones de contrato sin implementar pagos todavia.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
 - Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
 - Revisar politicas legales con profesional: terminos, privacidad, cookies y consentimientos.
@@ -12,6 +16,8 @@
 
 ## Media prioridad
 
+- Implementar oferta profesional como segundo tipo de publicacion de propuestas.
+- Preparar facturacion TRAX Pro sobre el nucleo de contratacion sin integrar ARCA hasta aprobacion funcional.
 - Migrar navbar completo a Design System v2 en un sprint especifico sin cambiar rutas ni comportamiento.
 - Migrar Home, Resultados y Perfil Profesional completo a Design System v2 con validacion visual dedicada.
 - Migrar Dashboards, Presupuestos, Propuestas, Emergencias, Admin y tablas a componentes `.trax-*` por fases.
@@ -21,6 +27,10 @@
 - Revisar uso del servidor Flask de desarrollo dentro de Docker y separar perfil local de perfil productivo.
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
+- Auditar la lectura administrativa de comentarios originales con un evento de acceso si el volumen y la política de privacidad lo requieren.
+- Reemplazar los lectores históricos de puntos usados por elegibilidad PRO cuando producto apruebe una política neutral sustituta.
+- Evaluar una outbox transaccional cuando se habilite el primer canal externo; `INTERNAL` permanece sin dispatcher.
+- Definir politica de retencion y limpieza de `OperationCommand` sin perder capacidad de auditoria.
 - Agregar `source` explicito al modelo de consentimientos si producto requiere trazabilidad separada del contexto tecnico.
 - Incorporar escaneo automatizado de dependencias y secretos en CI.
 - Evaluar Redis futuro para rate limiting, cache o colas cuando el volumen lo justifique.

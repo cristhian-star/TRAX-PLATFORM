@@ -115,7 +115,7 @@ def build_budget_offer_data(offer):
 
 def build_client_budget_request_rows(user_id, status_filter):
     statuses_by_filter = {
-        "activas": ("ABIERTO", "COTIZANDO"),
+        "activas": ("ABIERTO", "PUBLICADA", "COTIZANDO"),
         "adjudicadas": ("ADJUDICADA",),
         "canceladas": ("CANCELADA",),
         "todas": None,

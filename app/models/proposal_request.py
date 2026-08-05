@@ -5,6 +5,18 @@ from app import db
 
 class ProposalRequest(db.Model):
     __tablename__ = "proposal_requests"
+    __table_args__ = (
+        db.CheckConstraint(
+            "hiring_mode = 'SINGLE'",
+            name="ck_proposal_requests_hiring_mode_single_phase2a",
+        ),
+    )
+
+    HIRING_MODE_SINGLE = "SINGLE"
+
+    HIRING_MODES = (
+        HIRING_MODE_SINGLE,
+    )
 
     ESTADOS = (
         "PUBLICADA",
@@ -28,6 +40,7 @@ class ProposalRequest(db.Model):
     fecha_inicio_estimada = db.Column(db.Date)
     fecha_limite_postulacion = db.Column(db.Date)
     fecha_limite = db.Column(db.DateTime)
+    hiring_mode = db.Column(db.String(20), nullable=False, default=HIRING_MODE_SINGLE)
     estado = db.Column(db.String(50), nullable=False, default="PUBLICADA")
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

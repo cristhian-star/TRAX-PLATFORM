@@ -1,3 +1,5 @@
+import secrets
+
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 
 from app import db, limiter
@@ -13,20 +15,38 @@ from app.services.budget_service import (
     get_offer_allowance,
 )
 from app.services.contract_service import (
-    audit_contract_action,
+    ContractConflictError,
     accept_contract,
     cancel_contract,
-    complete_contract,
-    confirm_contract,
+    confirm_completion,
     create_contract,
+    declare_work_completed,
     get_contract_detail_context,
     get_contract_or_error,
-    require_assigned_professional,
-    require_client_owner,
+    require_idempotency_key,
     reject_contract,
     start_contract,
 )
+from app.services.contract_review_service import (
+    ContractReviewConflictError,
+    ContractReviewIdempotencyConflictError,
+    ContractReviewIntegrityError,
+    create_contract_review,
+)
 from app.services.emergency_service import create_emergency_request
+from app.services.negotiation_service import (
+    NegotiationConflictError,
+    accept_negotiation_terms,
+    cancel_negotiation,
+    finalize_negotiation_contract,
+    get_negotiation_for_actor,
+    initiate_direct_negotiation,
+    propose_negotiation_terms,
+    reject_negotiation,
+)
+from app.services.formal_negotiation_policy import (
+    require_formal_negotiation_eligibility,
+)
 from app.services.proposal_service import (
     accept_application,
     apply_to_proposal,
@@ -39,12 +59,10 @@ from app.services.professional_service import (
     get_professional_by_id,
 )
 from app.services.operation_notification_service import (
-    notify_budget_awarded,
     notify_budget_cancelled,
     notify_budget_created,
     notify_budget_offer_created,
     notify_emergency_created,
-    notify_proposal_accepted,
     notify_proposal_application_created,
     notify_proposal_cancelled,
     notify_proposal_created,
@@ -94,10 +112,248 @@ def _load_contract_or_404(contract_id):
         abort(404)
 
 
+def _contract_command_args():
+    expected_version = request.form.get("expected_version")
+    try:
+        parsed_version = int(expected_version) if expected_version not in (None, "") else None
+    except (TypeError, ValueError):
+        raise ContractConflictError("Version contractual invalida") from None
+    return {
+        "expected_version": parsed_version,
+        "idempotency_key": (
+            request.form.get("idempotency_key")
+            or request.headers.get("Idempotency-Key")
+        ),
+    }
+
+
+def _handle_contract_command(command):
+    try:
+        command()
+    except ContractConflictError as error:
+        return str(error), 409
+    except ValueError as error:
+        return str(error), 400
+    except PermissionError:
+        abort(403)
+    except LookupError:
+        abort(404)
+    return None
+
+
+def _negotiation_command_args():
+    try:
+        expected_version = int(request.form.get("expected_version"))
+    except (TypeError, ValueError):
+        raise NegotiationConflictError(
+            "Version de negociacion invalida"
+        ) from None
+    return {
+        "expected_version": expected_version,
+        "idempotency_key": (
+            request.form.get("idempotency_key")
+            or request.headers.get("Idempotency-Key")
+        ),
+    }
+
+
+def _handle_negotiation_command(command):
+    try:
+        return command(), None
+    except NegotiationConflictError as error:
+        return None, (str(error), 409)
+    except ValueError as error:
+        return None, (str(error), 400)
+    except PermissionError:
+        abort(403)
+    except LookupError:
+        abort(404)
+
+
+@operations.route("/negociacion/nueva", methods=["GET", "POST"])
+@login_required
+def nueva_negociacion_directa():
+    raw_professional_id = (
+        request.form.get("professional_id")
+        if request.method == "POST"
+        else request.args.get("professional_id")
+    )
+    try:
+        professional_id = int(raw_professional_id)
+    except (TypeError, ValueError):
+        return "ID de profesional invalido", 400
+    professional = get_professional_by_id(professional_id)
+    if professional is None:
+        abort(404)
+    try:
+        require_formal_negotiation_eligibility(
+            session["user_id"],
+            professional,
+        )
+    except PermissionError:
+        abort(403)
+
+    if request.method == "POST":
+        negotiation, error = _handle_negotiation_command(
+            lambda: initiate_direct_negotiation(
+                cliente_id=session["user_id"],
+                professional_id=professional_id,
+                servicio=request.form.get("servicio"),
+                description=request.form.get("description"),
+                scope=request.form.get("scope"),
+                external_price=request.form.get("external_price"),
+                estimated_start_at=parse_datetime(
+                    request.form.get("estimated_start_at")
+                ),
+                estimated_end_at=parse_datetime(
+                    request.form.get("estimated_end_at")
+                ),
+                observations=empty_to_none(
+                    request.form.get("observations")
+                ),
+                actor_user_id=session["user_id"],
+                idempotency_key=(
+                    request.form.get("idempotency_key")
+                    or request.headers.get("Idempotency-Key")
+                ),
+            )
+        )
+        if error:
+            return error
+        return redirect(f"/negociacion/{negotiation.id}")
+
+    return render_template(
+        "negotiation_start.html",
+        idempotency_key=secrets.token_urlsafe(24),
+        professional=professional,
+    )
+
+
+@operations.route("/negociacion/<int:id>")
+@login_required
+def negotiation_detail(id):
+    try:
+        context = get_negotiation_for_actor(
+            id,
+            actor_user_id=session["user_id"],
+        )
+    except PermissionError:
+        abort(403)
+    except LookupError:
+        abort(404)
+    return render_template(
+        "negotiation_detail.html",
+        **context,
+        command_keys={
+            "propose": secrets.token_urlsafe(24),
+            "accept": secrets.token_urlsafe(24),
+            "cancel": secrets.token_urlsafe(24),
+            "reject": secrets.token_urlsafe(24),
+            "finalize": secrets.token_urlsafe(24),
+        },
+    )
+
+
+@operations.route("/negociacion/<int:id>/proponer", methods=["POST"])
+@login_required
+def proponer_terminos_negociacion(id):
+    negotiation, error = _handle_negotiation_command(
+        lambda: propose_negotiation_terms(
+            id,
+            description=request.form.get("description"),
+            scope=request.form.get("scope"),
+            external_price=request.form.get("external_price"),
+            estimated_start_at=parse_datetime(
+                request.form.get("estimated_start_at")
+            ),
+            estimated_end_at=parse_datetime(
+                request.form.get("estimated_end_at")
+            ),
+            observations=empty_to_none(request.form.get("observations")),
+            actor_user_id=session["user_id"],
+            **_negotiation_command_args(),
+        )
+    )
+    if error:
+        return error
+    return redirect(f"/negociacion/{negotiation.id}")
+
+
+@operations.route("/negociacion/<int:id>/aceptar", methods=["POST"])
+@login_required
+def aceptar_terminos_negociacion(id):
+    negotiation, error = _handle_negotiation_command(
+        lambda: accept_negotiation_terms(
+            id,
+            actor_user_id=session["user_id"],
+            terms_version=request.form.get("terms_version"),
+            **_negotiation_command_args(),
+        )
+    )
+    if error:
+        return error
+    return redirect(f"/negociacion/{negotiation.id}")
+
+
+@operations.route("/negociacion/<int:id>/cancelar", methods=["POST"])
+@login_required
+def cancelar_negociacion_directa(id):
+    negotiation, error = _handle_negotiation_command(
+        lambda: cancel_negotiation(
+            id,
+            actor_user_id=session["user_id"],
+            **_negotiation_command_args(),
+        )
+    )
+    if error:
+        return error
+    return redirect(f"/negociacion/{negotiation.id}")
+
+
+@operations.route("/negociacion/<int:id>/rechazar", methods=["POST"])
+@login_required
+def rechazar_negociacion_directa(id):
+    negotiation, error = _handle_negotiation_command(
+        lambda: reject_negotiation(
+            id,
+            actor_user_id=session["user_id"],
+            **_negotiation_command_args(),
+        )
+    )
+    if error:
+        return error
+    return redirect(f"/negociacion/{negotiation.id}")
+
+
+@operations.route("/negociacion/<int:id>/crear-contrato", methods=["POST"])
+@login_required
+def crear_contrato_desde_negociacion(id):
+    contract, error = _handle_negotiation_command(
+        lambda: finalize_negotiation_contract(
+            id,
+            actor_user_id=session["user_id"],
+            terms_version=request.form.get("terms_version"),
+            **_negotiation_command_args(),
+        )
+    )
+    if error:
+        return error
+    return redirect(f"/contratacion/{contract.id}")
+
+
 @operations.route("/contratacion/nueva", methods=["GET", "POST"])
 @login_required
 def nueva_contratacion():
     if request.method == "POST":
+        idempotency_key = (
+            request.form.get("idempotency_key")
+            or request.headers.get("Idempotency-Key")
+        )
+        try:
+            idempotency_key = require_idempotency_key(idempotency_key)
+        except ValueError as error:
+            return str(error), 400
+
         professional_id_raw = request.form.get("professional_id")
 
         try:
@@ -116,20 +372,32 @@ def nueva_contratacion():
         if professional.user_id == session["user_id"]:
             return "No podes contratar tu propio perfil", 400
 
-        contract = create_contract(
-            cliente_id=session["user_id"],
-            professional_id=professional.id,
-            professional_user_id=professional.user_id,
-            servicio=request.form.get("servicio"),
-            descripcion=empty_to_none(request.form.get("descripcion")),
-            precio_acordado=empty_to_none(request.form.get("precio_acordado")),
-            fecha_inicio=parse_datetime(request.form.get("fecha_inicio")),
-            fecha_fin=parse_datetime(request.form.get("fecha_fin"))
-        )
+        try:
+            contract = create_contract(
+                cliente_id=session["user_id"],
+                professional_id=professional.id,
+                professional_user_id=professional.user_id,
+                servicio=request.form.get("servicio"),
+                descripcion=empty_to_none(request.form.get("descripcion")),
+                precio_acordado=empty_to_none(request.form.get("precio_acordado")),
+                fecha_inicio=parse_datetime(request.form.get("fecha_inicio")),
+                fecha_fin=parse_datetime(request.form.get("fecha_fin")),
+                actor_user_id=session["user_id"],
+                idempotency_key=idempotency_key,
+            )
+        except ContractConflictError as error:
+            return str(error), 409
+        except ValueError as error:
+            return str(error), 400
+        except PermissionError:
+            abort(403)
 
         return redirect(f"/contratacion/{contract.id}")
 
-    return render_template("nueva_contratacion.html")
+    return render_template(
+        "nueva_contratacion.html",
+        idempotency_key=secrets.token_urlsafe(24),
+    )
 
 
 @operations.route("/contratacion/<int:id>")
@@ -144,29 +412,94 @@ def contract_detail(id):
     return render_template(
         "contract_detail.html",
         **context,
+        command_keys={
+            "accept": secrets.token_urlsafe(24),
+            "reject": secrets.token_urlsafe(24),
+            "start": secrets.token_urlsafe(24),
+            "complete": secrets.token_urlsafe(24),
+            "confirm": secrets.token_urlsafe(24),
+            "cancel": secrets.token_urlsafe(24),
+        },
     )
+
+
+@operations.route("/contratacion/<int:id>/review", methods=["GET", "POST"])
+@login_required
+@role_required("CLIENTE")
+def create_contractual_review(id):
+    contract = _load_contract_or_404(id)
+    try:
+        context = get_contract_detail_context(contract, session["user_id"])
+    except PermissionError:
+        abort(403)
+
+    if not context["is_client"]:
+        abort(403)
+    if contract.estado != "CONFIRMADA":
+        return "La contratacion debe estar CONFIRMADA", 400
+    if request.method == "GET" and context["contract_review"] is not None:
+        return "La contratacion ya tiene una review", 409
+
+    idempotency_key = (
+        request.form.get("idempotency_key")
+        if request.method == "POST"
+        else secrets.token_urlsafe(24)
+    )
+    error_message = None
+    status_code = 200
+
+    if request.method == "POST":
+        try:
+            rating = int(request.form.get("rating", ""))
+        except (TypeError, ValueError):
+            rating = request.form.get("rating")
+        try:
+            review = create_contract_review(
+                actor_user_id=session["user_id"],
+                contract_id=id,
+                rating=rating,
+                comment=request.form.get("comment"),
+                idempotency_key=idempotency_key,
+            )
+        except ContractReviewIdempotencyConflictError as error:
+            error_message, status_code = str(error), 409
+        except ContractReviewConflictError as error:
+            error_message, status_code = str(error), 409
+        except ContractReviewIntegrityError as error:
+            error_message, status_code = str(error), 409
+        except PermissionError:
+            abort(403)
+        except ValueError as error:
+            error_message, status_code = str(error), 400
+        else:
+            return redirect(
+                f"/profesional/{review.professional_id}#review-{review.id}"
+            )
+
+    return render_template(
+        "contract_review_form.html",
+        contract=contract,
+        professional_user=context["professional_user"],
+        idempotency_key=idempotency_key,
+        error_message=error_message,
+        submitted_rating=(
+            request.form.get("rating") if request.method == "POST" else None
+        ),
+        submitted_comment=(
+            request.form.get("comment") if request.method == "POST" else None
+        ),
+    ), status_code
 
 
 @operations.route("/contratacion/<int:id>/aceptar", methods=["POST"])
 @login_required
 @role_required("PROFESIONAL")
 def aceptar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_assigned_professional(contract, session["user_id"])
-        contract = accept_contract(id, session["user_id"])
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_ACCEPTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} aceptada.",
+    error = _handle_contract_command(
+        lambda: accept_contract(id, session["user_id"], **_contract_command_args())
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
@@ -174,22 +507,11 @@ def aceptar_contratacion(id):
 @login_required
 @role_required("PROFESIONAL")
 def rechazar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_assigned_professional(contract, session["user_id"])
-        contract = reject_contract(id, session["user_id"])
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_REJECTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} rechazada.",
+    error = _handle_contract_command(
+        lambda: reject_contract(id, session["user_id"], **_contract_command_args())
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
@@ -197,22 +519,15 @@ def rechazar_contratacion(id):
 @login_required
 @role_required("PROFESIONAL")
 def iniciar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_assigned_professional(contract, session["user_id"])
-        contract = start_contract(id)
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_STARTED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} iniciada.",
+    error = _handle_contract_command(
+        lambda: start_contract(
+            id,
+            actor_user_id=session["user_id"],
+            **_contract_command_args(),
+        )
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
@@ -220,66 +535,45 @@ def iniciar_contratacion(id):
 @login_required
 @role_required("PROFESIONAL")
 def completar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_assigned_professional(contract, session["user_id"])
-        contract = complete_contract(id)
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_COMPLETED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} completada.",
+    error = _handle_contract_command(
+        lambda: declare_work_completed(
+            id,
+            actor_user_id=session["user_id"],
+            **_contract_command_args(),
+        )
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
 @operations.route("/contratacion/<int:id>/confirmar", methods=["POST"])
 @login_required
 def confirmar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_client_owner(contract, session["user_id"])
-        contract = confirm_contract(id)
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_CONFIRMED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} confirmada por cliente.",
+    error = _handle_contract_command(
+        lambda: confirm_completion(
+            id,
+            actor_user_id=session["user_id"],
+            **_contract_command_args(),
+        )
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
 @operations.route("/contratacion/<int:id>/cancelar", methods=["POST"])
 @login_required
 def cancelar_contratacion(id):
-    contract = _load_contract_or_404(id)
-    try:
-        require_client_owner(contract, session["user_id"])
-        contract = cancel_contract(id)
-    except ValueError as error:
-        return str(error), 400
-    except PermissionError:
-        abort(403)
-    audit_contract_action(
-        "CONTRACT_CANCELLED",
-        contract,
-        session["user_id"],
-        ip_address=request.remote_addr,
-        user_agent=request.user_agent.string,
-        description=f"Contratacion #{id} cancelada por cliente.",
+    error = _handle_contract_command(
+        lambda: cancel_contract(
+            id,
+            actor_user_id=session["user_id"],
+            **_contract_command_args(),
+        )
     )
+    if error:
+        return error
     return redirect(f"/contratacion/{id}")
 
 
@@ -485,12 +779,11 @@ def ofertar_presupuesto(id):
 @login_required
 def adjudicar_presupuesto(id, presupuesto_id):
     try:
-        offer = award_budget_offer(
+        award_budget_offer(
             budget_request_id=id,
             offer_id=presupuesto_id,
             cliente_id=session["user_id"],
         )
-        notify_budget_awarded(offer)
     except PermissionError:
         abort(403)
     except ValueError as error:
@@ -722,8 +1015,7 @@ def postular_propuesta(id):
 @login_required
 def aceptar_postulacion(id, application_id):
     try:
-        application = accept_application(id, application_id, session["user_id"])
-        notify_proposal_accepted(application)
+        accept_application(id, application_id, session["user_id"])
     except PermissionError:
         abort(403)
     except ValueError as error:

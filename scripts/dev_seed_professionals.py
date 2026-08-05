@@ -165,6 +165,7 @@ def _upsert_user(data):
         user.rol = "PROFESIONAL"
         user.estado = "ACTIVO"
         user.motivo_estado = None
+        user.password = generate_password_hash(DEMO_PASSWORD)
 
     return user, created
 
@@ -188,6 +189,7 @@ def _upsert_demo_client():
         user.rol = "CLIENTE"
         user.estado = "ACTIVO"
         user.motivo_estado = None
+        user.password = generate_password_hash(DEMO_PASSWORD)
 
     return user, created
 
@@ -266,31 +268,33 @@ def _ensure_verification(verification_model, user_id, data):
     return False
 
 
-def _ensure_reputation_events(reputation_model, user_id, event_specs):
-    created = 0
-
-    for event_type, points, label in event_specs:
-        description = f"{DEMO_MARKER} {label}"
-        existing = reputation_model.query.filter_by(
+def _ensure_client_verification(verification_model, user_id):
+    approved = (
+        verification_model.query
+        .filter_by(
             user_id=user_id,
-            tipo_evento=event_type,
-            descripcion=description,
-        ).first()
-
-        if existing is not None:
-            continue
-
-        db.session.add(
-            reputation_model(
-                user_id=user_id,
-                tipo_evento=event_type,
-                puntos=points,
-                descripcion=description,
-            )
+            tipo_usuario="CLIENTE",
+            estado="APROBADO",
         )
-        created += 1
+        .order_by(verification_model.created_at.desc())
+        .first()
+    )
+    if approved is not None:
+        return False
 
-    return created
+    db.session.add(
+        verification_model(
+            user_id=user_id,
+            tipo_usuario="CLIENTE",
+            documento_identidad="DEV-CLIENT-IDENTITY",
+            estado="APROBADO",
+            observaciones=(
+                f"{DEMO_MARKER} Verificacion cliente aprobada para QA local."
+            ),
+            reviewed_at=datetime.now(timezone.utc),
+        )
+    )
+    return True
 
 
 def seed_professionals():
@@ -311,6 +315,14 @@ def seed_professionals():
         f"{'CREADO' if client_created else 'ACTUALIZADO'} "
         f"{demo_client.nombre} <{demo_client.email}>"
     )
+    verification_model = optional_models.get("verification")
+    if verification_model is not None:
+        summary["verifications_created"] += int(
+            _ensure_client_verification(
+                verification_model,
+                demo_client.id,
+            )
+        )
 
     for data in DEMO_PROFESSIONALS:
         user, user_created = _upsert_user(data)
@@ -331,14 +343,6 @@ def seed_professionals():
                 _ensure_verification(verification_model, user.id, data)
             )
 
-        reputation_model = optional_models.get("reputation")
-        if reputation_model is not None:
-            summary["reputation_events_created"] += _ensure_reputation_events(
-                reputation_model,
-                user.id,
-                data["reputation_events"],
-            )
-
         print(
             f"{'CREADO' if professional_created else 'ACTUALIZADO'} "
             f"{professional.nombre} <{user.email}>"
@@ -349,14 +353,15 @@ def seed_professionals():
 
 
 def main():
-    production_env = (
-        os.environ.get("FLASK_ENV") == "production"
-        or os.environ.get("APP_ENV") == "production"
-    )
-
-    if production_env and os.environ.get("ALLOW_DEV_SEED") != "1":
+    environment = (
+        os.environ.get("APP_ENV")
+        or os.environ.get("FLASK_ENV")
+        or os.environ.get("TRAX_ENV")
+        or "development"
+    ).strip().lower()
+    if environment in ("production", "prod"):
         raise SystemExit(
-            "Seed DEV bloqueado en produccion. Usa ALLOW_DEV_SEED=1 solo si es intencional."
+            "Seed QA bloqueado en produccion sin excepciones."
         )
 
     app = create_app()
