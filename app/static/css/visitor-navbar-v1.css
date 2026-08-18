@@ -17,6 +17,46 @@
 
 .site-header--visitor .brand {
     flex: 0 0 auto;
+    width: 200px;
+    height: 56px;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.site-header--visitor .brand-logo {
+    height: 56px;
+    object-position: center;
+}
+
+.site-header--visitor .brand-logo--light {
+    width: 200px;
+    object-fit: cover;
+}
+
+.site-header--visitor .brand-logo--dark {
+    width: 200px;
+    object-fit: cover;
+}
+
+.site-header--visitor .brand-logo--dark,
+.site-header--visitor .brand-symbol {
+    display: none;
+}
+
+.theme-light .site-header--visitor .brand-logo--light {
+    display: block;
+}
+
+.theme-light .site-header--visitor .brand-logo--dark {
+    display: none;
+}
+
+.theme-dark .site-header--visitor .brand-logo--light {
+    display: none;
+}
+
+.theme-dark .site-header--visitor .brand-logo--dark {
+    display: block;
 }
 
 .header-utilities {
@@ -260,7 +300,24 @@
     }
 
     .site-header--visitor .brand {
+        width: 44px;
+        height: 44px;
         min-width: 0;
+        overflow: hidden;
+    }
+
+    .site-header--visitor .brand-logo,
+    .theme-dark .site-header--visitor .brand-logo {
+        display: none;
+    }
+
+    .site-header--visitor .brand-symbol,
+    .theme-dark .site-header--visitor .brand-symbol {
+        display: block;
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+        transform: scale(1.65);
     }
 
     .site-header--visitor .menu-toggle {

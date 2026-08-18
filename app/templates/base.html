@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANDOBRA Marketplace</title>
-    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/branding/mandobra/mandobra-symbol-compact.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system-v2.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -27,8 +27,9 @@
 <body>
     <header class="site-header site-header--visitor">
         <a class="brand" href="/" aria-label="MANDOBRA inicio">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MANDOBRA Logo">
-            <span>MANDOBRA</span>
+            <img class="brand-logo brand-logo--light" src="{{ url_for('static', filename='img/branding/mandobra/ahora_si2.png') }}" alt="" aria-hidden="true">
+            <img class="brand-logo brand-logo--dark" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-on-dark.png') }}" alt="" aria-hidden="true">
+            <img class="brand-symbol" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-symbol-compact.png') }}" alt="" aria-hidden="true">
         </a>
 
         <button
