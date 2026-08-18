@@ -7,7 +7,7 @@
 {% block content %}
 
 {% set user_role = session.get("user_role", "CLIENTE") %}
-{% set user_name = session.get("user_name", "Usuario TRAX") %}
+{% set user_name = session.get("user_name", "Usuario MANDOBRA") %}
 {% if user_role == "SUPER_ADMIN" %}
     {% set dashboard_url = "/admin/dashboard" %}
 {% elif user_role == "PROFESIONAL" %}
@@ -65,9 +65,9 @@
         <section class="logged-dark-center" aria-label="Resumen operativo">
             <article class="logged-dark-card logged-summary">
                 <div>
-                    <span class="logged-kicker">TRAX privado</span>
+                    <span class="logged-kicker">MANDOBRA privado</span>
                     <h2>Hola, {{ user_name }}.</h2>
-                    <p>Aca tenes un resumen de tu actividad y los accesos principales para operar dentro de TRAX.</p>
+                    <p>Aca tenes un resumen de tu actividad y los accesos principales para operar dentro de MANDOBRA.</p>
                 </div>
                 <div class="logged-summary__stats">
                     <article>
@@ -129,7 +129,7 @@
                     </div>
                 </div>
                 <div class="logged-activity__list">
-                    <p><strong>Nuevo mensaje recibido</strong><span>Consulta sobre trabajo TRAX-2591</span><time>Hace 10 min</time></p>
+                    <p><strong>Nuevo mensaje recibido</strong><span>Consulta sobre trabajo MANDOBRA-2591</span><time>Hace 10 min</time></p>
                     <p><strong>Tu propuesta fue vista</strong><span>Instalacion electrica comercial</span><time>Hace 35 min</time></p>
                     <p><strong>Nueva resena recibida</strong><span>Calificacion positiva en tu perfil</span><time>Hace 1 h</time></p>
                     <p><strong>Trabajo completado</strong><span>Solicitud marcada como finalizada</span><time>Hace 3 h</time></p>

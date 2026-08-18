@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% set client_name = current_user.nombre if current_user else session.get("user_name", "Cliente TRAX") %}
+{% set client_name = current_user.nombre if current_user else session.get("user_name", "Cliente MANDOBRA") %}
 {% set account_status = current_user.estado if current_user else "ACTIVO" %}
 
 <main class="client-dashboard">
@@ -27,7 +27,7 @@
             <aside class="client-dashboard__status-card" aria-label="Estado de cuenta cliente">
                 <span class="client-dashboard__status-label">Estado de la cuenta</span>
                 <h2>{{ account_status|replace("_", " ")|title }}</h2>
-                <p>Cuenta lista para publicar solicitudes y comparar profesionales en TRAX.</p>
+                <p>Cuenta lista para publicar solicitudes y comparar profesionales en MANDOBRA.</p>
                 <dl class="client-dashboard__status-stats">
                     <div>
                         <dt>Ultimo acceso</dt>
@@ -191,7 +191,7 @@
                     <div class="client-dashboard__contact-list">
                         {% for contact in whatsapp_contact_sessions %}
                             <div>
-                                <strong>{{ contact.professional.nombre if contact.professional else "Profesional TRAX" }}</strong>
+                                <strong>{{ contact.professional.nombre if contact.professional else "Profesional MANDOBRA" }}</strong>
                                 <span>{{ contact.operation_type|replace("_", " ")|title }}</span>
                                 <small>{{ format_dashboard_date(contact.initiated_at) }} - {{ contact.status|replace("_", " ")|title }}</small>
                             </div>
@@ -200,7 +200,7 @@
                 {% else %}
                     <div class="client-dashboard__placeholder">
                         <strong>Todavia no iniciaste contactos por WhatsApp.</strong>
-                        <span>Cuando abras una conversacion desde TRAX, quedara registrada aca.</span>
+                        <span>Cuando abras una conversacion desde MANDOBRA, quedara registrada aca.</span>
                     </div>
                 {% endif %}
             </article>

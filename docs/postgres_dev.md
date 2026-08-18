@@ -6,7 +6,7 @@ Este entorno incorpora PostgreSQL para desarrollo en Docker. No migra los datos 
 
 ## Base usada segun entorno
 
-- Fuera de Docker, si `DATABASE_URL` no esta definida, TRAX mantiene SQLite en `instance/trax.db`.
+- Fuera de Docker, si `DATABASE_URL` no esta definida, MANDOBRA mantiene SQLite en `instance/trax.db`.
 - Dentro de Docker Compose, `trax-web` recibe `DATABASE_URL=postgresql+psycopg2://trax_user:trax_password@postgres:5432/trax_db` y utiliza PostgreSQL.
 - El volumen SQLite existente `trax_instance` se conserva, pero no recibe nuevos datos mientras la web use PostgreSQL.
 - PostgreSQL persiste datos DEV en el volumen `trax_postgres_data`.
@@ -48,7 +48,7 @@ docker compose exec trax-web alembic history
 
 ## Volver a SQLite local
 
-Para ejecutar TRAX localmente con SQLite, no definir `DATABASE_URL` y usar el entorno Python local:
+Para ejecutar MANDOBRA localmente con SQLite, no definir `DATABASE_URL` y usar el entorno Python local:
 
 ```powershell
 Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
@@ -60,7 +60,7 @@ La aplicacion volvera a leer `instance/trax.db`. En caso de necesitar restaurar 
 ## Gate PostgreSQL obligatorio de Contracting Core
 
 La concurrencia real de Sprint 7 se valida en una base exclusivamente
-descartable. La suite aplica `alembic upgrade head` y trunca las tablas TRAX
+descartable. La suite aplica `alembic upgrade head` y trunca las tablas MANDOBRA
 entre casos, por lo que nunca debe apuntarse a una base compartida:
 
 ```powershell

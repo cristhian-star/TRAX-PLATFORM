@@ -268,7 +268,7 @@ class ContractReviewRoutesUiModerationTest(unittest.TestCase):
         self.assertNotIn("ORIGINAL_PRIVATE_MARKER", body)
         self.assertNotIn("LEGACY_ORIGINAL_PRIVATE", body)
         self.assertNotIn("EXCLUDED_PUBLIC_MARKER", body)
-        self.assertNotIn("Reputacion TRAX", body)
+        self.assertNotIn("Reputacion MANDOBRA", body)
         with self.app.app_context():
             metrics = get_professional_reputation_metrics(self.profile_id)
             self.assertEqual(metrics.eligible_rating_count, 2)

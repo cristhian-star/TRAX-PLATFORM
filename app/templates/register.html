@@ -9,7 +9,7 @@
 <main class="trax-page auth-page auth-page--register">
     <section class="trax-container auth-shell" aria-labelledby="register-title">
         <div class="trax-card trax-card--elevated auth-panel auth-panel--story">
-            <p class="auth-eyebrow">Nueva cuenta TRAX</p>
+            <p class="auth-eyebrow">Nueva cuenta MANDOBRA</p>
             <h1 id="register-title">Empezá simple. Completá lo importante después.</h1>
             <p class="auth-lead" data-role-copy>
                 Creá tu cuenta para publicar solicitudes, comparar profesionales y operar con más orden.
@@ -32,7 +32,7 @@
 
             <div class="trax-card__header auth-card__head">
                 <p>Crear cuenta</p>
-                <h2>Sumate a TRAX</h2>
+                <h2>Sumate a MANDOBRA</h2>
             </div>
 
             {% if error %}
@@ -52,7 +52,7 @@
                     required
                     aria-describedby="register-name-help{% if errors and errors.nombre %} register-name-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.nombre else 'false' }}">
-                <small class="trax-field__help" id="register-name-help">Como querés que te identifiquemos dentro de TRAX.</small>
+                <small class="trax-field__help" id="register-name-help">Como querés que te identifiquemos dentro de MANDOBRA.</small>
                 {% if errors and errors.nombre %}
                     <p class="trax-field__error auth-field-error" id="register-name-error">{{ errors.nombre }}</p>
                 {% endif %}
@@ -163,7 +163,7 @@
                     {% if form_values and form_values.terms_accepted %}checked{% endif %}
                     aria-describedby="register-terms-help{% if errors and errors.terms_accepted %} register-terms-error{% endif %}"
                     aria-invalid="{{ 'true' if errors and errors.terms_accepted else 'false' }}">
-                <span>Acepto los términos y la política de privacidad de TRAX.</span>
+                <span>Acepto los términos y la política de privacidad de MANDOBRA.</span>
             </label>
             <small class="trax-field__help auth-terms-help" id="register-terms-help">Registramos esta aceptación para trazabilidad de cumplimiento.</small>
             {% if errors and errors.terms_accepted %}

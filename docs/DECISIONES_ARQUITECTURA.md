@@ -1,4 +1,4 @@
-# DECISIONES DE ARQUITECTURA TRAX
+# DECISIONES DE ARQUITECTURA MANDOBRA
 
 ## 2026-08-04 - Reviews contractuales y reputación neutral
 
@@ -105,7 +105,7 @@ Se decidio rediseñar login y registro manteniendo las URLs actuales y adoptando
 
 Motivo:
 
-TRAX necesita reducir friccion inicial sin pedir datos profesionales avanzados antes de tiempo. El profesional puede completar rubro, cobertura, verificacion y portfolio despues de crear la cuenta.
+MANDOBRA necesita reducir friccion inicial sin pedir datos profesionales avanzados antes de tiempo. El profesional puede completar rubro, cobertura, verificacion y portfolio despues de crear la cuenta.
 
 Alcance:
 
@@ -174,7 +174,7 @@ Se decidio centralizar la disponibilidad de Google Maps y tratar la API key como
 
 Motivo:
 
-TRAX debe poder operar sin Google Maps en desarrollo, testing o entornos sin key real, y no debe activar scripts externos con placeholders ni exponer claves hardcodeadas.
+MANDOBRA debe poder operar sin Google Maps en desarrollo, testing o entornos sin key real, y no debe activar scripts externos con placeholders ni exponer claves hardcodeadas.
 
 Alcance:
 
@@ -194,7 +194,7 @@ Se decidio incorporar una base de seguridad transversal sin cambiar URLs, modelo
 
 Motivo:
 
-TRAX ya cuenta con flujos operativos sensibles: autenticacion, presupuestos, propuestas, contratos, WhatsApp, cobertura geografica y administracion. La plataforma necesita controles preventivos de abuso, errores seguros y criterios productivos antes de escalar.
+MANDOBRA ya cuenta con flujos operativos sensibles: autenticacion, presupuestos, propuestas, contratos, WhatsApp, cobertura geografica y administracion. La plataforma necesita controles preventivos de abuso, errores seguros y criterios productivos antes de escalar.
 
 Alcance:
 
@@ -214,7 +214,7 @@ La seguridad base debe ser incremental y compatible con el monolito modular exis
 
 ## 2026-07-21
 
-Se decidio consolidar TRAX como monolito modular con servicios internos concretos para reglas de negocio, view models, permisos operativos y notificaciones.
+Se decidio consolidar MANDOBRA como monolito modular con servicios internos concretos para reglas de negocio, view models, permisos operativos y notificaciones.
 
 Motivo:
 
@@ -239,7 +239,7 @@ Se decidio implementar un esquema hibrido para contacto por WhatsApp: username c
 
 Motivo:
 
-Los usernames de WhatsApp mejoran la privacidad del profesional, pero no existe una URL publica estable y universal para abrir chats por username desde TRAX sin APIs avanzadas.
+Los usernames de WhatsApp mejoran la privacidad del profesional, pero no existe una URL publica estable y universal para abrir chats por username desde MANDOBRA sin APIs avanzadas.
 
 Alcance:
 
@@ -260,12 +260,12 @@ Se decidio rediseñar la cobertura del perfil publico como una experiencia visua
 
 Motivo:
 
-El cliente debe entender rapidamente el area de trabajo del profesional, pero TRAX debe proteger la ubicacion exacta y evitar que el mapa parezca una direccion precisa.
+El cliente debe entender rapidamente el area de trabajo del profesional, pero MANDOBRA debe proteger la ubicacion exacta y evitar que el mapa parezca una direccion precisa.
 
 Alcance:
 
 - Mostrar centro aproximado, anillo de cobertura y radio declarado.
-- Usar un marcador propio TRAX con concepto de trabajador de oficio.
+- Usar un marcador propio MANDOBRA con concepto de trabajador de oficio.
 - Reducir la informacion textual a cobertura aproximada, zona base y aviso de privacidad.
 - Agregar modal no editable para ver la cobertura ampliada.
 - Mantener intactas la logica de matching, Cobertura Inteligente, Google Maps v2, dashboards y rutas.
@@ -280,7 +280,7 @@ Se decidio implementar el matching geografico inicial con formula Haversine en b
 
 Motivo:
 
-TRAX necesita determinar si un profesional cubre una ubicacion de trabajo usando coordenadas y radio ya persistidos, sin depender de APIs externas ni exponer ubicaciones profesionales exactas.
+MANDOBRA necesita determinar si un profesional cubre una ubicacion de trabajo usando coordenadas y radio ya persistidos, sin depender de APIs externas ni exponer ubicaciones profesionales exactas.
 
 Alcance:
 
@@ -302,7 +302,7 @@ La distancia Haversine no representa rutas, transito ni tiempos de viaje. Las fu
 
 ## 2026-07-14
 
-Se decidio centralizar toda apertura de WhatsApp en un unico flujo interno de TRAX.
+Se decidio centralizar toda apertura de WhatsApp en un unico flujo interno de MANDOBRA.
 
 Motivo:
 
@@ -313,7 +313,7 @@ Alcance:
 - Crear `WhatsAppContactSession` como registro auditable de cada apertura.
 - Generar URLs de WhatsApp solo desde `whatsapp_contact_service.py`.
 - Usar `POST /whatsapp/iniciar` como unica entrada del flujo.
-- Exigir consentimiento explicito antes de redireccionar fuera de TRAX.
+- Exigir consentimiento explicito antes de redireccionar fuera de MANDOBRA.
 - Registrar actividad interna sin enviar mensajes automaticos.
 - No almacenar conversaciones, mensajes, archivos ni datos sensibles.
 - Mantener fuera de esta fase WhatsApp Business API, webhooks, IA y lectura de conversaciones.
@@ -407,7 +407,7 @@ Se decidio incorporar una documentacion permanente y viva dentro del repositorio
 
 Motivo:
 
-El proyecto TRAX necesita conservar el contexto tecnico, funcional y de UX sin depender de la memoria del equipo ni del historial de Git.
+El proyecto MANDOBRA necesita conservar el contexto tecnico, funcional y de UX sin depender de la memoria del equipo ni del historial de Git.
 
 Alcance:
 
@@ -428,7 +428,7 @@ Un sprint solo se considerara cerrado cuando este implementado, probado, documen
 
 ## 2026-07-09
 
-Se decidio crear `docs/ESTANDARES_DESARROLLO.md` como manual permanente de desarrollo de TRAX.
+Se decidio crear `docs/ESTANDARES_DESARROLLO.md` como manual permanente de desarrollo de MANDOBRA.
 
 Motivo:
 
@@ -440,7 +440,7 @@ El documento se actualizara solo ante cambios de reglas permanentes del proyecto
 
 ## 2026-07-10
 
-Se decidio consolidar el sistema visual de TRAX en una capa semantica de variables CSS v2.
+Se decidio consolidar el sistema visual de MANDOBRA en una capa semantica de variables CSS v2.
 
 Motivo:
 

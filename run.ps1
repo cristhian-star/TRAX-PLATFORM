@@ -1,5 +1,5 @@
 Write-Host "=============================" -ForegroundColor DarkGray
-Write-Host "Iniciando TRAX..." -ForegroundColor Cyan
+Write-Host "Iniciando MANDOBRA..." -ForegroundColor Cyan
 Write-Host "=============================" -ForegroundColor DarkGray
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass

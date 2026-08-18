@@ -8,7 +8,7 @@
 {% set gallery_entries = professional.gallery_urls.splitlines() if professional and professional.gallery_urls else [] %}
 {% set portfolio_entries = professional.portfolio_urls.splitlines() if professional and professional.portfolio_urls else [] %}
 {% set other_link_entries = professional.other_links.splitlines() if professional and professional.other_links else [] %}
-{% set profile_name = professional.nombre if professional else session.get("user_name", "Profesional TRAX") %}
+{% set profile_name = professional.nombre if professional else session.get("user_name", "Profesional MANDOBRA") %}
 {% set profile_specialty = (professional.especialidad or professional.servicio) if professional else "Rubro no informado" %}
 {% set profile_zone = professional.zona if professional else "Zona no informada" %}
 {% set public_profile_url = "/profesional/" ~ professional.id if professional else "/profesional/dashboard" %}
@@ -360,7 +360,7 @@
                         type="checkbox"
                         name="coverage_location_consent"
                         {% if coverage and coverage.has_location_consent %}checked{% endif %}>
-                    <span>Autorizo a TRAX a utilizar esta ubicacion para calcular y mostrar mi zona aproximada de cobertura.</span>
+                    <span>Autorizo a MANDOBRA a utilizar esta ubicacion para calcular y mostrar mi zona aproximada de cobertura.</span>
                 </label>
 
                 <div class="private-profile__coverage-actions">
@@ -379,7 +379,7 @@
                         <span class="private-profile__eyebrow">Oferta</span>
                         <h2>Servicios</h2>
                     </div>
-                    <small>Define como queres ser encontrado dentro de TRAX.</small>
+                    <small>Define como queres ser encontrado dentro de MANDOBRA.</small>
                 </div>
 
                 <div class="private-profile__read-card">
@@ -400,7 +400,7 @@
 
                 <div class="private-profile__hint-card">
                     <strong>Privacidad en WhatsApp</strong>
-                    <span>TRAX priorizara tu username cuando este disponible para evitar exponer publicamente tu numero.</span>
+                    <span>MANDOBRA priorizara tu username cuando este disponible para evitar exponer publicamente tu numero.</span>
                 </div>
 
                 <div class="private-profile__field-grid">
@@ -423,7 +423,7 @@
                             <option value="USERNAME" {% if selected_whatsapp_preference == "USERNAME" %}selected{% endif %}>Usar username</option>
                             <option value="PHONE" {% if selected_whatsapp_preference == "PHONE" %}selected{% endif %}>Usar telefono</option>
                         </select>
-                        <small>Si WhatsApp no permite abrir chats por username, TRAX usara el telefono como fallback tecnico.</small>
+                        <small>Si WhatsApp no permite abrir chats por username, MANDOBRA usara el telefono como fallback tecnico.</small>
                     </label>
                 </div>
 

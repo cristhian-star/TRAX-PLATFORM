@@ -177,13 +177,13 @@ def resolver_identificador_contacto(professional):
 
 def _build_message(professional, operation_type):
     operation_labels = {
-        OPERATION_PROFILE: "tu perfil profesional en TRAX",
-        OPERATION_EMERGENCY: "una emergencia publicada en TRAX",
-        OPERATION_BUDGET_AWARDED: "un presupuesto adjudicado en TRAX",
-        OPERATION_PROPOSAL_ACCEPTED: "una propuesta aceptada en TRAX",
-        OPERATION_DIRECT_CONTACT: "TRAX",
+        OPERATION_PROFILE: "tu perfil profesional en MANDOBRA",
+        OPERATION_EMERGENCY: "una emergencia publicada en MANDOBRA",
+        OPERATION_BUDGET_AWARDED: "un presupuesto adjudicado en MANDOBRA",
+        OPERATION_PROPOSAL_ACCEPTED: "una propuesta aceptada en MANDOBRA",
+        OPERATION_DIRECT_CONTACT: "MANDOBRA",
     }
-    context = operation_labels.get(operation_type, "TRAX")
+    context = operation_labels.get(operation_type, "MANDOBRA")
     return f"Hola {professional.nombre}, te contacto desde {context}."
 
 
@@ -357,7 +357,7 @@ def _registrar_notificaciones(contact_session, professional):
             tipo=TIPO_WHATSAPP_CONTACTO_INICIADO,
             categoria=CATEGORIA_CUENTA,
             titulo="Un cliente inicio contacto por WhatsApp",
-            mensaje="Un cliente inicio contacto directo por WhatsApp desde TRAX.",
+            mensaje="Un cliente inicio contacto directo por WhatsApp desde MANDOBRA.",
             url_destino="/profesional/dashboard",
             entity_type="WhatsAppContactSession",
             entity_id=contact_session.id,

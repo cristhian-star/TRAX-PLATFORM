@@ -412,7 +412,7 @@ def upgrade_pro():
             upgrade_to_pro(user_id)
             return redirect("/profesional/dashboard?pro_upgraded=1")
 
-        error = "Necesitas reputacion minima de 100 puntos o verificacion aprobada para pasar a TRAX PRO."
+        error = "Necesitas reputacion minima de 100 puntos o verificacion aprobada para pasar a MANDOBRA PRO."
 
     return render_template(
         "solicitar_upgrade_pro.html",
@@ -496,7 +496,7 @@ def completar_perfil_profesional():
 
         professional = complete_professional_profile(
             user_id=user_id,
-            nombre=session.get("user_name", "Profesional TRAX"),
+            nombre=session.get("user_name", "Profesional MANDOBRA"),
             especialidad=especialidad,
             anios_experiencia=anios_experiencia,
             tipo_credencial=_empty_to_none(request.form.get("tipo_credencial")),
@@ -758,7 +758,7 @@ def profesional_dashboard():
         if not has_approved_verification(user_id):
             recommendations.append("Solicita verificacion para reforzar confianza en contrataciones.")
         if not reviews:
-            recommendations.append("Impulsa tus primeras reseÃ±as cerrando trabajos dentro de TRAX.")
+            recommendations.append("Impulsa tus primeras reseÃ±as cerrando trabajos dentro de MANDOBRA.")
         if not coverage["configured"]:
             recommendations.append("Configura tu zona de cobertura para que los clientes entiendan donde trabajas.")
 
@@ -1011,7 +1011,7 @@ def admin_usuario_activar_pro(id):
         return "Usuario no encontrado", 404
 
     upgrade_to_pro(id)
-    _audit_admin_action("USER_PRO_ACTIVATED", id, "Acceso TRAX PRO activado.")
+    _audit_admin_action("USER_PRO_ACTIVATED", id, "Acceso MANDOBRA PRO activado.")
     return redirect("/admin/usuarios")
 
 
@@ -1024,7 +1024,7 @@ def admin_usuario_quitar_pro(id):
 
     subscription = cancel_subscription(id)
     if subscription is not None:
-        _audit_admin_action("USER_PRO_REMOVED", id, "Acceso TRAX PRO removido.")
+        _audit_admin_action("USER_PRO_REMOVED", id, "Acceso MANDOBRA PRO removido.")
     return redirect("/admin/usuarios")
 
 

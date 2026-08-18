@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% set profile_name = professional.nombre if professional else session.get("user_name", "Profesional TRAX") %}
+{% set profile_name = professional.nombre if professional else session.get("user_name", "Profesional MANDOBRA") %}
 {% set profile_specialty = professional.especialidad or professional.servicio if professional else "Especialidad no informada" %}
 {% set profile_zone = professional.zona if professional else "Zona no informada" %}
 {% set public_profile_url = "/profesional/" ~ professional.id if professional else "/profesional/perfil/completar" %}
@@ -17,7 +17,7 @@
                 <span class="pro-dashboard__eyebrow">Operacion profesional</span>
                 <h1>Dashboard profesional</h1>
                 <p>
-                    Una cabina operativa para entender como estas trabajando dentro de TRAX:
+                    Una cabina operativa para entender como estas trabajando dentro de MANDOBRA:
                     estado, reputacion, presupuestos, propuestas, limites y proximas acciones.
                 </p>
                 <div class="pro-dashboard__hero-actions" aria-label="Accesos principales">
@@ -61,13 +61,13 @@
 
     <section class="pro-dashboard__shell pro-dashboard__content">
         {% if verification_requested %}
-            <p class="pro-dashboard__alert">Solicitud de verificacion enviada. El equipo TRAX la revisara.</p>
+            <p class="pro-dashboard__alert">Solicitud de verificacion enviada. El equipo MANDOBRA la revisara.</p>
         {% endif %}
         {% if profile_completed %}
             <p class="pro-dashboard__alert">Perfil profesional enviado a revision.</p>
         {% endif %}
         {% if pro_upgraded %}
-            <p class="pro-dashboard__alert">TRAX PRO activado correctamente.</p>
+            <p class="pro-dashboard__alert">MANDOBRA PRO activado correctamente.</p>
         {% endif %}
 
         <section class="pro-dashboard__quick-links" aria-label="Accesos rapidos">
@@ -233,7 +233,7 @@
                     <div class="pro-dashboard__contact-list">
                         {% for contact in whatsapp_contact_sessions %}
                             <div>
-                                <strong>{{ contact.client_user.nombre if contact.client_user else "Visitante TRAX" }}</strong>
+                                <strong>{{ contact.client_user.nombre if contact.client_user else "Visitante MANDOBRA" }}</strong>
                                 <span>{{ contact.operation_type|replace("_", " ")|title }}</span>
                                 <small>{{ format_notification_date(contact.initiated_at) }} - {{ contact.status|replace("_", " ")|title }}</small>
                             </div>
@@ -242,7 +242,7 @@
                 {% else %}
                     <div class="pro-dashboard__placeholder">
                         <strong>Sin contactos recientes por WhatsApp</strong>
-                        <span>Cuando un cliente abra WhatsApp desde TRAX, vas a verlo como oportunidad operativa.</span>
+                        <span>Cuando un cliente abra WhatsApp desde MANDOBRA, vas a verlo como oportunidad operativa.</span>
                     </div>
                 {% endif %}
             </article>

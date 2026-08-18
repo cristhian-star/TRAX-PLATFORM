@@ -1,4 +1,4 @@
-# CHANGELOG TRAX
+# CHANGELOG MANDOBRA
 
 ## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (cierre aprobado)
 

@@ -1,6 +1,6 @@
-# TRAX Platform
+# MANDOBRA Platform
 
-TRAX es una plataforma Flask para conectar clientes con profesionales, gestionar solicitudes operativas y sostener flujos de presupuestos, emergencias, propuestas, contrataciones, cobertura y contacto controlado por WhatsApp.
+MANDOBRA es una plataforma Flask para conectar clientes con profesionales, gestionar solicitudes operativas y sostener flujos de presupuestos, emergencias, propuestas, contrataciones, cobertura y contacto controlado por WhatsApp.
 
 ## Tecnologias principales
 
@@ -45,7 +45,7 @@ git diff --check
 
 ## Seguridad y produccion
 
-Antes de promover TRAX a staging o produccion validar:
+Antes de promover MANDOBRA a staging o produccion validar:
 
 - Secretos reales fuera de Git: `SECRET_KEY`, `DATABASE_URL`, claves externas y credenciales operativas.
 - HTTPS activo y HSTS habilitado solo sobre conexiones seguras.
@@ -106,7 +106,7 @@ Toda apertura de WhatsApp debe pasar por `POST /whatsapp/iniciar`.
 Reglas:
 
 - No generar enlaces `wa.me` desde templates.
-- Exigir consentimiento antes de salir de TRAX.
+- Exigir consentimiento antes de salir de MANDOBRA.
 - Validar operacion, ownership, CSRF y rate limit en backend.
 - Registrar `WhatsAppContactSession` y pasar a `CONTACTO_ABIERTO`.
 - Responder JSON seguro para apertura autorizada desde el frontend.

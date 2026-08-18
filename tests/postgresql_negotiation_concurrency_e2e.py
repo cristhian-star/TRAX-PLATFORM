@@ -140,7 +140,7 @@ class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
             description="Descripcion negociada",
             scope="Alcance negociado",
             external_price="150000.00",
-            observations="Sin pagos dentro de TRAX",
+            observations="Sin pagos dentro de MANDOBRA",
             actor_user_id=self.client_id,
             idempotency_key="pg-negotiation-init-0001",
         )

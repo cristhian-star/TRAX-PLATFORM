@@ -133,7 +133,7 @@ class FormalNegotiationAccessTest(unittest.TestCase):
         self._login_session(self.eligible_client_id, "CLIENTE")
         response = self._profile()
         self.assertIn(b"Formalizar condiciones", response.data)
-        self.assertIn(b"TRAX registra el acuerdo", response.data)
+        self.assertIn(b"MANDOBRA registra el acuerdo", response.data)
         entry = self.http.get(
             f"/negociacion/nueva?professional_id={self.professional_id}"
         )

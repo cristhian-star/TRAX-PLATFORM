@@ -20,7 +20,7 @@ DEMO_MARKER = "[DEV_SEED_PROFESSIONALS_V1]"
 
 DEMO_CLIENT = {
     "email": "cliente.demo@trax.local",
-    "nombre": "Cliente Demo TRAX",
+    "nombre": "Cliente Demo MANDOBRA",
 }
 
 DEMO_PROFESSIONALS = (
@@ -71,7 +71,7 @@ DEMO_PROFESSIONALS = (
         "tipo_credencial": "Certificado de oficio",
         "numero_credencial": "DEV-PLOM-002",
         "certificaciones_text": (
-            "Certificacion demo de oficio para visualizar credenciales en TRAX."
+            "Certificacion demo de oficio para visualizar credenciales en MANDOBRA."
         ),
         "portfolio_urls": "\n".join(
             (

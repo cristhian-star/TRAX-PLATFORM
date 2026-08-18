@@ -23,7 +23,7 @@ from app.services.notification_service import (
 )
 
 
-def user_display_name(user_id, fallback="Usuario TRAX"):
+def user_display_name(user_id, fallback="Usuario MANDOBRA"):
     user = db.session.get(User, user_id) if user_id else None
     return user.nombre if user and user.nombre else fallback
 

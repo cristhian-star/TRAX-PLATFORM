@@ -1,8 +1,8 @@
-# Alembic en TRAX
+# Alembic en MANDOBRA
 
 ## Que es Alembic
 
-Alembic es el sistema oficial de migraciones para el schema SQLAlchemy de TRAX. Permite versionar cambios de estructura, aplicarlos de forma ordenada y preparar una futura transicion desde SQLite DEV hacia PostgreSQL.
+Alembic es el sistema oficial de migraciones para el schema SQLAlchemy de MANDOBRA. Permite versionar cambios de estructura, aplicarlos de forma ordenada y preparar una futura transicion desde SQLite DEV hacia PostgreSQL.
 
 La aplicacion selecciona la base mediante configuracion:
 

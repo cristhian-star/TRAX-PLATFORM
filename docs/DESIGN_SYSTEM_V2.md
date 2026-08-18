@@ -1,8 +1,8 @@
-# Design System v2 TRAX
+# Design System v2 MANDOBRA
 
 ## Principios
 
-El Design System v2 normaliza la identidad visual existente de TRAX. No reemplaza la experiencia actual: la ordena para que nuevas pantallas puedan construirse con tokens y componentes reutilizables.
+El Design System v2 normaliza la identidad visual existente de MANDOBRA. No reemplaza la experiencia actual: la ordena para que nuevas pantallas puedan construirse con tokens y componentes reutilizables.
 
 Reglas permanentes:
 

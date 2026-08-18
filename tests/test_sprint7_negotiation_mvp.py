@@ -116,7 +116,7 @@ class Sprint7NegotiationMVPTest(unittest.TestCase):
             "description": "Instalar tablero nuevo",
             "scope": "Materiales y mano de obra",
             "external_price": "125000.00",
-            "observations": "Pago externo a TRAX",
+            "observations": "Pago externo a MANDOBRA",
             "actor_user_id": self.client_id,
             "idempotency_key": "negotiation-init-mvp-0001",
         }

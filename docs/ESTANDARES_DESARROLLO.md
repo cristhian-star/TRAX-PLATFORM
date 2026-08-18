@@ -1,8 +1,8 @@
-# ESTANDARES DE DESARROLLO TRAX
+# ESTANDARES DE DESARROLLO MANDOBRA
 
 ## Objetivo
 
-Definir las reglas permanentes de trabajo para mantener TRAX ordenado, seguro y mantenible a largo plazo.
+Definir las reglas permanentes de trabajo para mantener MANDOBRA ordenado, seguro y mantenible a largo plazo.
 
 Este documento funciona como manual de desarrollo del proyecto. Debe cambiar solo cuando exista una decision tecnica, funcional o de proceso relevante.
 
@@ -65,7 +65,7 @@ Estructura principal:
 
 ## Reglas UX/UI
 
-- Respetar el Design System TRAX definido en `docs/design-system-v1.md`.
+- Respetar el Design System MANDOBRA definido en `docs/design-system-v1.md`.
 - Mantener consistencia visual entre pantallas publicas, privadas y dashboards.
 - Priorizar claridad, jerarquia visual y acciones evidentes.
 - No introducir patrones visuales aislados si no responden a una necesidad real.
@@ -116,7 +116,7 @@ Checklist minimo para aceptar un Pull Request:
 - [ ] No incluye codigo temporal ni pruebas descartadas.
 - [ ] Las rutas protegidas validan permisos y roles.
 - [ ] Los formularios o acciones sensibles mantienen CSRF.
-- [ ] La UI respeta el Design System TRAX.
+- [ ] La UI respeta el Design System MANDOBRA.
 - [ ] `python -m compileall app scripts` ejecutado correctamente.
 - [ ] `git diff --check` ejecutado correctamente.
 - [ ] Docker probado si el cambio afecta runtime, dependencias, base de datos o configuracion.

@@ -1,4 +1,4 @@
-# TRAX Design System v1
+# MANDOBRA Design System v1
 
 ## Jerarquia actual
 
@@ -8,7 +8,7 @@
 
 ## 1. Alcance
 
-Esta propuesta define la base visual para implementar el UX Map v1 de TRAX.
+Esta propuesta define la base visual para implementar el UX Map v1 de MANDOBRA.
 No rediseña pantallas, no cambia flujos y no modifica backend, modelos,
 servicios ni persistencia.
 
@@ -20,7 +20,7 @@ La entrega se compone de:
 
 ## 2. Direccion visual
 
-TRAX debe sentirse como una herramienta de trabajo: precisa, resistente,
+MANDOBRA debe sentirse como una herramienta de trabajo: precisa, resistente,
 moderna y confiable. La identidad toma referencias industriales sin recurrir a
 texturas pesadas ni decoracion mecanica literal.
 
@@ -41,7 +41,7 @@ texturas pesadas ni decoracion mecanica literal.
 - Directa, no agresiva.
 - Profesional, no corporativa generica.
 
-## 3. Paleta TRAX
+## 3. Paleta MANDOBRA
 
 ### 3.1 Colores de marca
 
@@ -529,6 +529,6 @@ Durante la migracion se pueden mapear aliases:
 - Tipografia y espaciado funcionan sin dependencias externas.
 - Botones, inputs, cards, badges y tabs tienen anatomia y estados definidos.
 - La propuesta es mobile first y mantiene contraste alto.
-- Emergencia es prioritaria sin dominar visualmente todo TRAX.
+- Emergencia es prioritaria sin dominar visualmente todo MANDOBRA.
 - Los tokens no alteran las pantallas existentes hasta ser enlazados.
 - La especificacion permite implementar componentes sin decidir nuevamente su estilo base.

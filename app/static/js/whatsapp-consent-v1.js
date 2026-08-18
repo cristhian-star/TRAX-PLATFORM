@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const supportsDialog = Boolean(dialog && typeof dialog.showModal === "function");
     const fallbackMessage = [
         "Estas por comunicarte directamente con un profesional mediante WhatsApp.",
-        "La conversacion se realizara fuera de TRAX.",
+        "La conversacion se realizara fuera de MANDOBRA.",
         "No compartas datos bancarios sensibles.",
         "",
         "Aceptas continuar?"
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (reservedWindow) {
                     reservedWindow.close();
                 }
-                throw new Error(payload.error || "No se pudo iniciar WhatsApp desde TRAX.");
+                throw new Error(payload.error || "No se pudo iniciar WhatsApp desde MANDOBRA.");
             }
 
             if (reservedWindow) {
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             form.dataset.whatsappConsentConfirmed = "false";
-            window.alert(error.message || "No se pudo iniciar WhatsApp desde TRAX.");
+            window.alert(error.message || "No se pudo iniciar WhatsApp desde MANDOBRA.");
         } finally {
             form.dataset.whatsappSubmitting = "false";
         }

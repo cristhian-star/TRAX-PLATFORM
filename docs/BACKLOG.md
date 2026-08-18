@@ -1,10 +1,10 @@
-# BACKLOG TRAX
+# BACKLOG MANDOBRA
 
 ## Alta prioridad
 
 - Diseñar en una fase futura `hiring_mode = MULTIPLE`; Sprint 7 conserva exclusivamente `SINGLE`.
 - Diseñar en una fase futura cancelaciones consensuadas y correcciones ampliadas sin alterar el cierre exitoso `CONFIRMADA`.
-- Definir, mediante decisión de producto futura, si TRAX necesita badges plata/oro o una proyección propietaria; no forman parte de la reputación neutral.
+- Definir, mediante decisión de producto futura, si MANDOBRA necesita badges plata/oro o una proyección propietaria; no forman parte de la reputación neutral.
 - Diseñar hitos, evidencias, disputas y modificaciones de contrato sin implementar pagos todavia.
 - Sustituir almacenamiento en memoria de Flask-Limiter por Redis u otro backend compartido.
 - Definir WSGI productivo para despliegues fuera del servidor Flask de desarrollo.
@@ -17,7 +17,7 @@
 ## Media prioridad
 
 - Implementar oferta profesional como segundo tipo de publicacion de propuestas.
-- Preparar facturacion TRAX Pro sobre el nucleo de contratacion sin integrar ARCA hasta aprobacion funcional.
+- Preparar facturacion MANDOBRA PRO sobre el nucleo de contratacion sin integrar ARCA hasta aprobacion funcional.
 - Migrar navbar completo a Design System v2 en un sprint especifico sin cambiar rutas ni comportamiento.
 - Migrar Home, Resultados y Perfil Profesional completo a Design System v2 con validacion visual dedicada.
 - Migrar Dashboards, Presupuestos, Propuestas, Emergencias, Admin y tablas a componentes `.trax-*` por fases.
@@ -48,7 +48,7 @@
 - Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
 - Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.
 - Incorporar poligonos avanzados y zonas personalizadas multiples.
-- Evaluar estilos avanzados de Google Maps si TRAX define un mapa de marca propio.
+- Evaluar estilos avanzados de Google Maps si MANDOBRA define un mapa de marca propio.
 - Crear listado dedicado de emergencias del cliente para reemplazar enlaces operativos provisorios.
 - Crear vista consolidada de solicitudes del cliente que incluya presupuestos, emergencias y propuestas.
 - Implementar Agenda.

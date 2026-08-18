@@ -1,8 +1,8 @@
-# TRAX Taxonomy v1
+# MANDOBRA Taxonomy v1
 
 ## Objetivo
 
-Preparar una capa unica de clasificacion para que los modulos publicos y operativos de TRAX puedan converger sobre el mismo arbol:
+Preparar una capa unica de clasificacion para que los modulos publicos y operativos de MANDOBRA puedan converger sobre el mismo arbol:
 
 ```text
 Industria
