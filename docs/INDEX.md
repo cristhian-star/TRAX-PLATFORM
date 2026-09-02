@@ -42,6 +42,7 @@ de las dos partes debe cambiar.
 
 - [Estandares de desarrollo](ESTANDARES_DESARROLLO.md)
 - [QA local](QA_LOCAL.md)
+- [Handoffs tecnicos](HANDOFFS/README.md)
 - [Troubleshooting](TROUBLESHOOTING/README.md)
 - [Runbooks](RUNBOOKS/README.md)
 
