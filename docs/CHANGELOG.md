@@ -1,5 +1,39 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-02 - Consolidacion documental de trazabilidad
+
+Timestamp: 2026-09-02T21:18:48-03:00
+Estado: DOCUMENTACION_VALIDADA
+Documento: documentacion canonica de MANDOBRA
+Motivo: registrar el contraste estatico de `develop` contra Master Spec,
+decisiones, Roadmap y Backlog.
+Evidencia: rama `docs/documentation-traceability-consolidation`, commit base
+`f63c8db` y auditoria tecnica del 2026-09-02.
+Responsable: Codex / Documentation Engineer Senior
+Rama: `docs/documentation-traceability-consolidation`
+Commit base: `f63c8db`
+
+### Aclarado
+
+- El check de Emergencias cubre solicitud y directorio, no asignacion
+  persistente, resolucion operativa completa ni contrato `EMERGENCY`.
+- Design System v2 es la capa canonica, pero la migracion visual total sigue
+  pendiente.
+- La ausencia de P0/P1/P2 documentada corresponde al cierre historico de
+  Sprint 7 y no acredita preparacion productiva general.
+
+### Trazabilidad
+
+- Se registro una revision posterior del Master Spec sin alterar su revision
+  historica `d07d95`.
+- Se incorporo la auditoria tecnica estatica de `f63c8db` al indice.
+- Se consolidaron pendientes de Planes/PRO, Emergencias, cobertura de pruebas
+  e identificadores internos TRAX sin convertirlos en requisitos aprobados.
+- Se eliminaron duplicados no rastreados bajo `docs/RUNBOOKS/` despues de
+  verificar contenido y preservar las fuentes canonicas en
+  `docs/DECISIONES_ARQUITECTURA.md` y `docs/PLANTILLAS/`.
+- Tests de aplicacion: NO EJECUTADOS - no aplican al alcance documental.
+
 ## 2026-08-04 - Sprint 7 Contractual Trust Fases 2E-2F (cierre aprobado)
 
 Estado: la auditoría independiente de integración fue aprobada. Sprint 7 está

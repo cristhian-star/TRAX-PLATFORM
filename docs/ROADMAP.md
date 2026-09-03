@@ -16,6 +16,11 @@
 
 [x] Emergencias
 
+Alcance verificado: captura de solicitud y directorio de profesionales con
+contexto de cobertura. No se consideran completas ni aprobadas la asignacion
+persistente de un profesional, la resolucion operativa de punta a punta ni la
+creacion de contratos con origen `EMERGENCY`.
+
 [x] Propuestas
 
 [x] Dashboard Profesional
@@ -63,6 +68,10 @@ Estado operativo soportado: Alembic `20260726_07`. Un downgrade a
 autoriza despliegue productivo. P0/P1/P2: ninguno. P3 no bloqueante: contrasena
 demo predecible pendiente de endurecimiento futuro.
 
+La clasificacion P0/P1/P2 anterior pertenece exclusivamente al cierre
+historico de Sprint 7. No representa una evaluacion general de preparacion para
+staging, produccion o ampliacion del producto.
+
 [ ] Agenda
 
 [ ] WhatsApp Business API
@@ -92,6 +101,11 @@ demo predecible pendiente de endurecimiento futuro.
 [x] Design System v2 - Fase 1
 
 [x] UX/UI General & Design System v2
+
+Alcance verificado: Design System v2 esta establecido como capa canonica y
+coexiste con capas legacy. La migracion visual completa de todas las pantallas
+no forma parte de este check y permanece pendiente en los items siguientes y
+en el Backlog.
 
 [ ] Design System v2 - Componentes avanzados
 
