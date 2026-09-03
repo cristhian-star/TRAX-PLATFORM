@@ -1,8 +1,8 @@
 # Handoff tecnico activo
 
-Timestamp: 2026-09-02T21:32:07-03:00
-Estado: ACTIVE
-Resultado del ciclo: CIERRE_DOCUMENTAL_EN_PROGRESO
+Timestamp: 2026-09-02T21:34:04-03:00
+Estado: COMPLETED
+Resultado del ciclo: COMPLETED
 Dispositivo/origen: Codex Desktop local
 Responsable: Codex / Documentation Engineer Senior
 
@@ -18,10 +18,11 @@ MANDOBRA, corregir ambiguedades y revisar los documentos no rastreados bajo
 - Commit base y ultimo commit: `f63c8db docs: add technical handoff workflow`.
 - Rama inicial: `develop`.
 - Estado inicial: dos grupos no rastreados bajo `docs/RUNBOOKS/`.
-- Estado previo al commit: cambios documentales sin commit; los duplicados no
-  rastreados fueron eliminados con autorizacion expresa.
+- Estado final: arbol limpio despues del commit documental y del commit de
+  cierre de este handoff.
 - Push a GitHub: NO REALIZADO.
-- Commit: NO REALIZADO.
+- Commit documental: `c21ed41 docs: consolidate project documentation traceability`.
+- Commit de cierre: el commit que contiene esta actualizacion del handoff.
 - PR: NO ABIERTA.
 - Merge: NO REALIZADO; requiere revision y autorizacion posterior.
 - Sincronizacion remota: NO VERIFICADA EN TIEMPO REAL; no se ejecuto `git fetch`.
@@ -38,6 +39,9 @@ MANDOBRA, corregir ambiguedades y revisar los documentos no rastreados bajo
   identificadores internos TRAX en el Backlog.
 - Se enlazo la nueva auditoria desde el indice y se registro el ciclo en el
   Changelog.
+- Se eliminaron exclusivamente los duplicados autorizados y se preservaron
+  `docs/DECISIONES_ARQUITECTURA.md` y `docs/PLANTILLAS/`.
+- Se creo el commit documental local `c21ed41`.
 
 ## Archivos modificados
 
@@ -100,9 +104,9 @@ verificadas antes y despues de la eliminacion.
 
 ## Proximo paso recomendado
 
-1. Completar las validaciones y el commit local autorizado.
-2. Actualizar este handoff con los hashes reales de cierre.
-3. No realizar push ni merge sin una nueva autorizacion expresa.
+1. Revisar los dos commits locales de la rama.
+2. Solicitar autorizacion antes de cualquier push o merge.
+3. Integrar a `develop` solo mediante el flujo Git aprobado.
 
 ## Instrucciones exactas para retomar
 
