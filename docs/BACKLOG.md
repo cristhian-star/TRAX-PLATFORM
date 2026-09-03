@@ -2,6 +2,13 @@
 
 ## Alta prioridad
 
+- Definir mediante requisito aprobado el catalogo, beneficios, limites y
+  activacion de `FREE`, `PRO` y `ENTERPRISE`; la UI publica conserva `Plus`
+  como referencia contradictoria y debe corregirse solo despues de esa
+  definicion.
+- Definir el alcance objetivo de Emergencias: solicitud y descubrimiento,
+  asignacion operativa o integracion con el contrato canonico de origen
+  `EMERGENCY`.
 - Diseñar en una fase futura `hiring_mode = MULTIPLE`; Sprint 7 conserva exclusivamente `SINGLE`.
 - Diseñar en una fase futura cancelaciones consensuadas y correcciones ampliadas sin alterar el cierre exitoso `CONFIRMADA`.
 - Definir, mediante decisión de producto futura, si MANDOBRA necesita badges plata/oro o una proyección propietaria; no forman parte de la reputación neutral.
@@ -13,6 +20,9 @@
 - Implementar checklist productivo en staging con secretos reales, HTTPS, backups, monitoreo y prueba de restauracion.
 - Implementar recuperacion de contraseña con tokens seguros y expiracion.
 - Implementar verificacion de email antes de activar flujos sensibles.
+- Incorporar pruebas especificas para Emergencias, suscripciones/PRO,
+  mutaciones del centro de notificaciones y operaciones administrativas que
+  hoy no tienen cobertura directa equivalente al Contracting Core.
 
 ## Media prioridad
 
@@ -59,6 +69,9 @@
 - Evaluar grupos automaticos de WhatsApp solo con una API oficial y consentimiento explicito.
 - Evaluar Push notifications cuando exista estrategia mobile/browser.
 - Evaluar polling moderado o WebSockets solo cuando el producto requiera tiempo real.
+- Planificar la migracion gradual de identificadores internos `TRAX` sin
+  romper taxonomia, tokens CSS, rutas, datos persistidos ni compatibilidad
+  historica.
 
 ## Baja prioridad
 

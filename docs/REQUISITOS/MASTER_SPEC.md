@@ -20,6 +20,30 @@ privacidad; no procesa pagos en su alcance actual.
 Este documento describe la linea base observada en el codigo. No convierte
 prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
+## Registro de revision posterior
+
+Timestamp: 2026-09-02T21:18:48-03:00
+Estado: VERIFICACION_ESTATICA_DOCUMENTAL
+Documento: `docs/REQUISITOS/MASTER_SPEC.md`
+Motivo: actualizar la trazabilidad de la linea base sin reescribir la revision
+historica del 2026-08-31.
+Evidencia: inspeccion de `develop` en `f63c8db`, documentos canonicos, codigo,
+migraciones y archivos de pruebas existentes.
+Responsable: Codex / Documentation Engineer Senior
+Rama: `docs/documentation-traceability-consolidation`
+Commit base: `f63c8db`
+
+- La revision original `d07d95` se conserva como referencia historica.
+- Entre `d07d95` y `f63c8db` se identificaron dos commits documentales:
+  `d963b0c` y `f63c8db`.
+- No se identificaron cambios funcionales en ese rango mediante inspeccion
+  estatica del historial y del repositorio.
+- No se ejecutaron tests, migraciones ni la aplicacion durante esta revision.
+- No se ejecuto `git fetch`; la coincidencia con `origin/develop` corresponde
+  exclusivamente a las referencias Git locales disponibles.
+- La evidencia, inconsistencias y pendientes se detallan en la
+  [auditoria tecnica del 2026-09-02](../AUDITORIA_TECNICA_2026-09-02.md).
+
 ## Jerarquia de verdad
 
 1. Codigo, migraciones y pruebas ejecutables.

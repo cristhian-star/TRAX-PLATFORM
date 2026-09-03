@@ -30,6 +30,7 @@ de las dos partes debe cambiar.
 ### Estado documental
 
 - [Auditoria documental del 2026-08-31](AUDITORIA_DOCUMENTAL_2026-08-31.md)
+- [Auditoria tecnica del 2026-09-02](AUDITORIA_TECNICA_2026-09-02.md)
 
 ### Arquitectura y datos
 
