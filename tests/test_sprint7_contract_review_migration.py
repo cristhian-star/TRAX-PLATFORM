@@ -231,7 +231,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
     def test_empty_upgrade_from_base_and_reupgrade_install_physical_objects(self):
         command.upgrade(self.config, "20260726_05")
         command.upgrade(self.config, "head")
-        self.assertEqual(self._revision(), "20260726_07")
+        self.assertEqual(self._revision(), "20260904_01")
         inspector = sa.inspect(self.engine)
         review_columns = {c["name"] for c in inspector.get_columns("reviews")}
         event_columns = {
@@ -260,7 +260,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
             {c["name"] for c in sa.inspect(self.engine).get_columns("reviews")},
         )
         command.upgrade(self.config, "head")
-        self.assertEqual(self._revision(), "20260726_07")
+        self.assertEqual(self._revision(), "20260904_01")
 
     def test_legacy_classification_is_closed_reconciled_and_non_reputational(self):
         command.upgrade(self.config, "20260726_05")
@@ -458,7 +458,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
                 ).scalar_one(),
                 0,
             )
-        self.assertEqual(self._revision(), "20260726_07")
+        self.assertEqual(self._revision(), "20260904_01")
 
     def test_sqlite_rejects_null_unknown_and_legacy_discriminator_attacks(self):
         command.upgrade(self.config, "head")
@@ -548,7 +548,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
                         0,
                     )
                     connection.commit()
-                    self.assertEqual(self._revision(), "20260726_07")
+                    self.assertEqual(self._revision(), "20260904_01")
 
             with connection.begin():
                 review = self._create_contractual_review(
@@ -575,7 +575,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
                         "CONTRACTUAL",
                     )
                     connection.commit()
-                    self.assertEqual(self._revision(), "20260726_07")
+                    self.assertEqual(self._revision(), "20260904_01")
 
             base_event = (
                 "INSERT INTO reputation_events (user_id, review_id, contract_id, "
@@ -627,7 +627,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
                         0,
                     )
                     connection.commit()
-                    self.assertEqual(self._revision(), "20260726_07")
+                    self.assertEqual(self._revision(), "20260904_01")
 
             with connection.begin():
                 event = self._create_contractual_event(
@@ -660,7 +660,7 @@ class Sprint7ContractReviewMigrationTest(unittest.TestCase):
                         1,
                     )
                     connection.commit()
-                    self.assertEqual(self._revision(), "20260726_07")
+                    self.assertEqual(self._revision(), "20260904_01")
             self.assertEqual(
                 connection.execute(sa.text("SELECT COUNT(*) FROM reviews")).scalar_one(),
                 1,

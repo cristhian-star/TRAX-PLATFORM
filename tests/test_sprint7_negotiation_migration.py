@@ -161,7 +161,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
 
         command.upgrade(self.config, "head")
         schema = self._schema()
-        self.assertEqual(self._revision(), "20260726_07")
+        self.assertEqual(self._revision(), "20260904_01")
         self.assertTrue(
             {
                 "contract_negotiations",
@@ -191,7 +191,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
         )
 
         command.upgrade(self.config, "head")
-        self.assertEqual(self._revision(), "20260726_07")
+        self.assertEqual(self._revision(), "20260904_01")
         self.assertIn("contract_negotiations", self._schema()["tables"])
 
     def test_downgrade_with_protected_data_blocks_before_constraints_change(self):
@@ -352,7 +352,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
                 legacy_hash,
             )
             command.upgrade(self.config, "head")
-            self.assertEqual(self._revision(), "20260726_07")
+            self.assertEqual(self._revision(), "20260904_01")
             with engine.connect() as connection:
                 stored_hash = connection.execute(
                     sa.text(

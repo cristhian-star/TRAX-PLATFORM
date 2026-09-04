@@ -1,4 +1,242 @@
-# Handoff tecnico: especificacion PRO y Facturacion MVP
+# Handoff tecnico: cierre focal P1 del guard PostgreSQL
+
+Timestamp: 2026-09-04T13:19:30-03:00
+Estado: COMPLETED
+Resultado del ciclo: CORRECCION_P1_FOCAL_VALIDADA
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Rama: `feature/pro-entitlement-foundation`
+Commit base y ultimo commit: `18e46fd6bf6d05b73884b7ba3fdbb335f66d7d7e`
+Estado Git: incremento PRO y correccion focal sin commit
+Push a GitHub: NO
+Merge: NO; no autorizado
+
+## Objetivo y resultado
+
+Cerrar exclusivamente el P1 pendiente del guard PostgreSQL, sin modificar la
+implementacion funcional PRO. El nombre se valida mediante `fullmatch()` contra
+`^trax_pro_entitlement_test(?:_[a-z0-9]+(?:_[a-z0-9]+)*)?$`, sin parametros y
+con el limite PostgreSQL de 63 bytes. La autorizacion de reset y el dialecto
+PostgreSQL siguen siendo obligatorios.
+
+## Archivos modificados en esta correccion
+
+- `tests/postgresql_pro_entitlement_e2e.py`
+- `tests/test_pro_entitlement_foundation.py`
+- `docs/postgres_dev.md`
+- `docs/SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+No se modificaron modelos, servicios, rutas, templates, seed ni migraciones
+durante esta correccion focal.
+
+## Tests y migraciones
+
+- Guard focal: 5 ejecutados, 5 aprobados, 0 fallidos, 0 omitidos.
+- Suite focal PRO: 21 ejecutados, 21 aprobados, 0 fallidos, 0 omitidos.
+- Suite completa: 287 ejecutados, 282 aprobados, 0 fallidos, 5 omitidos.
+- Gate PostgreSQL real: 1 ejecutado, 1 aprobado, 0 fallidos, 0 omitidos sobre
+  `trax_pro_entitlement_test_finalaudit_20260904`.
+- Rechazo instrumentado de `trax_db`: 1 ejecutado y aprobado; engine no creado.
+- Revision de `trax_db` antes y despues: `20260726_07`; no fue migrada.
+- Base descartable eliminada despues de la validacion; volumenes preservados.
+- `compileall`: PASS.
+- `alembic heads`: `20260904_01 (head)`.
+- `git diff --check`: PASS.
+
+## Pendientes, riesgos y proximo paso
+
+El P1 del guard queda cerrado. REQ-001 sigue en implementacion parcial; PSP,
+pagos, suscripcion comercial, renovaciones y REQ-002 permanecen fuera de este
+alcance. Proximo paso recomendado: revision tecnica final y, si resulta
+aprobada, solicitar autorizacion para commit. No ejecutar commit, push, PR,
+merge, rebase, reset, clean, stash ni deploy sin autorizacion expresa.
+
+---
+
+# Handoff tecnico: correcciones de auditoria del nucleo PRO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+Estado: COMPLETED
+Resultado del ciclo: CORRECCIONES_P1_VALIDADAS
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Rama: `feature/pro-entitlement-foundation`
+Commit base y ultimo commit: `18e46fd6bf6d05b73884b7ba3fdbb335f66d7d7e`
+Estado Git: cambios sin commit del incremento PRO y sus correcciones autorizadas
+Push a GitHub: NO
+Merge: NO; pendiente de nueva revision y autorizacion
+
+## Objetivo
+
+Corregir los hallazgos P1/P2/P3 de la auditoria sin descartar la implementacion
+existente ni ampliar REQ-001.
+
+## Trabajo completado
+
+- Revocacion limitada por `user_id` a PRO ACTIVA, fuente TRANSACTIONAL o
+  SUBSCRIPTION, vencimiento no nulo y futuro.
+- Revocacion y AuditLog preparados en una sesion y confirmados con un unico
+  commit; cualquier excepcion ejecuta rollback y se propaga.
+- `create_audit_log()` conserva el commit para callers legacy mediante un
+  helper interno sin commit. La atomicidad de otras acciones administrativas
+  queda registrada como deuda fuera de alcance.
+- Gate PostgreSQL endurecido antes de crear el engine: solo acepta
+  `trax_pro_entitlement_test` o `trax_pro_entitlement_test_<sufijo>`.
+- Downgrade documentado y probado como reversible estructuralmente pero no para
+  la clasificacion de `source_type`; el re-upgrade devuelve NULL.
+- Seed QA temporalmente idempotente: conserva vencimientos futuros y renueva la
+  misma fila vencida por 365 dias sinteticos de QA.
+- Frontera UTC centralizada para timestamps PRO sobre columnas legacy UTC
+  naive.
+- Frontmatter de REQ-001 corregido a `IMPLEMENTACION_PARCIAL` sin cambiar su
+  estado `APROBADO`.
+
+## Migracion y gate PostgreSQL
+
+- Head: `20260904_01`.
+- Base descartable usada: `trax_pro_entitlement_test_20260904_102916`.
+- Upgrade/downgrade/re-upgrade: PASS; perdida de clasificacion confirmada.
+- Gate: 1 ejecutado, 1 aprobado, 0 fallidos, 0 omitidos.
+- Intento contra `trax_db`: rechazado antes de crear el engine.
+- Revision de `trax_db` antes y despues: `20260726_07`; sin mutacion.
+- La base descartable fue eliminada; `trax_db` y los volumenes se preservaron.
+
+## Tests y validaciones
+
+- Focalizadas finales: 20 ejecutadas, 20 aprobadas, 0 fallidas, 0 omitidas.
+- Suite final: 286 ejecutadas, 281 aprobadas, 5 omitidas, 0 fallidas.
+- `compileall`: PASS.
+- `alembic heads`: `20260904_01 (head)`.
+- `git diff --check`: PASS.
+- Dos fallos intermitentes ajenos a PRO aparecieron en corridas previas; ambos
+  pasaron aislados. Se aislo el estado del limiter en las pruebas PRO y la
+  corrida completa final paso.
+
+## Riesgos y pendientes
+
+- El downgrade pierde deliberadamente `source_type`; exige respaldo y
+  autorizacion cuando la clasificacion deba conservarse.
+- Otras acciones administrativas legacy aun pueden contener commits internos;
+  su refactorizacion no fue autorizada en este ciclo.
+- PSP, pagos, suscripcion comercial, renovaciones y REQ-002 siguen pendientes.
+
+## Proximo paso
+
+Ejecutar una nueva revision tecnica del diff. No realizar commit, push, PR,
+merge ni deploy sin autorizacion explicita.
+
+---
+
+# Handoff tecnico: fundacion del entitlement PRO
+
+Timestamp: 2026-09-04T10:03:12-03:00
+Estado: COMPLETED
+Resultado del ciclo: IMPLEMENTACION_PARCIAL_VALIDADA
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Rama: `feature/pro-entitlement-foundation`
+Commit base y ultimo commit: `18e46fd6bf6d05b73884b7ba3fdbb335f66d7d7e`
+Estado Git: cambios sin commit exclusivamente del incremento enumerado abajo
+Push a GitHub: NO
+Merge: NO; pendiente de revision y autorizacion
+
+## Objetivo
+
+Implementar el primer incremento de REQ-001: evaluador central de entitlement
+PRO con elegibilidad, fuente valida, vencimiento UTC, bloqueo de concesiones
+legacy/manuales y un unico entitlement QA local.
+
+## Trabajo completado
+
+- Se agrego `Subscription.source_type`, nullable para preservar historia y con
+  constraint para TRANSACTIONAL o SUBSCRIPTION.
+- `has_pro_access()` exige PROFESIONAL ACTIVO, verificacion PROFESIONAL
+  APROBADA, PRO ACTIVA, fuente reconocida y expiracion futura.
+- Puntos, verificacion aislada, legacy, ENTERPRISE, filas indefinidas o vencidas
+  y cuentas no elegibles no conceden capacidades.
+- Las rutas profesional y administrativa ya no crean acceso PRO; la accion
+  visual administrativa fue retirada y la pantalla profesional informa la
+  indisponibilidad comercial.
+- La revocacion administrativa cancela todas las filas PRO activas del usuario
+  sin afectar una eventual fila FREE activa.
+- El seed QA deja exactamente a `electricidad.pro@demo.trax.local` con una
+  fuente SUBSCRIPTION temporal y conserva el bloqueo production/prod.
+- Se creo ADR-001 y se actualizo la trazabilidad documental.
+
+## Parcialmente completado y pendientes
+
+REQ-001 permanece parcial. Faltan PSP, prueba de 30 dias, extensiones de 60
+dias, pagos, suscripcion comercial, renovaciones, mora y contracargos.
+REQ-002, Facturacion, ARCA, IA y ENTERPRISE operativo quedaron fuera de alcance.
+
+## Migracion
+
+- `20260904_01_pro_entitlement_foundation.py`, lineal desde `20260726_07`.
+- Upgrade y downgrade verificados en SQLite y PostgreSQL 16 descartable.
+- Registros legacy conservados con `source_type=NULL`.
+
+## Tests ejecutados
+
+- Baseline: 266 ejecutados, 261 aprobados, 5 omitidos, 0 fallidos.
+- Focalizados finales: 14 ejecutados, 14 aprobados, 0 omitidos, 0 fallidos.
+- Suite final: 280 ejecutados, 275 aprobados, 5 omitidos, 0 fallidos.
+- Gate PostgreSQL: 1 ejecutado y aprobado, sin omisiones.
+- `python -m compileall -q app scripts tests`: PASS.
+- `python -m alembic heads`: `20260904_01 (head)`.
+- `git diff --check`: PASS.
+
+## Errores y troubleshooting
+
+- El primer gate no importo `app` al ejecutarse como archivo; se corrigio el
+  bootstrap de `PROJECT_ROOT`, patron ya usado por scripts del repositorio.
+- La primera regresion mostro 36 asserts que fijaban el head historico; se
+  actualizaron solo las expectativas ejecutadas despues de `upgrade head`.
+- No se creo troubleshooting separado: causa y solucion fueron directas y
+  quedaron cubiertas por tests.
+
+## Archivos modificados o creados
+
+- `app/models/subscription.py`
+- `app/services/subscription_service.py`
+- `app/routes/main_routes.py`
+- `app/templates/solicitar_upgrade_pro.html`
+- `app/templates/admin_usuarios.html`
+- `scripts/dev_seed_professionals.py`
+- `migrations/versions/20260904_01_pro_entitlement_foundation.py`
+- `tests/test_pro_entitlement_foundation.py`
+- `tests/test_pro_entitlement_migration.py`
+- `tests/postgresql_pro_entitlement_e2e.py`
+- `tests/test_sprint7_contract_review_migration.py`
+- `tests/test_sprint7_negotiation_migration.py`
+- `docs/ADR/README.md`
+- `docs/ADR/ADR-001-pro-entitlement-foundation.md`
+- `docs/REQUISITOS/REQ-001-activacion-y-vigencia-pro.md`
+- `docs/REQUISITOS/MASTER_SPEC.md`
+- `docs/ROADMAP.md`, `docs/BACKLOG.md`, `docs/CHANGELOG.md`
+- `docs/QA_LOCAL.md`, `docs/INDEX.md`
+- `docs/SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+## Riesgos y proximo paso
+
+- No aplicar la migracion antes de desplegar el codigo produciria errores por
+  columna ausente; no existe autorizacion de deploy.
+- Las fuentes comerciales aun no tienen productores reales.
+- Proximo paso: revision tecnica del diff; si se aprueba, autorizar commit y
+  push de la rama. No mergear ni desplegar automaticamente.
+
+## Instrucciones para retomar
+
+1. Confirmar rama y estado Git sin descartar cambios.
+2. Revisar diff completo y evidencia de tests.
+3. Mantener fuera de alcance REQ-002 y proveedores externos.
+4. No ejecutar commit, push, PR, merge, rebase, reset, clean, stash o deploy sin
+   autorizacion expresa.
+
+---
+
+# Registro historico superado: especificacion PRO y Facturacion MVP
 
 Timestamp: 2026-09-03T21:55:15-03:00
 Estado: COMPLETED

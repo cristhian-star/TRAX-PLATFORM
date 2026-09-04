@@ -2,9 +2,10 @@
 
 ## PRO y Facturacion - requisitos aprobados, implementacion pendiente
 
-- Implementar [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md):
-  reemplazar la elegibilidad por puntos legacy, modelar una fuente de
-  entitlement auditable, onboarding PSP, prueba de 30 dias, extension de 60
+- Completar [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md):
+  el nucleo calculado, la eliminacion de puntos legacy y las fuentes temporales
+  reconocidas quedaron implementados parcialmente; faltan onboarding PSP,
+  prueba de 30 dias, extension de 60
   dias por operacion con comision efectiva, suscripcion pagada y transiciones
   seguras a `FREE`.
 - Resolver antes de implementar REQ-001: porcentaje de comision; precio y
@@ -99,3 +100,11 @@
 
 - Incorporar Mercados.
 - Incorporar funcionalidades de IA.
+# Deuda tecnica posterior al nucleo PRO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+
+- Revisar en un incremento separado la atomicidad de las acciones
+  administrativas legacy que todavia combinan servicios con commits propios.
+  La revocacion PRO ya fue corregida; este registro no autoriza refactorizar las
+  demas acciones dentro del alcance actual.

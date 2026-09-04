@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from werkzeug.security import generate_password_hash
@@ -13,10 +13,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from app import create_app, db
 from app.models.professional import Professional
 from app.models.user import User
+from app.services.pro_time import as_utc_naive, utc_now
 
 
 DEMO_PASSWORD = os.environ.get("TRAX_DEMO_PASSWORD", "TraxDemo2026!")
 DEMO_MARKER = "[DEV_SEED_PROFESSIONALS_V1]"
+QA_PRO_EMAIL = "electricidad.pro@demo.trax.local"
+QA_PRO_DURATION = timedelta(days=365)
 
 DEMO_CLIENT = {
     "email": "cliente.demo@trax.local",
@@ -219,28 +222,61 @@ def _upsert_professional(user, data):
     return professional, created
 
 
-def _ensure_pro_subscription(subscription_model, user_id):
-    active_subscription = (
+def _sync_demo_pro_subscription(
+    subscription_model,
+    user_id,
+    should_have_pro,
+    now=None,
+):
+    evaluated_at = as_utc_naive(now or utc_now())
+    pro_subscriptions = (
         subscription_model.query
-        .filter_by(user_id=user_id, estado="ACTIVA")
+        .filter_by(user_id=user_id, plan="PRO")
         .order_by(subscription_model.started_at.desc())
-        .first()
+        .all()
+    )
+    qa_source = next(
+        (
+            item for item in pro_subscriptions
+            if item.source_type == "SUBSCRIPTION"
+        ),
+        None,
     )
 
-    if active_subscription is None:
-        active_subscription = subscription_model(
+    created = False
+    if should_have_pro and qa_source is None:
+        qa_source = subscription_model(
             user_id=user_id,
             plan="PRO",
             estado="ACTIVA",
-            started_at=datetime.now(timezone.utc),
+            started_at=evaluated_at,
+            source_type="SUBSCRIPTION",
+            expires_at=evaluated_at + QA_PRO_DURATION,
             auto_renew=False,
         )
-        db.session.add(active_subscription)
-        return True
+        db.session.add(qa_source)
+        pro_subscriptions.append(qa_source)
+        created = True
 
-    active_subscription.plan = "PRO"
-    active_subscription.estado = "ACTIVA"
-    return False
+    qa_source_is_current = (
+        qa_source is not None
+        and qa_source.estado == "ACTIVA"
+        and qa_source.expires_at is not None
+        and as_utc_naive(qa_source.expires_at) > evaluated_at
+    )
+    for subscription in pro_subscriptions:
+        if should_have_pro and subscription is qa_source:
+            subscription.estado = "ACTIVA"
+            subscription.source_type = "SUBSCRIPTION"
+            if not qa_source_is_current:
+                subscription.started_at = evaluated_at
+                subscription.expires_at = evaluated_at + QA_PRO_DURATION
+            subscription.auto_renew = False
+        elif subscription.estado == "ACTIVA":
+            subscription.estado = "CANCELADA"
+            subscription.auto_renew = False
+
+    return created
 
 
 def _ensure_verification(verification_model, user_id, data):
@@ -297,7 +333,7 @@ def _ensure_client_verification(verification_model, user_id):
     return True
 
 
-def seed_professionals():
+def seed_professionals(now=None):
     optional_models = _load_optional_models()
     summary = {
         "users_created": 0,
@@ -332,9 +368,14 @@ def seed_professionals():
         summary["professionals_created"] += int(professional_created)
 
         subscription_model = optional_models.get("subscription")
-        if data["is_pro"] and subscription_model is not None:
+        if subscription_model is not None:
             summary["subscriptions_created"] += int(
-                _ensure_pro_subscription(subscription_model, user.id)
+                _sync_demo_pro_subscription(
+                    subscription_model,
+                    user.id,
+                    data["email"] == QA_PRO_EMAIL,
+                    now=now,
+                )
             )
 
         verification_model = optional_models.get("verification")
