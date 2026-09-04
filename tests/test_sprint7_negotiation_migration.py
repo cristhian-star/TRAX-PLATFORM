@@ -11,6 +11,8 @@ import sqlalchemy as sa
 from alembic import command
 from alembic.config import Config
 
+from tests.alembic_head_validation import assert_database_at_repository_head
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,6 +48,9 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
                 ).scalar_one()
         finally:
             engine.dispose()
+
+    def _assert_current_head(self):
+        return assert_database_at_repository_head(self.config, [self._revision()])
 
     def _insert_phase2b_snapshot(self, engine, payload_hash):
         with engine.begin() as connection:
@@ -161,7 +166,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
 
         command.upgrade(self.config, "head")
         schema = self._schema()
-        self.assertEqual(self._revision(), "20260904_01")
+        self._assert_current_head()
         self.assertTrue(
             {
                 "contract_negotiations",
@@ -191,7 +196,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
         )
 
         command.upgrade(self.config, "head")
-        self.assertEqual(self._revision(), "20260904_01")
+        self._assert_current_head()
         self.assertIn("contract_negotiations", self._schema()["tables"])
 
     def test_downgrade_with_protected_data_blocks_before_constraints_change(self):
@@ -352,7 +357,7 @@ class Sprint7NegotiationMigrationTest(unittest.TestCase):
                 legacy_hash,
             )
             command.upgrade(self.config, "head")
-            self.assertEqual(self._revision(), "20260904_01")
+            self._assert_current_head()
             with engine.connect() as connection:
                 stored_hash = connection.execute(
                     sa.text(

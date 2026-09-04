@@ -1,3 +1,133 @@
+# Handoff tecnico: cierre P1 de prueba dinamica Alembic
+
+Timestamp: 2026-09-04T20:02:58-03:00
+Estado: READY_TO_RESUME
+Resultado del ciclo: CORRECCIONES_IMPLEMENTADAS_PENDIENTES_DE_RETESTING
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Objetivo: eliminar la dependencia fija del head vigente en la prueba real del
+helper Alembic, sin modificar el helper, los gates ni el nucleo PRO.
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `fe979ce278607bfcf243ff2dbab31984d4b1e7ee`
+Estado Git: paquete correctivo local sin commit
+Push a GitHub: NO; las correcciones locales no fueron publicadas
+PR: #5 permanece abierto y no mergeado
+Merge: NO; no autorizado
+
+## Trabajo completado
+
+- La prueba real construye `ScriptDirectory` desde `alembic.ini`, obtiene los
+  heads mediante `get_heads()` y exige exactamente uno.
+- El unico head real se usa como revision aplicada y resultado esperado del
+  helper; una migracion descendiente futura no requiere editar esta prueba.
+- Se preservaron los escenarios adversariales y no cambio codigo funcional.
+- Helper Alembic: 6 ejecutados, 6 aprobados, 0 fallidos, 0 omitidos.
+- Migraciones historicas: 16 ejecutados, 16 aprobados, 0 fallidos, 0 omitidos.
+- Suite completa: 293 ejecutados, 288 aprobados, 0 fallidos, 5 omitidos.
+- `compileall -q tests`, `git diff --check` y busqueda de referencias: PASS.
+
+## Proximo paso y restricciones
+
+Transferir el paquete correctivo validado a una nueva revision tecnica. No
+ejecutar commit, push, nuevo PR, merge, rebase, reset, clean, stash, amend ni
+deploy sin autorizacion expresa.
+
+---
+
+# Handoff tecnico: ejecucion independiente del fundamento PRO
+
+Timestamp: 2026-09-04T19:25:31-03:00
+Estado: READY_TO_RESUME
+Resultado del ciclo: CORRECCIONES_IMPLEMENTADAS_PENDIENTES_DE_RETESTING
+Dispositivo/origen: Codex Desktop local
+Agente: 03 - Testing - Test Executor
+Objetivo: validar independientemente el fundamento tecnico de autorizacion PRO.
+Rama: `feature/pro-entitlement-foundation`
+Commit probado: `fe979ce278607bfcf243ff2dbab31984d4b1e7ee`
+Estado Git inicial: limpio
+Push a GitHub: NO
+Merge: NO; no autorizado
+
+## Evidencia ejecutada
+
+- Identidad de rama y commit: PASS.
+- `git diff --check develop...fe979ce`: PASS.
+- `python -m compileall -q app scripts tests` dentro de `trax-web`: PASS.
+- Suite focal PRO: 21 ejecutados, 21 aprobados, 0 fallidos, 0 omitidos.
+- Suite completa: 287 tests descubiertos; ejecucion final sin fallos y con las
+  5 omisiones historicas esperadas.
+- Gate PostgreSQL PRO: 1 ejecutado, 1 aprobado, 0 fallidos, 0 omitidos.
+- Runner PostgreSQL de migracion parcial: 21 ejecutados, 21 aprobados, 0
+  fallidos, 0 omitidos en repeticion aislada.
+- `alembic heads`: `20260904_01 (head)`.
+- Coverage: NO EJECUTADO; `coverage.py` no esta declarado ni disponible y no
+  se autorizo instalar dependencias.
+- Playwright, axe-core y responsive: NO REQUERIDOS por el paquete para este
+  incremento.
+
+## Hallazgos y bloqueantes
+
+- P1 TEST: `postgresql_contracting_concurrency_e2e.py` y
+  `postgresql_negotiation_concurrency_e2e.py` conservan una expectativa fija
+  de revision `20260726_07`; con el head vigente `20260904_01` ambos fallan en
+  `setUpClass` antes de ejecutar casos.
+- P1 COBERTURA: la atomicidad de revocacion y `AuditLog` esta probada en la
+  suite focal SQLite, pero el gate PRO PostgreSQL no fuerza ese rollback; la
+  evidencia PostgreSQL obligatoria del paquete queda pendiente.
+- P2 DOCUMENTACION: el handoff anterior seguia describiendo el incremento como
+  cambios sin commit sobre `18e46fd`, aunque el paquete y el HEAD probado son
+  `fe979ce`.
+- Una repeticion del runner parcial sufrio dos errores de entorno porque la
+  primera base efimera desaparecio durante la corrida. La repeticion aislada
+  posterior paso 21/21, por lo que no se clasifica como defecto del producto.
+
+## Bases PostgreSQL y seguridad
+
+- Bases efimeras utilizadas:
+  `trax_pro_entitlement_test_executor_20260904` y
+  `trax_pro_entitlement_test_partial_20260904`.
+- Ambas fueron eliminadas; no quedan bases con prefijo
+  `trax_pro_entitlement_test`.
+- `trax_db`, staging, produccion y volumenes no fueron reseteados ni migrados.
+- No se imprimieron secretos ni se conservaron credenciales o datos reales.
+
+## Archivos modificados y proximo paso
+
+- Modificado en esta sesion: `docs/HANDOFFS/ACTIVE_HANDOFF.md` exclusivamente.
+- Codigo productivo, migraciones y tests: sin modificaciones.
+- Proximo paso recomendado: actualizar los dos gates historicos para aceptar el
+  head vigente sin debilitar sus invariantes y ampliar el gate PostgreSQL PRO
+  con rollback real de revocacion y auditoria; luego repetir el paquete.
+- No realizar commit, push, PR, merge, rebase, reset, clean, stash ni deploy sin
+  autorizacion expresa.
+
+## Correcciones implementadas por Builder
+
+Timestamp: 2026-09-04T19:50:24-03:00
+
+- Commit evaluado y base de las correcciones:
+  `fe979ce278607bfcf243ff2dbab31984d4b1e7ee`.
+- Los gates posteriores a `upgrade("head")` validan dinamicamente un unico
+  head, una unica revision aplicada, coincidencia exacta y ascendencia desde
+  `20260726_07`; los checkpoints historicos explicitos se conservaron.
+- El gate PRO PostgreSQL fuerza una FK invalida durante el commit conjunto de
+  dos revocaciones y AuditLog, comprueba rollback desde conexion independiente,
+  recuperacion de sesion y una revocacion valida posterior.
+- Helper Alembic: 5 ejecutados, 5 aprobados, 0 fallidos, 0 omitidos.
+- Migraciones historicas: 16 ejecutados, 16 aprobados, 0 fallidos, 0 omitidos.
+- Gates PostgreSQL historicos: contratacion 8/8, negociacion 8/8, reviews 10/10
+  y rutas/moderacion 8/8.
+- Gate PostgreSQL PRO: 2 ejecutados, 2 aprobados, 0 fallidos, 0 omitidos.
+- Suite focal PRO: 21 ejecutados, 21 aprobados, 0 fallidos, 0 omitidos.
+- Suite completa: 292 ejecutados, 287 aprobados, 0 fallidos, 5 omitidos.
+- Coverage permanece PENDIENTE y no bloqueante; `coverage.py` no fue instalado.
+- PR #5 no fue modificado, cerrado ni mergeado.
+
+Estado final: READY_TO_RESUME; resultado
+`CORRECCIONES_IMPLEMENTADAS_PENDIENTES_DE_RETESTING`.
+
+---
+
 # Handoff tecnico: cierre focal P1 del guard PostgreSQL
 
 Timestamp: 2026-09-04T13:19:30-03:00

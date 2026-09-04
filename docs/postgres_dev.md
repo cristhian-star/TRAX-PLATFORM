@@ -118,3 +118,19 @@ Unicode, guiones bajos finales o dobles y coincidencias parciales.
 
 La validacion y `TRAX_POSTGRES_TEST_ALLOW_RESET=1` se comprueban antes de crear
 el engine o ejecutar upgrade, downgrade o limpieza.
+
+## Head dinamico y rollback real del gate PRO
+
+Timestamp: 2026-09-04T19:50:24-03:00
+
+Los gates que ejecutan `upgrade("head")` obtienen el head vigente con
+`ScriptDirectory`, exigen un unico head y una unica fila en `alembic_version`,
+y comprueban coincidencia exacta. Ademas verifican mediante el grafo Alembic
+que `20260726_07` exista y sea ancestro del head; las pruebas de revisiones
+historicas explicitas mantienen sus identificadores concretos.
+
+El gate PRO incluye una ruta administrativa real con autenticacion
+`SUPER_ADMIN` y CSRF. Fuerza una violacion FK durante el commit de AuditLog y
+confirma desde una conexion independiente que ambas revocaciones se revierten,
+que no queda auditoria parcial, que la sesion se recupera y que una operacion
+valida posterior confirma conjuntamente revocacion y auditoria.

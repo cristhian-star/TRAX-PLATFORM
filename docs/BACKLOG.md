@@ -1,5 +1,13 @@
 # BACKLOG MANDOBRA
 
+## Infraestructura de coverage pendiente
+
+Timestamp: 2026-09-04T19:50:24-03:00
+
+- PENDIENTE no bloqueante: evaluar `coverage.py` como dependencia de desarrollo
+  despues de aprobar un baseline. Esta iteracion no instala la dependencia ni
+  define un porcentaje minimo.
+
 ## PRO y Facturacion - requisitos aprobados, implementacion pendiente
 
 - Completar [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md):

@@ -67,3 +67,35 @@ Timestamp: 2026-09-04T13:19:30-03:00
   `trax_pro_entitlement_test_finalaudit_20260904`.
 - `compileall`, Alembic head `20260904_01` y `git diff --check`: PASS.
 - El P1 del guard queda cerrado. REQ-001 permanece en implementacion parcial.
+
+## Correcciones de infraestructura solicitadas por Testing
+
+Timestamp: 2026-09-04T19:50:24-03:00
+
+- Los gates historicos ya no fijan el resultado posterior a `upgrade("head")`:
+  consultan el head unico vigente mediante `ScriptDirectory` y exigen que la
+  base coincida exactamente con el.
+- El helper verifica que `20260726_07` exista y sea ancestro del head mediante
+  las APIs de Alembic; no usa orden textual, prefijos ni fechas.
+- El gate PRO PostgreSQL demuestra rollback real ante una FK invalida en
+  AuditLog, ausencia de revocaciones parciales, recuperacion de sesion y exito
+  atomico posterior.
+- Validacion: helper 5/5; migraciones historicas 16/16; gates PostgreSQL
+  historicos 34/34; gate PRO 2/2; focal PRO 21/21; suite completa 292 tests,
+  287 aprobados, 5 omitidos y 0 fallidos.
+- Coverage sigue pendiente y no bloqueante. REQ-001 permanece parcial.
+
+## Cierre P1 de prueba dinamica Alembic
+
+Timestamp: 2026-09-04T20:02:58-03:00
+
+- La prueba real del helper obtiene los heads desde `ScriptDirectory`, exige
+  exactamente uno y usa ese valor dinamico como revision aplicada y esperada.
+- Se elimino su dependencia literal del head `20260904_01`; las referencias
+  restantes en tests corresponden exclusivamente a la prueba historica de esa
+  migracion PRO.
+- No se modificaron el helper, los gates PostgreSQL ni el nucleo funcional PRO.
+- Validacion: helper 6/6; migraciones historicas 16/16; suite completa 293
+  ejecutados, 288 aprobados, 5 omitidos y 0 fallidos; `compileall -q tests` y
+  `git diff --check`: PASS.
+- El P1 queda cerrado y validado, pendiente de revision tecnica independiente.
