@@ -1,5 +1,40 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-03 - Especificacion de PRO y Facturacion MVP
+
+Timestamp: 2026-09-03T21:47:10-03:00
+Estado: DOCUMENTACION_APROBADA_IMPLEMENTACION_PENDIENTE
+Documento: requisitos de PRO y Facturacion MANDOBRA MVP
+Motivo: formalizar por separado la activacion y vigencia PRO y el beneficio
+opcional de Facturacion PRO MVP.
+Responsable: Cristian Sánchez
+Rama: `docs/spec-pro-facturacion-mvp`
+Commit base: `e0eed2`
+
+### Agregado
+
+- Se creo [REQ-001](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md) para el
+  catalogo `FREE`, `PRO`, `ENTERPRISE`, la elegibilidad profesional y las
+  modalidades transaccional y por suscripcion del mismo entitlement PRO.
+- Se creo [REQ-002](REQUISITOS/REQ-002-facturacion-pro-mvp.md) para el modulo
+  opcional de Facturacion, limitado en el MVP a persona humana, monotributo
+  activo y Factura C.
+
+### Aclarado
+
+- `Plus` no pertenece al catalogo aprobado y los puntos legacy no determinan
+  elegibilidad PRO.
+- Facturacion no activa PRO y exige entitlement vigente para nuevas emisiones.
+- `ENTERPRISE` permanece conceptual y no autoriza crear el actor `EMPRESA`.
+- Proveedores PSP, integracion ARCA, custodia de credenciales, modelos e IA
+  permanecen pendientes de evaluacion y decisiones posteriores.
+
+### Trazabilidad
+
+- Se actualizaron Master Spec, Roadmap, Backlog, indice documental e indice de
+  requisitos sin declarar capacidades implementadas.
+- Tests de aplicacion: NO EJECUTADOS - no aplican al alcance documental.
+
 ## 2026-09-02 - Consolidacion documental de trazabilidad
 
 Timestamp: 2026-09-02T21:18:48-03:00

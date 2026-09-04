@@ -1,11 +1,34 @@
 # BACKLOG MANDOBRA
 
+## PRO y Facturacion - requisitos aprobados, implementacion pendiente
+
+- Implementar [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md):
+  reemplazar la elegibilidad por puntos legacy, modelar una fuente de
+  entitlement auditable, onboarding PSP, prueba de 30 dias, extension de 60
+  dias por operacion con comision efectiva, suscripcion pagada y transiciones
+  seguras a `FREE`.
+- Resolver antes de implementar REQ-001: porcentaje de comision; precio y
+  periodicidad; beneficios y limites completos; renovacion, cancelacion, mora,
+  contracargos, periodo de gracia; migracion de accesos existentes; proveedor
+  PSP y modelo futuro de `ENTERPRISE`.
+- Implementar [REQ-002 - Facturacion MANDOBRA PRO MVP](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
+  como modulo opcional para PRO vigente, limitado inicialmente a persona
+  humana, monotributo activo y Factura C, con borrador asistido, vista previa,
+  confirmacion humana, CAE, auditoria e idempotencia.
+- Resolver antes de implementar REQ-002: integracion directa o proveedor;
+  custodia y rotacion de certificados; validacion fiscal; datos del receptor;
+  almacenamiento, entrega y retencion; limites; correcciones, anulaciones y
+  notas de credito; contingencia ARCA; IA, costos y revisiones legal, fiscal,
+  contable y de seguridad.
+- Crear los ADR necesarios cuando se decidan PSP, integracion fiscal, custodia
+  de secretos, modelo de datos, idempotencia externa y proveedor de IA. Ninguna
+  de esas decisiones esta aprobada todavia.
+
 ## Alta prioridad
 
-- Definir mediante requisito aprobado el catalogo, beneficios, limites y
-  activacion de `FREE`, `PRO` y `ENTERPRISE`; la UI publica conserva `Plus`
-  como referencia contradictoria y debe corregirse solo despues de esa
-  definicion.
+- Alinear la UI publica con el catalogo aprobado `FREE`, `PRO`, `ENTERPRISE` en
+  una fase de implementacion autorizada; `Plus` permanece como contradiccion
+  visible y no pertenece al catalogo aprobado.
 - Definir el alcance objetivo de Emergencias: solicitud y descubrimiento,
   asignacion operativa o integracion con el contrato canonico de origen
   `EMERGENCY`.
@@ -27,7 +50,6 @@
 ## Media prioridad
 
 - Implementar oferta profesional como segundo tipo de publicacion de propuestas.
-- Preparar facturacion MANDOBRA PRO sobre el nucleo de contratacion sin integrar ARCA hasta aprobacion funcional.
 - Migrar navbar completo a Design System v2 en un sprint especifico sin cambiar rutas ni comportamiento.
 - Migrar Home, Resultados y Perfil Profesional completo a Design System v2 con validacion visual dedicada.
 - Migrar Dashboards, Presupuestos, Propuestas, Emergencias, Admin y tablas a componentes `.trax-*` por fases.
@@ -38,7 +60,6 @@
 - Reemplazar usos legacy de `Query.get()` por `db.session.get()`.
 - Reemplazar `datetime.utcnow()` deprecated por timestamps timezone-aware.
 - Auditar la lectura administrativa de comentarios originales con un evento de acceso si el volumen y la política de privacidad lo requieren.
-- Reemplazar los lectores históricos de puntos usados por elegibilidad PRO cuando producto apruebe una política neutral sustituta.
 - Evaluar una outbox transaccional cuando se habilite el primer canal externo; `INTERNAL` permanece sin dispatcher.
 - Definir politica de retencion y limpieza de `OperationCommand` sin perder capacidad de auditoria.
 - Agregar `source` explicito al modelo de consentimientos si producto requiere trazabilidad separada del contexto tecnico.
@@ -53,7 +74,8 @@
 - Evaluar `PortfolioItem` futuro si el portfolio necesita agrupar trabajos con multiples imagenes y narrativa propia.
 - Evaluar soporte de videos solo si producto define moderacion, storage y costos.
 - Evaluar moderacion automatica de imagenes cuando exista politica aprobada y proveedor definido.
-- Evaluar rol o flujo `EMPRESA` cuando exista definicion funcional y modelo de permisos.
+- Evaluar el actor o flujo `EMPRESA` solo durante la futura definicion de
+  `ENTERPRISE`; REQ-001 no autoriza crearlo.
 - Implementar geocoding de ubicaciones base.
 - Evolucionar matching geografico hacia PostGIS o indices espaciales cuando escale el volumen.
 - Implementar rutas, tiempos de viaje o distancia real por calle solo si producto lo requiere.

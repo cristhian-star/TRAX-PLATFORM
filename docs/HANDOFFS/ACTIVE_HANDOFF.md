@@ -1,145 +1,223 @@
-# Handoff tecnico activo
+# Handoff tecnico: especificacion PRO y Facturacion MVP
 
-Timestamp: 2026-09-02T21:43:17-03:00
-Estado: READY_TO_RESUME
-Resultado del ciclo: PARTIAL
-Dispositivo/origen: Codex Desktop local
-Responsable: Codex / Documentation Engineer Senior
+Timestamp: 2026-09-03T21:55:15-03:00
+Estado: COMPLETED
+Resultado del ciclo: COMPLETED
+Alcance: especificacion funcional documental de activacion y vigencia PRO y de
+Facturacion MANDOBRA PRO MVP
 
-## Objetivo
+## Identificacion
 
-Consolidar la trazabilidad documental derivada de la auditoria tecnica de
-MANDOBRA, corregir ambiguedades y revisar los documentos no rastreados bajo
-`docs/RUNBOOKS/` sin modificar codigo funcional.
+- Dispositivo/origen: Codex Desktop local.
+- Agente o sesion de origen: Codex / Documentation Engineer Senior.
+- Rama actual: `docs/spec-pro-facturacion-mvp` (estado provisto y verificado
+  antes de iniciar esta tarea; no se repitio el preflight por instruccion).
+- Commit base y ultimo commit informado: `e0eed2`.
+- Cambios sin commit: SI; nueve archivos Markdown bajo `docs/` enumerados en
+  este handoff.
+- Rama subida a GitHub: NO; no se ejecuto push ni se verificaron remotos por
+  restriccion expresa.
+- Destino previsto: `02 - Implementacion y Refinacion`.
 
-## Estado Git
+## Objetivo de la sesion
 
-- Rama actual: `docs/documentation-traceability-consolidation`.
-- Commit base y ultimo commit: `f63c8db docs: add technical handoff workflow`.
-- Rama inicial: `develop`.
-- Estado inicial: dos grupos no rastreados bajo `docs/RUNBOOKS/`.
-- Estado final: arbol limpio despues del commit documental y del commit de
-  cierre de este handoff.
-- Push a GitHub: REALIZADO sobre
-  `origin/docs/documentation-traceability-consolidation`.
-- Commit documental: `c21ed41 docs: consolidate project documentation traceability`.
-- Commit de cierre: el commit que contiene esta actualizacion del handoff.
-- Rama remota verificada: `2f0874e5be0945a42b0a518f56a99ea08b33b66e`
-  antes del commit adicional de trazabilidad.
-- PR: NO ABIERTA; GitHub CLI no esta instalado en el entorno.
-- URL para creacion manual:
-  `https://github.com/cristhian-star/TRAX-PLATFORM/pull/new/docs/documentation-traceability-consolidation`.
-- Merge: NO REALIZADO; requiere revision y autorizacion posterior.
-- Sincronizacion remota: VERIFICADA mediante `git fetch origin develop`.
-  `origin/develop` permanecia en `f63c8db`; comparacion previa al push: cero
-  commits detras y dos delante.
+Formalizar como requisitos separados y aprobados la activacion y vigencia de
+MANDOBRA PRO y Facturacion MANDOBRA MVP como beneficio opcional de PRO, sin
+implementar codigo, proveedores, integraciones, migraciones, tests ni cambios
+visuales.
 
 ## Trabajo completado
 
-- Se registro la auditoria tecnica estatica de `f63c8db`.
-- Se agrego trazabilidad posterior al Master Spec sin cambiar la revision
-  historica `d07d95`.
-- Se delimito el alcance del check de Emergencias en el Roadmap.
-- Se aclaro el alcance historico de P0/P1/P2 de Sprint 7.
-- Se aclaro que Design System v2 no implica migracion visual total.
-- Se consolidaron pendientes de Planes/PRO, Emergencias, pruebas e
-  identificadores internos TRAX en el Backlog.
-- Se enlazo la nueva auditoria desde el indice y se registro el ciclo en el
-  Changelog.
-- Se eliminaron exclusivamente los duplicados autorizados y se preservaron
-  `docs/DECISIONES_ARQUITECTURA.md` y `docs/PLANTILLAS/`.
-- Se creo el commit documental local `c21ed41`.
-- Se publico la rama documental sin force push.
-- El diff remoto contra `origin/develop` se verifico como exclusivamente
-  documental: siete archivos bajo `docs/`.
+- Se creo [REQ-001](../REQUISITOS/REQ-001-activacion-y-vigencia-pro.md) con
+  catalogo `FREE`, `PRO`, `ENTERPRISE`, elegibilidad profesional y reglas para
+  PRO transaccional y por suscripcion.
+- Se creo [REQ-002](../REQUISITOS/REQ-002-facturacion-pro-mvp.md) con el alcance
+  fiscal MVP de persona humana, monotributo activo y Factura C.
+- Se separaron expresamente Facturacion, entitlement PRO y configuracion ARCA.
+- Se registro el contraste con el codigo actual: activacion inmediata/manual,
+  lector de puntos legacy, falta de control de vencimiento y ausencia de PSP,
+  ARCA, facturacion e IA productiva.
+- Se actualizaron Master Spec, Roadmap, Backlog, Changelog e indices con
+  implementacion marcada como `PENDIENTE`.
+- Se conservaron preguntas abiertas separadas de las decisiones aprobadas.
+
+## Trabajo parcialmente completado
+
+Ninguno dentro del alcance documental autorizado.
+
+## Pendientes
+
+- Porcentaje de comision; precio, periodicidad, beneficios y limites completos
+  de PRO; renovacion, cancelacion, mora, contracargos y periodo de gracia.
+- Politica de migracion de accesos PRO actuales y concesiones administrativas.
+- Seleccion y validacion del PSP y estrategia del entitlement.
+- Integracion directa con ARCA o proveedor; custodia y rotacion de
+  certificados; validacion de monotributo; datos del receptor; retencion,
+  almacenamiento, entrega, limites, correcciones, anulaciones, notas de credito
+  y contingencia.
+- Proveedor y modelo de IA, costos y revisiones legal, fiscal, contable y de
+  seguridad.
+- Modelo futuro de `ENTERPRISE`; no se autorizo crear el actor `EMPRESA`.
+- Implementacion y pruebas de ambos requisitos, sujetas a nueva autorizacion.
+
+## Bloqueantes
+
+- BLOQUEANTE para implementar PRO transaccional: seleccionar y validar PSP y
+  cerrar politicas comerciales y de contracargos.
+- BLOQUEANTE para implementar Facturacion: resolver integracion fiscal,
+  custodia de credenciales, politicas de datos y revisiones legal, fiscal,
+  contable y de seguridad.
+- No existen bloqueantes para el cierre de esta especificacion documental.
+
+## Archivos creados
+
+- `docs/REQUISITOS/REQ-001-activacion-y-vigencia-pro.md`: requisito aprobado;
+  implementacion pendiente, sin commit.
+- `docs/REQUISITOS/REQ-002-facturacion-pro-mvp.md`: requisito aprobado;
+  implementacion pendiente, sin commit.
 
 ## Archivos modificados
 
-- `docs/REQUISITOS/MASTER_SPEC.md`
-- `docs/ROADMAP.md`
-- `docs/BACKLOG.md`
-- `docs/INDEX.md`
-- `docs/CHANGELOG.md`
-- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+- `docs/REQUISITOS/README.md`: indice de requisitos aprobados, sin commit.
+- `docs/REQUISITOS/MASTER_SPEC.md`: resumen, actores, estado actual, capacidades
+  aprobadas y pendientes, sin commit.
+- `docs/ROADMAP.md`: especificaciones aprobadas e implementaciones pendientes,
+  sin commit.
+- `docs/BACKLOG.md`: pendientes consolidados y enlazados, sin commit.
+- `docs/INDEX.md`: enlaces a REQ-001 y REQ-002, sin commit.
+- `docs/CHANGELOG.md`: cambios exclusivamente documentales, sin commit.
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`: reemplazo del handoff activo para este
+  ciclo, sin commit.
 
-## Archivos incorporados
+## Migraciones relacionadas
 
-- `docs/AUDITORIA_TECNICA_2026-09-02.md`
+Ninguna. No se crearon ni ejecutaron migraciones.
 
-## Duplicados eliminados con autorizacion
+## Tests y validaciones ejecutados
 
-- Autorizacion: Cristian Sanchez, 2026-09-02T21:30:33-03:00.
-- `docs/RUNBOOKS/DECISIONES_ARQUITECTURA.md`: DUPLICADO EXACTO de
-  `docs/DECISIONES_ARQUITECTURA.md`.
-- `docs/RUNBOOKS/PLANTILLAS/DECISION_ARQUITECTURA.md`: DUPLICADO EXACTO.
-- `docs/RUNBOOKS/PLANTILLAS/ERROR_RESUELTO.md`: DUPLICADO EXACTO.
-- `docs/RUNBOOKS/PLANTILLAS/REQUISITO.md`: DUPLICADO EXACTO.
-- `docs/RUNBOOKS/PLANTILLAS/RUNBOOK.md`: DUPLICADO EXACTO.
-- `docs/RUNBOOKS/PLANTILLAS/README.md`: DUPLICADO PARCIAL de
-  `docs/PLANTILLAS/README.md`; omite la plantilla de handoff y no contiene
-  informacion unica.
+- Inspeccion estatica dirigida de `Subscription`, `subscription_service`,
+  verificacion, decoradores, ruta de upgrade, administracion, Planes y puntos
+  legacy: EJECUTADA; confirma el contexto registrado en los requisitos.
+- Verificacion de las 16 secciones obligatorias en REQ-001 y REQ-002:
+  EJECUTADA; resultado `HEADINGS_OK` para ambos documentos.
+- Comprobacion de enlaces Markdown relativos en los documentos creados o
+  actualizados: EJECUTADA; resultado `RELATIVE_LINKS_OK`.
+- Comprobacion de identificadores: EJECUTADA; `REQ-001` y `REQ-002` son los
+  primeros identificadores de requisito y no reutilizan un `REQ-NNN` previo.
+- `git status --short`: EJECUTADO; cambios exclusivamente Markdown bajo
+  `docs/`.
+- `git diff --check`: EJECUTADO; sin errores, con advertencias informativas de
+  conversion futura LF a CRLF para archivos rastreados.
+- `git diff --stat`: EJECUTADO; revisado antes del cierre del handoff.
+- `git diff -- docs`: EJECUTADO; revisado antes del cierre del handoff.
 
-Evidencia: los cinco duplicados exactos fueron comparados mediante SHA-256. El
-`README.md` fue comparado mediante diff y su unica diferencia fue la ausencia
-del enlace a la plantilla canonica de handoff. Las fuentes canonicas fueron
-verificadas antes y despues de la eliminacion.
-
-## Decisiones aplicadas
-
-- No crear una segunda fuente canonica dentro de `docs/RUNBOOKS/`.
-- No cambiar requisitos funcionales ni aprobar funcionalidades nuevas.
-- Conservar documentos y fechas historicas; agregar trazabilidad fechada.
-- Diferenciar inspeccion estatica de ejecucion real.
-
-## Validaciones
+## Tests y validaciones no ejecutados
 
 - Tests de aplicacion: NO EJECUTADOS - no aplican al alcance documental.
-- Migraciones: NO EJECUTADAS.
-- Aplicacion: NO EJECUTADA.
-- `git diff --check`: APROBADO, sin errores; solo advertencias informativas de
-  conversion futura LF a CRLF en el entorno Windows.
-- Enlaces relativos de documentos modificados: APROBADOS, sin destinos rotos.
-- Alcance: APROBADO; `git status` no muestra cambios fuera de `docs/`.
-- Secretos y datos personales: no se detectaron valores sensibles en los
-  documentos modificados mediante busqueda estatica dirigida.
-- Requisitos funcionales: no se aprobo ninguno nuevo.
+- Aplicacion: NO EJECUTADA; no aplica al alcance documental.
+- Migraciones: NO EJECUTADAS; no existen cambios de esquema.
+- Integraciones PSP, ARCA e IA: NO EJECUTADAS; no estan implementadas ni fueron
+  autorizadas.
 
-## Pendientes y bloqueantes
+## Resultados de tests
 
-- Pendiente operativo: crear manualmente el Pull Request hacia `develop` o
-  disponer de GitHub CLI autenticado. No se instalo ninguna herramienta.
-- Pendiente de producto: Planes/PRO, elegibilidad neutral, Emergencias,
-  politica productiva e identificadores TRAX.
-- Bloqueantes tecnicos para produccion: WSGI, rate limiting compartido,
-  staging, secretos, HTTPS, backups, monitoreo, restauracion y validaciones de
-  proveedores.
+- Aprobados: validaciones documentales de estructura, enlaces, alcance y diff.
+- Fallidos: ninguno.
+- Omitidos: suite de aplicacion, por no aplicar al alcance documental.
+- Resultado general: PASS documental; implementacion NO EJECUTADA.
+
+## Errores conocidos
+
+- Ninguno durante la edicion documental.
+- CONTRADICCION vigente y no corregida en codigo: la UI publica conserva
+  `Plus`, mientras el catalogo aprobado es `FREE`, `PRO`, `ENTERPRISE`.
+- CONTRADICCION vigente y no corregida en codigo: el upgrade usa puntos legacy
+  o verificacion, mientras REQ-001 exige cuenta activa, verificacion aprobada y
+  una fuente de entitlement vigente.
+
+## Troubleshooting relacionado
+
+Ninguno.
+
+## Decisiones tomadas
+
+- APROBADO: `FREE`, `PRO`, `ENTERPRISE` es el catalogo canonico; `Plus` queda
+  fuera.
+- APROBADO: la primera implementacion PRO corresponde a profesionales con
+  cuenta activa y verificacion aprobada; puntos legacy no conceden PRO.
+- APROBADO: modalidad transaccional y suscripcion mantienen el mismo
+  entitlement `PRO`.
+- APROBADO: Facturacion es un modulo separado, opcional y exclusivo de PRO
+  vigente; no activa ni extiende PRO.
+- APROBADO: el alcance fiscal inicial es persona humana, monotributo activo y
+  Factura C, con borrador asistido y confirmacion humana obligatoria.
+- PENDIENTE: proveedor PSP, integracion fiscal, custodia de secretos, proveedor
+  de IA, modelos, precios y porcentajes.
+- PENDIENTE: crear ADR cuando se aprueben decisiones arquitectonicas con impacto
+  transversal o costosas de revertir.
+
+## Documentacion actualizada
+
+- [REQ-001](../REQUISITOS/REQ-001-activacion-y-vigencia-pro.md).
+- [REQ-002](../REQUISITOS/REQ-002-facturacion-pro-mvp.md).
+- [Indice de requisitos](../REQUISITOS/README.md).
+- [Master Spec](../REQUISITOS/MASTER_SPEC.md).
+- [Roadmap](../ROADMAP.md).
+- [Backlog](../BACKLOG.md).
+- [Indice documental](../INDEX.md).
+- [Changelog](../CHANGELOG.md).
+- Este handoff activo.
+
+## Riesgos
+
+- Implementar antes de cerrar politicas abiertas puede producir accesos,
+  cobros o efectos fiscales incorrectos.
+- Webhooks duplicados o fuera de orden pueden degradar vigencia e idempotencia.
+- Una custodia inadecuada puede exponer secretos y datos fiscales.
+- IA sin limites estrictos puede inventar datos o aparentar asesoramiento
+  fiscal.
+- El codigo legacy puede seguir concediendo PRO por puntos hasta que una
+  implementacion autorizada aplique REQ-001.
 
 ## Proximo paso recomendado
 
-1. Abrir el Pull Request manualmente mediante la URL registrada.
-2. Verificar base `develop`, head
-   `docs/documentation-traceability-consolidation` y diff solo bajo `docs/`.
-3. Solicitar revision y autorizacion final antes de cualquier merge.
+Iniciar `02 - Implementacion y Refinacion` con una revision tecnica de REQ-001
+y REQ-002 que produzca un plan de implementacion por fases y ADR pendientes,
+sin escribir codigo hasta cerrar las decisiones bloqueantes y obtener
+autorizacion explicita.
 
-## Instrucciones exactas para retomar
+## Handoff exacto para 02 - Implementacion y Refinacion
 
-```powershell
-Set-Location "C:\Users\Cristhian\Proyecto Mandobra"
-git status --short --branch
-git branch --show-current
-git log -1 --oneline
-Get-Content docs/HANDOFFS/ACTIVE_HANDOFF.md
-git diff --check
-git diff --stat
-git diff -- docs
-```
+1. Verificar estado Git, rama y ultimo commit antes de actuar.
+2. Confirmar que los nueve cambios Markdown sin commit enumerados siguen
+   presentes e intactos.
+3. Leer completos REQ-001, REQ-002, Master Spec y este handoff.
+4. Contrastar nuevamente el plan con el codigo y migraciones vigentes si cambia
+   el commit base.
+5. Separar la implementacion de entitlement PRO del modulo de Facturacion.
+6. Proponer fases, invariantes, migraciones, pruebas PostgreSQL, controles de
+   seguridad y ADR, sin seleccionar proveedores no aprobados.
+7. Resolver o elevar las preguntas bloqueantes antes de implementar.
+8. No modificar codigo, migraciones o UI sin autorizacion explicita para la
+   fase de implementacion.
 
-## Acciones que no deben realizarse
+## Acciones que NO deben realizarse
 
-- No eliminar ningun otro archivo bajo `docs/RUNBOOKS/`.
-- No ejecutar `reset`, `clean`, `stash`, rebase, merge o cambio destructivo de
-  rama.
-- No modificar `app/`, `migrations/`, `tests/` ni `scripts/` como parte de este
-  ciclo.
-- No aprobar ni fusionar el Pull Request sin autorizacion expresa.
-- No usar force push, rebase ni resolucion automatica de divergencias.
+- No asumir que REQ-001 o REQ-002 ya estan implementados.
+- No elegir Mercado Pago, otro PSP, integracion ARCA ni proveedor de IA sin
+  evaluacion y aprobacion.
+- No almacenar claves fiscales en texto plano.
+- No usar puntos legacy como elegibilidad PRO.
+- No crear el actor `EMPRESA` por la sola existencia conceptual de
+  `ENTERPRISE`.
+- No ejecutar commit, push, PR, merge, rebase, reset, clean, stash ni cambios
+  de rama sin autorizacion expresa.
+- No mezclar cambios ajenos o fuera de `docs/` con este ciclo documental.
+
+## Criterio de cierre
+
+Este ciclo queda `COMPLETED` cuando los dos requisitos y su trazabilidad
+documental estan presentes, los cambios permanecen exclusivamente bajo
+`docs/`, las validaciones documentales no informan errores y se entrega este
+handoff. El cierre no requiere ni autoriza commit, push, PR, merge o
+implementacion.

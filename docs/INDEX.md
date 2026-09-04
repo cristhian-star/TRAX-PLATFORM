@@ -26,6 +26,8 @@ de las dos partes debe cambiar.
 - [Backlog](BACKLOG.md)
 - [Taxonomia del producto](trax-taxonomy-v1.md)
 - [Requisitos](REQUISITOS/README.md)
+- [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md)
+- [REQ-002 - Facturacion MANDOBRA PRO MVP](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
 
 ### Estado documental
 
