@@ -80,6 +80,25 @@ staging, produccion o ampliacion del producto.
 
 [ ] IA
 
+## PRO y Facturacion
+
+[x] Especificacion funcional de activacion y vigencia PRO aprobada en
+[REQ-001](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md)
+
+[ ] Implementacion de PRO transaccional: onboarding PSP, prueba de 30 dias y
+extensiones por operaciones con comision efectiva
+
+[ ] Implementacion de suscripcion PRO durante periodos efectivamente pagados
+
+[x] Facturacion PRO MVP aprobada para especificacion en
+[REQ-002](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
+
+[ ] Implementacion de Facturacion PRO MVP para persona humana, monotributo
+activo y Factura C, sujeta a decisiones tecnicas y revisiones previas
+
+[ ] Definicion e implementacion futura de `ENTERPRISE`; permanece conceptual y
+no autoriza crear el actor `EMPRESA`
+
 ## Documentacion del Proyecto
 
 [x] CHANGELOG

@@ -2,9 +2,9 @@
 id: MANDOBRA-MASTER-SPEC
 titulo: Especificacion maestra de MANDOBRA
 estado: LINEA_BASE_VERIFICADA
-version: 0.1
+version: 0.2
 fecha: 2026-08-31
-ultima_revision: 2026-08-31
+ultima_revision: 2026-09-03
 revision_codigo: d07d95
 ---
 
@@ -21,6 +21,29 @@ Este documento describe la linea base observada en el codigo. No convierte
 prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
+
+### 2026-09-03 - PRO y Facturacion MVP
+
+Timestamp: 2026-09-03T21:47:10-03:00
+Estado: APROBADO_IMPLEMENTACION_PENDIENTE
+Motivo: incorporar al Master Spec la decision de producto aprobada para
+activacion y vigencia PRO y para Facturacion MANDOBRA como beneficio opcional.
+Responsable: Cristian Sánchez
+Rama: `docs/spec-pro-facturacion-mvp`
+Commit base: `e0eed2`
+
+- [REQ-001](REQ-001-activacion-y-vigencia-pro.md) aprueba el catalogo
+  `FREE`, `PRO`, `ENTERPRISE`, la elegibilidad profesional y dos fuentes del
+  mismo entitlement `PRO`: transaccional y suscripcion.
+- [REQ-002](REQ-002-facturacion-pro-mvp.md) aprueba Facturacion como modulo
+  opcional para PRO vigente, limitado inicialmente a persona humana,
+  monotributo activo y Factura C.
+- La aprobacion es funcional y documental. No declara pagos, PSP, ARCA, IA,
+  suscripciones comerciales ni facturacion como capacidades implementadas.
+- Proveedores, precios, comisiones, arquitectura, modelos y politicas abiertas
+  requieren decisiones y autorizacion posteriores.
+
+### 2026-09-02 - Verificacion estatica documental
 
 Timestamp: 2026-09-02T21:18:48-03:00
 Estado: VERIFICACION_ESTATICA_DOCUMENTAL
@@ -81,6 +104,11 @@ el documento o el codigo es correcto.
 - Envia ofertas y postulaciones dentro de los limites aplicables.
 - Participa en negociaciones elegibles.
 - Acepta, inicia y declara completados los contratos asignados.
+- En el alcance futuro aprobado, puede acceder al entitlement `PRO` si tiene
+  cuenta activa, verificacion profesional aprobada y una fuente de vigencia
+  valida conforme a REQ-001.
+- Con PRO vigente, puede optar por configurar Facturacion para emitir Factura C
+  si es persona humana con monotributo activo, conforme a REQ-002.
 
 ### SUPER_ADMIN
 
@@ -255,7 +283,9 @@ el documento o el codigo es correcto.
 - El upgrade actual puede habilitarse por verificacion o por puntos legacy.
 - Un administrador puede activar o quitar PRO.
 - No hay cobro ni renovacion comercial real.
-- Esta area es provisional y requiere un requisito aprobado antes de evolucionar.
+- El comportamiento actual no satisface [REQ-001](REQ-001-activacion-y-vigencia-pro.md):
+  los puntos legacy no pertenecen a la elegibilidad aprobada, la verificacion
+  por si sola no concede PRO y faltan fuentes y vigencias comerciales.
 
 ### 14. Mercados
 
@@ -263,6 +293,41 @@ el documento o el codigo es correcto.
 - No consume APIs ni calcula estadisticas sobre datos reales.
 - No debe usarse para decisiones economicas ni anunciarse como modulo
   implementado.
+
+## Capacidades aprobadas pendientes de implementacion
+
+### Activacion y vigencia PRO
+
+- El catalogo canonico es `FREE`, `PRO`, `ENTERPRISE`; `Plus` no pertenece al
+  catalogo aprobado.
+- La primera implementacion corresponde a profesionales prestadores con cuenta
+  activa y verificacion aprobada.
+- PRO transaccional se activa tras validar la vinculacion PSP, concede 30 dias
+  de prueba y se extiende hasta 60 dias desde cada operacion con comision
+  efectiva, sin reducir una vigencia existente.
+- PRO por suscripcion permanece vigente durante el periodo efectivamente pagado
+  y no aplica comision transaccional de MANDOBRA sobre las operaciones.
+- Ambas modalidades conceden el mismo entitlement funcional `PRO`.
+- `ENTERPRISE` es conceptual para empresas; no autoriza crear el actor
+  `EMPRESA` ni define precios, beneficios, permisos o modelo organizacional.
+- Detalle y criterios: [REQ-001](REQ-001-activacion-y-vigencia-pro.md).
+
+### Facturacion MANDOBRA PRO MVP
+
+- Es un modulo funcional separado y un beneficio opcional exclusivo de PRO
+  vigente; no activa, inicia ni extiende PRO.
+- El MVP fiscal se limita a profesionales personas humanas con monotributo
+  activo y Factura C.
+- El flujo aprobado exige configuracion fiscal opcional, validacion, borrador
+  asistido, vista previa, confirmacion humana explicita, solicitud fiscal/CAE,
+  resultado auditable y comprobante disponible.
+- La IA no puede inventar datos fiscales, determinar tratamientos fiscales ni
+  emitir sin confirmacion humana.
+- Perder PRO bloquea nuevas emisiones, no la consulta y descarga autorizada del
+  historial propio, sujeto a la futura politica de retencion.
+- La integracion directa con ARCA o mediante proveedor permanece pendiente de
+  evaluacion tecnica, legal, economica y de seguridad.
+- Detalle y criterios: [REQ-002](REQ-002-facturacion-pro-mvp.md).
 
 ## Modelo tecnico
 
@@ -331,7 +396,8 @@ el documento o el codigo es correcto.
 
 ## Fuera de alcance actual
 
-- Pagos y facturacion.
+- Pagos y facturacion no estan implementados. Facturacion PRO MVP es una
+  capacidad futura aprobada en REQ-002, con implementacion pendiente.
 - Custodia, garantias y disputas financieras.
 - Contratacion multiple.
 - Despacho contractual completo de emergencias.
@@ -339,19 +405,26 @@ el documento o el codigo es correcto.
 - WhatsApp Business API.
 - Email, push y tiempo real.
 - Agenda.
-- Inteligencia artificial productiva.
+- Inteligencia artificial productiva; REQ-002 solo aprueba asistencia futura
+  acotada al borrador y con confirmacion humana obligatoria.
 - Despliegue productivo aprobado.
 
 ## Decisiones pendientes prioritarias
 
-1. Beneficios, limites y activacion de Free/Pro/Enterprise.
-2. Sustituto neutral para la elegibilidad PRO basada en puntos legacy.
-3. Alcance final de Emergencias y su relacion con contratos.
-4. Politica de produccion, operacion y cumplimiento legal.
-5. Estrategia gradual para nombres internos TRAX sin romper compatibilidad.
+1. Porcentaje de comision; precio, periodicidad, beneficios y limites completos
+   de PRO; renovacion, cancelacion, mora, contracargos y periodo de gracia.
+2. PSP y estrategia de implementacion del entitlement sin puntos legacy.
+3. Integracion fiscal directa o proveedor, custodia de certificados, retencion,
+   contingencia ARCA, IA y revisiones legal, fiscal, contable y de seguridad.
+4. Modelo funcional futuro de `ENTERPRISE` y eventual actor `EMPRESA`.
+5. Alcance final de Emergencias y su relacion con contratos.
+6. Politica de produccion, operacion y cumplimiento legal.
+7. Estrategia gradual para nombres internos TRAX sin romper compatibilidad.
 
 ## Documentos relacionados
 
+- [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQ-001-activacion-y-vigencia-pro.md)
+- [REQ-002 - Facturacion MANDOBRA PRO MVP](REQ-002-facturacion-pro-mvp.md)
 - [Auditoria documental del 2026-08-31](../AUDITORIA_DOCUMENTAL_2026-08-31.md)
 - [Decisiones de arquitectura](../DECISIONES_ARQUITECTURA.md)
 - [Roadmap](../ROADMAP.md)
