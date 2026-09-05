@@ -1798,6 +1798,14 @@ button.ghost-link {
     max-width: none;
 }
 
+.pro-upgrade-screen .upgrade-summary article,
+.pro-upgrade-screen .upgrade-benefits article,
+.pro-upgrade-screen .upgrade-action-card {
+    border-color: var(--trax-ds-border-subtle);
+    background: var(--trax-ds-card);
+    color: var(--trax-ds-text);
+}
+
 @media (max-width: 820px) {
     .upgrade-summary,
     .upgrade-benefits {
@@ -2354,8 +2362,35 @@ button.ghost-link {
     font-size: 38px;
 }
 
+.admin-users-screen .admin-nav a {
+    border-color: var(--trax-ds-border);
+    background: var(--trax-ds-surface);
+    color: var(--trax-ds-text-strong);
+}
+
 .admin-users-table td {
     vertical-align: middle;
+}
+
+.admin-users-table.admin-table {
+    background: var(--trax-ds-card);
+    color: var(--trax-ds-text);
+}
+
+.admin-users-table.admin-table th {
+    border-color: var(--trax-ds-border-subtle);
+    background: var(--trax-ds-surface-soft);
+    color: var(--trax-ds-text-strong);
+}
+
+.admin-users-table.admin-table td {
+    border-color: var(--trax-ds-border-subtle);
+    color: var(--trax-ds-text);
+}
+
+.admin-users-table .user-status-pill.is-muted {
+    background: var(--trax-ds-surface-soft);
+    color: var(--trax-ds-text-muted);
 }
 
 .user-role-pill,
@@ -2440,6 +2475,18 @@ button.ghost-link {
 .admin-user-actions button.danger {
     border-color: #fecaca;
     color: #b91c1c;
+}
+
+.admin-users-table .admin-user-actions button {
+    border-color: var(--trax-ds-border);
+    background: var(--trax-ds-surface);
+    color: var(--trax-ds-text-strong);
+}
+
+.admin-users-table .admin-user-actions button.danger {
+    border-color: var(--trax-ds-danger-border);
+    background: var(--trax-ds-danger-soft);
+    color: var(--trax-ds-danger);
 }
 
 .admin-reason-input {

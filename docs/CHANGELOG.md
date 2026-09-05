@@ -1,5 +1,31 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-05 - Correccion focal de contraste oscuro en PRO
+
+Timestamp: 2026-09-05T19:45:29-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `f35797a1852e4b0293b1618ac03fdbbdba0510ae`
+
+- Se reemplazaron fondos, bordes y textos blancos heredados por tokens
+  canonicos del Design System v2, con alcance limitado a la pantalla de
+  upgrade PRO y a la gestion administrativa de usuarios.
+- Se agrego una clase de alcance a la pantalla administrativa y un test de
+  regresion que exige los tokens de tema en ambas superficies.
+- Implementacion realizo la medicion visual claro/oscuro: contraste principal
+  de 17.74:1 en claro y 16.98:1
+  en oscuro; texto secundario de 6.93:1 en oscuro. Las vistas moviles de
+  390x844 no presentan desbordamiento de documento.
+- Implementacion comprobo la revocacion mediante la ruta administrativa real:
+  el profesional quedo en WORK y la pantalla de upgrade lo mostro como
+  Elegible, sin errores de consola. La prueba uso una base SQLite efimera;
+  `trax_db` no fue modificada.
+- Validacion focal: 30/30. Suite completa: 294 ejecutados, 289 aprobados,
+  5 omitidos y 0 fallidos. `compileall`, Alembic head `20260904_01` y
+  `git diff --check`: PASS.
+- El P1 requiere retesting independiente en 05 - QA funcional. El PR #5
+  permanece bloqueado para merge hasta obtener ese resultado.
+
 ## 2026-09-04 - Fundacion del entitlement PRO
 
 Timestamp: 2026-09-04T09:56:46-03:00

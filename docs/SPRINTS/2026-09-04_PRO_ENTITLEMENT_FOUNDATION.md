@@ -99,3 +99,31 @@ Timestamp: 2026-09-04T20:02:58-03:00
   ejecutados, 288 aprobados, 5 omitidos y 0 fallidos; `compileall -q tests` y
   `git diff --check`: PASS.
 - El P1 queda cerrado y validado, pendiente de revision tecnica independiente.
+
+## Correccion focal P1 de contraste en tema oscuro
+
+Timestamp: 2026-09-05T19:45:29-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Commit base: `f35797a1852e4b0293b1618ac03fdbbdba0510ae`
+
+- Causa raiz: reglas legacy de `styles.css` imponian fondo blanco a las
+  tarjetas PRO y a la tabla administrativa por encima de la compatibilidad
+  tematica del Design System v2.
+- Correccion: superficies, bordes y texto usan tokens `--trax-ds-card`,
+  `--trax-ds-surface`, `--trax-ds-surface-soft`, `--trax-ds-text`,
+  `--trax-ds-text-strong`, `--trax-ds-text-muted` y los bordes canonicos,
+  limitados a `.pro-upgrade-screen` y `.admin-users-screen`.
+- Implementacion realizo la medicion visual en claro y oscuro, 390x844 y
+  1440x900. Contraste principal 17.74:1 en claro y 16.98:1 en oscuro; texto
+  secundario 6.93:1 en oscuro. No hubo desbordamiento del documento en movil
+  ni errores de consola.
+- Implementacion uso la ruta administrativa real para revocar el entitlement
+  QA y comprobo WORK en administracion y Elegible en upgrade. Se uso SQLite
+  efimero y no se ejecuto ninguna migracion ni mutacion sobre `trax_db`.
+- Validacion: focal Design System/PRO 30/30; suite completa 294 ejecutados,
+  289 aprobados, 5 omitidos y 0 fallidos; `compileall`, Alembic head
+  `20260904_01` y `git diff --check`: PASS.
+- No se modificaron la logica funcional PRO, modelos, migraciones,
+  dependencias, PSP, ARCA, pagos, IA ni ENTERPRISE. REQ-001 permanece parcial.
+- El P1 requiere retesting independiente en 05 - QA funcional. El PR #5
+  permanece bloqueado para merge hasta obtener ese resultado.

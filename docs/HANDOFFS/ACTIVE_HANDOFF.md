@@ -1,3 +1,72 @@
+# Handoff tecnico: correccion focal de contraste oscuro PRO
+
+Timestamp: 2026-09-05T19:45:29-03:00
+Estado: READY_TO_RESUME
+Resultado del ciclo: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Objetivo: corregir exclusivamente el P1 visual de contraste oscuro informado
+por QA funcional para las superficies PRO y administracion de usuarios.
+Rama: `feature/pro-entitlement-foundation`
+Commit base y ultimo commit: `f35797a1852e4b0293b1618ac03fdbbdba0510ae`
+PR asociado: #5, abierto, no modificado y bloqueado para merge hasta el
+retesting independiente de 05 - QA funcional
+Estado Git: cambios correctivos locales sin commit
+Push a GitHub: NO realizado
+Merge: NO; no autorizado
+
+## Trabajo completado
+
+- Las tarjetas de `/profesional/pro/upgrade` y la tabla, navegacion, estados y
+  acciones de `/admin/usuarios` consumen tokens del Design System v2 dentro de
+  alcances exclusivos de pantalla.
+- Se agrego cobertura estatica de regresion para impedir el regreso de fondos
+  o textos hardcodeados en las superficies corregidas.
+- Implementacion realizo la medicion visual claro/oscuro en 390x844 y
+  1440x900: contraste principal 17.74:1 en claro y 16.98:1 en oscuro; texto
+  secundario 6.93:1 en oscuro. No hubo overflow de documento en movil ni
+  errores de consola.
+- Implementacion comprobo la revocacion con la ruta administrativa real sobre
+  SQLite efimero: el usuario paso de PRO a WORK y luego se mostro Elegible en
+  upgrade. `trax_db` no fue migrada, reseteada ni modificada.
+
+## Validaciones
+
+- Focal Design System/PRO: 30 ejecutados, 30 aprobados, 0 fallidos, 0 errores,
+  0 omitidos.
+- Suite completa: 294 ejecutados, 289 aprobados, 0 fallidos, 0 errores y
+  5 omitidos historicos.
+- `python -m compileall -q app scripts tests`: PASS.
+- `python -m alembic heads`: `20260904_01 (head)`.
+- `git diff --check`: PASS.
+
+## Archivos locales modificados
+
+- `app/static/css/styles.css`
+- `app/templates/admin_usuarios.html`
+- `tests/test_design_system_v2.py`
+- `docs/CHANGELOG.md`
+- `docs/SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+## Pendientes, riesgos y reanudacion
+
+- Pendiente: retesting independiente del P1 por 05 - QA funcional, revision
+  del diff y autorizacion explicita antes de cualquier commit o push. El PR #5
+  permanece bloqueado para merge. Coverage permanece pendiente y no bloqueante.
+- Riesgo conocido preexistente: la tabla administrativa densa conserva scroll
+  horizontal interno; en desktop su ancho puede superar el viewport. No fue
+  introducido ni ampliado por esta correccion focal.
+- Proximo paso recomendado: auditoria tecnica focal del paquete visual y, si
+  resulta aprobado, solicitar autorizacion para un commit correctivo en la
+  misma rama y la actualizacion del PR #5.
+- Para retomar: confirmar rama, commit, estado Git, leer este handoff y revisar
+  los seis archivos indicados antes de actuar.
+- No ejecutar commit, push, merge, rebase, reset, clean, stash, amend, nuevo PR
+  ni deploy sin autorizacion explicita.
+
+---
+
 # Handoff tecnico: revalidacion independiente posterior a correcciones P1
 
 Timestamp: 2026-09-05T14:49:25-03:00
