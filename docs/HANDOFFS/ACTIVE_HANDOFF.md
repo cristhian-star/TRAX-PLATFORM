@@ -1,3 +1,75 @@
+# Handoff tecnico: revalidacion independiente posterior a correcciones P1
+
+Timestamp: 2026-09-05T14:49:25-03:00
+Estado: COMPLETED
+Resultado del ciclo: APROBADO
+Dispositivo/origen: Codex Desktop local
+Agente: 03 - Testing - Test Executor
+Objetivo: revalidar independientemente PRO Entitlement despues de las
+correcciones P1 de gates Alembic y rollback PostgreSQL.
+Rama: `feature/pro-entitlement-foundation`
+Commit probado: `e5b4ba9be651772afe86683b8f7a6494b2afb0f7`
+Commit funcional anterior: `fe979ce278607bfcf243ff2dbab31984d4b1e7ee`
+PR asociado: #5
+Estado Git inicial: limpio
+Push a GitHub: NO realizado en esta sesion
+Merge: NO; no autorizado
+
+## Evidencia valida
+
+- Se invalido expresamente la suite cortada por el cierre de Docker y no se
+  utilizo como evidencia.
+- Tras reiniciar Docker se eliminaron las cuatro bases residuales con prefijo
+  `trax_pro_entitlement_test_` y se verifico `ABSENT`.
+- `python -m compileall -q app scripts tests`: PASS.
+- Suite focal Alembic, PRO y migraciones: 43 ejecutados, 43 aprobados, 0
+  fallidos, 0 errores, 0 omitidos.
+- Suite completa posterior al reinicio: 293 ejecutados, 288 aprobados, 0
+  fallidos, 0 errores y 5 omitidos historicos.
+- Validacion dinamica Alembic: 6/6 PASS; confirma head unico obtenido del
+  grafo, revision aplicada exacta, ascendencia de `20260726_07` y rechazo de
+  multiples heads, base vacia, atrasada, desconocida o sin ancestro requerido.
+- Head del repositorio: `20260904_01 (head)`.
+- Gate PostgreSQL PRO: 2/2 PASS. El caso de rollback provoco una FK invalida
+  real al insertar auditoria, confirmo desde otra conexion que dos
+  entitlements seguian activos y que no persistio AuditLog, recupero la sesion
+  mediante rollback y completo una revocacion valida posterior.
+- Gate PostgreSQL contracting concurrency: 8/8 PASS.
+- Gate PostgreSQL negotiation concurrency: 8/8 PASS.
+- Gate PostgreSQL OperationCommand partial migration: 21/21 PASS.
+- Ningun gate PostgreSQL obligatorio quedo omitido.
+- `git diff --check 18e46fd...e5b4ba9` y verificacion final: PASS.
+- Coverage: PENDIENTE y no bloqueante; `coverage.py` no esta declarado y no se
+  instalaron dependencias.
+
+## PostgreSQL y limpieza
+
+- Evidencia valida ejecutada exclusivamente sobre bases nuevas con nombres
+  `trax_pro_entitlement_test_resume2_pro`,
+  `trax_pro_entitlement_test_resume2_contracting`,
+  `trax_pro_entitlement_test_resume2_negotiation` y
+  `trax_pro_entitlement_test_resume2_partial`.
+- Las cuatro bases fueron eliminadas despues de finalizar los procesos.
+- Verificacion final de bases `trax_pro_entitlement_test_*`: `ABSENT`.
+- `trax_db` conserva revision `20260726_07`; no fue reseteada ni migrada.
+- Staging, produccion y volumenes no fueron modificados.
+
+## Hallazgos, archivos y cierre
+
+- P0/P1 nuevos: ninguno.
+- Observaciones no bloqueantes: advertencias legacy/deprecacion ya existentes
+  de SQLAlchemy y `datetime.utcnow()`.
+- Codigo productivo, migraciones y tests: sin modificaciones en esta sesion.
+- Unico archivo modificado: `docs/HANDOFFS/ACTIVE_HANDOFF.md` por cierre
+  obligatorio.
+- Los dos P1 previos quedan VERIFICADOS como cerrados.
+- Veredicto final: `APROBADO`.
+- Proximo paso recomendado: revision/integracion de PR #5 mediante el flujo
+  autorizado. No realizar commit, push, PR, merge, rebase, reset, clean,
+  stash, amend ni deploy sin autorizacion expresa.
+
+---
+
 # Handoff tecnico: cierre P1 de prueba dinamica Alembic
 
 Timestamp: 2026-09-04T20:02:58-03:00
