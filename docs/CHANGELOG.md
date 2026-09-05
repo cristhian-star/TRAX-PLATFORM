@@ -1,5 +1,22 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-04 - Fundacion del entitlement PRO
+
+Timestamp: 2026-09-04T09:56:46-03:00
+Estado: IMPLEMENTACION_PARCIAL_VALIDADA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `18e46fd6bf6d05b73884b7ba3fdbb335f66d7d7e`
+
+- Se centralizo el acceso PRO con elegibilidad profesional, fuente reconocida,
+  vencimiento obligatorio y politica UTC.
+- Se agrego `subscriptions.source_type` mediante Alembic `20260904_01`, sin
+  convertir ni borrar registros legacy.
+- Se deshabilitaron concesiones por puntos, verificacion aislada y acciones
+  manuales profesional/administrativa.
+- El seed QA conserva un unico PRO temporal y sigue bloqueado en produccion.
+- PSP, pagos, Facturacion, ARCA, IA y ENTERPRISE operativo no se implementaron.
+- Decision: [ADR-001](ADR/ADR-001-pro-entitlement-foundation.md).
+
 ## 2026-09-03 - Especificacion de PRO y Facturacion MVP
 
 Timestamp: 2026-09-03T21:47:10-03:00
@@ -535,3 +552,18 @@ autoriza publicación ni despliegue productivo.
 ### Corregido
 
 - Sin correcciones registradas.
+# 2026-09-04 - Correcciones de auditoria del nucleo PRO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+
+### Corregido
+
+- La revocacion solo cancela fuentes PRO reconocidas, activas y vigentes, y se
+  confirma atomicamente junto con su AuditLog.
+- El seed QA no extiende una vigencia futura y renueva la misma fila tras su
+  vencimiento.
+- El gate PostgreSQL rechaza cualquier base fuera del namespace reservado
+  `trax_pro_entitlement_test[_sufijo]` antes de crear el engine.
+- Se centralizo la frontera UTC naive del nucleo PRO y se documento la perdida
+  de `source_type` durante downgrade.
+- REQ-001 declara canonicamente `IMPLEMENTACION_PARCIAL`.

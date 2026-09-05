@@ -55,6 +55,9 @@ from app.services.contracting_core_service import (
     create_contract_from_proposal_application,
 )
 
+from tests.alembic_head_validation import assert_database_at_repository_head
+
+
 class Sprint7ContractingPostgreSQLConcurrencyE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -75,11 +78,10 @@ class Sprint7ContractingPostgreSQLConcurrencyE2E(unittest.TestCase):
         cls.app = create_app(initialize_schema=False)
         cls.app.config.update(TESTING=True)
         with cls.app.app_context():
-            self_revision = db.session.execute(
+            revisions = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
-            if self_revision != "20260726_07":
-                raise RuntimeError(f"Revision Alembic inesperada: {self_revision}")
+            ).scalars().all()
+            assert_database_at_repository_head(config, revisions)
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("La suite E2E no esta ejecutando PostgreSQL")
 

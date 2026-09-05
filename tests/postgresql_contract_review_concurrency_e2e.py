@@ -50,6 +50,9 @@ from app.services.contract_review_service import (
 )
 
 
+from tests.alembic_head_validation import assert_database_at_repository_head
+
+
 class ContractReviewPostgreSQLGate(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -69,11 +72,10 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
         cls.app = create_app(initialize_schema=False)
         cls.app.config.update(TESTING=True)
         with cls.app.app_context():
-            revision = db.session.execute(
+            revisions = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
-            if revision != "20260726_07":
-                raise RuntimeError(f"Revision Alembic inesperada: {revision}")
+            ).scalars().all()
+            assert_database_at_repository_head(cls.config, revisions)
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("El gate no esta ejecutando PostgreSQL")
             version = db.session.execute(sa.text("SHOW server_version")).scalar_one()
@@ -536,11 +538,11 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
                     db.session.rollback()
                     self.assertEqual(Review.query.count(), 0)
                     self.assertEqual(User.query.count(), 4)
-                    self.assertEqual(
+                    assert_database_at_repository_head(
+                        self.config,
                         db.session.execute(
                             sa.text("SELECT version_num FROM alembic_version")
-                        ).scalar_one(),
-                        "20260726_07",
+                        ).scalars().all(),
                     )
 
             orm_attack = Review(
@@ -620,11 +622,11 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
                     db.session.rollback()
                     self.assertEqual(ReputationEvent.query.count(), 0)
                     self.assertEqual(User.query.count(), 4)
-                    self.assertEqual(
+                    assert_database_at_repository_head(
+                        self.config,
                         db.session.execute(
                             sa.text("SELECT version_num FROM alembic_version")
-                        ).scalar_one(),
-                        "20260726_07",
+                        ).scalars().all(),
                     )
 
             db.session.execute(event_sql, event_common)
@@ -648,11 +650,11 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
                     db.session.rollback()
                     self.assertEqual(ReputationEvent.query.count(), 1)
                     self.assertEqual(User.query.count(), 4)
-                    self.assertEqual(
+                    assert_database_at_repository_head(
+                        self.config,
                         db.session.execute(
                             sa.text("SELECT version_num FROM alembic_version")
-                        ).scalar_one(),
-                        "20260726_07",
+                        ).scalars().all(),
                     )
             self.assertEqual(Review.query.count(), 1)
             self.assertEqual(ReputationEvent.query.count(), 1)
@@ -824,7 +826,11 @@ class ContractReviewPostgreSQLGate(unittest.TestCase):
             command.downgrade(self.config, "20260726_05")
             command.upgrade(self.config, "head")
             scenario_b = snapshot()
-            self.assertEqual(scenario_b, scenario_a)
+            assert_database_at_repository_head(self.config, [scenario_b[3]])
+            self.assertEqual(
+                scenario_b[:3] + scenario_b[4:],
+                scenario_a[:3] + scenario_a[4:],
+            )
         finally:
             command.upgrade(self.config, "head")
             engine.dispose()

@@ -6,3 +6,7 @@ sostiene. No reemplazan el registro historico existente en
 cuando una decision necesita analisis independiente y trazabilidad detallada.
 
 Usar la plantilla [Decision de arquitectura](../PLANTILLAS/DECISION_ARQUITECTURA.md).
+
+## Decisiones vigentes
+
+- [ADR-001 - Nucleo calculado de entitlement PRO](ADR-001-pro-entitlement-foundation.md)

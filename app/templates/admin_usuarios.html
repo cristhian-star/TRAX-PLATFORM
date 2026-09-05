@@ -96,11 +96,6 @@
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit">Quitar PRO</button>
                             </form>
-                            {% else %}
-                            <form action="/admin/usuarios/{{ usuario.id }}/activar-pro" method="POST">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit">Activar PRO</button>
-                            </form>
                             {% endif %}
                         </div>
                     </div>

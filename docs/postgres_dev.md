@@ -82,3 +82,55 @@ finalizaciones concurrentes, conteos exactos y rollback por constraint real.
 - No borrar `instance/trax.db`, `instance/trax_backup_before_postgres.db` ni el volumen `trax_instance`.
 - No ejecutar importaciones de datos SQLite a PostgreSQL durante esta fase.
 - Este compose usa credenciales fijas de desarrollo y no representa una configuracion productiva.
+# Gate PostgreSQL del entitlement PRO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+
+El gate que ejecuta upgrade/downgrade solo admite una base descartable llamada
+`trax_pro_entitlement_test` o un nombre aislado con prefijo
+`trax_pro_entitlement_test_`. Requiere ademas
+`TRAX_POSTGRES_TEST_ALLOW_RESET=1` y rechaza `trax_db`, `postgres`, templates y
+cualquier nombre arbitrario antes de crear el engine.
+
+Ejemplo seguro con una base creada exclusivamente para la corrida:
+
+```powershell
+$env:TRAX_POSTGRES_PRO_ENTITLEMENT_TEST_URL = "postgresql://usuario:clave@localhost/trax_pro_entitlement_test_20260904_1030"
+$env:TRAX_POSTGRES_TEST_ALLOW_RESET = "1"
+python tests/postgresql_pro_entitlement_e2e.py
+```
+
+## Validacion estricta del nombre del gate PRO
+
+Timestamp: 2026-09-04T13:19:30-03:00
+
+El nombre normalizado por SQLAlchemy debe cumplir exactamente:
+
+```text
+^trax_pro_entitlement_test(?:_[a-z0-9]+(?:_[a-z0-9]+)*)?$
+```
+
+Admite el nombre base o segmentos ASCII en minusculas, alfanumericos y
+separados por un unico guion bajo. El nombre completo no puede superar el
+limite PostgreSQL de 63 bytes. Se rechazan sufijos vacios, mayusculas, guiones
+medios, puntos, espacios, secuencias codificadas, separadores, parametros,
+Unicode, guiones bajos finales o dobles y coincidencias parciales.
+
+La validacion y `TRAX_POSTGRES_TEST_ALLOW_RESET=1` se comprueban antes de crear
+el engine o ejecutar upgrade, downgrade o limpieza.
+
+## Head dinamico y rollback real del gate PRO
+
+Timestamp: 2026-09-04T19:50:24-03:00
+
+Los gates que ejecutan `upgrade("head")` obtienen el head vigente con
+`ScriptDirectory`, exigen un unico head y una unica fila en `alembic_version`,
+y comprueban coincidencia exacta. Ademas verifican mediante el grafo Alembic
+que `20260726_07` exista y sea ancestro del head; las pruebas de revisiones
+historicas explicitas mantienen sus identificadores concretos.
+
+El gate PRO incluye una ruta administrativa real con autenticacion
+`SUPER_ADMIN` y CSRF. Fuerza una violacion FK durante el commit de AuditLog y
+confirma desde una conexion independiente que ambas revocaciones se revierten,
+que no queda auditoria parcial, que la sesion se recupera y que una operacion
+valida posterior confirma conjuntamente revocacion y auditoria.
