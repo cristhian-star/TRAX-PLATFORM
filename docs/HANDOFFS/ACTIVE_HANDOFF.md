@@ -1,3 +1,125 @@
+# Handoff tecnico: correcciones posteriores a revision focalizada PRO
+
+Timestamp: 2026-09-06T19:38:40-03:00
+Estado: READY_TO_RESUME
+Resultado del ciclo: CORRECCIONES_DOCUMENTALES_LISTAS_PARA_REVISION_FOCALIZADA
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 01 - Documentation Engineer
+Objetivo: corregir cuatro hallazgos P1 y dos P2 sin ampliar el alcance del
+paquete documental.
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base y ultimo commit observado: `1548935`
+Estado Git: paquete Markdown bajo `docs/` sin commit
+Push, PR y merge: NO realizados; no autorizados
+
+## Correcciones realizadas
+
+- REQ-001 diferencia origen del trabajo y canal de pago: trabajos externos
+  cobrados mediante MANDOBRA pueden generar creditos; efectivo y pagos fuera
+  de MANDOBRA no los generan.
+- Reserva aprobada: indisponibilidad sin consumo, consumo solo tras pago
+  completo, liberacion definitiva con vencimiento original, no reactivacion de
+  creditos vencidos y conciliacion de estados inciertos/reintentos.
+- Tarjeta vinculada requerida comercialmente aun con creditos completos, con
+  viabilidad pendiente y separacion respecto de autorizacion de debito/datos.
+- Switch definido como preferencia/autorizacion sincronizada con el PSP; el
+  sistema previene duplicados sin imponer al usuario una antelacion desconocida.
+- Se agregaron precio, cargo y total previos, neto profesional estimado,
+  obligacion unica en contratos internos y efectivo configurable sin creditos.
+- Se incorporaron criterios de aceptacion verificables para esas reglas.
+- Master Spec enumera las capacidades comerciales realmente pendientes y deja
+  la extension de 60 dias solo como antecedente historico reemplazado.
+
+## Estado y pendientes
+
+- La nueva correccion NO esta aprobada: requiere revision focalizada antes de
+  commit o transferencia operativa al Agente 02.
+- Permanecen pendientes plazo de reserva, acreditaciones tardias, precio,
+  porcentaje/base, costos, impuestos, reversas, antelacion, viabilidad PSP y
+  validacion juridica/contable.
+- No se aprobaron arquitectura, modelos, migraciones, proveedor o SDK nuevos.
+- Tests de aplicacion: NO EJECUTADOS - alcance documental.
+- No se modificaron codigo, configuracion, bases ni dependencias.
+
+Proximo paso: revisar focalmente REQ-001, Master Spec, Changelog y este handoff;
+si el resultado es aprobado, solicitar autorizacion separada para commit. No
+iniciar implementacion ni contactos externos.
+
+---
+
+# Handoff tecnico: refinamiento documental comercial PRO y PSP
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: COMPLETED
+Resultado del ciclo: DOCUMENTACION_CONSOLIDADA_LISTA_PARA_REVISION_Y_AGENTE_02
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 01 - Documentation Engineer
+Objetivo: consolidar reglas comerciales PRO, corregir contradicciones,
+incorporar expedientes juridico/contable y Mercado Pago, actualizar
+planificacion, enlaces y cierre post-merge.
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base y ultimo commit observado: `1548935`
+Estado Git inicial: limpio
+Estado Git final: cambios Markdown bajo `docs/` sin commit
+Push a GitHub: NO realizado
+PR: NO creado
+Merge: NO; tarea documental local sin autorizacion de publicacion
+
+## Trabajo completado
+
+- PR #5 y PRO Entitlement Foundation quedaron registrados como integrados en
+  `develop` mediante merge `1548935`, con resultado informado
+  `APROBADO_POST_MERGE` y evidencia 294/289/0/5.
+- REQ-001 conserva implementacion parcial y reemplaza la regla historica de 60
+  dias por creditos, umbral y periodos transaccionales de 30 dias.
+- Se separaron decisiones aprobadas, propuestas juridico-operativas y
+  pendientes de producto/proveedor.
+- Se incorporaron los expedientes de Mercado Pago y revision juridica/contable
+  como borradores no enviados.
+- Se alinearon REQ-002, Master Spec, indices, Roadmap, Backlog, arquitectura,
+  Changelog y documentos de sprint.
+
+## Pendientes y bloqueantes
+
+- Revision humana del diff documental y aprobacion antes de commit/publicacion.
+- MP-01 a MP-16: todas pendientes; no se contacto a Mercado Pago.
+- Revision juridica y contable: pendiente; el expediente no es dictamen.
+- Producto: precio, porcentaje/base, conversion de creditos, reversas, reservas,
+  aprobaciones tardias, cambios de precio, consentimiento y beneficios finales.
+- Arquitectura: ADR PSP/eventos, ledger/compensaciones, concurrencia, secretos y
+  observabilidad, posteriores a viabilidad y decisiones aprobadas.
+- Facturacion: evaluacion directa/proveedor pendiente; implementacion separada.
+
+## Validacion y alcance
+
+- Archivos modificados: exclusivamente Markdown bajo `docs/`.
+- Tests de aplicacion: NO EJECUTADOS - no aplican al alcance documental.
+- Migraciones, bases, Docker, dependencias y contactos externos: NO ejecutados.
+- Commit, push, PR, merge y deploy: NO ejecutados.
+- `git diff --check`: PASS. Enlaces relativos de los archivos modificados y
+  nuevos: destinos existentes. El checker general solo detecto el placeholder
+  historico `../TROUBLESHOOTING/archivo.md` de la plantilla de handoff, fuera
+  del alcance y no introducido por este ciclo.
+
+## Proximo paso recomendado
+
+Transferir a Agente 02 un encargo exclusivamente de evaluacion y preparacion:
+mapa de brechas, viabilidad separada marketplace/suscripcion, comparacion
+ARCA/proveedores, slicing de sprints 2 y 3, estrategia de pruebas, estimaciones
+y decisiones previas a codigo. No implementar ni contactar terceros sin nueva
+autorizacion.
+
+Para retomar: confirmar rama, HEAD y estado; revisar primero este bloque, el
+[plan del ciclo](../SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md),
+[REQ-001](../REQUISITOS/REQ-001-activacion-y-vigencia-pro.md),
+[consultas PSP](../CONSULTAS/MERCADO_PAGO_v0_1.md) y
+[base juridica](../LEGAL/BASE_REVISION_JURIDICA_v0_2.md).
+
+No ejecutar implementacion, tests, migraciones, contacto externo, commit,
+push, PR, merge, rebase, reset, clean, stash, amend ni deploy sin autorizacion.
+
+---
+
 # Handoff tecnico: correccion responsive y teclado de admin usuarios
 
 Timestamp: 2026-09-05T20:27:36-03:00

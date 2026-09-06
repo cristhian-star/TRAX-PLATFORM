@@ -1,5 +1,54 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-06 - Refinamiento comercial PRO, PSP y expediente juridico
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: DOCUMENTACION_CONSOLIDADA_PENDIENTE_DE_REVISION
+Responsable de producto: Cristian Sánchez
+Agente: 01 - Documentation Engineer
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base observado: `1548935`
+
+### Consolidado
+
+- Se registro el cierre post-merge de PR #5: merge `1548935`, resultado
+  informado `APROBADO_POST_MERGE`, suite 294/289/0/5, Alembic `20260904_01`,
+  sin P0/P1 y con `trax_db` preservada.
+- REQ-001 reemplaza prospectivamente la regla de 60 dias por operacion con
+  lotes de creditos de 40 dias y un umbral para periodos transaccionales de 30
+  dias. La regla anterior se conserva como historia.
+- Se documentaron periodos de suscripcion de 30 dias, pagos total/parcial con
+  creditos, prueba inicial, gracia de 10 dias y transiciones, sin declararlos
+  implementados.
+- Se incorporaron el [expediente Mercado Pago](CONSULTAS/MERCADO_PAGO_v0_1.md)
+  y la [base juridica/contable](LEGAL/BASE_REVISION_JURIDICA_v0_2.md) como
+  borradores pendientes, no enviados y sin valor de dictamen.
+- Se documento la secuencia PRO de tres sprints sin reiniciar la numeracion
+  historica ni agregar ARCA/IA al Sprint 3.
+
+### Limites
+
+- No se eligio producto/API, Split, arquitectura PSP, integracion fiscal,
+  proveedor de IA, precio, porcentaje ni formula economica.
+- No se modificaron codigo, migraciones, tests, configuracion o bases.
+- Tests de aplicacion: NO EJECUTADOS - alcance exclusivamente documental.
+
+### Correccion posterior a revision focalizada
+
+Timestamp: 2026-09-06T19:38:40-03:00
+Estado: CORRECCIONES_DOCUMENTALES_LISTAS_PARA_REVISION
+
+- REQ-001 distingue trabajo externo pagado mediante MANDOBRA de pagos fuera de
+  la plataforma; solo estos ultimos y el efectivo quedan sin creditos.
+- Se consolidaron reserva sin consumo, consumo tras pago completo, liberacion,
+  vencimiento, conciliacion y reintentos de pagos mixtos.
+- Se incorporaron tarjeta vinculada, contrato del switch de renovacion,
+  responsabilidad sistemica contra duplicados y presentacion economica previa.
+- Se explicitaron la obligacion unica de pago para contratos internos y el
+  efectivo configurable sin creditos.
+- Master Spec retiro la referencia vigente ambigua a “extensiones”.
+- Esta correccion no esta aprobada todavia; queda lista para revision focalizada.
+
 ## 2026-09-05 - Correccion responsive y teclado en admin usuarios
 
 Timestamp: 2026-09-05T20:27:36-03:00

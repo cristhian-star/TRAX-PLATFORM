@@ -88,19 +88,27 @@ staging, produccion o ampliacion del producto.
 [x] Fundacion del entitlement PRO: evaluador central, fuentes reconocidas,
 vencimiento UTC, desactivacion de concesiones legacy/manuales y seed QA aislado
 
-[ ] Completar REQ-001 con PSP, prueba transaccional, extensiones, pagos,
-suscripcion comercial, renovaciones y contracargos
+[ ] Sprint 1 PRO comercial - cerrar especificacion, viabilidad PSP, revision
+juridica/contable y evaluacion fiscal
 
-[ ] Implementacion de PRO transaccional: onboarding PSP, prueba de 30 dias y
-extensiones por operaciones con comision efectiva
+[ ] Sprint 2 PRO comercial - cobros transaccionales, checkout/enlace/QR, lotes
+de creditos y periodos de 30 dias por umbral
 
-[ ] Implementacion de suscripcion PRO durante periodos efectivamente pagados
+[ ] Sprint 3 PRO comercial - suscripcion de 30 dias, pagos mixtos, renovacion,
+exencion, gracia y retorno transaccional
+
+Los tres nombres anteriores pertenecen a la secuencia PRO iniciada el
+2026-09-06 y no reinician la numeracion historica. Sprint 1 es documental; los
+sprints 2 y 3 requieren decisiones, viabilidad externa y autorizacion futura.
 
 [x] Facturacion PRO MVP aprobada para especificacion en
 [REQ-002](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
 
 [ ] Implementacion de Facturacion PRO MVP para persona humana, monotributo
 activo y Factura C, sujeta a decisiones tecnicas y revisiones previas
+
+[ ] Definir un incremento fiscal separado despues de comparar ARCA directo y
+proveedores; no agregar ARCA o IA silenciosamente al Sprint 3 PRO
 
 [ ] Definicion e implementacion futura de `ENTERPRISE`; permanece conceptual y
 no autoriza crear el actor `EMPRESA`

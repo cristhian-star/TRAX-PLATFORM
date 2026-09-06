@@ -29,6 +29,12 @@ de las dos partes debe cambiar.
 - [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md)
 - [REQ-002 - Facturacion MANDOBRA PRO MVP](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
 
+### Refinamiento comercial y consultas externas
+
+- [Plan documental y tres sprints PRO](SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md)
+- [Consultas tecnicas y comerciales a Mercado Pago](CONSULTAS/MERCADO_PAGO_v0_1.md)
+- [Base comercial para revision juridica y contable](LEGAL/BASE_REVISION_JURIDICA_v0_2.md)
+
 ### Estado documental
 
 - [Auditoria documental del 2026-08-31](AUDITORIA_DOCUMENTAL_2026-08-31.md)
@@ -60,6 +66,7 @@ de las dos partes debe cambiar.
 - [Changelog](CHANGELOG.md)
 - [Documentacion de sprints](SPRINTS/)
 - [Incremento PRO entitlement foundation](SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md)
+- [Refinamiento comercial, PSP y tres sprints](SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md)
 
 ### Reglas y plantillas
 

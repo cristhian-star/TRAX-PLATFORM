@@ -4,8 +4,8 @@ titulo: Especificacion maestra de MANDOBRA
 estado: LINEA_BASE_VERIFICADA
 version: 0.2
 fecha: 2026-08-31
-ultima_revision: 2026-09-03
-revision_codigo: d07d95
+ultima_revision: 2026-09-06
+revision_codigo: 1548935
 ---
 
 # MANDOBRA Master Spec
@@ -21,6 +21,24 @@ Este documento describe la linea base observada en el codigo. No convierte
 prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
+
+### 2026-09-06 - Refinamiento comercial PRO y PSP
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: REGLAS_COMERCIALES_APROBADAS_IMPLEMENTACION_PENDIENTE
+Responsable: Cristian Sánchez
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base observado: `1548935`
+
+- PR #5 integro la Foundation calculada de entitlement; no implemento PSP,
+  pagos, creditos ni suscripciones comerciales.
+- La regla historica de 60 dias por operacion queda reemplazada por lotes de
+  creditos de 40 dias y consumo de un umbral para periodos transaccionales de
+  30 dias. Precio, porcentaje y conversion siguen pendientes.
+- Se aprobaron periodos de suscripcion de 30 dias, aplicacion total/parcial de
+  creditos, prueba inicial de 30 dias y gracia transaccional de 10 dias.
+- Mercado Pago es direccion de evaluacion, no proveedor tecnicamente validado.
+  Los expedientes PSP y juridico siguen pendientes de respuestas externas.
 
 ### 2026-09-03 - PRO y Facturacion MVP
 
@@ -115,7 +133,8 @@ el documento o el codigo es correcto.
 - Gestiona estados y roles de usuarios.
 - Revisa verificaciones, reportes, contenido y media.
 - Modera la parte publica de reviews sin alterar el comentario original.
-- Puede activar o quitar PRO mediante herramientas administrativas existentes.
+- Puede quitar fuentes PRO vigentes. Las nuevas activaciones administrativas
+  estan deshabilitadas; su politica futura permanece pendiente.
 
 ## Limites del sistema
 
@@ -280,8 +299,9 @@ el documento o el codigo es correcto.
 - El modelo de datos ya admite esos tres valores.
 - La UI publica muestra todavia `Free`, `Plus`, `Pro`; `Plus` es una referencia
   desactualizada que debe reemplazarse por `Enterprise`.
-- El upgrade actual puede habilitarse por verificacion o por puntos legacy.
-- Un administrador puede activar o quitar PRO.
+- La Foundation integrada en PR #5 ya no concede PRO por verificacion aislada,
+  puntos legacy ni activacion manual.
+- Un administrador puede revocar fuentes vigentes; no puede concederlas.
 - No hay cobro ni renovacion comercial real.
 - El comportamiento actual no satisface [REQ-001](REQ-001-activacion-y-vigencia-pro.md):
   los puntos legacy no pertenecen a la elegibilidad aprobada, la verificacion
@@ -302,11 +322,16 @@ el documento o el codigo es correcto.
   catalogo aprobado.
 - La primera implementacion corresponde a profesionales prestadores con cuenta
   activa y verificacion aprobada.
-- PRO transaccional se activa tras validar la vinculacion PSP, concede 30 dias
-  de prueba y se extiende hasta 60 dias desde cada operacion con comision
-  efectiva, sin reducir una vigencia existente.
+- PRO transaccional se activa tras validar la vinculacion PSP y concede 30 dias
+  de prueba. Las comisiones efectivas generan lotes de creditos que vencen a
+  40 dias; un umbral concede 30 dias transaccionales. La regla anterior de 60
+  dias por operacion queda como antecedente reemplazado.
 - PRO por suscripcion permanece vigente durante el periodo efectivamente pagado
   y no aplica comision transaccional de MANDOBRA sobre las operaciones.
+- Suscripciones y periodos transaccionales son de 30 dias fijos. Creditos
+  vigentes pueden pagar total o parcialmente primera suscripcion y
+  renovaciones; la gracia posterior a suscripcion impaga dura 10 dias, conserva
+  PRO transaccional y no concede exencion.
 - Ambas modalidades conceden el mismo entitlement funcional `PRO`.
 - `ENTERPRISE` es conceptual para empresas; no autoriza crear el actor
   `EMPRESA` ni define precios, beneficios, permisos o modelo organizacional.
@@ -416,13 +441,17 @@ El nucleo de entitlement PRO se calcula desde rol y estado de cuenta,
 verificacion profesional aprobada y una fuente PRO reconocida con vencimiento
 UTC vigente. Los registros legacy se preservan con fuente nula pero no conceden
 capacidades; puntos, ENTERPRISE y activaciones manuales tampoco conceden.
-PSP, prueba, extensiones y suscripciones comerciales permanecen pendientes.
+PSP, onboarding y prueba comercial, ledger y reserva de creditos, cobros,
+periodos transaccionales, pagos mixtos, webhooks, renovacion, conciliacion y
+suscripciones comerciales permanecen pendientes. La referencia historica a
+extensiones de 60 dias no describe el modelo comercial vigente.
 
 ## Decisiones pendientes prioritarias
 
-1. Porcentaje de comision; precio, periodicidad, beneficios y limites completos
-   de PRO; renovacion, cancelacion, mora, contracargos y periodo de gracia.
-2. PSP y estrategia de implementacion del entitlement sin puntos legacy.
+1. Porcentaje y base de comision; precio, conversion y moneda de creditos;
+   beneficios y limites completos de PRO; reversas y cambios de precio.
+2. Validacion de Mercado Pago, producto/API, marketplace/Split, recurrencia,
+   pagos mixtos, reintentos, cargos en transito e inicio diferido.
 3. Integracion fiscal directa o proveedor, custodia de certificados, retencion,
    contingencia ARCA, IA y revisiones legal, fiscal, contable y de seguridad.
 4. Modelo funcional futuro de `ENTERPRISE` y eventual actor `EMPRESA`.
@@ -441,3 +470,6 @@ PSP, prueba, extensiones y suscripciones comerciales permanecen pendientes.
 - [Estandares de desarrollo](../ESTANDARES_DESARROLLO.md)
 - [Cierre de Sprint 7](../SPRINTS/2026-08-04_SPRINT_7_CLOSURE.md)
 - [ADR-001 - Nucleo calculado de entitlement PRO](../ADR/ADR-001-pro-entitlement-foundation.md)
+- [Refinamiento comercial y PSP](../SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md)
+- [Consultas a Mercado Pago](../CONSULTAS/MERCADO_PAGO_v0_1.md)
+- [Base de revision juridica](../LEGAL/BASE_REVISION_JURIDICA_v0_2.md)

@@ -1,5 +1,27 @@
 # DECISIONES DE ARQUITECTURA MANDOBRA
 
+## 2026-09-06 - Frontera documental previa a integraciones PRO
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: DECISIONES_COMERCIALES_DOCUMENTADAS_ARQUITECTURA_PENDIENTE
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base observado: `1548935`
+
+La Foundation de entitlement integrada por PR #5 permanece gobernada por
+[ADR-001](ADR/ADR-001-pro-entitlement-foundation.md). Las reglas comerciales
+posteriores de creditos y transiciones no autorizan modelos, migraciones,
+servicios, SDK ni proveedor.
+
+Cuando exista evidencia PSP y aprobacion de producto deben evaluarse ADR
+separados para frontera de integracion, eventos/webhooks e idempotencia, ledger
+de creditos y compensaciones, concurrencia temporal, secretos y observabilidad.
+Precio, porcentaje, naturaleza juridica, politica comercial y textos legales
+permanecen en requisitos/expedientes y no deben decidirse por un ADR tecnico.
+
+Documentos: [plan del ciclo](SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md),
+[consultas PSP](CONSULTAS/MERCADO_PAGO_v0_1.md) y
+[revision juridica](LEGAL/BASE_REVISION_JURIDICA_v0_2.md).
+
 ## 2026-08-04 - Reviews contractuales y reputación neutral
 
 Se decidió que toda review nueva nace de un contrato canónico en estado exactamente `CONFIRMADA`.

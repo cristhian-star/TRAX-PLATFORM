@@ -10,7 +10,8 @@ La linea base vigente esta en [MANDOBRA Master Spec](MASTER_SPEC.md).
 
 - [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQ-001-activacion-y-vigencia-pro.md)
   - Estado: `APROBADO`.
-  - Implementacion: `PENDIENTE`.
+  - Implementacion: `IMPLEMENTACION_PARCIAL`; Foundation integrada, PSP,
+    creditos, cobros y suscripciones comerciales pendientes.
 - [REQ-002 - Facturacion MANDOBRA PRO MVP](REQ-002-facturacion-pro-mvp.md)
   - Estado: `APROBADO`.
   - Implementacion: `PENDIENTE`.

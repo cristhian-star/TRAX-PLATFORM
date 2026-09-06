@@ -6,6 +6,7 @@ fecha_aprobacion: 2026-09-03T20:38:47-03:00
 responsable: Cristian Sánchez
 rama_documental: docs/spec-pro-facturacion-mvp
 implementacion: PENDIENTE
+ultima_revision: 2026-09-06T19:22:08-03:00
 ---
 
 # REQ-002 - Facturacion MANDOBRA PRO MVP
@@ -60,8 +61,8 @@ capacidades como implementada.
 2. Configurar o usar Facturacion no debe activar PRO ni iniciar o extender la
    prueba transaccional de 30 dias.
 3. El modulo debe estar disponible opcionalmente solo con entitlement PRO
-   vigente por prueba transaccional, extension por operacion con comision o
-   suscripcion pagada.
+   vigente, incluida prueba inicial, periodo transaccional obtenido mediante
+   creditos, suscripcion pagada o gracia gratuita conforme a REQ-001.
 4. Un usuario `FREE` no debe poder iniciar una nueva emision.
 5. Un usuario PRO no debe estar obligado a configurar ni usar Facturacion.
 6. El alcance fiscal inicial debe limitarse a profesionales personas humanas
@@ -145,6 +146,8 @@ capacidades como implementada.
 8. Perder PRO bloquea nuevas emisiones, no el acceso autorizado al historial
    propio existente.
 9. La IA asiste en la preparacion; no ejerce criterio ni asesoramiento fiscal.
+10. Trabajo confirmado, pago aprobado y comprobante fiscal autorizado son
+    hechos distintos; ninguno prueba automaticamente los otros.
 
 ## RESTRICCIONES
 
@@ -284,3 +287,19 @@ capacidades como implementada.
 - [Backlog](../BACKLOG.md).
 - [Changelog](../CHANGELOG.md).
 - [Handoff activo](../HANDOFFS/ACTIVE_HANDOFF.md).
+
+## ACTUALIZACION DE CONSISTENCIA CON REQ-001
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: APROBADO_DOCUMENTAL_IMPLEMENTACION_PENDIENTE
+Responsable de producto: Cristian Sánchez
+Rama: `docs/pro-commercial-psp-refinement`
+Commit base observado: `1548935`
+
+- Facturacion sigue siendo opcional para cualquier PRO vigente conforme al
+  modelo actualizado, incluidos periodos gratuitos; nunca activa PRO.
+- No se exige configurar ARCA para contratar o cobrar y no se presume que una
+  factura prueba pago ni que un pago prueba emision fiscal.
+- La integracion fiscal productiva no pertenece a los tres sprints PRO
+  comerciales hasta completar evaluacion tecnica, juridica, fiscal y contable.
+- Base de consulta: [revision juridica](../LEGAL/BASE_REVISION_JURIDICA_v0_2.md).
