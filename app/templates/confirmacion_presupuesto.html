@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="budget-page">
+    <section class="budget-detail-hero">
+        <div class="budget-shell budget-confirmation-hero">
+            <div>
+                <span class="budget-eyebrow">Solicitud publicada</span>
+                <h1>Solicitud publicada correctamente.</h1>
+                <p>Tu pedido ya quedo disponible para que profesionales compatibles puedan enviar presupuestos preliminares.</p>
+            </div>
+            <div class="budget-counter" aria-label="{{ offer_count }} de {{ max_offers }} presupuestos recibidos">
+                <strong>{{ offer_count }}/{{ max_offers }}</strong>
+                <span>Presupuestos recibidos</span>
+                <div class="budget-counter__track" aria-hidden="true">
+                    <span style="width: {{ (offer_count / max_offers * 100)|round|int }}%"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="budget-shell budget-entry">
+        <div class="budget-panel budget-confirmation-card">
+            <div class="budget-section-heading">
+                <span class="budget-status budget-status--{{ budget_request.estado|lower }}">
+                    {{ budget_request.estado }}
+                </span>
+                <h2>{{ budget_request.titulo }}</h2>
+                <p>{{ budget_request.categoria }} · {{ budget_request.zona }}</p>
+            </div>
+
+            <dl class="budget-facts">
+                <div>
+                    <dt>Estado</dt>
+                    <dd>Esperando presupuestos</dd>
+                </div>
+                <div>
+                    <dt>Tiempo restante</dt>
+                    <dd>Publicacion activa. Calculo automatico proximamente.</dd>
+                </div>
+                <div>
+                    <dt>Fecha de publicacion</dt>
+                    <dd>{{ budget_request.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</dd>
+                </div>
+            </dl>
+
+            <div class="budget-form__actions budget-actions-wrap">
+                <a class="budget-button budget-button--primary" href="/presupuestos/{{ budget_request.id }}">
+                    Ver presupuestos recibidos
+                </a>
+                <span class="budget-button budget-button--disabled" aria-disabled="true">
+                    Editar solicitud no disponible
+                </span>
+                <span class="budget-button budget-button--disabled" aria-disabled="true">
+                    Cancelar solicitud no disponible
+                </span>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

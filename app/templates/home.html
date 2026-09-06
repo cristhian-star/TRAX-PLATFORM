@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="trax-home">
+    <section class="trax-home__hero" aria-labelledby="home-title">
+        <div class="trax-home__grid"></div>
+        <div class="shell trax-home__hero-layout">
+            <div class="trax-home__intro">
+                <span class="trax-home__eyebrow">Servicios tecnicos y oficios</span>
+                <h1 id="home-title">El trabajo correcto empieza con una conexion confiable.</h1>
+                <p class="trax-home__lead">
+                    Encontra profesionales, compara presupuestos, resolve una urgencia
+                    o accede a nuevas oportunidades desde un solo lugar.
+                </p>
+
+                <div class="trax-home__proof" aria-label="Beneficios de MANDOBRA">
+                    <span>Perfiles con reputacion visible</span>
+                    <span>Busqueda por servicio y zona</span>
+                    <span>Seguimiento dentro de MANDOBRA</span>
+                </div>
+            </div>
+
+            {% include "home/_operation_search.html" %}
+        </div>
+    </section>
+
+    <section class="trax-home__pathways" aria-labelledby="pathways-title">
+        <div class="shell">
+            <div class="trax-home__section-heading">
+                <div>
+                    <span class="trax-home__eyebrow trax-home__eyebrow--dark">Una red para cada tarea</span>
+                    <h2 id="pathways-title">Elegi como queres avanzar.</h2>
+                </div>
+                <p>
+                    MANDOBRA conecta necesidades concretas con profesionales preparados,
+                    sin mezclar contrataciones, cotizaciones y oportunidades.
+                </p>
+            </div>
+
+            <div class="trax-home__pathway-grid">
+                <article class="trax-home__pathway">
+                    <span class="trax-home__pathway-index">01</span>
+                    <h3>Busca con criterio</h3>
+                    <p>Filtra por especialidad y zona antes de revisar cada perfil.</p>
+                    <a href="/resultados">Explorar profesionales</a>
+                </article>
+                <article class="trax-home__pathway">
+                    <span class="trax-home__pathway-index">02</span>
+                    <h3>Compara propuestas</h3>
+                    <p>Publica el trabajo y evalua alcance, plazo y condiciones.</p>
+                    <a href="/presupuestos/nuevo">Pedir presupuestos</a>
+                </article>
+                <article class="trax-home__pathway trax-home__pathway--dark">
+                    <span class="trax-home__pathway-index">03</span>
+                    <h3>Hace crecer tu oficio</h3>
+                    <p>Presenta tu experiencia y accede a trabajos relevantes.</p>
+                    <a href="/propuestas/nueva">Ver propuestas</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="trax-home__trust" aria-labelledby="trust-title">
+        <div class="shell trax-home__trust-layout">
+            <div>
+                <span class="trax-home__eyebrow trax-home__eyebrow--dark">Confianza operativa</span>
+                <h2 id="trust-title">Decisiones claras antes del primer contacto.</h2>
+            </div>
+            <div class="trax-home__trust-list">
+                <article>
+                    <strong>Identidad profesional</strong>
+                    <p>Especialidad, zona, reputacion y badges visibles.</p>
+                </article>
+                <article>
+                    <strong>Contexto de trabajo</strong>
+                    <p>Cada operacion solicita solo la informacion necesaria.</p>
+                </article>
+                <article>
+                    <strong>Estados comprensibles</strong>
+                    <p>Sabes que accion realizaste y cual es el proximo paso.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/home-tabs.js') }}"></script>
+{% endblock %}

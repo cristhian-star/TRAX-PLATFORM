@@ -1,0 +1,228 @@
+﻿{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client-dashboard-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set client_name = current_user.nombre if current_user else session.get("user_name", "Cliente MANDOBRA") %}
+{% set account_status = current_user.estado if current_user else "ACTIVO" %}
+
+<main class="client-dashboard">
+    <section class="client-dashboard__hero">
+        <div class="client-dashboard__shell client-dashboard__hero-grid">
+            <div class="client-dashboard__hero-copy">
+                <span class="client-dashboard__eyebrow">Centro de operaciones cliente</span>
+                <h1>Hola, {{ client_name }}.</h1>
+                <p>
+                    Aca podes entender que esta pasando con tus solicitudes,
+                    presupuestos recibidos, emergencias, propuestas y contrataciones.
+                </p>
+                <div class="client-dashboard__hero-actions" aria-label="Accesos principales">
+                    <a class="client-dashboard__button client-dashboard__button--primary" href="/presupuestos/nuevo">Nuevo presupuesto</a>
+                    <a class="client-dashboard__button client-dashboard__button--secondary" href="/explorar">Buscar profesionales</a>
+                </div>
+            </div>
+
+            <aside class="client-dashboard__status-card" aria-label="Estado de cuenta cliente">
+                <span class="client-dashboard__status-label">Estado de la cuenta</span>
+                <h2>{{ account_status|replace("_", " ")|title }}</h2>
+                <p>Cuenta lista para publicar solicitudes y comparar profesionales en MANDOBRA.</p>
+                <dl class="client-dashboard__status-stats">
+                    <div>
+                        <dt>Ultimo acceso</dt>
+                        <dd>{{ format_dashboard_date(last_access) if last_access else "No registrado" }}</dd>
+                    </div>
+                    <div>
+                        <dt>Solicitudes</dt>
+                        <dd>{{ total_request_count }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ultima actividad</dt>
+                        <dd>{{ format_dashboard_date(latest_activity) if latest_activity else "Sin actividad" }}</dd>
+                    </div>
+                </dl>
+            </aside>
+        </div>
+    </section>
+
+    <section class="client-dashboard__shell client-dashboard__content">
+        <section class="client-dashboard__quick-links" aria-label="Accesos rapidos">
+            <a href="/presupuestos/nuevo">Nuevo Presupuesto</a>
+            <a href="/emergencias/nueva">Nueva Emergencia</a>
+            <a href="/propuestas/nueva">Nueva Propuesta</a>
+            <a href="/explorar">Buscar Profesionales</a>
+            <a href="/presupuestos/mis-solicitudes">Ver Mis Solicitudes</a>
+        </section>
+
+        <section class="client-dashboard__metrics" aria-label="Resumen de actividad">
+            <article>
+                <span>Presupuestos activos</span>
+                <strong>{{ active_budget_count }}</strong>
+                <small>{{ total_offer_count }} presupuestos recibidos</small>
+            </article>
+            <article>
+                <span>Emergencias activas</span>
+                <strong>{{ active_emergency_count }}</strong>
+                <small>Casos urgentes en seguimiento</small>
+            </article>
+            <article>
+                <span>Propuestas activas</span>
+                <strong>{{ active_proposal_count }}</strong>
+                <small>{{ total_application_count }} postulaciones recibidas</small>
+            </article>
+            <article>
+                <span>Profesionales adjudicados</span>
+                <strong>{{ awarded_professionals_count }}</strong>
+                <small>Presupuestos, propuestas o contrataciones aceptadas</small>
+            </article>
+            <article>
+                <span>Historial</span>
+                <strong>{{ history_count }}</strong>
+                <small>Movimientos registrados en tu cuenta</small>
+            </article>
+        </section>
+
+        <div class="client-dashboard__grid">
+            <article class="client-dashboard__panel client-dashboard__panel--wide">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Actividad</span>
+                        <h2>Centro de actividad</h2>
+                    </div>
+                    <a href="/notificaciones">Ver toda la actividad</a>
+                </div>
+
+                {% if recent_activity %}
+                    <div class="client-dashboard__activity-list">
+                        {% for notification in recent_activity %}
+                            <a href="{{ notification.url_destino or '/notificaciones' }}" class="{{ 'is-unread' if not notification.leida else 'is-read' }}">
+                                <span>{{ notification.categoria }}</span>
+                                <strong>{{ notification.titulo }}</strong>
+                                <small>{{ notification.mensaje }} - {{ format_notification_date(notification.created_at) }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="client-dashboard__placeholder">
+                        <strong>Tu actividad reciente aparecera aqui.</strong>
+                        <span>Cuando exista actividad real en tus solicitudes, la vas a ver en este resumen.</span>
+                    </div>
+                {% endif %}
+            </article>
+
+            <article class="client-dashboard__panel client-dashboard__panel--wide">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Solicitudes</span>
+                        <h2>Mis solicitudes</h2>
+                    </div>
+                    <a href="/presupuestos/mis-solicitudes">Ver todas</a>
+                </div>
+
+                <div class="client-dashboard__request-grid">
+                    {% for section in request_sections %}
+                        <section class="client-dashboard__request-group" aria-label="{{ section['title'] }}">
+                            <div class="client-dashboard__request-head">
+                                <div>
+                                    <span>{{ section['title'] }}</span>
+                                    <strong>{{ section['active_count'] }} activas</strong>
+                                </div>
+                                <a href="{{ section['href'] }}">Ver todas</a>
+                            </div>
+
+                            {% if section['items'] %}
+                                <div class="client-dashboard__request-list">
+                                    {% for item in section['items'] %}
+                                        {% set item_title = item.titulo|default(item.categoria, true) %}
+                                        {% set item_date = item.fecha_creacion if item.fecha_creacion is defined else item.created_at %}
+                                        {% if section['title'] == "Presupuestos" %}
+                                            {% set item_href = "/presupuestos/" ~ item.id %}
+                                        {% elif section['title'] == "Propuestas" %}
+                                            {% set item_href = "/propuestas/" ~ item.id %}
+                                        {% else %}
+                                            {% set item_href = section['href'] %}
+                                        {% endif %}
+                                        <a href="{{ item_href }}">
+                                            <strong>{{ item_title }}</strong>
+                                            <small>{{ item.estado }} - {{ format_dashboard_date(item_date) }}</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="client-dashboard__empty">{{ section['empty'] }}</p>
+                            {% endif %}
+                        </section>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="client-dashboard__panel">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Cuenta</span>
+                        <h2>Estado operativo</h2>
+                    </div>
+                </div>
+                <dl class="client-dashboard__account-state">
+                    <div>
+                        <dt>Cuenta</dt>
+                        <dd>{{ account_status|replace("_", " ")|title }}</dd>
+                    </div>
+                    <div>
+                        <dt>Solicitudes totales</dt>
+                        <dd>{{ total_request_count }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ultima actividad</dt>
+                        <dd>{{ format_dashboard_date(latest_activity) if latest_activity else "Sin actividad" }}</dd>
+                    </div>
+                </dl>
+            </article>
+
+            <article class="client-dashboard__panel">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">WhatsApp</span>
+                        <h2>Contactos iniciados</h2>
+                    </div>
+                </div>
+                {% if whatsapp_contact_sessions %}
+                    <div class="client-dashboard__contact-list">
+                        {% for contact in whatsapp_contact_sessions %}
+                            <div>
+                                <strong>{{ contact.professional.nombre if contact.professional else "Profesional MANDOBRA" }}</strong>
+                                <span>{{ contact.operation_type|replace("_", " ")|title }}</span>
+                                <small>{{ format_dashboard_date(contact.initiated_at) }} - {{ contact.status|replace("_", " ")|title }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="client-dashboard__placeholder">
+                        <strong>Todavia no iniciaste contactos por WhatsApp.</strong>
+                        <span>Cuando abras una conversacion desde MANDOBRA, quedara registrada aca.</span>
+                    </div>
+                {% endif %}
+            </article>
+
+            <article class="client-dashboard__panel">
+                <div class="client-dashboard__section-head">
+                    <div>
+                        <span class="client-dashboard__eyebrow">Sugerencias</span>
+                        <h2>Recomendaciones</h2>
+                    </div>
+                </div>
+                <ul class="client-dashboard__recommendations">
+                    {% for recommendation in recommendations %}
+                        <li>
+                            <strong>{{ recommendation.title }}</strong>
+                            <span>{{ recommendation.detail }}</span>
+                            <a href="{{ recommendation.href }}">Abrir</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </article>
+        </div>
+    </section>
+</main>
+{% endblock %}

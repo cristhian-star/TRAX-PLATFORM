@@ -1,0 +1,171 @@
+.notification-dropdown {
+    flex: 0 0 auto;
+}
+
+.notification-summary {
+    position: relative;
+    width: var(--trax-control-height-md);
+    min-width: var(--trax-control-height-md);
+    min-height: var(--trax-control-height-md);
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-pill);
+    background: var(--trax-color-surface);
+    box-shadow: var(--trax-shadow-sm);
+}
+
+.notification-summary svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.9;
+}
+
+.notification-summary__count {
+    position: absolute;
+    top: -0.35rem;
+    right: -0.35rem;
+    display: inline-flex;
+    min-width: 1.25rem;
+    min-height: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--trax-space-1);
+    border: 2px solid var(--trax-color-surface);
+    border-radius: var(--trax-radius-pill);
+    color: var(--trax-white);
+    background: var(--trax-color-action-primary);
+    font-size: var(--trax-font-size-12);
+    font-weight: var(--trax-font-weight-bold);
+    line-height: 1;
+    width: auto;
+    height: auto;
+    transform: none;
+}
+
+.nav-dropdown[open] > .notification-summary > .notification-summary__count {
+    transform: none;
+}
+
+.notification-dropdown__menu {
+    left: auto;
+    right: 0;
+    width: min(23rem, calc(100vw - (var(--trax-page-gutter) * 2)));
+    transform: none;
+}
+
+.notification-dropdown__menu::before {
+    left: auto;
+    right: var(--trax-space-5);
+    transform: rotate(45deg);
+}
+
+.notification-dropdown__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--trax-space-3);
+    padding: var(--trax-space-2) var(--trax-space-2) var(--trax-space-3);
+}
+
+.notification-dropdown__head strong {
+    color: var(--trax-color-brand-strong);
+}
+
+.notification-dropdown__head a {
+    color: var(--trax-color-action-primary);
+    font-size: var(--trax-font-size-12);
+    font-weight: var(--trax-font-weight-bold);
+    text-decoration: none;
+}
+
+.notification-dropdown__list {
+    display: grid;
+    gap: var(--trax-space-2);
+}
+
+.notification-dropdown__item {
+    display: grid;
+    gap: var(--trax-space-1);
+    padding: var(--trax-space-3);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-md);
+    background: var(--trax-color-surface-subtle);
+    text-decoration: none;
+}
+
+.notification-dropdown__item.is-unread {
+    border-color: var(--trax-ds-primary-border);
+    background: var(--trax-ds-primary-soft);
+}
+
+.notification-dropdown__item span,
+.notification-dropdown__item time {
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-12);
+    font-weight: var(--trax-font-weight-bold);
+}
+
+.notification-dropdown__item strong {
+    color: var(--trax-color-brand-strong);
+    font-size: var(--trax-font-size-14);
+    overflow-wrap: anywhere;
+}
+
+.notification-dropdown__item small {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--trax-color-text-muted);
+    font-size: var(--trax-font-size-12);
+    line-height: var(--trax-line-height-body);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.notification-dropdown__item:hover,
+.notification-dropdown__item:focus-visible {
+    border-color: var(--trax-color-border);
+    background: var(--trax-color-surface);
+}
+
+.notification-dropdown__empty {
+    margin: 0;
+    padding: var(--trax-space-4);
+    color: var(--trax-color-text-muted);
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-md);
+    background: var(--trax-color-surface-subtle);
+    line-height: var(--trax-line-height-body);
+}
+
+@media (max-width: 820px) {
+    .notification-dropdown,
+    .notification-summary {
+        width: 100%;
+    }
+
+    .notification-summary {
+        justify-content: space-between;
+        padding: 0 var(--trax-space-3);
+        border-radius: var(--trax-radius-md);
+    }
+
+    .notification-summary::after {
+        content: "Notificaciones";
+        color: var(--trax-color-brand-strong);
+        font-weight: var(--trax-font-weight-bold);
+    }
+
+    .notification-summary__count {
+        position: static;
+        margin-left: auto;
+    }
+
+    .notification-dropdown__menu {
+        width: 100%;
+    }
+}

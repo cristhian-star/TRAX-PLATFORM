@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container contract-detail-screen">
+    <span class="kicker">Negociacion directa</span>
+    <h2>{{ negotiation.servicio }}</h2>
+
+    <div class="contract-summary">
+        <div>
+            <span>Estado</span>
+            <strong class="contract-state">{{ negotiation.state }}</strong>
+        </div>
+        <div>
+            <span>Version de negociacion</span>
+            <strong>{{ negotiation.version }}</strong>
+        </div>
+        <div>
+            <span>Version de terminos</span>
+            <strong>{{ negotiation.current_terms_version }}</strong>
+        </div>
+        <div>
+            <span>Modalidad</span>
+            <strong>EXTERNAL</strong>
+        </div>
+    </div>
+
+    <section class="contract-panel">
+        <h3>Terminos vigentes</h3>
+        <p><strong>Descripcion:</strong> {{ current_terms.description }}</p>
+        <p><strong>Alcance:</strong> {{ current_terms.scope }}</p>
+        <p><strong>Precio externo:</strong> {{ current_terms.external_price }}</p>
+        {% if current_terms.estimated_start_at %}
+            <p><strong>Inicio estimado:</strong> {{ current_terms.estimated_start_at.strftime("%d/%m/%Y %H:%M") }}</p>
+        {% endif %}
+        {% if current_terms.estimated_end_at %}
+            <p><strong>Finalizacion estimada:</strong> {{ current_terms.estimated_end_at.strftime("%d/%m/%Y %H:%M") }}</p>
+        {% endif %}
+        {% if current_terms.observations %}
+            <p><strong>Observaciones:</strong> {{ current_terms.observations }}</p>
+        {% endif %}
+    </section>
+
+    <section class="contract-panel">
+        <h3>Aceptaciones de la version {{ current_terms.version_no }}</h3>
+        <p>
+            Cliente:
+            <strong>{{ "Aceptada" if "CLIENT" in accepted_parties else "Pendiente" }}</strong>
+        </p>
+        <p>
+            Profesional:
+            <strong>{{ "Aceptada" if "PROFESSIONAL" in accepted_parties else "Pendiente" }}</strong>
+        </p>
+    </section>
+
+    {% if negotiation.state == "OPEN" %}
+    <section class="contract-panel">
+        <h3>Proponer nueva version</h3>
+        <form action="/negociacion/{{ negotiation.id }}/proponer" method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ negotiation.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.propose }}">
+            <label>Descripcion<textarea name="description" maxlength="5000" required>{{ current_terms.description }}</textarea></label>
+            <label>Alcance<textarea name="scope" maxlength="5000" required>{{ current_terms.scope }}</textarea></label>
+            <label>Precio externo<input type="number" name="external_price" min="0" max="99999999.99" step="0.01" value="{{ current_terms.external_price }}" required></label>
+            <label>Inicio estimado<input type="datetime-local" name="estimated_start_at" value="{{ current_terms.estimated_start_at.strftime('%Y-%m-%dT%H:%M') if current_terms.estimated_start_at else '' }}"></label>
+            <label>Finalizacion estimada<input type="datetime-local" name="estimated_end_at" value="{{ current_terms.estimated_end_at.strftime('%Y-%m-%dT%H:%M') if current_terms.estimated_end_at else '' }}"></label>
+            <label>Observaciones<textarea name="observations" maxlength="3000">{{ current_terms.observations or "" }}</textarea></label>
+            <button type="submit">Proponer cambios</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="contract-actions" aria-label="Acciones de negociacion">
+        {% if negotiation.state == "OPEN" and actor_party not in accepted_parties %}
+        <form action="/negociacion/{{ negotiation.id }}/aceptar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ negotiation.version }}">
+            <input type="hidden" name="terms_version" value="{{ current_terms.version_no }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.accept }}">
+            <button type="submit">Aceptar esta version</button>
+        </form>
+        {% endif %}
+
+        {% if actor_party == "CLIENT" and negotiation.state in ("OPEN", "AGREED") %}
+        <form action="/negociacion/{{ negotiation.id }}/cancelar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ negotiation.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.cancel }}">
+            <button class="secondary-action" type="submit">Cancelar negociacion</button>
+        </form>
+        {% endif %}
+
+        {% if actor_party == "PROFESSIONAL" and negotiation.state in ("OPEN", "AGREED") %}
+        <form action="/negociacion/{{ negotiation.id }}/rechazar" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ negotiation.version }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.reject }}">
+            <button class="secondary-action" type="submit">Rechazar negociacion</button>
+        </form>
+        {% endif %}
+
+        {% if actor_party == "CLIENT" and negotiation.state == "AGREED" %}
+        <form action="/negociacion/{{ negotiation.id }}/crear-contrato" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="expected_version" value="{{ negotiation.version }}">
+            <input type="hidden" name="terms_version" value="{{ current_terms.version_no }}">
+            <input type="hidden" name="idempotency_key" value="{{ command_keys.finalize }}">
+            <button type="submit">Crear contratacion</button>
+        </form>
+        {% endif %}
+    </section>
+
+    {% if negotiation.contract_id %}
+        <p><a href="/contratacion/{{ negotiation.contract_id }}">Ver contratacion creada</a></p>
+    {% endif %}
+</section>
+{% endblock %}

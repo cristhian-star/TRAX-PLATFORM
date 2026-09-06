@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container admin-moderation-screen">
+    <span class="kicker">Moderacion</span>
+    <h2>Panel de confianza y seguridad</h2>
+    <nav class="admin-nav" aria-label="Navegacion admin">
+        <a href="/admin/dashboard">Hub admin</a>
+        <a href="/admin/moderacion">Moderacion</a>
+        <a href="/admin/usuarios">Usuarios</a>
+        <a href="/admin/rubros">Rubros</a>
+        <a href="/mercados">Mercados</a>
+        <a href="/">Volver al sitio</a>
+    </nav>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Reviews contractuales</span>
+            <h3>Comentarios pendientes</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Review</th>
+                    <th>Contrato</th>
+                    <th>Comentario original</th>
+                    <th>Rating</th>
+                    <th>Acciones cerradas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in contract_reviews %}
+                <tr>
+                    <td>#{{ review.id }}</td>
+                    <td>#{{ review.contract_id }}</td>
+                    <td>{{ review.comentario or "Sin comentario" }}</td>
+                    <td>{{ review.rating }}/5 ({{ review.rating_eligibility_status }})</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="SHOW">
+                            <select name="reason" required aria-label="Motivo para mostrar comentario">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Mostrar</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="HIDE">
+                            <select name="reason" required aria-label="Motivo para ocultar comentario">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Ocultar</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/comentario" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="REDACT">
+                            <input type="text" name="redacted_comment" placeholder="Version publica" required aria-label="Versión pública redactada">
+                            <select name="reason" required aria-label="Motivo para publicar versión redactada">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Publicar redactada</button>
+                        </form>
+                        <form action="/admin/reviews/{{ review.id }}/rating/excluir" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select name="reason" required aria-label="Motivo para excluir rating">
+                                {% for reason in contract_review_moderation_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+                            </select>
+                            <button type="submit">Excluir rating</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No hay comentarios contractuales pendientes.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Denuncias abiertas</span>
+            <h3>Reportes de usuarios</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Reporter</th>
+                    <th>Reported</th>
+                    <th>Motivo</th>
+                    <th>Descripcion</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                <tr>
+                    <td>{{ reporte.reporter_id }}</td>
+                    <td>{{ reporte.reported_user_id }}</td>
+                    <td>{{ reporte.motivo }}</td>
+                    <td>{{ reporte.descripcion or "-" }}</td>
+                    <td>{{ reporte.created_at.strftime("%Y-%m-%d") if reporte.created_at else "-" }}</td>
+                    <td>{{ reporte.estado }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/reportes/{{ reporte.id }}/resolver" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Resolver</button>
+                        </form>
+                        <form action="/admin/reportes/{{ reporte.id }}/descartar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Descartar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No hay denuncias abiertas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Imagenes profesionales</span>
+            <h3>Media en revision</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Profesional</th>
+                    <th>Tipo</th>
+                    <th>Archivo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for media in media_pendientes %}
+                <tr>
+                    <td>{{ media.id }}</td>
+                    <td>{{ media.professional_id }}</td>
+                    <td>{{ media.media_type }}</td>
+                    <td>
+                        <a href="{{ media.secure_url or media.public_url }}" target="_blank" rel="noreferrer">
+                            {{ media.title or media.original_filename or "Ver imagen" }}
+                        </a>
+                    </td>
+                    <td>{{ media.status }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/media/{{ media.id }}/publicar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Publicar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/rechazar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="No cumple politicas de imagen.">
+                            <button type="submit">Rechazar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/ocultar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="Retiro preventivo de imagen.">
+                            <button type="submit">Ocultar</button>
+                        </form>
+                        <form action="/admin/media/{{ media.id }}/restaurar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="motivo" value="Restaurada por administracion.">
+                            <button type="submit">Restaurar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No hay imagenes en revision.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="moderation-section">
+        <div class="panel-title compact-title">
+            <span class="kicker">Verificaciones pendientes</span>
+            <h3>Solicitudes de validacion</h3>
+        </div>
+
+        <table class="admin-table moderation-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Tipo usuario</th>
+                    <th>Documentos</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for verificacion in verificaciones %}
+                <tr>
+                    <td>{{ verificacion.user_id }}</td>
+                    <td>{{ verificacion.tipo_usuario }}</td>
+                    <td>
+                        <div class="document-list">
+                            <span>DNI: {{ verificacion.documento_identidad or "-" }}</span>
+                            <span>Certificado: {{ verificacion.certificado_oficio or "-" }}</span>
+                            <span>Titulo: {{ verificacion.titulo_profesional or "-" }}</span>
+                            <span>Material: {{ verificacion.material_probatorio or "-" }}</span>
+                        </div>
+                    </td>
+                    <td>{{ verificacion.estado }}</td>
+                    <td class="moderation-actions">
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/aprobar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Aprobar</button>
+                        </form>
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/observar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Observar</button>
+                        </form>
+                        <form action="/admin/verificaciones/{{ verificacion.id }}/rechazar" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No hay verificaciones pendientes.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</section>
+
+{% endblock %}

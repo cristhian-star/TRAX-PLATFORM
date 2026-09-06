@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-ux-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<main class="trax-page auth-page auth-page--register">
+    <section class="trax-container auth-shell" aria-labelledby="register-title">
+        <div class="trax-card trax-card--elevated auth-panel auth-panel--story">
+            <p class="auth-eyebrow">Nueva cuenta MANDOBRA</p>
+            <h1 id="register-title">Empezá simple. Completá lo importante después.</h1>
+            <p class="auth-lead" data-role-copy>
+                Creá tu cuenta para publicar solicitudes, comparar profesionales y operar con más orden.
+            </p>
+            <div class="auth-flow">
+                <span>1</span>
+                <p><strong>Cuenta segura</strong> Nombre, email y contraseña.</p>
+                <span>2</span>
+                <p><strong>Rol inicial</strong> Cliente o profesional.</p>
+                <span>3</span>
+                <p><strong>Perfil progresivo</strong> Rubro, cobertura y portfolio se completan luego.</p>
+            </div>
+        </div>
+
+        <form action="/register" method="POST" class="trax-card auth-card" data-auth-form novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
+
+            <div class="trax-card__header auth-card__head">
+                <p>Crear cuenta</p>
+                <h2>Sumate a MANDOBRA</h2>
+            </div>
+
+            {% if error %}
+                <p class="trax-alert trax-alert--danger auth-alert" id="register-form-error" role="alert">{{ error }}</p>
+            {% endif %}
+
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-name">Nombre completo</label>
+                <input
+                    class="trax-input"
+                    id="register-name"
+                    type="text"
+                    name="nombre"
+                    value="{{ form_values.nombre if form_values and form_values.nombre else '' }}"
+                    autocomplete="name"
+                    maxlength="120"
+                    required
+                    aria-describedby="register-name-help{% if errors and errors.nombre %} register-name-error{% endif %}"
+                    aria-invalid="{{ 'true' if errors and errors.nombre else 'false' }}">
+                <small class="trax-field__help" id="register-name-help">Como querés que te identifiquemos dentro de MANDOBRA.</small>
+                {% if errors and errors.nombre %}
+                    <p class="trax-field__error auth-field-error" id="register-name-error">{{ errors.nombre }}</p>
+                {% endif %}
+            </div>
+
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-email">Email</label>
+                <input
+                    class="trax-input"
+                    id="register-email"
+                    type="email"
+                    name="email"
+                    value="{{ form_values.email if form_values and form_values.email else '' }}"
+                    autocomplete="email"
+                    inputmode="email"
+                    maxlength="120"
+                    required
+                    aria-describedby="register-email-help{% if errors and errors.email %} register-email-error{% endif %}"
+                    aria-invalid="{{ 'true' if errors and errors.email else 'false' }}">
+                <small class="trax-field__help" id="register-email-help">Lo usaremos para iniciar sesión y futuras verificaciones.</small>
+                {% if errors and errors.email %}
+                    <p class="trax-field__error auth-field-error" id="register-email-error">{{ errors.email }}</p>
+                {% endif %}
+            </div>
+
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-password">Contraseña</label>
+                <div class="auth-password">
+                    <input
+                        class="trax-input"
+                        id="register-password"
+                        type="password"
+                        name="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                        data-password-strength
+                        aria-describedby="register-password-help register-password-strength{% if errors and errors.password %} register-password-error{% endif %}"
+                        aria-invalid="{{ 'true' if errors and errors.password else 'false' }}">
+                    <button class="trax-button trax-button--secondary" type="button" data-password-toggle aria-controls="register-password" aria-label="Mostrar contraseña">Mostrar</button>
+                </div>
+                <small class="trax-field__help" id="register-password-help">Mínimo 8 caracteres.</small>
+                <div class="auth-strength" id="register-password-strength" aria-live="polite">
+                    <span></span>
+                    <small>Fortaleza pendiente</small>
+                </div>
+                {% if errors and errors.password %}
+                    <p class="trax-field__error auth-field-error" id="register-password-error">{{ errors.password }}</p>
+                {% endif %}
+            </div>
+
+            <div class="trax-field auth-field">
+                <label class="trax-field__label" for="register-password-confirm">Confirmar contraseña</label>
+                <input
+                    class="trax-input"
+                    id="register-password-confirm"
+                    type="password"
+                    name="password_confirm"
+                    autocomplete="new-password"
+                    required
+                    aria-describedby="register-password-confirm-help{% if errors and errors.password_confirm %} register-password-confirm-error{% endif %}"
+                    aria-invalid="{{ 'true' if errors and errors.password_confirm else 'false' }}">
+                <small class="trax-field__help" id="register-password-confirm-help">Debe coincidir con la contraseña anterior.</small>
+                {% if errors and errors.password_confirm %}
+                    <p class="trax-field__error auth-field-error" id="register-password-confirm-error">{{ errors.password_confirm }}</p>
+                {% endif %}
+            </div>
+
+            <fieldset class="trax-field auth-role-group" aria-describedby="register-role-help{% if errors and errors.rol %} register-role-error{% endif %}">
+                <legend>Tipo de cuenta</legend>
+                <label class="auth-role-option">
+                    <input
+                        class="trax-radio"
+                        type="radio"
+                        name="rol"
+                        value="CLIENTE"
+                        data-role-option
+                        {{ 'checked' if not form_values or form_values.rol != 'PROFESIONAL' else '' }}>
+                    <span>
+                        <strong>Cliente</strong>
+                        <small>Publicar solicitudes y contratar profesionales.</small>
+                    </span>
+                </label>
+                <label class="auth-role-option">
+                    <input
+                        class="trax-radio"
+                        type="radio"
+                        name="rol"
+                        value="PROFESIONAL"
+                        data-role-option
+                        {{ 'checked' if form_values and form_values.rol == 'PROFESIONAL' else '' }}>
+                    <span>
+                        <strong>Profesional</strong>
+                        <small>Completar perfil, cobertura y portfolio después.</small>
+                    </span>
+                </label>
+                <small class="trax-field__help" id="register-role-help">Podés operar sólo con los permisos de tu tipo de cuenta.</small>
+                {% if errors and errors.rol %}
+                    <p class="trax-field__error auth-field-error" id="register-role-error">{{ errors.rol }}</p>
+                {% endif %}
+            </fieldset>
+
+            <label class="auth-terms">
+                <input
+                    class="trax-checkbox"
+                    type="checkbox"
+                    name="terms_accepted"
+                    {% if form_values and form_values.terms_accepted %}checked{% endif %}
+                    aria-describedby="register-terms-help{% if errors and errors.terms_accepted %} register-terms-error{% endif %}"
+                    aria-invalid="{{ 'true' if errors and errors.terms_accepted else 'false' }}">
+                <span>Acepto los términos y la política de privacidad de MANDOBRA.</span>
+            </label>
+            <small class="trax-field__help auth-terms-help" id="register-terms-help">Registramos esta aceptación para trazabilidad de cumplimiento.</small>
+            {% if errors and errors.terms_accepted %}
+                <p class="trax-field__error auth-field-error" id="register-terms-error">{{ errors.terms_accepted }}</p>
+            {% endif %}
+
+            <button type="submit" class="trax-button trax-button--primary trax-button--large auth-submit" data-auth-submit>
+                <span>Crear cuenta</span>
+                <span class="auth-submit__loading" aria-hidden="true">Creando...</span>
+            </button>
+
+            <p class="auth-switch">
+                ¿Ya tenés cuenta?
+                <a href="/login{% if next_url %}?next={{ next_url|urlencode }}{% endif %}">Ingresá</a>
+            </p>
+        </form>
+    </section>
+</main>
+
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/auth-ux-v1.js') }}"></script>
+{% endblock %}

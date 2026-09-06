@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="emergency-directory">
+    <section class="emergency-directory__hero">
+        <div class="shell emergency-directory__hero-layout">
+            <div>
+                <span>Directorio de emergencia</span>
+                <h1>Profesionales para {{ categoria or "tu emergencia" }}</h1>
+                <p>
+                    Categoria buscada: <strong>{{ categoria or "todas" }}</strong>.
+                    Zona buscada: <strong>{{ zona or "sin zona especifica" }}</strong>.
+                    Encontramos <strong>{{ professional_rows|length }}</strong> perfiles compatibles.
+                </p>
+            </div>
+            <div class="emergency-directory__count">
+                <strong>{{ professional_rows|length }}</strong>
+                <span>profesionales encontrados</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shell emergency-directory__content">
+        <div class="emergency-legal emergency-legal--directory">
+            <span aria-hidden="true">!</span>
+            <p>
+                Si hay riesgo para personas, incendio, fuga grave o peligro inmediato,
+                contacta primero a emergencias oficiales.
+            </p>
+        </div>
+
+        <p class="emergency-directory__availability-note">
+            La disponibilidad es informada por cada profesional y debe confirmarse al contactar.
+        </p>
+
+        {% if request_created %}
+            <p class="emergency-directory__notice">
+                Solicitud registrada. Ahora podes contactar profesionales compatibles.
+            </p>
+        {% elif anonymous_search %}
+            <p class="emergency-directory__notice">
+                Busqueda preparada. Como visitante no se guardo una solicitud en MANDOBRA.
+            </p>
+        {% endif %}
+
+        <div class="emergency-directory__toolbar">
+            <div>
+                <span>Categoria</span>
+                <strong>{{ categoria or "Todas" }}</strong>
+            </div>
+            <div>
+                <span>Zona</span>
+                <strong>{{ zona or "Todas" }}</strong>
+            </div>
+            <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                Ajustar busqueda
+            </a>
+        </div>
+
+        {% if professional_rows %}
+            <div class="emergency-card-list">
+                {% for row in professional_rows %}
+                    {% set professional = row.professional %}
+                    {% set badges = row.badges %}
+                    {% set rating = row.rating %}
+                    {% set phone = row.phone %}
+                    {% include "components/_emergency_professional_card.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="emergency-empty">
+                <span aria-hidden="true">0</span>
+                <h2>No encontramos profesionales con esos filtros.</h2>
+                <p>
+                    Proba cambiar la zona, usar un rubro mas general o iniciar una solicitud de presupuesto
+                    si no necesitas asistencia inmediata.
+                </p>
+                <div class="emergency-empty__actions">
+                    <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                        Ampliar busqueda
+                    </a>
+                    <a href="/presupuestos/nuevo?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                        Solicitar presupuesto
+                    </a>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="emergency-guard-note" aria-label="Guardias futuras">
+            <span>Guardia futura</span>
+            <strong>Proximamente los profesionales podran activar guardias por dia y horario.</strong>
+            <p>En esta version, la disponibilidad se confirma manualmente al contactar.</p>
+        </section>
+
+        <section class="emergency-membership-note" aria-label="Informacion de membresias">
+            <article>
+                <strong>WORK</strong>
+                <p>Oportunidades mensuales limitadas proximamente.</p>
+            </article>
+            <article>
+                <strong>PRO</strong>
+                <p>Emergencias ilimitadas proximamente.</p>
+            </article>
+        </section>
+    </section>
+</main>
+{% include "components/_whatsapp_consent_modal.html" %}
+{% endblock %}

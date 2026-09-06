@@ -1,0 +1,2 @@
+TRAX database migrations managed with Alembic.
+Use `alembic upgrade head` to apply migrations.

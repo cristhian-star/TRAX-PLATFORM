@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set entry_data = form_data|default({}) %}
+
+<main class="budget-page">
+    <section class="budget-hero">
+        <div class="budget-shell budget-hero__layout">
+            <div>
+                <span class="budget-eyebrow">Presupuestos MANDOBRA</span>
+                <h1>Publica tu necesidad y compara hasta 6 presupuestos.</h1>
+                <p>
+                    Conta que trabajo necesitas, donde y para cuando. Profesionales de la
+                    plataforma podran enviarte propuestas para que elijas con informacion clara.
+                </p>
+            </div>
+            <aside class="budget-hero__summary" aria-label="Como funciona">
+                <strong>Como funciona</strong>
+                <ol>
+                    <li>Publicas los datos del trabajo.</li>
+                    <li>Recibis hasta 6 presupuestos.</li>
+                    <li>Comparas y adjudicas uno.</li>
+                </ol>
+            </aside>
+        </div>
+    </section>
+
+    <section class="budget-shell budget-entry">
+        {% if anonymous_preview %}
+            <div class="budget-alert budget-alert--success" role="status">
+                Tu solicitud fue preparada correctamente. No se publico todavia porque estas navegando como visitante.
+            </div>
+
+            <section class="budget-panel">
+                <div class="budget-section-heading">
+                    <span class="budget-eyebrow">Vista previa</span>
+                    <h2>{{ anonymous_preview.titulo }}</h2>
+                    <p>
+                        Podes iniciar tu solicitud sin registrarte. Para gestionar, adjudicar o hacer
+                        seguimiento, te pediremos iniciar sesion mas adelante.
+                    </p>
+                </div>
+
+                <dl class="budget-facts">
+                    <div>
+                        <dt>Categoria</dt>
+                        <dd>{{ anonymous_preview.categoria }}</dd>
+                    </div>
+                    <div>
+                        <dt>Zona</dt>
+                        <dd>{{ anonymous_preview.zona }}</dd>
+                    </div>
+                    <div>
+                        <dt>Fecha estimada</dt>
+                        <dd>{{ anonymous_preview.fecha_estimada_display }}</dd>
+                    </div>
+                    <div>
+                        <dt>Urgencia</dt>
+                        <dd>{{ anonymous_preview.urgencia|capitalize }}</dd>
+                    </div>
+                </dl>
+
+                <p class="budget-description">{{ anonymous_preview.descripcion }}</p>
+
+                <div class="budget-form__actions">
+                    <p>
+                        Por seguridad, esta vista previa no se guarda ni queda disponible para otros usuarios.
+                    </p>
+                    <a class="budget-button budget-button--primary" href="/login?next=/presupuestos/nuevo">
+                        Iniciar sesion para publicar
+                    </a>
+                </div>
+            </section>
+        {% else %}
+        <div class="budget-section-heading">
+            <span class="budget-eyebrow">Nueva solicitud</span>
+            <h2>Datos del trabajo</h2>
+            <p>Los campos marcados con * son obligatorios.</p>
+        </div>
+
+        {% if is_anonymous %}
+            <div class="budget-alert budget-alert--info" role="status">
+                Podes iniciar tu solicitud sin registrarte. Para gestionar, adjudicar o hacer seguimiento,
+                te pediremos iniciar sesion mas adelante.
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="budget-alert budget-alert--error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form action="/presupuestos/nuevo" method="POST" class="budget-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="budget-form__grid">
+                <label class="budget-field">
+                    <span>Categoria o rubro *</span>
+                    <input
+                        type="text"
+                        name="categoria"
+                        value="{{ entry_data.get('categoria', '') }}"
+                        placeholder="Ej. Electricidad"
+                        autocomplete="off"
+                        required>
+                </label>
+
+                <label class="budget-field">
+                    <span>Zona *</span>
+                    <input
+                        type="text"
+                        name="zona"
+                        value="{{ entry_data.get('zona', '') }}"
+                        placeholder="Ej. Palermo, CABA"
+                        autocomplete="address-level2"
+                        required>
+                </label>
+
+                <label class="budget-field budget-field--wide">
+                    <span>Titulo del trabajo *</span>
+                    <input
+                        type="text"
+                        name="titulo"
+                        maxlength="160"
+                        value="{{ entry_data.get('titulo', '') }}"
+                        placeholder="Ej. Renovacion de tablero electrico"
+                        aria-describedby="budget-title-help"
+                        required>
+                    <small id="budget-title-help">Maximo 160 caracteres. Se recorta visualmente en los listados si es muy largo.</small>
+                </label>
+
+                <label class="budget-field">
+                    <span>Fecha estimada</span>
+                    <input
+                        type="date"
+                        name="fecha_estimada"
+                        value="{{ entry_data.get('fecha_estimada', '') }}">
+                </label>
+
+                <label class="budget-field">
+                    <span>Urgencia</span>
+                    <select name="urgencia">
+                        <option value="BAJA" {% if entry_data.get('urgencia') == 'BAJA' %}selected{% endif %}>Flexible</option>
+                        <option value="NORMAL" {% if entry_data.get('urgencia', 'NORMAL') == 'NORMAL' %}selected{% endif %}>Normal</option>
+                        <option value="ALTA" {% if entry_data.get('urgencia') == 'ALTA' %}selected{% endif %}>Prioritaria</option>
+                    </select>
+                </label>
+
+                <label class="budget-field budget-field--wide">
+                    <span>Descripcion *</span>
+                    <textarea
+                        name="descripcion"
+                        rows="6"
+                        maxlength="1200"
+                        placeholder="Inclui alcance, medidas aproximadas, materiales disponibles y cualquier condicion relevante."
+                        aria-describedby="budget-description-help"
+                        required>{{ entry_data.get('descripcion', '') }}</textarea>
+                    <small id="budget-description-help">Maximo 1200 caracteres. No incluyas datos sensibles o medios de pago.</small>
+                </label>
+            </div>
+
+            <div class="budget-form__actions">
+                <p>Podras revisar los presupuestos desde el detalle de esta solicitud.</p>
+                <button class="budget-button budget-button--primary" type="submit">
+                    {% if is_anonymous %}Preparar solicitud{% else %}Publicar solicitud{% endif %}
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

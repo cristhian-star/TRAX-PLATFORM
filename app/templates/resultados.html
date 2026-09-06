@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-cards-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set profesionales = resultados if resultados is defined else [] %}
+
+<main class="professional-listing">
+    <section class="professional-listing__hero">
+        <div class="shell professional-listing__hero-layout">
+            <div>
+                <span class="professional-listing__eyebrow">Red profesional MANDOBRA</span>
+                <h1>{{ servicio or "Profesionales tecnicos" }}{% if zona %} en {{ zona }}{% endif %}</h1>
+                <p>
+                    Revisa especialidad, ubicacion, reputacion y verificaciones antes
+                    de iniciar una contratacion.
+                </p>
+            </div>
+            <div class="professional-listing__summary" aria-label="Resumen de resultados">
+                <strong>{{ profesionales|length }}</strong>
+                <span>
+                    {% if profesionales|length == 1 %}
+                        profesional encontrado
+                    {% else %}
+                        profesionales encontrados
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <section class="shell professional-listing__content">
+        <form action="/buscar" method="GET" class="professional-filters" aria-label="Filtrar profesionales">
+            <label>
+                <span>Servicio</span>
+                <select name="servicio">
+                    <option value="">Todos los servicios</option>
+                    <option {% if servicio in ("Electricidad",) %}selected{% endif %}>Electricidad</option>
+                    <option
+                        value="Refrigeración A/C"
+                        {% if servicio in ("Refrigeracion A/C", "Refrigeración A/C") %}selected{% endif %}>
+                        Refrigeracion A/C
+                    </option>
+                    <option
+                        value="Plomería"
+                        {% if servicio in ("Plomeria", "Plomería") %}selected{% endif %}>
+                        Plomeria
+                    </option>
+                    <option {% if servicio == "Herreria" %}selected{% endif %}>Herreria</option>
+                    <option {% if servicio == "Gas domiciliario" %}selected{% endif %}>Gas domiciliario</option>
+                </select>
+            </label>
+            <label>
+                <span>Zona</span>
+                <input name="zona" value="{{ zona or '' }}" placeholder="Ciudad, barrio o zona">
+            </label>
+            <button type="submit">Aplicar filtros</button>
+        </form>
+
+        {% if profesionales %}
+            <div class="professional-list" aria-label="Resultados de profesionales">
+                {% for professional in profesionales %}
+                    {% set profile_id = professional.id %}
+                    {% set badges = professional_badges.get(profile_id, {"work": true, "pro": false, "verified": false, "reputation_score": 0}) if professional_badges is defined else {"work": true, "pro": false, "verified": false, "reputation_score": 0} %}
+                    {% set rating = professional_ratings.get(profile_id, {"average": none, "count": 0}) if professional_ratings is defined else {"average": none, "count": 0} %}
+                    {% set coverage_match = matching_results.get(profile_id) if matching_results is defined else none %}
+                    {% include "components/_professional_card.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="professional-empty" aria-labelledby="professional-empty-title">
+                <span aria-hidden="true">0</span>
+                <h2 id="professional-empty-title">No encontramos profesionales con esos filtros.</h2>
+                <p>Proba con otro servicio, amplia la zona o limpia la busqueda.</p>
+                <a href="/resultados">Ver todos los profesionales</a>
+            </section>
+        {% endif %}
+    </section>
+</main>
+{% include "components/_whatsapp_consent_modal.html" %}
+{% endblock %}

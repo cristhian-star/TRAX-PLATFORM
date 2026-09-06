@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="trax-page">
+    <section class="trax-container trax-page__content">
+        <div class="trax-card trax-card--compact">
+            <div class="trax-card__header">
+                <p class="trax-badge trax-badge--success">Rubro solicitado</p>
+                <h2 class="trax-page__title">Solicitud recibida</h2>
+            </div>
+
+            <div class="trax-card__body">
+
+            <p>
+                Estamos trabajando para enlistar tu rubro o actividad:
+                <strong>{{ nombre_rubro }}</strong>.
+            </p>
+
+            <p>
+                ¿Querés recibir una notificación cuando esté lista?
+            </p>
+
+            <p>
+                Solicitudes actuales para este rubro: <strong>{{ cantidad }}</strong>/10
+            </p>
+
+            {% if cantidad >= 10 %}
+                <p class="trax-alert trax-alert--warning">
+                    Este rubro alcanzó el mínimo de solicitudes. Se notificará al administrador.
+                </p>
+            {% endif %}
+            </div>
+
+            <div class="trax-card__footer">
+                <a href="/" class="trax-button trax-button--secondary">Volver al inicio</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

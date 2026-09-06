@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-profile-v2.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set pro = profesional %}
+{% set nombre = pro.nombre %}
+{% set especialidad = pro.especialidad or pro.servicio %}
+{% set servicio = pro.servicio %}
+{% set zona = pro.zona %}
+{% set telefono = pro.telefono %}
+{% set descripcion = pro.descripcion %}
+{% set badges = profile_badges if profile_badges is defined else {"work": true, "pro": false, "verified": false} %}
+{% set portfolio_entries = pro.portfolio_urls.splitlines() if pro.portfolio_urls else [] %}
+{% set gallery_entries = pro.gallery_urls.splitlines() if pro.gallery_urls else [] %}
+{% set public_google_maps_api_key = google_maps_api_key if google_maps_api_key and google_maps_api_key != "tu_clave_real" else none %}
+{% set professional_media = professional_media if professional_media is defined else {"avatar_url": pro.logo_url, "cover_url": pro.cover_url, "gallery": []} %}
+
+<main class="professional-profile">
+    <section class="professional-profile__cover" aria-label="Portada profesional">
+        {% if professional_media.cover_url %}
+            <img class="professional-profile__cover-image" src="{{ professional_media.cover_url }}" alt="{{ professional_media.cover_alt or '' }}">
+        {% endif %}
+        <div class="professional-profile__cover-grid"></div>
+        <div class="shell professional-profile__cover-content">
+            {% if not professional_media.cover_url %}
+                <span>Portada profesional</span>
+                <small>Agrega una portada desde la edicion de tu perfil</small>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="shell professional-profile__identity">
+        <div class="professional-profile__brand" aria-label="Logo o marca profesional">
+            {% if professional_media.avatar_url %}
+                <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt or 'Logo de ' ~ nombre }}">
+            {% else %}
+                <span>{{ nombre[:2]|upper }}</span>
+                <small>Marca</small>
+            {% endif %}
+        </div>
+
+        <div class="professional-profile__avatar" aria-label="Avatar de {{ nombre }}">
+            {% if professional_media.avatar_url %}
+                <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt or 'Avatar de ' ~ nombre }}">
+            {% else %}
+                {{ nombre[:2]|upper }}
+            {% endif %}
+        </div>
+
+        <div class="professional-profile__headline">
+            <div class="professional-profile__badges" aria-label="Distinciones del perfil">
+                {% if badges.work %}
+                    <span class="profile-badge profile-badge--work">WORK</span>
+                {% endif %}
+                {% if badges.pro %}
+                    <span class="profile-badge profile-badge--pro">PRO</span>
+                {% endif %}
+                {% if badges.verified %}
+                    <span class="profile-badge profile-badge--verified">VERIFICADO</span>
+                {% endif %}
+            </div>
+            <h1>{{ nombre }}</h1>
+            <p class="professional-profile__specialty">{{ especialidad }}</p>
+            <p class="professional-profile__location">{{ zona }}</p>
+
+            <div class="professional-profile__rating">
+                {% if average_rating %}
+                    <span aria-hidden="true">&#9733;</span>
+                    <strong>{{ average_rating }}</strong>
+                    <span>
+                        {{ review_count or 0 }}
+                        {% if review_count == 1 %}resena{% else %}resenas{% endif %}
+                    </span>
+                {% else %}
+                    <strong>Sin calificaciones</strong>
+                    <span>0 resenas</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="professional-profile__actions" aria-label="Acciones del perfil">
+            {% if telefono %}
+                <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="professional_id" value="{{ pro.id }}">
+                    <input type="hidden" name="operation_type" value="PERFIL_PROFESIONAL">
+                    <input type="hidden" name="whatsapp_consent" value="">
+                    <button class="profile-action profile-action--whatsapp" type="submit">WhatsApp</button>
+                </form>
+            {% else %}
+                <span class="profile-action profile-action--disabled" aria-disabled="true">WhatsApp</span>
+            {% endif %}
+            {% if pro.whatsapp_username and pro.whatsapp_contact_preference != "PHONE" %}
+                <p class="professional-profile__contact-privacy">
+                    Contacto protegido mediante username de WhatsApp.
+                </p>
+            {% endif %}
+            <a
+                class="profile-action profile-action--primary"
+                href="/contratacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
+                Contactar
+            </a>
+            {% if formal_negotiation_allowed %}
+                <a
+                    class="profile-action profile-action--secondary"
+                    href="/negociacion/nueva?professional_id={{ pro.id }}&servicio={{ servicio|urlencode }}">
+                    Formalizar condiciones
+                </a>
+                <p class="professional-profile__contact-privacy">
+                    Las condiciones son definidas y aceptadas por las partes. MANDOBRA registra el acuerdo y aporta trazabilidad, pero no garantiza su cumplimiento.
+                </p>
+            {% endif %}
+            <button class="profile-action profile-action--secondary" type="button" data-share-profile>
+                Compartir perfil
+            </button>
+            <p class="professional-profile__share-status" data-share-status aria-live="polite"></p>
+        </div>
+    </section>
+
+    {% if report_created %}
+        <div class="shell">
+            <p class="professional-profile__notice">
+                Reporte enviado correctamente. El equipo MANDOBRA lo revisara.
+            </p>
+        </div>
+    {% endif %}
+
+    <section class="shell professional-profile__layout">
+        <div class="professional-profile__main">
+            <section class="profile-section" aria-labelledby="about-title">
+                <div class="profile-section__heading">
+                    <span>Perfil profesional</span>
+                    <h2 id="about-title">Acerca de {{ nombre }}</h2>
+                </div>
+                {% if descripcion %}
+                    <p class="profile-section__body">{{ descripcion }}</p>
+                {% else %}
+                    <p class="profile-placeholder">
+                        Este profesional todavia no agrego una descripcion.
+                    </p>
+                {% endif %}
+
+                <div class="profile-service-grid">
+                    <article>
+                        <span>Servicio principal</span>
+                        <strong>{{ servicio }}</strong>
+                    </article>
+                    <article>
+                        <span>Zona de trabajo</span>
+                        <strong>{{ zona }}</strong>
+                    </article>
+                    {% if pro.anios_experiencia is not none %}
+                        <article>
+                            <span>Experiencia informada</span>
+                            <strong>
+                                {{ pro.anios_experiencia }}
+                                {% if pro.anios_experiencia == 1 %}ano{% else %}anos{% endif %}
+                            </strong>
+                        </article>
+                    {% endif %}
+                </div>
+            </section>
+
+            {% set google_maps_api_key = public_google_maps_api_key %}
+            {% include "components/_professional_work_area.html" %}
+            {% include "components/_professional_gallery.html" %}
+            {% include "components/_professional_credentials.html" %}
+            {% include "components/_professional_reviews.html" %}
+        </div>
+
+        <aside class="professional-profile__sidebar">
+            <section class="profile-side-card">
+                <span class="profile-side-card__eyebrow">Resumen</span>
+                <h2>Informacion del perfil</h2>
+                <dl>
+                    <div>
+                        <dt>Especialidad</dt>
+                        <dd>{{ especialidad }}</dd>
+                    </div>
+                    <div>
+                        <dt>Ubicacion</dt>
+                        <dd>{{ zona }}</dd>
+                    </div>
+                    <div>
+                        <dt>Reviews verificadas</dt>
+                        <dd>{{ reputation_metrics.eligible_rating_count if reputation_metrics is defined else 0 }}</dd>
+                    </div>
+                    {% if pro.estado_perfil %}
+                        <div>
+                            <dt>Estado del perfil</dt>
+                            <dd>{{ pro.estado_perfil|replace("_", " ")|title }}</dd>
+                        </div>
+                    {% endif %}
+                    {% if pro.disponibilidad|default(none) %}
+                        <div>
+                            <dt>Disponibilidad</dt>
+                            <dd>{{ pro.disponibilidad }}</dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </section>
+
+            {% include "components/_professional_links.html" %}
+
+            <section class="profile-side-card profile-side-card--support">
+                <h2>Seguridad y soporte</h2>
+                <p>Reporta informacion incorrecta o una conducta que deba revisar MANDOBRA.</p>
+                <a href="/reportar/usuario/{{ pro.id }}">Reportar usuario</a>
+            </section>
+        </aside>
+    </section>
+</main>
+{% include "components/_whatsapp_consent_modal.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/professional-profile-v2.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/professional-coverage-map.js') }}"></script>
+    {% if public_google_maps_api_key and coverage and coverage.has_coordinates %}
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ public_google_maps_api_key|urlencode }}&callback=traxInitCoverageMaps"></script>
+    {% endif %}
+{% endblock %}

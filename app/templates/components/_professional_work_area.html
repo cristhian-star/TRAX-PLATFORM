@@ -1,0 +1,126 @@
+<section class="profile-section profile-work-area-section" aria-labelledby="work-area-title">
+    <div class="profile-section__heading profile-section__heading--split">
+        <div>
+            <span>Cobertura profesional</span>
+            <h2 id="work-area-title">Zona de cobertura</h2>
+        </div>
+        <small>Ubicacion protegida</small>
+    </div>
+
+    {% if coverage and coverage.configured %}
+        {% set coverage_base = [] %}
+        {% if coverage.city %}
+            {% set _ = coverage_base.append(coverage.city) %}
+        {% endif %}
+        {% if coverage.province %}
+            {% set _ = coverage_base.append(coverage.province) %}
+        {% endif %}
+        {% set coverage_base_label = coverage_base|join(" · ") if coverage_base else (zona or "Zona no informada") %}
+        {% set coverage_radius_label = coverage.radius_km ~ " km" if coverage.radius_km is not none else "A coordinar" %}
+
+        <div class="profile-work-area profile-work-area--marketplace">
+            <div class="profile-work-area__map-shell">
+                <div
+                    class="profile-work-area__map"
+                    style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}"
+                    data-coverage-map
+                    data-map-mode="public"
+                    data-has-api-key="{{ 'true' if google_maps_api_key else 'false' }}"
+                    data-lat="{{ coverage.public_latitude if coverage and coverage.public_latitude is not none else '' }}"
+                    data-lng="{{ coverage.public_longitude if coverage and coverage.public_longitude is not none else '' }}"
+                    data-radius-km="{{ coverage.radius_km if coverage and coverage.radius_km is not none else 10 }}"
+                    role="img"
+                    aria-label="Mapa aproximado del area de cobertura profesional">
+                    <div class="profile-work-area__map-canvas" data-coverage-map-canvas aria-label="Mapa publico aproximado de cobertura"></div>
+                    <div class="profile-work-area__map-fallback" data-coverage-map-fallback>
+                        <span class="profile-work-area__road profile-work-area__road--one"></span>
+                        <span class="profile-work-area__road profile-work-area__road--two"></span>
+                        <span class="profile-work-area__road profile-work-area__road--three"></span>
+                        <span class="profile-work-area__coverage" aria-hidden="true"></span>
+                        <span class="profile-work-area__marker" aria-hidden="true">
+                            <img src="{{ url_for('static', filename='img/trax-worker-marker.svg') }}" alt="">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="profile-work-area__map-overlay" aria-hidden="true">
+                    <span>Area de cobertura</span>
+                    <strong>{{ coverage_radius_label }}</strong>
+                </div>
+            </div>
+
+            <div class="profile-work-area__summary" aria-label="Resumen publico de cobertura">
+                <div>
+                    <span>Cobertura aproximada</span>
+                    <strong>{{ coverage_radius_label }}</strong>
+                </div>
+                <div>
+                    <span>Zona base</span>
+                    <strong>{{ coverage_base_label }}</strong>
+                </div>
+            </div>
+
+            <p class="profile-work-area__privacy">
+                La ubicacion exacta del profesional permanece protegida por motivos de privacidad.
+            </p>
+
+            <button class="profile-work-area__expand" type="button" data-coverage-modal-open>
+                Ver cobertura ampliada
+            </button>
+        </div>
+
+        <dialog class="profile-work-area-modal" data-coverage-modal aria-labelledby="coverage-modal-title">
+            <div class="profile-work-area-modal__content">
+                <div class="profile-work-area-modal__head">
+                    <div>
+                        <span>Cobertura profesional</span>
+                        <h3 id="coverage-modal-title">Zona de cobertura ampliada</h3>
+                    </div>
+                    <button type="button" aria-label="Cerrar cobertura ampliada" data-coverage-modal-close>
+                        Cerrar
+                    </button>
+                </div>
+
+                <div
+                    class="profile-work-area__map profile-work-area__map--modal"
+                    style="--coverage-scale: {{ coverage.radius_scale if coverage else 0.2 }}"
+                    data-coverage-map
+                    data-map-mode="public"
+                    data-has-api-key="{{ 'true' if google_maps_api_key else 'false' }}"
+                    data-lat="{{ coverage.public_latitude if coverage and coverage.public_latitude is not none else '' }}"
+                    data-lng="{{ coverage.public_longitude if coverage and coverage.public_longitude is not none else '' }}"
+                    data-radius-km="{{ coverage.radius_km if coverage and coverage.radius_km is not none else 10 }}"
+                    role="img"
+                    aria-label="Mapa ampliado aproximado del area de cobertura profesional">
+                    <div class="profile-work-area__map-canvas" data-coverage-map-canvas aria-label="Mapa publico ampliado de cobertura"></div>
+                    <div class="profile-work-area__map-fallback" data-coverage-map-fallback>
+                        <span class="profile-work-area__road profile-work-area__road--one"></span>
+                        <span class="profile-work-area__road profile-work-area__road--two"></span>
+                        <span class="profile-work-area__road profile-work-area__road--three"></span>
+                        <span class="profile-work-area__coverage" aria-hidden="true"></span>
+                        <span class="profile-work-area__marker" aria-hidden="true">
+                            <img src="{{ url_for('static', filename='img/trax-worker-marker.svg') }}" alt="">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="profile-work-area__summary profile-work-area__summary--modal">
+                    <div>
+                        <span>Cobertura aproximada</span>
+                        <strong>{{ coverage_radius_label }}</strong>
+                    </div>
+                    <div>
+                        <span>Zona base</span>
+                        <strong>{{ coverage_base_label }}</strong>
+                    </div>
+                </div>
+            </div>
+        </dialog>
+    {% else %}
+        <div class="profile-work-area-empty">
+            <span aria-hidden="true"></span>
+            <strong>El profesional todavia no configuro su zona de cobertura.</strong>
+            <p>Cuando complete esta informacion, MANDOBRA mostrara un mapa aproximado sin revelar su ubicacion exacta.</p>
+        </div>
+    {% endif %}
+</section>

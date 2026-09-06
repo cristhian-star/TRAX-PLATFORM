@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set entry_data = form_data|default({}) %}
+
+<main class="emergency-entry">
+    <section class="emergency-entry__hero">
+        <div class="shell emergency-entry__hero-content">
+            <span>Asistencia urgente MANDOBRA</span>
+            <h1>Busca ayuda tecnica disponible para resolver una urgencia.</h1>
+            <p>
+                Completa categoria, zona y una descripcion breve. MANDOBRA te mostrara profesionales compatibles
+                para contactar por WhatsApp o llamada, sin prometer tiempos de respuesta garantizados.
+            </p>
+        </div>
+    </section>
+
+    <section class="shell emergency-entry__layout">
+        <form action="/emergencias/nueva" method="POST" class="emergency-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="prioridad" value="ALTA">
+
+            <div class="emergency-form__heading">
+                <span>Solicitud urgente</span>
+                <h2>Buscar ayuda ahora</h2>
+                <p>Te llevamos directo al directorio de profesionales compatibles para que confirmes disponibilidad.</p>
+            </div>
+
+            <label>
+                <span>Tipo de emergencia / categoria</span>
+                <input
+                    type="text"
+                    name="categoria"
+                    value="{{ entry_data.get('categoria', '') }}"
+                    placeholder="Ej: Electricidad, plomeria, refrigeracion"
+                    required>
+            </label>
+
+            <label>
+                <span>Zona</span>
+                <input
+                    type="text"
+                    name="zona"
+                    value="{{ entry_data.get('zona', '') }}"
+                    placeholder="Barrio, localidad o area"
+                    required>
+            </label>
+
+            <label class="emergency-form__wide">
+                <span>Descripcion breve</span>
+                <textarea
+                    name="descripcion"
+                    maxlength="600"
+                    placeholder="Describi que ocurre, que instalacion esta afectada y cualquier riesgo visible."
+                    required>{{ entry_data.get('descripcion', '') }}</textarea>
+            </label>
+
+            <button class="emergency-form__wide emergency-form__submit" type="submit">Buscar ayuda ahora</button>
+        </form>
+
+        <aside class="emergency-entry__aside">
+            <section class="emergency-legal" aria-labelledby="emergency-legal-title">
+                <span aria-hidden="true">!</span>
+                <div>
+                    <h2 id="emergency-legal-title">Primero, protege a las personas</h2>
+                    <p>
+                        Si hay riesgo para personas, incendio, fuga grave o peligro inmediato,
+                        contacta primero a emergencias oficiales.
+                    </p>
+                </div>
+            </section>
+
+            <section class="emergency-process" aria-labelledby="emergency-process-title">
+                <h2 id="emergency-process-title">Como funciona esta version</h2>
+                <ol>
+                    <li>Registras categoria, zona y que esta pasando.</li>
+                    <li>MANDOBRA muestra profesionales compatibles por rubro y area declarada.</li>
+                    <li>Confirmas disponibilidad por WhatsApp o llamada.</li>
+                </ol>
+            </section>
+        </aside>
+    </section>
+</main>
+{% endblock %}

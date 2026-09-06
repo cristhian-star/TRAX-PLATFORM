@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section-container admin-management-screen">
+    <span class="kicker">Administracion</span>
+    <h2>Gestion de usuarios</h2>
+
+    <nav class="admin-nav" aria-label="Navegacion admin">
+        <a href="/admin/dashboard">Hub admin</a>
+        <a href="/admin/moderacion">Moderacion</a>
+        <a href="/admin/usuarios">Usuarios</a>
+        <a href="/admin/rubros">Rubros</a>
+        <a href="/mercados">Mercados</a>
+        <a href="/">Volver al sitio</a>
+    </nav>
+
+    <table class="admin-table admin-users-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Reputacion</th>
+                <th>PRO</th>
+                <th>Verificado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>
+                    <strong>{{ usuario.nombre }}</strong>
+                    <small class="admin-user-email">{{ usuario.email }}</small>
+                </td>
+                <td><span class="user-role-pill">{{ usuario.rol }}</span></td>
+                <td>
+                    <span class="user-status-pill {{ 'is-active' if usuario.is_active else 'is-blocked' }}">{{ usuario.estado }}</span>
+                    {% if usuario.motivo_estado %}<small class="admin-status-reason">{{ usuario.motivo_estado }}</small>{% endif %}
+                </td>
+                <td>{{ usuario.reputation_score }}</td>
+                <td>
+                    <span class="user-status-pill {{ 'is-active' if usuario.is_pro else 'is-muted' }}">
+                        {{ 'PRO' if usuario.is_pro else 'WORK' }}
+                    </span>
+                </td>
+                <td>
+                    <span class="user-status-pill {{ 'is-active' if usuario.is_verified else 'is-muted' }}">
+                        {{ 'Verificado' if usuario.is_verified else 'Pendiente' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="admin-user-actions">
+                        <div class="admin-action-group">
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/cliente" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Cliente</button>
+                            </form>
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/profesional" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Profesional</button>
+                            </form>
+                            <form action="/admin/usuarios/{{ usuario.id }}/rol/super-admin" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Super Admin</button>
+                            </form>
+                        </div>
+                        <div class="admin-status-actions">
+                            {% if usuario.is_active %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/suspender" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input class="admin-reason-input" type="text" name="motivo" placeholder="Motivo de suspension">
+                                <button type="submit" class="danger">Suspender</button>
+                            </form>
+                            {% endif %}
+                            {% if usuario.estado != "BANEADO" %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/banear" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input class="admin-reason-input" type="text" name="motivo" placeholder="Motivo de baneo">
+                                <button type="submit" class="danger">Banear</button>
+                            </form>
+                            {% endif %}
+                            {% if not usuario.is_active %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/reactivar" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Reactivar</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <div class="admin-action-group">
+                            {% if usuario.is_pro %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/quitar-pro" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Quitar PRO</button>
+                            </form>
+                            {% else %}
+                            <form action="/admin/usuarios/{{ usuario.id }}/activar-pro" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit">Activar PRO</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No hay usuarios registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+{% endblock %}
