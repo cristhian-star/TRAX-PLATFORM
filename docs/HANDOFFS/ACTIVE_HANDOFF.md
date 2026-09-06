@@ -1,3 +1,73 @@
+# Handoff tecnico: correccion responsive y teclado de admin usuarios
+
+Timestamp: 2026-09-05T20:27:36-03:00
+Estado: READY_TO_RESUME
+Resultado del ciclo: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Dispositivo/origen: Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Objetivo: corregir el overflow global desktop y la visibilidad inicial del
+control `Suspender` al navegar por teclado en `/admin/usuarios`.
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `fe048c4810cc337dfd1c3498d9f96579453cd065`
+PR asociado: #5, abierto y bloqueado para merge hasta retesting independiente
+de 05 - QA funcional
+Estado Git: seis cambios correctivos locales sin commit
+Push a GitHub: NO realizado
+Merge: NO; no autorizado
+
+## Trabajo completado
+
+- Se reprodujo 1453px de ancho documental frente a 1440px de viewport y el
+  control `Suspender` terminando en 449.25px frente a 390px de viewport.
+- Un wrapper exclusivo de admin usuarios contiene el scroll horizontal, tiene
+  nombre accesible, foco por teclado, foco visible y scroll padding con tokens.
+  La tabla sigue siendo `<table>`, conserva ocho columnas y todas las acciones.
+- Implementacion valido claro/oscuro en 1440x900 y 390x844. Resultado:
+  documento 1425/1425 desktop y 375/390 mobile; `Suspender` quedo entre
+  247.48px y 351.44px dentro del wrapper de 12px a 363.20px. El wrapper
+  mantuvo scroll interno de 1216px y cero errores de consola.
+- No se agrego JavaScript, `!important`, colores hardcodeados, ocultamiento
+  global de overflow ni cambios en logica PRO, rutas, servicios o migraciones.
+
+## Validaciones
+
+- Focal Design System/Admin/PRO: 30 ejecutados, 30 aprobados, 0 fallidos,
+  0 errores y 0 omitidos.
+- Suite completa: 294 ejecutados, 289 aprobados, 0 fallidos, 0 errores y
+  5 omitidos historicos.
+- `python -m compileall -q app scripts tests`: PASS.
+- `python -m alembic heads`: `20260904_01 (head)`.
+- `git diff --check`: PASS.
+- La suite historica de migraciones ejercito downgrade solo en sus bases
+  temporales; no hubo downgrade sobre la base QA ni sobre `trax_db`.
+
+## Archivos locales modificados
+
+- `app/static/css/styles.css`
+- `app/templates/admin_usuarios.html`
+- `tests/test_design_system_v2.py`
+- `docs/CHANGELOG.md`
+- `docs/SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+## Playwright, axe-core y pendientes
+
+- No existen `package.json`, lockfiles, configuracion o tests Playwright, ni
+  axe-core versionado. No se instalaron ni modificaron dependencias.
+- Propuesta minima pendiente de autorizacion: `@playwright/test@1.62.1` y
+  `@axe-core/playwright@4.13.0` como devDependencies; crear `package.json`,
+  lock, `playwright.config.js` y `tests/e2e/admin-users-responsive.spec.js`;
+  ejecutar con `npx playwright test`.
+- Pendiente: retesting independiente en 05 - QA funcional. El PR #5 permanece
+  bloqueado para merge; Coverage continua pendiente y no bloqueante.
+- Proximo paso recomendado: auditoria tecnica focal y envio del paquete a QA.
+- Para retomar: confirmar rama, SHA y estado Git; leer este bloque y revisar
+  exclusivamente los seis archivos listados.
+- No ejecutar commit, push, nuevo PR, merge, rebase, reset, clean, stash,
+  amend ni deploy sin autorizacion explicita.
+
+---
+
 # Handoff tecnico: correccion focal de contraste oscuro PRO
 
 Timestamp: 2026-09-05T19:45:29-03:00

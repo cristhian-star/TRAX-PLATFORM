@@ -215,6 +215,45 @@ class DesignSystemV2Test(unittest.TestCase):
             'class="section-container admin-management-screen admin-users-screen"',
             admin_template,
         )
+        self.assertIn('class="admin-users-table-scroll"', admin_template)
+        self.assertIn('role="region"', admin_template)
+        self.assertIn('aria-label="Tabla de gestion de usuarios"', admin_template)
+        self.assertIn('tabindex="0"', admin_template)
+        self.assertRegex(
+            admin_template,
+            r'class="admin-users-table-scroll"[\s\S]*'
+            r'<table class="admin-table admin-users-table">',
+        )
+
+        scroll_block = _css_block(
+            css, ".admin-users-screen .admin-users-table-scroll"
+        )
+        scroll_declarations = _css_declarations(scroll_block)
+        self.assertEqual(scroll_declarations["max-width"], ["100%"])
+        self.assertEqual(scroll_declarations["overflow-x"], ["auto"])
+        self.assertEqual(
+            scroll_declarations["scroll-padding-inline"],
+            ["var(--trax-ds-space-4)"],
+        )
+
+        focus_block = _css_block(
+            css, ".admin-users-screen .admin-users-table-scroll:focus-visible"
+        )
+        self.assertIn("var(--trax-ds-accent)", focus_block)
+        self.assertIn("box-shadow: var(--trax-ds-shadow-focus);", focus_block)
+
+        table_block = _css_block(
+            css,
+            ".admin-users-screen .admin-users-table-scroll .admin-users-table",
+        )
+        self.assertIn("display: table;", table_block)
+        self.assertIn("overflow: visible;", table_block)
+
+        self.assertNotRegex(
+            css,
+            r"(?is)(?:^|,)\s*(?:html|body)\b[^\{]*\{[^\}]*"
+            r"overflow-x\s*:\s*hidden",
+        )
 
     def test_low_risk_pilot_template_renders_canonical_components(self):
         with self.app.test_request_context("/rubros/solicitar", method="POST"):

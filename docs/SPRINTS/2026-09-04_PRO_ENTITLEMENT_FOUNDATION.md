@@ -127,3 +127,35 @@ Commit base: `f35797a1852e4b0293b1618ac03fdbbdba0510ae`
   dependencias, PSP, ARCA, pagos, IA ni ENTERPRISE. REQ-001 permanece parcial.
 - El P1 requiere retesting independiente en 05 - QA funcional. El PR #5
   permanece bloqueado para merge hasta obtener ese resultado.
+
+## Correccion responsive y navegacion por teclado de admin usuarios
+
+Timestamp: 2026-09-05T20:27:36-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Commit base: `fe048c4810cc337dfd1c3498d9f96579453cd065`
+
+- La tabla amplia dejo de expandir el documento: un wrapper exclusivo de
+  `.admin-users-screen` concentra el overflow horizontal en todos los
+  viewports, conserva la tabla HTML nativa y mantiene las ocho columnas.
+- El wrapper usa `role="region"`, nombre accesible, `tabindex="0"`, foco visible
+  con tokens y `scroll-padding-inline`. No se agrego JavaScript porque el
+  comportamiento nativo ubico completamente el control enfocado.
+- Implementacion reprodujo el estado previo: 1453px de documento en 1440px y
+  `Suspender` con borde derecho en 449.25px sobre viewport movil de 390px.
+- Resultado local claro/oscuro: documento 1425/1425 en desktop y 375/390 en
+  mobile. Al llegar por Tab, `Suspender` quedo entre 247.48px y 351.44px,
+  dentro del wrapper de 12px a 363.20px; scroll interno 862.40/1216px.
+- No hubo errores de consola ni respuestas 500; contraste, acciones, PRO y
+  revocacion permanecieron sin cambios funcionales.
+- Focal Design System/Admin/PRO: 30/30 PASS. Suite completa: 294 ejecutados,
+  289 aprobados, 5 omitidos y 0 fallidos. `compileall`, Alembic head
+  `20260904_01` y `git diff --check`: PASS.
+- La suite historica de migraciones ejecuta downgrade solo sobre sus bases
+  temporales aisladas; no se ordeno downgrade sobre la base QA ni `trax_db`.
+- No existen `package.json`, locks ni infraestructura Playwright/axe-core en
+  el repositorio. Propuesta pendiente de autorizacion: dependencias de
+  desarrollo `@playwright/test@1.62.1` y `@axe-core/playwright@4.13.0`, crear
+  package/lock, `playwright.config.js` y un spec focal, ejecutado con
+  `npx playwright test`. No se instalaron ni modificaron dependencias.
+- Pendiente: retesting independiente en 05 - QA funcional. El PR #5 permanece
+  bloqueado para merge.

@@ -1,5 +1,32 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-05 - Correccion responsive y teclado en admin usuarios
+
+Timestamp: 2026-09-05T20:27:36-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `fe048c4810cc337dfd1c3498d9f96579453cd065`
+
+- Causa raiz: la tabla era su propio contenedor de overflow solo bajo 820px;
+  su ancho minimo ampliaba el documento en desktop y no existia una region
+  focalizable que gestionara el desplazamiento al navegar por teclado.
+- Se incorporo un wrapper exclusivo de admin usuarios con region accesible,
+  nombre, foco, overflow horizontal local y scroll padding mediante tokens.
+  La tabla conserva semantica nativa, ocho columnas y todos sus controles.
+- Implementacion valido en 1440x900 y 390x844, claro y oscuro: el ancho del
+  documento no supera el viewport, la tabla mantiene scroll interno y
+  `Suspender` queda dentro del viewport y del wrapper al recibir foco por Tab.
+  No hubo errores de consola ni respuestas 500.
+- Focal Design System/Admin/PRO: 30/30 PASS. Suite completa: 294 ejecutados,
+  289 aprobados, 5 omitidos y 0 fallidos. `compileall`, Alembic head
+  `20260904_01` y `git diff --check`: PASS.
+- Playwright y axe-core no estan versionados y no se instalaron. Propuesta
+  pendiente de autorizacion: `@playwright/test@1.62.1` y
+  `@axe-core/playwright@4.13.0`, con `package.json`, lock, configuracion y un
+  spec E2E focal; ejecucion mediante `npx playwright test`.
+- El P1/P2/P3 visual requiere retesting independiente en 05 - QA funcional.
+  El PR #5 permanece bloqueado para merge hasta ese resultado.
+
 ## 2026-09-05 - Correccion focal de contraste oscuro en PRO
 
 Timestamp: 2026-09-05T19:45:29-03:00
