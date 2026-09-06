@@ -59,3 +59,16 @@ Timestamp: 2026-09-04T10:29:16-03:00
   clasificacion y un re-upgrade devuelve las filas con `source_type=NULL`.
 - No debe ejecutarse ese downgrade sobre datos cuya clasificacion deba
   conservarse sin respaldo y autorizacion explicita.
+
+## Trazabilidad post-merge y limite vigente
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: ACEPTADA_IMPLEMENTACION_PARCIAL
+Merge observado: `1548935`
+
+- La Foundation fue integrada mediante PR #5 y conserva esta decision.
+- Las reglas comerciales de creditos, periodos, pagos mixtos, gracia y
+  recurrencia no modifican retroactivamente este ADR ni estan implementadas.
+- La futura seleccion PSP, el contrato de eventos/webhooks, el ledger de
+  creditos, concurrencia y custodia de credenciales requieren ADR propios una
+  vez aprobadas sus decisiones y comprobada la viabilidad externa.

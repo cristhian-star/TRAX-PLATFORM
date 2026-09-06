@@ -159,3 +159,24 @@ Commit base: `fe048c4810cc337dfd1c3498d9f96579453cd065`
   `npx playwright test`. No se instalaron ni modificaron dependencias.
 - Pendiente: retesting independiente en 05 - QA funcional. El PR #5 permanece
   bloqueado para merge.
+
+## Cierre post-merge
+
+Timestamp: 2026-09-06T19:22:08-03:00
+Estado: COMPLETED
+Resultado: APROBADO_POST_MERGE
+Rama origen: `feature/pro-entitlement-foundation`
+Rama destino: `develop`
+Commit funcional/QA final: `f1e6e5bdb6ad2583c44ec064f65b731597d3b45e`
+Merge: `15489350962b681ea239b512f86bb507cb34b6ec`
+
+Este bloque supera expresamente los estados anteriores de PR abierto,
+retesting pendiente y cambios sin commit, que se conservan como historia.
+
+- Suite post-merge informada: 294 ejecutados, 289 aprobados, 0 fallos y 5
+  omisiones justificadas.
+- Alembic: head unico `20260904_01`.
+- P0/P1: ninguno. `trax_db` permanecio intacta.
+- Coverage continua pendiente y no bloqueante.
+- REQ-001 sigue parcial: PSP, creditos, pagos y suscripcion comercial no fueron
+  implementados por este merge.

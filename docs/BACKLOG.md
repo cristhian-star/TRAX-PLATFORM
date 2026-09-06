@@ -10,16 +10,25 @@ Timestamp: 2026-09-04T19:50:24-03:00
 
 ## PRO y Facturacion - requisitos aprobados, implementacion pendiente
 
+Timestamp de refinamiento: 2026-09-06T19:22:08-03:00
+
 - Completar [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md):
   el nucleo calculado, la eliminacion de puntos legacy y las fuentes temporales
   reconocidas quedaron implementados parcialmente; faltan onboarding PSP,
-  prueba de 30 dias, extension de 60
-  dias por operacion con comision efectiva, suscripcion pagada y transiciones
-  seguras a `FREE`.
-- Resolver antes de implementar REQ-001: porcentaje de comision; precio y
-  periodicidad; beneficios y limites completos; renovacion, cancelacion, mora,
-  contracargos, periodo de gracia; migracion de accesos existentes; proveedor
-  PSP y modelo futuro de `ENTERPRISE`.
+  prueba de 30 dias, lotes de creditos de 40 dias, consumo de umbral para
+  periodos de 30 dias, pagos mixtos, suscripcion y transiciones seguras.
+- La regla historica de 60 dias por operacion fue reemplazada; no implementarla.
+- Resolver antes de implementar REQ-001: porcentaje y base de comision; precio,
+  conversion y moneda de creditos; beneficios; reversas; cambios de precio;
+  reservas, aprobaciones tardias, reintentos, consentimiento y cargos en
+  transito; migracion de accesos y modelo futuro de `ENTERPRISE`.
+- Resolver [MP-01 a MP-16](CONSULTAS/MERCADO_PAGO_v0_1.md). El expediente esta
+  pendiente y no fue enviado; Mercado Pago es direccion de evaluacion, no
+  integracion validada.
+- Obtener revision de producto, juridica y contable de la
+  [base comercial](LEGAL/BASE_REVISION_JURIDICA_v0_2.md), incluida naturaleza
+  de creditos, precio total, baja, consentimiento, devoluciones, retencion,
+  responsabilidades y tratamiento fiscal.
 - Implementar [REQ-002 - Facturacion MANDOBRA PRO MVP](REQUISITOS/REQ-002-facturacion-pro-mvp.md)
   como modulo opcional para PRO vigente, limitado inicialmente a persona
   humana, monotributo activo y Factura C, con borrador asistido, vista previa,
@@ -32,6 +41,8 @@ Timestamp: 2026-09-04T19:50:24-03:00
 - Crear los ADR necesarios cuando se decidan PSP, integracion fiscal, custodia
   de secretos, modelo de datos, idempotencia externa y proveedor de IA. Ninguna
   de esas decisiones esta aprobada todavia.
+- Plan vigente: [tres sprints PRO](SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md).
+  Sprint 1 es documental; Sprint 2 y Sprint 3 no estan autorizados para codigo.
 
 ## Alta prioridad
 
