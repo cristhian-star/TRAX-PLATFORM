@@ -85,6 +85,12 @@ staging, produccion o ampliacion del producto.
 [x] Especificacion funcional de activacion y vigencia PRO aprobada en
 [REQ-001](REQUISITOS/REQ-001-activacion-y-vigencia-pro.md)
 
+[x] Fundacion del entitlement PRO: evaluador central, fuentes reconocidas,
+vencimiento UTC, desactivacion de concesiones legacy/manuales y seed QA aislado
+
+[ ] Completar REQ-001 con PSP, prueba transaccional, extensiones, pagos,
+suscripcion comercial, renovaciones y contracargos
+
 [ ] Implementacion de PRO transaccional: onboarding PSP, prueba de 30 dias y
 extensiones por operaciones con comision efectiva
 

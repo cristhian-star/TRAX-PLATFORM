@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<section class="section-container admin-management-screen">
+<section class="section-container admin-management-screen admin-users-screen">
     <span class="kicker">Administracion</span>
     <h2>Gestion de usuarios</h2>
 
@@ -15,6 +15,12 @@
         <a href="/">Volver al sitio</a>
     </nav>
 
+    <div
+        class="admin-users-table-scroll"
+        role="region"
+        aria-label="Tabla de gestion de usuarios"
+        tabindex="0"
+    >
     <table class="admin-table admin-users-table">
         <thead>
             <tr>
@@ -96,11 +102,6 @@
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit">Quitar PRO</button>
                             </form>
-                            {% else %}
-                            <form action="/admin/usuarios/{{ usuario.id }}/activar-pro" method="POST">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit">Activar PRO</button>
-                            </form>
                             {% endif %}
                         </div>
                     </div>
@@ -113,6 +114,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </section>
 
 {% endblock %}

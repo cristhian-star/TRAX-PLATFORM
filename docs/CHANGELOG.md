@@ -1,5 +1,75 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-05 - Correccion responsive y teclado en admin usuarios
+
+Timestamp: 2026-09-05T20:27:36-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `fe048c4810cc337dfd1c3498d9f96579453cd065`
+
+- Causa raiz: la tabla era su propio contenedor de overflow solo bajo 820px;
+  su ancho minimo ampliaba el documento en desktop y no existia una region
+  focalizable que gestionara el desplazamiento al navegar por teclado.
+- Se incorporo un wrapper exclusivo de admin usuarios con region accesible,
+  nombre, foco, overflow horizontal local y scroll padding mediante tokens.
+  La tabla conserva semantica nativa, ocho columnas y todos sus controles.
+- Implementacion valido en 1440x900 y 390x844, claro y oscuro: el ancho del
+  documento no supera el viewport, la tabla mantiene scroll interno y
+  `Suspender` queda dentro del viewport y del wrapper al recibir foco por Tab.
+  No hubo errores de consola ni respuestas 500.
+- Focal Design System/Admin/PRO: 30/30 PASS. Suite completa: 294 ejecutados,
+  289 aprobados, 5 omitidos y 0 fallidos. `compileall`, Alembic head
+  `20260904_01` y `git diff --check`: PASS.
+- Playwright y axe-core no estan versionados y no se instalaron. Propuesta
+  pendiente de autorizacion: `@playwright/test@1.62.1` y
+  `@axe-core/playwright@4.13.0`, con `package.json`, lock, configuracion y un
+  spec E2E focal; ejecucion mediante `npx playwright test`.
+- El P1/P2/P3 visual requiere retesting independiente en 05 - QA funcional.
+  El PR #5 permanece bloqueado para merge hasta ese resultado.
+
+## 2026-09-05 - Correccion focal de contraste oscuro en PRO
+
+Timestamp: 2026-09-05T19:45:29-03:00
+Estado: CORRECCION_IMPLEMENTADA_VALIDADA_LOCALMENTE_PENDIENTE_RETESTING_QA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `f35797a1852e4b0293b1618ac03fdbbdba0510ae`
+
+- Se reemplazaron fondos, bordes y textos blancos heredados por tokens
+  canonicos del Design System v2, con alcance limitado a la pantalla de
+  upgrade PRO y a la gestion administrativa de usuarios.
+- Se agrego una clase de alcance a la pantalla administrativa y un test de
+  regresion que exige los tokens de tema en ambas superficies.
+- Implementacion realizo la medicion visual claro/oscuro: contraste principal
+  de 17.74:1 en claro y 16.98:1
+  en oscuro; texto secundario de 6.93:1 en oscuro. Las vistas moviles de
+  390x844 no presentan desbordamiento de documento.
+- Implementacion comprobo la revocacion mediante la ruta administrativa real:
+  el profesional quedo en WORK y la pantalla de upgrade lo mostro como
+  Elegible, sin errores de consola. La prueba uso una base SQLite efimera;
+  `trax_db` no fue modificada.
+- Validacion focal: 30/30. Suite completa: 294 ejecutados, 289 aprobados,
+  5 omitidos y 0 fallidos. `compileall`, Alembic head `20260904_01` y
+  `git diff --check`: PASS.
+- El P1 requiere retesting independiente en 05 - QA funcional. El PR #5
+  permanece bloqueado para merge hasta obtener ese resultado.
+
+## 2026-09-04 - Fundacion del entitlement PRO
+
+Timestamp: 2026-09-04T09:56:46-03:00
+Estado: IMPLEMENTACION_PARCIAL_VALIDADA
+Rama: `feature/pro-entitlement-foundation`
+Commit base: `18e46fd6bf6d05b73884b7ba3fdbb335f66d7d7e`
+
+- Se centralizo el acceso PRO con elegibilidad profesional, fuente reconocida,
+  vencimiento obligatorio y politica UTC.
+- Se agrego `subscriptions.source_type` mediante Alembic `20260904_01`, sin
+  convertir ni borrar registros legacy.
+- Se deshabilitaron concesiones por puntos, verificacion aislada y acciones
+  manuales profesional/administrativa.
+- El seed QA conserva un unico PRO temporal y sigue bloqueado en produccion.
+- PSP, pagos, Facturacion, ARCA, IA y ENTERPRISE operativo no se implementaron.
+- Decision: [ADR-001](ADR/ADR-001-pro-entitlement-foundation.md).
+
 ## 2026-09-03 - Especificacion de PRO y Facturacion MVP
 
 Timestamp: 2026-09-03T21:47:10-03:00
@@ -535,3 +605,18 @@ autoriza publicación ni despliegue productivo.
 ### Corregido
 
 - Sin correcciones registradas.
+# 2026-09-04 - Correcciones de auditoria del nucleo PRO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+
+### Corregido
+
+- La revocacion solo cancela fuentes PRO reconocidas, activas y vigentes, y se
+  confirma atomicamente junto con su AuditLog.
+- El seed QA no extiende una vigencia futura y renueva la misma fila tras su
+  vencimiento.
+- El gate PostgreSQL rechaza cualquier base fuera del namespace reservado
+  `trax_pro_entitlement_test[_sufijo]` antes de crear el engine.
+- Se centralizo la frontera UTC naive del nucleo PRO y se documento la perdida
+  de `source_type` durante downgrade.
+- REQ-001 declara canonicamente `IMPLEMENTACION_PARCIAL`.

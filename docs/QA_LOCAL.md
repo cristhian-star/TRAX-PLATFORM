@@ -31,6 +31,18 @@ Cuentas principales:
 - Cliente: `cliente.demo@trax.local`.
 - Profesional: `electricidad.pro@demo.trax.local`.
 
+Desde 2026-09-04T09:56:46-03:00, el seed deja exactamente a
+`electricidad.pro@demo.trax.local` con entitlement PRO valido, usando una fila
+demo `SUBSCRIPTION` con vencimiento UTC. `plomeria.work@demo.trax.local` y
+`refrigeracion.pro@demo.trax.local` quedan funcionalmente FREE. Reejecutar el
+seed reutiliza la fuente valida y neutraliza solo suscripciones PRO activas de
+las cuentas demo; no incorpora excepciones al evaluador productivo.
+
+La vigencia de 365 dias es exclusivamente un dato sintetico para QA. No define
+precio, periodicidad ni regla comercial. Mientras esa fuente permanezca activa
+y futura, reejecutar el seed conserva exactamente su `expires_at`; una fuente
+vencida se renueva reutilizando la misma fila.
+
 Se puede usar el login normal en `/login`. Como alternativa, `/dev/qa` ofrece
 acceso rapido y enlaces canonicos a perfiles. Los perfiles publicos se identifican
 por `Professional.id`, que no necesariamente coincide con `User.id` en bases

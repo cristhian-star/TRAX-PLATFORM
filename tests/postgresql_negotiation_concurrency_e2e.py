@@ -52,6 +52,9 @@ from app.services.negotiation_service import (
 )
 
 
+from tests.alembic_head_validation import assert_database_at_repository_head
+
+
 class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -72,11 +75,10 @@ class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
         cls.app = create_app(initialize_schema=False)
         cls.app.config.update(TESTING=True)
         with cls.app.app_context():
-            revision = db.session.execute(
+            revisions = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
-            if revision != "20260726_07":
-                raise RuntimeError(f"Revision Alembic inesperada: {revision}")
+            ).scalars().all()
+            assert_database_at_repository_head(config, revisions)
             if db.engine.dialect.name != "postgresql":
                 raise RuntimeError("El gate 2B no esta ejecutando PostgreSQL")
 
@@ -687,10 +689,10 @@ class Sprint7NegotiationPostgreSQLConcurrencyE2E(unittest.TestCase):
             command.downgrade(config, "20260726_04")
 
         with self.app.app_context():
-            revision = db.session.execute(
+            revisions = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
-            self.assertEqual(revision, "20260726_07")
+            ).scalars().all()
+            assert_database_at_repository_head(config, revisions)
             trigger_names = {
                 row[0]
                 for row in db.session.execute(

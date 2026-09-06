@@ -332,7 +332,8 @@ el documento o el codigo es correcto.
 ## Modelo tecnico
 
 - Backend: Python, Flask y SQLAlchemy.
-- Esquema: Alembic, head `20260726_07` al 2026-08-31.
+- Esquema: Alembic; baseline historica `20260726_07` al 2026-08-31 y head
+  `20260904_01` desde 2026-09-04 para la fundacion del entitlement PRO.
 - Base principal de desarrollo integrado: PostgreSQL mediante Docker Compose.
 - SQLite: tests y desarrollo local expresamente controlado.
 - Frontend: templates Jinja, CSS y JavaScript sin SPA.
@@ -409,6 +410,14 @@ el documento o el codigo es correcto.
   acotada al borrador y con confirmacion humana obligatoria.
 - Despliegue productivo aprobado.
 
+## Implementacion parcial PRO - 2026-09-04T09:56:46-03:00
+
+El nucleo de entitlement PRO se calcula desde rol y estado de cuenta,
+verificacion profesional aprobada y una fuente PRO reconocida con vencimiento
+UTC vigente. Los registros legacy se preservan con fuente nula pero no conceden
+capacidades; puntos, ENTERPRISE y activaciones manuales tampoco conceden.
+PSP, prueba, extensiones y suscripciones comerciales permanecen pendientes.
+
 ## Decisiones pendientes prioritarias
 
 1. Porcentaje de comision; precio, periodicidad, beneficios y limites completos
@@ -431,3 +440,4 @@ el documento o el codigo es correcto.
 - [Backlog](../BACKLOG.md)
 - [Estandares de desarrollo](../ESTANDARES_DESARROLLO.md)
 - [Cierre de Sprint 7](../SPRINTS/2026-08-04_SPRINT_7_CLOSURE.md)
+- [ADR-001 - Nucleo calculado de entitlement PRO](../ADR/ADR-001-pro-entitlement-foundation.md)

@@ -64,3 +64,12 @@ La SQLite previa y el volumen `trax_instance` se conservan; esta fase no migra s
 ## Limites de esta fase
 
 Esta configuracion habilita PostgreSQL DEV, pero no migra datos SQLite ni reemplaza automaticamente bases SQLite legacy. La baseline registra el modelo actual sin borrar datos. Los backfills de ownership y la limpieza de referencias historicas deben tratarse explicitamente antes de endurecer constraints o mover datos a produccion.
+# Downgrade de `20260904_01`
+
+Timestamp: 2026-09-04T10:29:16-03:00
+
+El downgrade desde `20260904_01` es reversible en estructura, pero elimina la
+columna `source_type` y pierde los valores `TRANSACTIONAL`/`SUBSCRIPTION`. Un
+re-upgrade recrea la columna nullable y esas filas vuelven con
+`source_type=NULL`. No ejecutar el downgrade cuando deba conservarse esa
+clasificacion sin respaldo y autorizacion explicita.

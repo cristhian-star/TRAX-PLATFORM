@@ -1,7 +1,7 @@
 from urllib.parse import urlsplit
 
 from flask import Blueprint, abort, render_template, request, redirect, session
-from app.services.audit_service import create_audit_log, get_recent_audit_logs
+from app.services.audit_service import _add_audit_log, create_audit_log, get_recent_audit_logs
 from app.services.abuse_report_service import (
     create_abuse_report,
     get_open_reports,
@@ -27,10 +27,10 @@ from app.utils.security import (
     paginate_items,
     user_rate_limit_key,
 )
-from app import limiter
+from app import db, limiter
 from app.models.user import User
 from app.models.professional_media import ProfessionalMedia
-from app.services.subscription_service import cancel_subscription, has_pro_access, upgrade_to_pro
+from app.services.subscription_service import cancel_subscription, has_pro_access
 from app.services.verification_service import (
     create_or_update_professional_verification_request,
     create_verification_request,
@@ -404,15 +404,14 @@ def upgrade_pro():
     reputation_score = get_user_reputation_score(user_id)
     is_verified = has_approved_verification(user_id)
     is_pro = has_pro_access(user_id)
-    is_eligible = reputation_score >= 100 or is_verified
+    is_eligible = is_verified
     error = None
 
     if request.method == "POST":
-        if is_eligible:
-            upgrade_to_pro(user_id)
-            return redirect("/profesional/dashboard?pro_upgraded=1")
-
-        error = "Necesitas reputacion minima de 100 puntos o verificacion aprobada para pasar a MANDOBRA PRO."
+        error = (
+            "La activacion comercial de MANDOBRA PRO todavia no esta disponible. "
+            "Tu cuenta y verificacion determinan elegibilidad, pero no conceden acceso."
+        )
 
     return render_template(
         "solicitar_upgrade_pro.html",
@@ -1010,9 +1009,7 @@ def admin_usuario_activar_pro(id):
     if User.query.get(id) is None:
         return "Usuario no encontrado", 404
 
-    upgrade_to_pro(id)
-    _audit_admin_action("USER_PRO_ACTIVATED", id, "Acceso MANDOBRA PRO activado.")
-    return redirect("/admin/usuarios")
+    return "La activacion manual de MANDOBRA PRO no esta disponible", 409
 
 
 @main.route("/admin/usuarios/<int:id>/quitar-pro", methods=["POST"])
@@ -1022,9 +1019,21 @@ def admin_usuario_quitar_pro(id):
     if User.query.get(id) is None:
         return "Usuario no encontrado", 404
 
-    subscription = cancel_subscription(id)
-    if subscription is not None:
-        _audit_admin_action("USER_PRO_REMOVED", id, "Acceso MANDOBRA PRO removido.")
+    try:
+        subscription = cancel_subscription(id)
+        if subscription is not None:
+            _add_audit_log(
+                actor_user_id=session["user_id"],
+                action="USER_PRO_REMOVED",
+                target_user_id=id,
+                description="Acceso MANDOBRA PRO removido.",
+                ip_address=request.remote_addr,
+                user_agent=request.user_agent.string,
+            )
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     return redirect("/admin/usuarios")
 
 

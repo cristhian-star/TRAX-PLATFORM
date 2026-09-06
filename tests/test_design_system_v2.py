@@ -1,4 +1,5 @@
 import os
+import re
 import unittest
 from pathlib import Path
 
@@ -12,6 +13,22 @@ from app import create_app, db
 from app.config.config import TestingConfig
 from app.models.activity_notification import ActivityNotification
 from app.models.user import User
+
+
+def _css_block(css, selector):
+    match = re.search(rf"{re.escape(selector)}\s*\{{([^{{}}]*)\}}", css)
+    if match is None:
+        raise AssertionError(f"CSS selector not found: {selector}")
+    return match.group(1)
+
+
+def _css_declarations(block):
+    declarations = {}
+    for property_name, value in re.findall(
+        r"(?m)^\s*([a-z-]+)\s*:\s*([^;]+);", block
+    ):
+        declarations.setdefault(property_name, []).append(value.strip())
+    return declarations
 
 
 class DesignSystemV2Test(unittest.TestCase):
@@ -113,6 +130,130 @@ class DesignSystemV2Test(unittest.TestCase):
         self.assertNotIn(".auth-password button {", css)
         self.assertIn(".auth-password .trax-button", css)
         self.assertIn(".auth-field-error", css)
+
+    def test_pro_upgrade_and_admin_users_surfaces_use_theme_tokens(self):
+        css = Path("app/static/css/styles.css").read_text(encoding="utf-8")
+        admin_template = Path("app/templates/admin_usuarios.html").read_text(
+            encoding="utf-8"
+        )
+
+        required_blocks = {
+            (
+                ".pro-upgrade-screen .upgrade-summary article,\n"
+                ".pro-upgrade-screen .upgrade-benefits article,\n"
+                ".pro-upgrade-screen .upgrade-action-card"
+            ): {
+                "background": "var(--trax-ds-card)",
+                "color": "var(--trax-ds-text)",
+                "border-color": "var(--trax-ds-border-subtle)",
+            },
+            ".admin-users-screen .admin-nav a": {
+                "background": "var(--trax-ds-surface)",
+                "color": "var(--trax-ds-text-strong)",
+                "border-color": "var(--trax-ds-border)",
+            },
+            ".admin-users-table.admin-table": {
+                "background": "var(--trax-ds-card)",
+                "color": "var(--trax-ds-text)",
+            },
+            ".admin-users-table.admin-table th": {
+                "background": "var(--trax-ds-surface-soft)",
+                "color": "var(--trax-ds-text-strong)",
+                "border-color": "var(--trax-ds-border-subtle)",
+            },
+            ".admin-users-table.admin-table td": {
+                "color": "var(--trax-ds-text)",
+                "border-color": "var(--trax-ds-border-subtle)",
+            },
+            ".admin-users-table .user-status-pill.is-muted": {
+                "background": "var(--trax-ds-surface-soft)",
+                "color": "var(--trax-ds-text-muted)",
+            },
+            ".admin-users-table .admin-user-actions button": {
+                "background": "var(--trax-ds-surface)",
+                "color": "var(--trax-ds-text-strong)",
+                "border-color": "var(--trax-ds-border)",
+            },
+            ".admin-users-table .admin-user-actions button.danger": {
+                "background": "var(--trax-ds-danger-soft)",
+                "color": "var(--trax-ds-danger)",
+                "border-color": "var(--trax-ds-danger-border)",
+            },
+        }
+
+        literal_color = re.compile(
+            r"#[0-9a-f]{3,8}\b|\brgba?\s*\(|\bhsla?\s*\(|\b(?:white|black)\b",
+            re.IGNORECASE,
+        )
+        for selector, expected_properties in required_blocks.items():
+            block = _css_block(css, selector)
+            declarations = _css_declarations(block)
+            self.assertIsNone(
+                literal_color.search(block),
+                msg=f"Literal color found in {selector}",
+            )
+            for property_name in ("background", "color", "border-color"):
+                self.assertLessEqual(
+                    len(declarations.get(property_name, [])),
+                    1,
+                    msg=f"Duplicate {property_name} declaration in {selector}",
+                )
+            for property_name, expected_value in expected_properties.items():
+                values = declarations.get(property_name, [])
+                self.assertEqual(
+                    len(values),
+                    1,
+                    msg=f"Expected one {property_name} declaration in {selector}",
+                )
+                self.assertEqual(
+                    values[-1],
+                    expected_value,
+                    msg=f"Unexpected effective {property_name} in {selector}",
+                )
+
+        self.assertIn(
+            'class="section-container admin-management-screen admin-users-screen"',
+            admin_template,
+        )
+        self.assertIn('class="admin-users-table-scroll"', admin_template)
+        self.assertIn('role="region"', admin_template)
+        self.assertIn('aria-label="Tabla de gestion de usuarios"', admin_template)
+        self.assertIn('tabindex="0"', admin_template)
+        self.assertRegex(
+            admin_template,
+            r'class="admin-users-table-scroll"[\s\S]*'
+            r'<table class="admin-table admin-users-table">',
+        )
+
+        scroll_block = _css_block(
+            css, ".admin-users-screen .admin-users-table-scroll"
+        )
+        scroll_declarations = _css_declarations(scroll_block)
+        self.assertEqual(scroll_declarations["max-width"], ["100%"])
+        self.assertEqual(scroll_declarations["overflow-x"], ["auto"])
+        self.assertEqual(
+            scroll_declarations["scroll-padding-inline"],
+            ["var(--trax-ds-space-4)"],
+        )
+
+        focus_block = _css_block(
+            css, ".admin-users-screen .admin-users-table-scroll:focus-visible"
+        )
+        self.assertIn("var(--trax-ds-accent)", focus_block)
+        self.assertIn("box-shadow: var(--trax-ds-shadow-focus);", focus_block)
+
+        table_block = _css_block(
+            css,
+            ".admin-users-screen .admin-users-table-scroll .admin-users-table",
+        )
+        self.assertIn("display: table;", table_block)
+        self.assertIn("overflow: visible;", table_block)
+
+        self.assertNotRegex(
+            css,
+            r"(?is)(?:^|,)\s*(?:html|body)\b[^\{]*\{[^\}]*"
+            r"overflow-x\s*:\s*hidden",
+        )
 
     def test_low_risk_pilot_template_renders_canonical_components(self):
         with self.app.test_request_context("/rubros/solicitar", method="POST"):

@@ -53,6 +53,9 @@ from app.services.contract_review_moderation_service import (
 )
 
 
+from tests.alembic_head_validation import assert_database_at_repository_head
+
+
 class ContractReviewRoutesModerationPostgreSQLGate(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -69,19 +72,19 @@ class ContractReviewRoutesModerationPostgreSQLGate(unittest.TestCase):
             raise RuntimeError(
                 "TRAX_POSTGRES_TEST_ALLOW_RESET=1 es obligatorio"
             )
-        command.upgrade(Config(str(PROJECT_ROOT / "alembic.ini")), "head")
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        command.upgrade(config, "head")
         cls.app = create_app(initialize_schema=False)
         cls.app.config.update(
             TESTING=True,
             WTF_CSRF_ENABLED=True,
         )
         with cls.app.app_context():
-            revision = db.session.execute(
+            revisions = db.session.execute(
                 sa.text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
+            ).scalars().all()
+            revision = assert_database_at_repository_head(config, revisions)
             version = db.session.execute(sa.text("SHOW server_version")).scalar_one()
-            if revision != "20260726_07":
-                raise RuntimeError(f"Revision inesperada: {revision}")
             print(
                 f"PostgreSQL server_version={version} alembic={revision}",
                 flush=True,

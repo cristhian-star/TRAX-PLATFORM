@@ -2,7 +2,7 @@ from app import db
 from app.models.audit_log import AuditLog
 
 
-def create_audit_log(
+def _add_audit_log(
     actor_user_id,
     action,
     target_user_id=None,
@@ -20,8 +20,26 @@ def create_audit_log(
     )
 
     db.session.add(audit_log)
-    db.session.commit()
+    return audit_log
 
+
+def create_audit_log(
+    actor_user_id,
+    action,
+    target_user_id=None,
+    description="",
+    ip_address=None,
+    user_agent=None,
+):
+    audit_log = _add_audit_log(
+        actor_user_id=actor_user_id,
+        action=action,
+        target_user_id=target_user_id,
+        description=description,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+    db.session.commit()
     return audit_log
 
 

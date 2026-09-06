@@ -38,6 +38,7 @@ de las dos partes debe cambiar.
 
 - [Decisiones de arquitectura](DECISIONES_ARQUITECTURA.md)
 - [ADR individuales](ADR/README.md)
+- [ADR-001 - Nucleo calculado de entitlement PRO](ADR/ADR-001-pro-entitlement-foundation.md)
 - [Alembic](alembic.md)
 - [PostgreSQL de desarrollo](postgres_dev.md)
 
@@ -58,6 +59,7 @@ de las dos partes debe cambiar.
 
 - [Changelog](CHANGELOG.md)
 - [Documentacion de sprints](SPRINTS/)
+- [Incremento PRO entitlement foundation](SPRINTS/2026-09-04_PRO_ENTITLEMENT_FOUNDATION.md)
 
 ### Reglas y plantillas
 

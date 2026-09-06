@@ -5,7 +5,7 @@ estado: APROBADO
 fecha_aprobacion: 2026-09-03T20:38:47-03:00
 responsable: Cristian Sánchez
 rama_documental: docs/spec-pro-facturacion-mvp
-implementacion: PENDIENTE
+implementacion: IMPLEMENTACION_PARCIAL
 ---
 
 # REQ-001 - Activacion y vigencia de MANDOBRA PRO
@@ -258,3 +258,30 @@ resolverse antes de implementar; este requisito no inventa su solucion tecnica.
 - [Backlog](../BACKLOG.md).
 - [Changelog](../CHANGELOG.md).
 - [Handoff activo](../HANDOFFS/ACTIVE_HANDOFF.md).
+
+## ACTUALIZACION POSTERIOR - NUCLEO DE ENTITLEMENT
+
+Timestamp: 2026-09-04T09:56:46-03:00
+Estado: IMPLEMENTACION_PARCIAL
+Rama: `feature/pro-entitlement-foundation`
+
+- Todos los accesos legacy se reevaluan inmediatamente con el nuevo lector.
+- Puntos, verificacion aislada y filas sin fuente o vencimiento no conceden PRO.
+- Solo `electricidad.pro@demo.trax.local` conserva PRO en QA local mediante un
+  registro demo `SUBSCRIPTION` temporal; no existe excepcion productiva por
+  email, ID o usuario.
+- Las nuevas activaciones manuales quedan deshabilitadas en esta fase.
+- Permanecen pendientes PSP, prueba de 30 dias, extensiones de 60 dias, pagos,
+  suscripcion comercial, renovaciones y contracargos; REQ-001 no esta completo.
+- Decision relacionada: [ADR-001](../ADR/ADR-001-pro-entitlement-foundation.md).
+
+## ACTUALIZACION POSTERIOR - CORRECCION DE ESTADO CANONICO
+
+Timestamp: 2026-09-04T10:29:16-03:00
+Estado: IMPLEMENTACION_PARCIAL
+
+- El frontmatter se corrigio de `PENDIENTE` a `IMPLEMENTACION_PARCIAL` para
+  coincidir con el nucleo ya implementado y validado.
+- El requisito conserva estado `APROBADO` y no se declara completamente
+  implementado: PSP, pagos, renovaciones y politicas comerciales siguen
+  pendientes.

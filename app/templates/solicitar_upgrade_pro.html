@@ -16,17 +16,17 @@
             <article>
                 <span>Reputacion actual</span>
                 <strong>{{ reputation_score }}</strong>
-                <small>Necesitas 100 puntos o verificacion aprobada.</small>
+                <small>La reputacion no concede acceso PRO.</small>
             </article>
             <article>
                 <span>Verificacion</span>
                 <strong>{% if is_verified %}Aprobada{% else %}Pendiente{% endif %}</strong>
-                <small>{% if is_verified %}Cumple requisito MVP.{% else %}Tambien podes solicitar verificacion profesional.{% endif %}</small>
+                <small>{% if is_verified %}Condicion de elegibilidad cumplida; no activa PRO por si sola.{% else %}La aprobacion profesional es una condicion de elegibilidad.{% endif %}</small>
             </article>
             <article>
                 <span>Estado</span>
-                <strong>{% if is_pro %}Ya sos PRO{% elif is_eligible %}Elegible{% else %}No elegible{% endif %}</strong>
-                <small>{% if is_eligible %}Tu cuenta puede activar MANDOBRA PRO.{% else %}Segui acumulando reputacion o completa verificacion.{% endif %}</small>
+                <strong>{% if is_pro %}PRO vigente{% elif is_eligible %}Elegible{% else %}No elegible{% endif %}</strong>
+                <small>{% if is_pro %}Tu acceso tiene una fuente vigente.{% elif is_eligible %}La activacion comercial todavia no esta disponible.{% else %}Completa la verificacion profesional para cumplir la elegibilidad.{% endif %}</small>
             </article>
         </div>
 
@@ -45,16 +45,13 @@
             </article>
         </div>
 
-        <form action="/profesional/pro/upgrade" method="POST" class="form-card upgrade-action-card">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-card upgrade-action-card">
             {% if is_pro %}
-                <p class="form-helper">Tu cuenta ya tiene acceso MANDOBRA PRO.</p>
-            {% elif is_eligible %}
-                <button type="submit">Activar MANDOBRA PRO</button>
+                <p class="form-helper">Tu cuenta ya tiene acceso MANDOBRA PRO vigente.</p>
             {% else %}
-                <button type="submit">Solicitar evaluacion</button>
+                <p class="form-helper">La activacion comercial de MANDOBRA PRO todavia no esta disponible.</p>
             {% endif %}
-        </form>
+        </div>
     </div>
 </section>
 
