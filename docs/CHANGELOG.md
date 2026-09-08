@@ -1,5 +1,54 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-07 - Cierre documental de Sprint 1 PRO
+
+Timestamp: 2026-09-07T21:54:36-03:00
+Estado: CERRADO_DOCUMENTALMENTE_INTEGRACION_GIT_PENDIENTE
+Agente: 01 - Documentation Engineer
+Rama y commit observados: `develop` en
+`1d22f87adc358eae20121ea727142b0276cf337e`
+
+- La revision independiente del Agente 02, emitida el
+  `2026-09-07T21:41:54-03:00`, no encontro hallazgos, aprobo el diff para commit
+  y considero satisfechos los criterios documentales de cierre.
+- Sprint 1 queda `CERRADO_DOCUMENTALMENTE`, con staging, commit e integracion
+  Git pendientes de autorizacion y ejecucion separadas.
+- Mercado Pago, la revision juridica/contable y la aclaracion de la estimacion
+  de 25-43 horas permanecen como pendientes selectivos.
+- El diseño 2.0 permanece `PROPUESTO_NO_APROBADO`; su implementacion no esta
+  autorizada.
+- La referencia a la ausencia de reviews nativas de GitHub conserva su
+  atribucion al informe disponible y no se presenta como verificacion propia.
+
+## 2026-09-07 - Preparacion del cierre documental de Sprint 1 PRO
+
+Timestamp: 2026-09-07T21:31:53-03:00
+Estado: LISTO_PARA_REVISION_DE_DIFF
+Agente: 01 - Documentation Engineer
+Rama y commit observados: `develop` en
+`1d22f87adc358eae20121ea727142b0276cf337e`
+Motivo: actualizar la trazabilidad posterior al merge de PR #7 y preparar, sin
+aprobar, el cierre documental de Sprint 1.
+
+- Git local confirma que PR #7 integro el commit documental `817fb4f` mediante
+  el merge `1d22f87`, fechado `2026-09-06T20:11:47-03:00`.
+- Se recupero el `APROBADO_PARA_COMMIT` informado en la conversacion de
+  revision focalizada previa. Se registra como evidencia conversacional,
+  distinta de una review nativa de GitHub; el informe del Agente 02 indico que
+  PR #7 no registra reviews nativas.
+- Se agregaron responsables propuestos, sin presentarlos como asignaciones
+  aceptadas, y bloqueos especificos para PSP, creditos, suscripcion y
+  facturacion.
+- Se registraron como `PROPUESTO_NO_APROBADO` las correcciones del diseño 2.0
+  sobre pago mixto versus cobertura total con creditos, atomicidad interna,
+  unicidad por obligacion/periodo e importe y consumo parcial por lote.
+- El rango de 25-43 horas queda pendiente de aclarar como total o restante y
+  de mapear contra entregables; no se genero una nueva estimacion.
+- Mercado Pago y la revision juridica/contable siguen pendientes. No se
+  implemento ni aprobo arquitectura, integracion, modelo o migracion.
+- Tests de aplicacion: NO EJECUTADOS - alcance exclusivamente documental.
+- Cierre de Sprint 1: PENDIENTE de revision del presente diff.
+
 ## 2026-09-06 - Refinamiento comercial PRO, PSP y expediente juridico
 
 Timestamp: 2026-09-06T19:22:08-03:00

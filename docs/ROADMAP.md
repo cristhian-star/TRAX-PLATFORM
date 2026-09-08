@@ -91,6 +91,23 @@ vencimiento UTC, desactivacion de concesiones legacy/manuales y seed QA aislado
 [ ] Sprint 1 PRO comercial - cerrar especificacion, viabilidad PSP, revision
 juridica/contable y evaluacion fiscal
 
+Estado previo a la revision al `2026-09-07T21:31:53-03:00`:
+`LISTO_PARA_REVISION_DE_DIFF`. PR #7 integro la especificacion y trazabilidad;
+la revision focalizada previa informo `APROBADO_PARA_COMMIT`, sin review nativa
+registrada en GitHub. El check permanece abierto hasta revisar el diff de
+cierre. Mercado Pago, revision juridica/contable y aclaracion de la estimacion
+25-43 horas siguen pendientes y bloquean solo las capacidades dependientes.
+Ver la [matriz de cierre y las correcciones propuestas al diseño
+2.0](SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md#matriz-de-cierre-de-sprint-1).
+
+Estado actualizado al `2026-09-07T21:54:36-03:00`:
+`CERRADO_DOCUMENTALMENTE_INTEGRACION_GIT_PENDIENTE`. La revision independiente
+del Agente 02 del `2026-09-07T21:41:54-03:00` no encontro hallazgos, aprobo el
+diff para commit y considero satisfechos los criterios documentales de cierre.
+Mercado Pago, revision juridica/contable y aclaracion de la estimacion de 25-43
+horas permanecen como pendientes selectivos. El diseño 2.0 sigue
+`PROPUESTO_NO_APROBADO` y no autoriza implementacion.
+
 [ ] Sprint 2 PRO comercial - cobros transaccionales, checkout/enlace/QR, lotes
 de creditos y periodos de 30 dias por umbral
 

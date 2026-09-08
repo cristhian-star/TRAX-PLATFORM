@@ -1,3 +1,128 @@
+# Handoff tecnico: cierre documental Sprint 1 PRO
+
+Timestamp: 2026-09-07T21:54:36-03:00
+Estado: COMPLETED
+Resultado: CERRADO_DOCUMENTALMENTE_INTEGRACION_GIT_PENDIENTE
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 01 - Documentation Engineer
+Objetivo: registrar el resultado de la revision independiente y cerrar el
+alcance documental de Sprint 1.
+Rama y ultimo commit observados: `develop` en
+`1d22f87adc358eae20121ea727142b0276cf337e`
+Estado Git: cuatro Markdown modificados, sin staging ni commit
+Push, nuevo PR, merge y deploy: NO realizados; no autorizados
+
+- El Agente 02 informo el `2026-09-07T21:41:54-03:00`: sin hallazgos, diff
+  `APROBADO_PARA_COMMIT` y criterios documentales de cierre satisfechos.
+- Sprint 1 queda `CERRADO_DOCUMENTALMENTE`; la integracion Git del presente
+  registro permanece pendiente.
+- Mercado Pago, revision juridica/contable y aclaracion de la estimacion de
+  25-43 horas siguen pendientes y bloquean solo capacidades dependientes.
+- El diseño 2.0 sigue `PROPUESTO_NO_APROBADO` y no autoriza implementacion.
+- La ausencia de reviews nativas de GitHub permanece atribuida al informe
+  disponible; no fue verificada de forma independiente en esta sesion.
+
+Archivos modificados: `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`,
+`docs/ROADMAP.md` y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+
+Tests de aplicacion: NO EJECUTADOS; alcance exclusivamente documental.
+Validaciones: coherencia de estados, enlaces relativos y `git diff --check`.
+Proximo paso: solicitar autorizacion separada para staging y commit del paquete.
+No iniciar implementacion ni ejecutar push, PR, merge, deploy o cambios de rama.
+
+---
+
+# Handoff tecnico: preparacion de cierre documental Sprint 1 PRO
+
+Timestamp: 2026-09-07T21:31:53-03:00
+Estado: READY_TO_RESUME
+Resultado: LISTO_PARA_REVISION_DE_DIFF
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 01 - Documentation Engineer
+Objetivo: actualizar la trazabilidad posterior al merge de PR #7, incorporar
+observaciones propuestas del diseño 2.0 y preparar la matriz de cierre.
+Rama y ultimo commit observados: `develop` en
+`1d22f87adc358eae20121ea727142b0276cf337e`
+Estado Git inicial: limpio y sincronizado con `origin/develop` segun referencias
+locales
+Estado Git final esperado: cambios sin commit exclusivamente Markdown bajo
+`docs/`
+Push, nuevo PR, merge y deploy: NO realizados; no autorizados
+
+## Estado anterior superado
+
+Los bloques del `2026-09-06T19:38:40-03:00` y
+`2026-09-06T19:22:08-03:00` describen correctamente el estado anterior al
+commit y al merge. Quedan preservados como historia, pero fueron superados por
+la integracion de PR #7.
+
+## Evidencia recuperada
+
+- Commit documental: `817fb4f3888a44984b951badc655eceeec2b9df8`.
+- PR: #7, rama origen `docs/pro-commercial-psp-refinement`, destino `develop`.
+- Merge: `1d22f87adc358eae20121ea727142b0276cf337e`, fechado
+  `2026-09-06T20:11:47-03:00`; Git local confirma que contiene el commit.
+- La revision focalizada anterior informo `APROBADO_PARA_COMMIT` en la
+  conversacion. No fue una review nativa de GitHub.
+- El informe del Agente 02 del `2026-09-07T20:59:03-03:00` registro cero
+  reviews nativas en PR #7 y mantuvo pendiente el cierre documental.
+- No existe una regla vigente que obligue a inventar o exigir retroactivamente
+  una review nativa para registrar el merge.
+
+## Trabajo completado en esta sesion
+
+- Se actualizo Changelog, Roadmap y el documento del ciclo con el estado real
+  post-merge.
+- Se separaron pendientes, bloqueos por capacidad y responsables propuestos;
+  ninguna propuesta se presenta como asignacion aceptada.
+- Se incorporaron como `PROPUESTO_NO_APROBADO` las correcciones al diseño 2.0:
+  pago mixto separado de cobertura total con creditos; confirmacion interna
+  atomica para diferencia cero; unicidad por obligacion/periodo e importe; y
+  consumo parcial de lotes preservando saldo y vencimiento.
+- El rango de 25-43 horas quedo pendiente de aclarar como total o restante y
+  de mapear a entregables, sin inventar una estimacion.
+- Se preparo la matriz de criterios de cierre. El resultado no es una
+  aprobacion ni un cierre automatico.
+
+## Pendientes, bloqueantes y responsables propuestos
+
+- Revision del diff documental actual: pendiente; proximo gate del Sprint 1.
+- MP-01 a MP-16: sin enviar y sin respuesta. Bloquean las capacidades PSP que
+  dependen de cada pregunta, no el contrato conceptual completo. Responsable
+  propuesto: responsable tecnico MANDOBRA para coordinar; Mercado Pago para
+  responder. No constituye asignacion aceptada.
+- Revision juridica/contable: sin dictamen. Bloquea consentimiento, presentacion
+  economica, reversas, comisiones y definiciones fiscales relacionadas.
+  Responsable propuesto: producto para coordinar especialistas por designar.
+- Producto/economia: precio, base y porcentaje, conversion, moneda, redondeo,
+  impuestos, reservas y eventos tardios. Responsable propuesto: Cristian
+  Sánchez/producto con contabilidad; asignacion no aceptada formalmente.
+- Arquitectura 2.0 y ADR: pendientes de revision y aprobacion expresa. No se
+  aprobaron modelos, constraints, SDK, endpoints, migraciones ni proveedor.
+- Facturacion opcional permanece separada de contratacion y cobro; su evaluacion
+  fiscal es un incremento propio.
+
+## Archivos, validaciones y restricciones
+
+Archivos modificados: `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`,
+`docs/ROADMAP.md` y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+
+Migraciones relacionadas: ninguna. Tests de aplicacion: NO EJECUTADOS; no
+aplican al alcance documental. La validacion final debe comprobar alcance,
+whitespace, enlaces y coherencia de estados.
+
+Proximo paso exacto: realizar una revision independiente del diff documental y
+de la matriz de cierre. Solo despues de un resultado explicito decidir si el
+Sprint 1 puede marcarse `APROBADO` o `CERRADO`.
+
+No iniciar implementacion, aprobar arquitectura 2.0, contactar terceros,
+instalar dependencias, modificar codigo/modelos/bases/configuracion, ni ejecutar
+commit, push, PR, merge, rebase, reset, clean, cambio de rama o deploy.
+
+---
+
 # Handoff tecnico: correcciones posteriores a revision focalizada PRO
 
 Timestamp: 2026-09-06T19:38:40-03:00

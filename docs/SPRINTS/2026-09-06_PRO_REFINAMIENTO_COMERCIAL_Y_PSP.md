@@ -1,11 +1,12 @@
 # PRO - Refinamiento comercial, PSP y plan de tres sprints
 
-Timestamp: 2026-09-06T19:22:08-03:00  
-Estado: SPRINT_1_DOCUMENTAL_EN_VALIDACION  
+Timestamp de actualizacion: 2026-09-07T21:31:53-03:00
+Timestamp de cierre documental: 2026-09-07T21:54:36-03:00
+Estado: CERRADO_DOCUMENTALMENTE_INTEGRACION_GIT_PENDIENTE
 Responsable de producto: Cristian Sánchez  
 Agente: 01 - Documentation Engineer  
-Rama: `docs/pro-commercial-psp-refinement`  
-Commit base observado: `1548935`
+Rama observada: `develop`
+Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
 ## Alcance y continuidad historica
 
@@ -38,6 +39,97 @@ Entregables documentales:
 Cierre documental: diff revisado, enlaces validos y pendientes con responsable.
 La viabilidad externa puede continuar pendiente y bloquear solo incrementos
 dependientes. Este documento no autoriza implementacion.
+
+### Integracion y revisiones recuperadas
+
+- Git local confirma que PR #7 integro en `develop` el commit documental
+  `817fb4f3888a44984b951badc655eceeec2b9df8` mediante el merge
+  `1d22f87adc358eae20121ea727142b0276cf337e`, fechado
+  `2026-09-06T20:11:47-03:00`.
+- Antes del commit se informo en la conversacion de revision focalizada el
+  resultado `APROBADO_PARA_COMMIT` sobre los cuatro P1 y dos P2 corregidos.
+  Es evidencia conversacional; no equivale a una review nativa de GitHub.
+- El informe del Agente 02, emitido el `2026-09-07T20:59:03-03:00`, registro
+  cero reviews nativas en PR #7 y dictamino
+  `EVALUACION_TECNICA_COMPLETADA_CON_CIERRE_DOCUMENTAL_PENDIENTE`.
+- Ninguna regla vigente exige una review nativa para reconocer el merge. La
+  revision del presente diff sigue pendiente y el Sprint 1 no se marca cerrado.
+
+### Pendientes y responsables propuestos
+
+Las siguientes son propuestas de responsabilidad, no asignaciones aceptadas:
+
+| Capacidad | Pendiente | Bloqueo especifico | Responsable propuesto |
+|---|---|---|---|
+| Onboarding y checkout PSP | Resolver MP-08 a MP-10, MP-12, MP-13 y MP-16 | Bloquea integracion real, enlaces/QR y confirmacion autoritativa; no bloquea el contrato conceptual | Responsable tecnico MANDOBRA para consulta; Mercado Pago para respuesta |
+| Reservas y pagos mixtos | Definir plazo, vencimiento durante reserva, aprobaciones tardias, reintentos y reversas; resolver MP-04 a MP-06, MP-09, MP-10 y MP-15 | Bloquea implementacion financiera y pruebas transaccionales reales | Producto + arquitectura; revision juridica/contable |
+| Suscripcion y renovacion | Resolver MP-01 a MP-07, MP-10, MP-11 y MP-14 a MP-16; definir consentimiento y cobros en curso | Bloquea recurrencia real y sincronizacion del switch | Producto + responsable tecnico; revision juridica |
+| Creditos y comision | Definir precio, porcentaje/base, conversion, moneda, redondeo, impuestos y reversas | Bloquea ledger definitivo, cobro y acreditacion | Cristian Sánchez/producto + contabilidad |
+| Facturacion opcional | Comparar ARCA directo/proveedor y completar revision fiscal, juridica, contable y de seguridad | Bloquea solo el incremento fiscal; no debe acoplarse al cobro o contratacion | Producto + responsable fiscal/contable por designar |
+
+No se contacto a Mercado Pago ni se obtuvo dictamen juridico o contable. Las
+preguntas MP-01 a MP-16 y la base de revision continuan abiertas.
+
+### Correcciones propuestas al diseño 2.0
+
+Estado: `PROPUESTO_NO_APROBADO`. Este bloque corrige la propuesta del Agente 02;
+no modifica las reglas comerciales aprobadas, no decide modelos ni autoriza
+implementacion.
+
+1. **Pago mixto con diferencia monetaria.** Cuando los creditos cubren solo una
+   parte, la reserva no se consume hasta confirmar autoritativamente el pago
+   completo de la diferencia. Incertidumbre, rechazo no definitivo o evento
+   tardio mantienen el flujo sujeto a conciliacion conforme REQ-001.
+2. **Cobertura total con creditos.** Si la diferencia monetaria es cero, no hay
+   cobro PSP que pueda confirmar el pago. El diseño debe definir una
+   confirmacion interna atomica que cierre una unica obligacion, consuma los
+   importes reservados y aplique el efecto PRO una sola vez. Validar una tarjeta
+   vinculada es un requisito comercial separado y no confirma un cobro.
+3. **Unicidad e importes.** La proteccion contra doble financiacion debe operar
+   por obligacion/periodo y por importe aplicado. Un lote puede consumirse
+   parcialmente en operaciones distintas; cada operacion preserva la traza del
+   importe y el saldo remanente conserva el vencimiento original. No se propone
+   unicidad global del lote.
+4. **Estimacion 25-43 horas.** El rango informado no debe tratarse como trabajo
+   restante ni total hasta que el Agente 02 aclare su base. Ya estan cubiertos
+   documentalmente REQ-001/REQ-002, expedientes PSP y juridico, trazabilidad,
+   mapa de brechas y propuesta conceptual; no se les imputan horas retroactivas.
+   Deben identificarse los entregables incluidos, los ya cubiertos y los
+   restantes sin crear una estimacion nueva.
+
+Estas correcciones requieren revision de arquitectura posterior. No se aprueba
+la arquitectura 2.0, un ADR, un SDK, un esquema de datos ni una migracion.
+
+### Matriz de cierre de Sprint 1
+
+| Criterio | Evidencia actual | Estado para cierre |
+|---|---|---|
+| Paquete documental integrado | PR #7; commits `817fb4f` y `1d22f87` | CUMPLIDO |
+| Correcciones P1/P2 revisadas | `APROBADO_PARA_COMMIT` informado en conversacion previa; sin review nativa | CUMPLIDO_CON_EVIDENCIA_CONVERSACIONAL |
+| REQ, Master Spec, planificacion y expedientes coherentes | 15 Markdown integrados por PR #7 | CUMPLIDO; sujeto al control del diff actual |
+| Informe del Agente 02 recuperado | `REVISION_FOCAL_COMPLETADA / DISEÑO_2_0_PROPUESTO` | CUMPLIDO; propuesta no aprobada |
+| Pendientes identificados | Matriz anterior y MP-01 a MP-16 | CUMPLIDO; responsables solo propuestos |
+| Viabilidad Mercado Pago | Expediente no enviado y sin respuestas | PENDIENTE; bloquea capacidades PSP dependientes |
+| Revision juridica/contable | Base preparada, sin dictamen | PENDIENTE; bloqueo selectivo segun capacidad |
+| Estimacion 25-43 h trazable | Falta definir total/restante y entregables incluidos | PENDIENTE_DE_ACLARACION |
+| Revision del diff de cierre | Agente 02, `2026-09-07T21:41:54-03:00`; sin hallazgos y `APROBADO_PARA_COMMIT` | CUMPLIDO |
+
+Resultado provisional: `LISTO_PARA_REVISION_DE_DIFF`. El Sprint 1 permanece
+abierto hasta esa revision; no queda automaticamente `APROBADO` ni `CERRADO`.
+
+### Cierre documental
+
+La revision independiente del Agente 02 del
+`2026-09-07T21:41:54-03:00` concluyo sin hallazgos, declaro el diff
+`APROBADO_PARA_COMMIT` y considero satisfechos los criterios documentales de
+cierre. Con esa evidencia, Sprint 1 queda `CERRADO_DOCUMENTALMENTE`, con la
+integracion Git de este registro todavia pendiente.
+
+La conclusion no resuelve ni elimina los pendientes selectivos de Mercado Pago,
+revision juridica/contable y aclaracion del rango de 25-43 horas. El diseño 2.0
+permanece `PROPUESTO_NO_APROBADO` y su implementacion no esta autorizada. La
+ausencia de reviews nativas de GitHub continua atribuida al informe disponible,
+no a una verificacion propia de esta sesion.
 
 ## Sprint 2 - Cobros transaccionales y creditos
 
