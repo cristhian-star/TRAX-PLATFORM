@@ -1,5 +1,31 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Correccion P2 de determinismo en PR #8
+
+Timestamp: 2026-09-09T20:42:09-03:00
+Estado: READY_TO_RESUME
+Resultado: PSP_ADAPTER_CONTRACT_P2_CORREGIDO_PR_ACTUALIZADO_PENDIENTE_DE_RETEST
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-adapter-contract`
+PR: #8
+Commit observado: `64eed3fdbf16ff55f7994b246a87b514a41a31bb`
+
+- Hallazgo P2: una cola vacia fallaba despues de invocar `id_factory` y
+  `clock`, por lo que dependencias con estado podian avanzar sin creacion.
+- Correccion: `ScenarioController` permite inspeccionar sin consumir; la
+  creacion valida primero la existencia del escenario, luego ID y reloj, y
+  consume exactamente un escenario inmediatamente antes de almacenar.
+- ID duplicado, reloj invalido, validacion, replay, conflicto y consulta no
+  consumen escenarios.
+- Focal: 24/24. Suite completa Docker: 318/318 ejecutadas, 313 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos
+  y `git diff --check`: aprobados.
+- PostgreSQL no aplica. No se agregaron persistencia, locks, capas, modelos,
+  migraciones ni integraciones productivas.
+- PR #8 permanece abierto y no esta aprobado para merge; requiere retest
+  independiente despues del nuevo commit y push autorizados.
+
 ## Retest independiente aprobado para commit
 
 Timestamp: 2026-09-09T20:23:34-03:00

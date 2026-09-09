@@ -1,5 +1,27 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-09 - Correccion P2 de determinismo del simulador PSP
+
+Timestamp: 2026-09-09T20:42:09-03:00
+Estado: PSP_ADAPTER_CONTRACT_P2_CORREGIDO_PR_ACTUALIZADO_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-adapter-contract`
+PR: #8
+Commit observado: `64eed3fdbf16ff55f7994b246a87b514a41a31bb`
+
+- P2: la ausencia de escenario permitia invocar antes la fabrica de IDs y el
+  reloj, avanzando dependencias con estado pese a no crear un intento.
+- Se agrego inspeccion no destructiva de la cola; el escenario se confirma y
+  consume solo despues de validar ID y reloj, inmediatamente antes de almacenar.
+- ID duplicado, reloj invalido, validacion, replay, conflicto y consulta no
+  consumen escenarios; una creacion valida consume exactamente uno.
+- Focal: 24/24. Suite completa Docker: 318/318 ejecutadas, 313 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos
+  y `git diff --check`: aprobados.
+- PostgreSQL no aplica. Persistencia, HTTP, SDK, webhooks, Mercado Pago, ARCA e
+  integracion productiva permanecen fuera de alcance. PR #8 no aprobado para
+  merge; requiere retest independiente.
+
 ## 2026-09-09 - Retest aprobado del contrato neutral PSP
 
 Timestamp: 2026-09-09T20:23:34-03:00

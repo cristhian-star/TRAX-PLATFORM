@@ -191,6 +191,25 @@ Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
 
 ### Incremento 2.0-B: contrato neutral PSP
 
+Correccion P2 preparada el `2026-09-09T20:42:09-03:00` por Codex en
+`feature/psp-adapter-contract`, PR #8, sobre el commit observado
+`64eed3fdbf16ff55f7994b246a87b514a41a31bb`. Estado:
+`PSP_ADAPTER_CONTRACT_P2_CORREGIDO_PR_ACTUALIZADO_PENDIENTE_DE_RETEST`.
+
+El hallazgo consistia en que una cola vacia fallaba despues de invocar la
+fabrica de IDs y el reloj, rompiendo el determinismo de dependencias con estado.
+La correccion inspecciona el proximo escenario sin consumirlo, valida ID y reloj
+y confirma su consumo inmediatamente antes de almacenar. ID duplicado, reloj
+invalido, validacion, replay, conflicto y consulta no consumen escenarios; una
+creacion valida consume exactamente uno. La focal aprobo 24/24 y la suite
+completa Docker ejecuto 318/318: 313 aprobadas, 5 omisiones historicas,
+0 fallos y 0 errores. `compileall`, enlaces relativos y `git diff --check`
+fueron aprobados.
+
+PostgreSQL no aplica. No se incorporan persistencia, concurrencia, locks,
+migraciones ni integracion productiva. PR #8 permanece abierto, no aprobado
+para merge y pendiente de retest independiente.
+
 Timestamp: 2026-09-08T23:01:15-03:00
 Estado: PSP_ADAPTER_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
 Agente: 02 - Implementacion - Builder

@@ -53,6 +53,14 @@ class ScenarioController:
                 "no simulation scenario is configured for the next new attempt"
             ) from exc
 
+    def peek(self) -> SimulationScenario:
+        try:
+            return self._scenarios[0]
+        except IndexError as exc:
+            raise SimulatorConfigurationError(
+                "no simulation scenario is configured for the next new attempt"
+            ) from exc
+
 
 # Compatibility re-exports for the neutral types previously defined here.
 AttemptStatus = PaymentAttemptStatus
@@ -121,6 +129,8 @@ class InMemoryPSPSimulator:
                 )
             return self._attempts[existing_id]
 
+        scenario = self._scenario_controller.peek()
+
         attempt_id = self._required_text(self._id_factory(), "generated attempt_id")
         if attempt_id in self._attempts:
             raise SimulatorConfigurationError("id_factory produced a duplicate attempt_id")
@@ -129,7 +139,7 @@ class InMemoryPSPSimulator:
         if not isinstance(created_at, datetime):
             raise SimulatorConfigurationError("clock must return datetime values")
 
-        scenario = self._scenario_controller.consume()
+        self._scenario_controller.consume()
         status = (
             PaymentAttemptStatus.PENDING
             if scenario is SimulationScenario.UNCERTAIN

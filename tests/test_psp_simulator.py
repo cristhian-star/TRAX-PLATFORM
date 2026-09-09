@@ -221,7 +221,24 @@ class InMemoryPSPSimulatorTest(unittest.TestCase):
         self.assertEqual(controller.remaining_count, 0)
 
     def test_missing_scenario_is_explicit_and_leaves_no_state(self):
-        simulator, controller = self._simulator_for()
+        calls = {"id_factory": 0, "clock": 0}
+        generated_ids = iter(("sim-001", "sim-002"))
+        timestamps = iter((self.now, datetime(2026, 9, 8, 13, 0, tzinfo=timezone.utc)))
+        controller = ScenarioController()
+
+        def id_factory():
+            calls["id_factory"] += 1
+            return next(generated_ids)
+
+        def clock():
+            calls["clock"] += 1
+            return next(timestamps)
+
+        simulator = InMemoryPSPSimulator(
+            id_factory=id_factory,
+            clock=clock,
+            scenario_controller=controller,
+        )
 
         with self.assertRaisesRegex(
             SimulatorConfigurationError, "no simulation scenario is configured"
@@ -232,6 +249,18 @@ class InMemoryPSPSimulatorTest(unittest.TestCase):
             )
 
         self.assertEqual(simulator.attempt_count, 0)
+        self.assertEqual(controller.remaining_count, 0)
+        self.assertEqual(calls, {"id_factory": 0, "clock": 0})
+
+        controller.enqueue(SimulationScenario.APPROVED)
+        created = simulator.create_attempt(
+            internal_reference="order-001", amount=Decimal("1"),
+            currency="ARS", idempotency_key="key-001",
+        )
+
+        self.assertEqual(created.attempt_id, "sim-001")
+        self.assertEqual(created.created_at, self.now)
+        self.assertEqual(calls, {"id_factory": 1, "clock": 1})
         self.assertEqual(controller.remaining_count, 0)
 
     def test_uncertain_response_exposes_consultable_pending_attempt(self):
@@ -363,6 +392,41 @@ class InMemoryPSPSimulatorTest(unittest.TestCase):
             )
 
         self.assertEqual(simulator.attempt_count, 1)
+        self.assertEqual(controller.remaining_count, 1)
+
+    def test_invalid_clock_does_not_consume_scenario(self):
+        controller = ScenarioController((SimulationScenario.APPROVED,))
+        clock_values = iter(("not-a-datetime", self.now))
+        generated_ids = iter(("sim-001", "sim-002"))
+        simulator = InMemoryPSPSimulator(
+            id_factory=lambda: next(generated_ids),
+            clock=lambda: next(clock_values),
+            scenario_controller=controller,
+        )
+
+        with self.assertRaisesRegex(SimulatorConfigurationError, "clock must return"):
+            simulator.create_attempt(
+                internal_reference="order-001", amount=Decimal("1"),
+                currency="ARS", idempotency_key="key-001",
+            )
+
+        self.assertEqual(simulator.attempt_count, 0)
+        self.assertEqual(controller.remaining_count, 1)
+
+        created = simulator.create_attempt(
+            internal_reference="order-001", amount=Decimal("1"),
+            currency="ARS", idempotency_key="key-001",
+        )
+        self.assertEqual(created.attempt_id, "sim-002")
+        self.assertEqual(created.status, PaymentAttemptStatus.APPROVED)
+        self.assertEqual(controller.remaining_count, 0)
+
+    def test_query_does_not_consume_scenario(self):
+        simulator, controller = self._simulator_for(SimulationScenario.APPROVED)
+
+        with self.assertRaises(AttemptNotFoundError):
+            simulator.get_attempt("missing")
+
         self.assertEqual(controller.remaining_count, 1)
 
     def test_historical_reexports_are_canonical_objects(self):
