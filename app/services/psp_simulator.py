@@ -1,48 +1,64 @@
-from dataclasses import dataclass
+from collections import deque
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Callable
+from typing import Callable, Iterable
+
+from app.services.psp_contract import (
+    AttemptNotFoundError,
+    IdempotencyConflictError,
+    PaymentAttempt,
+    PaymentAttemptStatus,
+    UncertainResponseError,
+)
 
 
-class AttemptStatus(str, Enum):
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
-    PENDING = "PENDING"
-
-
-class CreationOutcome(str, Enum):
+class SimulationScenario(str, Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     PENDING = "PENDING"
     UNCERTAIN = "UNCERTAIN"
 
 
-class AttemptNotFoundError(LookupError):
-    pass
-
-
-class IdempotencyConflictError(ValueError):
-    pass
-
-
-class UncertainResponseError(RuntimeError):
-    pass
-
-
 class SimulatorConfigurationError(RuntimeError):
     pass
 
 
-@dataclass(frozen=True, slots=True)
-class SimulatedPaymentAttempt:
-    attempt_id: str
-    internal_reference: str
-    amount: Decimal
-    currency: str
-    idempotency_key: str
-    status: AttemptStatus
-    created_at: datetime
+class ScenarioController:
+    """Instance-local FIFO used only to configure simulator behavior."""
+
+    def __init__(self, scenarios: Iterable[SimulationScenario] = ()):
+        self._scenarios = deque(scenarios)
+        if not all(isinstance(item, SimulationScenario) for item in self._scenarios):
+            raise SimulatorConfigurationError(
+                "all configured scenarios must be SimulationScenario values"
+            )
+
+    @property
+    def remaining_count(self) -> int:
+        return len(self._scenarios)
+
+    def enqueue(self, scenario: SimulationScenario) -> None:
+        if not isinstance(scenario, SimulationScenario):
+            raise SimulatorConfigurationError(
+                "scenario must be a SimulationScenario value"
+            )
+        self._scenarios.append(scenario)
+
+    def consume(self) -> SimulationScenario:
+        try:
+            return self._scenarios.popleft()
+        except IndexError as exc:
+            raise SimulatorConfigurationError(
+                "no simulation scenario is configured for the next new attempt"
+            ) from exc
+
+
+# Compatibility re-exports for the neutral types previously defined here.
+AttemptStatus = PaymentAttemptStatus
+SimulatedPaymentAttempt = PaymentAttempt
+# Compatibility name for simulator-only scenario configuration.
+CreationOutcome = SimulationScenario
 
 
 class InMemoryPSPSimulator:
@@ -62,13 +78,21 @@ class InMemoryPSPSimulator:
         *,
         id_factory: Callable[[], str],
         clock: Callable[[], datetime],
+        scenario_controller: ScenarioController,
     ):
-        if not callable(id_factory) or not callable(clock):
-            raise SimulatorConfigurationError("id_factory and clock must be callable")
+        if (
+            not callable(id_factory)
+            or not callable(clock)
+            or not isinstance(scenario_controller, ScenarioController)
+        ):
+            raise SimulatorConfigurationError(
+                "id_factory and clock must be callable and scenario_controller valid"
+            )
 
         self._id_factory = id_factory
         self._clock = clock
-        self._attempts: dict[str, SimulatedPaymentAttempt] = {}
+        self._scenario_controller = scenario_controller
+        self._attempts: dict[str, PaymentAttempt] = {}
         self._attempt_ids_by_key: dict[str, str] = {}
         self._fingerprints_by_key: dict[str, tuple[str, Decimal, str]] = {}
 
@@ -83,15 +107,11 @@ class InMemoryPSPSimulator:
         amount: Decimal,
         currency: str,
         idempotency_key: str,
-        outcome: CreationOutcome,
-    ) -> SimulatedPaymentAttempt:
+    ) -> PaymentAttempt:
         reference = self._required_text(internal_reference, "internal_reference")
         exact_amount = self._valid_amount(amount)
         normalized_currency = self._required_text(currency, "currency").upper()
         normalized_key = self._required_text(idempotency_key, "idempotency_key")
-        if not isinstance(outcome, CreationOutcome):
-            raise ValueError("outcome must be a CreationOutcome")
-
         fingerprint = (reference, exact_amount, normalized_currency)
         existing_id = self._attempt_ids_by_key.get(normalized_key)
         if existing_id is not None:
@@ -109,12 +129,13 @@ class InMemoryPSPSimulator:
         if not isinstance(created_at, datetime):
             raise SimulatorConfigurationError("clock must return datetime values")
 
+        scenario = self._scenario_controller.consume()
         status = (
-            AttemptStatus.PENDING
-            if outcome is CreationOutcome.UNCERTAIN
-            else AttemptStatus(outcome.value)
+            PaymentAttemptStatus.PENDING
+            if scenario is SimulationScenario.UNCERTAIN
+            else PaymentAttemptStatus(scenario.value)
         )
-        attempt = SimulatedPaymentAttempt(
+        attempt = PaymentAttempt(
             attempt_id=attempt_id,
             internal_reference=reference,
             amount=exact_amount,
@@ -127,14 +148,15 @@ class InMemoryPSPSimulator:
         self._attempt_ids_by_key[normalized_key] = attempt_id
         self._fingerprints_by_key[normalized_key] = fingerprint
 
-        if outcome is CreationOutcome.UNCERTAIN:
+        if scenario is SimulationScenario.UNCERTAIN:
             raise UncertainResponseError(
-                "simulated transport response is uncertain; reconcile by idempotent replay"
+                "simulated transport response is uncertain; reconcile by idempotent replay",
+                attempt_id=attempt_id,
             )
 
         return attempt
 
-    def get_attempt(self, attempt_id: str) -> SimulatedPaymentAttempt:
+    def get_attempt(self, attempt_id: str) -> PaymentAttempt:
         normalized_id = self._required_text(attempt_id, "attempt_id")
         try:
             return self._attempts[normalized_id]

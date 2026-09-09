@@ -1,5 +1,73 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-09 - Retest aprobado del contrato neutral PSP
+
+Timestamp: 2026-09-09T20:23:34-03:00
+Estado: PSP_ADAPTER_CONTRACT_APROBADO_PARA_COMMIT
+Agente: Codex - ejecutor de integracion autorizado
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+Retest independiente: `APROBADO_PARA_COMMIT` del
+`2026-09-09T20:14:06-03:00`
+
+- P1 y P3: `RESUELTO`; hallazgos actuales P0-P3: ninguno.
+- Focal: 22/22. Suite completa: 311/316, con 5 omisiones historicas,
+  0 fallos y 0 errores.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados.
+- PostgreSQL no fue ejecutado ni acreditado porque no aplica al incremento
+  exclusivamente en memoria.
+- Persistencia, webhooks, Mercado Pago, ARCA e integracion productiva siguen
+  fuera de alcance. El diseño general 2.0 continua `PROPUESTO_NO_APROBADO`.
+- Commit, push y PR permanecen pendientes en este registro.
+
+## 2026-09-09 - Correcciones P1/P3 del contrato neutral PSP
+
+Timestamp: 2026-09-09T20:01:57-03:00
+Estado: PSP_ADAPTER_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: 02 - Implementacion - Builder
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+Revision independiente: `REQUIERE_CORRECCIONES`, emitida el
+`2026-09-09T19:53:36-03:00`
+
+- P1 corregido: `UncertainResponseError.attempt_id` es opcional, usa `None`
+  cuando el adaptador no conoce un ID y conserva exactamente cualquier ID opaco
+  valido. El simulador sigue adjuntando el suyo porque crea el intento.
+- La conciliacion sin ID externo puede continuar mediante la clave idempotente
+  conocida por el llamador; no se inventan identificadores.
+- P3 corregido: pruebas AST cubren imports de contrato y simulador, las
+  reexportaciones historicas se verifican por identidad, `enqueue` se prueba en
+  orden, aislamiento y rechazo atomico, y los errores neutrales se distinguen
+  mediante comportamientos observables.
+- Focal: 22/22. Suite completa Docker: 311/316, con 5 omisiones historicas,
+  0 fallos y 0 errores. `compileall`, enlaces y `git diff --check`: aprobados.
+- Persistencia, PostgreSQL, HTTP, SDK, webhooks, Mercado Pago, ARCA e
+  integracion productiva permanecen fuera de alcance. El diseño 2.0 continua
+  `PROPUESTO_NO_APROBADO`.
+
+## 2026-09-08 - Contrato neutral PSP y control separado de escenarios
+
+Timestamp: 2026-09-08T23:01:15-03:00
+Estado: PSP_ADAPTER_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: 02 - Implementacion - Builder
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+
+- Se agrego un contrato PSP neutral con `Protocol`, intento inmutable, tres
+  estados financieros y errores neutrales diferenciables.
+- `create_attempt` ya no recibe resultados artificiales. El simulador consume
+  escenarios deterministas desde un controlador FIFO separado y local a cada
+  instancia; validaciones, replay y conflictos no consumen escenarios.
+- En el simulador, la incertidumbre conserva un intento `PENDING`, informa el
+  identificador que conoce y permite consulta y replay sin duplicacion. El
+  contrato neutral no exige que todo adaptador disponga de ese identificador.
+- Pruebas focales: 17/17 aprobadas. Suite completa Docker: 306/311 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos
+  y `git diff --check`: aprobados.
+- No se agregaron dependencias, persistencia, PostgreSQL, HTTP, SDK, webhooks ni
+  integraciones productivas. El diseño 2.0 continua `PROPUESTO_NO_APROBADO`;
+  Mercado Pago, ARCA y revision juridica/contable permanecen pendientes.
+
 ## 2026-09-08 - Integracion del simulador PSP en memoria
 
 Timestamp: 2026-09-08T22:40:33-03:00

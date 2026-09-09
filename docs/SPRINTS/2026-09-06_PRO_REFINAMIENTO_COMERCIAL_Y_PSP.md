@@ -189,6 +189,71 @@ atomicidad PostgreSQL, autenticidad de webhooks ni viabilidad PSP. Mercado
 Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
 2.0 permanece `PROPUESTO_NO_APROBADO`.
 
+### Incremento 2.0-B: contrato neutral PSP
+
+Timestamp: 2026-09-08T23:01:15-03:00
+Estado: PSP_ADAPTER_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: 02 - Implementacion - Builder
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+
+Se separo el contrato que MANDOBRA usaria con un PSP de la configuracion de
+escenarios exclusiva del simulador. El contrato neutral permite crear y
+consultar intentos sin aceptar `outcome`, `scenario` u otras instrucciones
+artificiales. Un controlador FIFO local al simulador programa estados e
+incertidumbre de forma determinista sin introducir aleatoriedad o esperas.
+
+La focal aprobo 17/17. La suite completa en Docker aprobo 306/311, con 5
+omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos y
+`git diff --check` aprobaron. Los gates PostgreSQL no se ejecutaron porque este
+incremento permanece exclusivamente en memoria.
+
+No se implementaron persistencia, modelos financieros, HTTP, SDK, webhooks,
+Mercado Pago, ARCA ni integracion productiva. La evidencia no acredita
+concurrencia o atomicidad PostgreSQL, autenticidad de webhooks ni viabilidad
+PSP. El diseño general 2.0 permanece `PROPUESTO_NO_APROBADO` y la revision
+juridica/contable continua pendiente.
+
+Correccion posterior a revision independiente:
+
+Timestamp: 2026-09-09T20:01:57-03:00
+Estado: PSP_ADAPTER_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: 02 - Implementacion - Builder
+Rama y base: `feature/psp-adapter-contract` en
+`2e7de49dfde6c20bc798089139ea235534ea0a75`
+Revision: `REQUIERE_CORRECCIONES` del `2026-09-09T19:53:36-03:00`
+
+El P1 contractual quedo corregido: una respuesta incierta puede omitir el ID
+externo y representarlo con `None`, o conservar exactamente una cadena no vacia
+cuando el adaptador la conoce. El simulador adjunta el identificador porque crea
+internamente el intento; un proveedor real puede no entregarlo y la
+conciliacion debe poder continuar con la clave idempotente conocida.
+
+El P3 quedo cubierto mediante inspeccion AST de imports en ambos modulos,
+identidad de reexportaciones, comportamiento atomico y aislado de `enqueue`, y
+diferenciacion observable de errores neutrales. Focal: 22/22. Suite completa
+Docker: 311/316, con 5 omisiones historicas, 0 fallos y 0 errores. `compileall`,
+enlaces relativos y `git diff --check`: aprobados.
+
+No se incorporaron persistencia, PostgreSQL, HTTP, SDK, webhooks, Mercado Pago,
+ARCA ni integracion productiva. El diseño 2.0 continua
+`PROPUESTO_NO_APROBADO`; el diff requiere retest independiente.
+
+Retest independiente registrado el `2026-09-09T20:23:34-03:00` por Codex sobre
+`feature/psp-adapter-contract` en la base
+`2e7de49dfde6c20bc798089139ea235534ea0a75`: el resultado emitido el
+`2026-09-09T20:14:06-03:00` fue `APROBADO_PARA_COMMIT`. P1 y P3 quedaron
+`RESUELTO` y no existen hallazgos actuales P0-P3. Estado:
+`PSP_ADAPTER_CONTRACT_APROBADO_PARA_COMMIT`.
+
+La evidencia comprende focal 22/22 y suite completa 311/316, con 5 omisiones
+historicas, 0 fallos y 0 errores; `compileall`, enlaces relativos y
+`git diff --check` aprobados. PostgreSQL no fue ejecutado ni acreditado porque
+no aplica al incremento en memoria. Persistencia, webhooks, Mercado Pago, ARCA
+e integracion productiva siguen fuera de alcance y el diseño 2.0 permanece
+`PROPUESTO_NO_APROBADO`. Commit, push y PR continuan pendientes en este
+registro.
+
 ## Sprint 2 - Cobros transaccionales y creditos
 
 Estado: PENDIENTE_DE_REFINAMIENTO_Y_AUTORIZACION.
