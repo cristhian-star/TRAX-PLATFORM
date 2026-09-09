@@ -177,6 +177,18 @@ valida ARCA. El simulador no esta conectado a flujos productivos; el diseño
 general 2.0 continua `PROPUESTO_NO_APROBADO`, con Mercado Pago y revision
 juridica/contable pendientes. Integracion Git: pendiente en este registro.
 
+Integracion confirmada el `2026-09-08T22:40:33-03:00` por Codex: el commit
+`50babd206369d47d68765e0dbf0fd3f2f42c21d0`,
+`feat: add deterministic in-memory PSP simulator`, fue publicado mediante push
+normal a `origin/develop`; el hash remoto observado coincide. Estado:
+`SIMULADOR_PSP_EN_MEMORIA_INTEGRADO`.
+
+Integrado refiere unicamente al simulador aislado y sus pruebas. No esta
+conectado a flujos productivos y no acredita persistencia, concurrencia o
+atomicidad PostgreSQL, autenticidad de webhooks ni viabilidad PSP. Mercado
+Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
+2.0 permanece `PROPUESTO_NO_APROBADO`.
+
 ## Sprint 2 - Cobros transaccionales y creditos
 
 Estado: PENDIENTE_DE_REFINAMIENTO_Y_AUTORIZACION.

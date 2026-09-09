@@ -1,5 +1,25 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-08 - Integracion del simulador PSP en memoria
+
+Timestamp: 2026-09-08T22:40:33-03:00
+Estado: SIMULADOR_PSP_EN_MEMORIA_INTEGRADO
+Agente: Codex - ejecutor de integracion autorizado
+Rama: `develop`
+Commit del simulador: `50babd206369d47d68765e0dbf0fd3f2f42c21d0`
+Hash remoto observado: `50babd206369d47d68765e0dbf0fd3f2f42c21d0`
+
+- El commit `feat: add deterministic in-memory PSP simulator` fue publicado
+  mediante push normal a `origin/develop`.
+- Validaciones: focal 21/21; suite completa 310/315 con 5 omisiones historicas,
+  0 fallos y 0 errores; `compileall`, enlaces y `git diff --check` aprobados.
+- Integrado refiere unicamente al simulador aislado y sus pruebas; no esta
+  conectado a flujos productivos.
+- No se acreditan persistencia, concurrencia o atomicidad PostgreSQL,
+  autenticidad de webhooks ni viabilidad PSP. Mercado Pago, ARCA y revision
+  juridica/contable continúan pendientes, y el diseño general 2.0 permanece
+  `PROPUESTO_NO_APROBADO`.
+
 ## 2026-09-08 - Aprobacion independiente del simulador PSP
 
 Timestamp: 2026-09-08T22:37:42-03:00

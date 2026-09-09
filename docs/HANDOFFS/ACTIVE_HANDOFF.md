@@ -1,5 +1,27 @@
 # Handoff tecnico: simulador PSP determinista en memoria
 
+## Integracion confirmada
+
+Timestamp: 2026-09-08T22:40:33-03:00
+Estado: COMPLETED
+Resultado: SIMULADOR_PSP_EN_MEMORIA_INTEGRADO
+Agente: Codex - ejecutor de integracion autorizado
+Rama: `develop`
+Commit del simulador: `50babd206369d47d68765e0dbf0fd3f2f42c21d0`
+Push: normal a `origin/develop`, confirmado
+Hash remoto observado: `50babd206369d47d68765e0dbf0fd3f2f42c21d0`
+
+- Validaciones: focal 21/21; suite completa 310/315, con 5 omisiones
+  historicas, 0 fallos y 0 errores; `compileall`, enlaces relativos y
+  `git diff --check` aprobados.
+- Integrado refiere solo al componente aislado en memoria y sus pruebas. No se
+  conecto a rutas, servicios ni flujos productivos.
+- No se acreditan persistencia, concurrencia o atomicidad PostgreSQL,
+  autenticidad de webhooks ni viabilidad PSP.
+- El diseño general 2.0 continua `PROPUESTO_NO_APROBADO`. Mercado Pago, ARCA y
+  revision juridica/contable permanecen pendientes.
+- Merge, rebase, force push y deploy: no realizados.
+
 ## Aprobacion independiente previa a integracion
 
 Timestamp: 2026-09-08T22:37:42-03:00
