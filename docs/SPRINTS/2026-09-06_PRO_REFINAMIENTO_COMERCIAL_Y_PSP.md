@@ -131,6 +131,52 @@ permanece `PROPUESTO_NO_APROBADO` y su implementacion no esta autorizada. La
 ausencia de reviews nativas de GitHub continua atribuida al informe disponible,
 no a una verificacion propia de esta sesion.
 
+### Incremento local posterior: simulador PSP en memoria
+
+Timestamp: 2026-09-07T22:40:12-03:00
+Estado: SIMULADOR_PSP_EN_MEMORIA_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: 02 - Implementacion - Builder
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+
+Se implemento exclusivamente un simulador PSP generico y determinista para
+pruebas y desarrollo futuro. Mantiene almacenamiento por instancia, importes
+exactos `Decimal`, idempotencia, resultados configurables y separacion entre
+incertidumbre de llamada y estado consultable. No se integra con la aplicacion
+operativa ni aprueba el diseño general 2.0.
+
+Las 21 pruebas focales pasaron. La suite completa no pudo validarse con el
+runtime de Codex Desktop: de 54 casos descubiertos, 21 pasaron y 33 terminaron
+en error de importacion por dependencias del proyecto ausentes. No se instalaron
+dependencias ni se uso Docker. `compileall`, enlaces relativos y
+`git diff --check` pasaron.
+
+La evidencia no acredita persistencia, atomicidad o concurrencia PostgreSQL,
+autenticidad, entrega u orden de webhooks, ni viabilidad tecnica, contractual o
+comercial de Mercado Pago. No selecciona proveedor ni arquitectura productiva.
+El diseño 2.0 permanece `PROPUESTO_NO_APROBADO`.
+
+Revalidacion del `2026-09-08T21:46:39-03:00`: el trabajo previo se inspecciono
+y conservo sin cambios funcionales. Las 21 pruebas focales volvieron a pasar y
+`compileall` aprobo. La suite completa repitio 54 pruebas descubiertas, 21
+aprobadas, 0 fallos de asercion, 33 errores de importacion y 0 omitidas por las
+dependencias ausentes del runtime. El estado maximo permanece
+`SIMULADOR_PSP_EN_MEMORIA_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION`.
+
+Revision independiente del `2026-09-08T22:28:13-03:00`, registrada el
+`2026-09-08T22:37:42-03:00` por Codex sobre `develop` en la base
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`: `APROBADO_PARA_COMMIT`, sin
+hallazgos P0-P3. La focal aprobo 21/21 y la suite completa en Docker aprobo
+310/315, con 5 omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces
+relativos y `git diff --check` aprobaron. El nuevo estado previo a integracion
+es `SIMULADOR_PSP_EN_MEMORIA_APROBADO_PARA_COMMIT`.
+
+Esta aprobacion no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+autenticidad de webhooks ni viabilidad de Mercado Pago, y no implementa o
+valida ARCA. El simulador no esta conectado a flujos productivos; el diseño
+general 2.0 continua `PROPUESTO_NO_APROBADO`, con Mercado Pago y revision
+juridica/contable pendientes. Integracion Git: pendiente en este registro.
+
 ## Sprint 2 - Cobros transaccionales y creditos
 
 Estado: PENDIENTE_DE_REFINAMIENTO_Y_AUTORIZACION.

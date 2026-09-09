@@ -1,5 +1,65 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-08 - Aprobacion independiente del simulador PSP
+
+Timestamp: 2026-09-08T22:37:42-03:00
+Estado: SIMULADOR_PSP_EN_MEMORIA_APROBADO_PARA_COMMIT
+Agente: Codex - revisor tecnico y funcional independiente
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+
+- La revision independiente del `2026-09-08T22:28:13-03:00` emitio
+  `APROBADO_PARA_COMMIT`, sin hallazgos P0, P1, P2 ni P3.
+- Focal: 21/21 aprobadas. Suite completa en Docker: 310/315 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados.
+- La evidencia no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+  autenticidad de webhooks ni viabilidad de Mercado Pago; tampoco implementa o
+  valida ARCA. El diseño general 2.0 continua `PROPUESTO_NO_APROBADO`.
+- Commit, push e integracion permanecen pendientes en este registro.
+
+## 2026-09-08 - Reanudacion y revalidacion del simulador PSP
+
+Timestamp: 2026-09-08T21:46:39-03:00
+Estado: SIMULADOR_PSP_EN_MEMORIA_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: 02 - Implementacion - Builder
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+
+- Se inspecciono y conservo el trabajo local previo del mismo incremento; no
+  requirio correcciones funcionales.
+- Pruebas focales repetidas: 21 ejecutadas, 21 aprobadas, 0 fallidas y 0
+  omitidas. `compileall` volvio a aprobar.
+- La suite completa repitio la limitacion de entorno: 54 pruebas descubiertas,
+  21 aprobadas, 0 fallos de asercion, 33 errores de importacion y 0 omitidas por
+  ausencia de Flask, SQLAlchemy, Alembic y Werkzeug en el runtime disponible.
+- No se instalaron dependencias ni se uso Docker. Los limites y exclusiones
+  registrados el `2026-09-07T22:40:12-03:00` permanecen vigentes.
+
+## 2026-09-07 - Simulador PSP determinista en memoria
+
+Timestamp: 2026-09-07T22:40:12-03:00
+Estado: SIMULADOR_PSP_EN_MEMORIA_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: 02 - Implementacion - Builder
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+
+- Se agrego un simulador PSP generico, determinista y aislado por instancia,
+  con intentos inmutables, importes `Decimal`, idempotencia canonica, estados
+  configurables y respuesta incierta separada del estado almacenado.
+- No se integro con rutas, modelos, bases, entitlement, contratos, creditos,
+  suscripciones, webhooks ni proveedores externos.
+- Pruebas focales: 21 ejecutadas, 21 aprobadas, 0 fallidas y 0 omitidas.
+- Suite completa con el Python incluido en Codex Desktop: 54 descubiertas, 21
+  aprobadas, 0 fallos de asercion, 33 errores de importacion y 0 omitidas. La
+  causa es la ausencia de Flask, SQLAlchemy, Alembic y Werkzeug en ese runtime;
+  no se instalaron dependencias ni se uso Docker.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados.
+- Estas pruebas no acreditan persistencia, atomicidad o concurrencia
+  PostgreSQL, autenticidad, entrega u orden de webhooks, ni viabilidad tecnica,
+  contractual o comercial de Mercado Pago. No seleccionan proveedor ni
+  arquitectura productiva.
+
 ## 2026-09-07 - Cierre documental de Sprint 1 PRO
 
 Timestamp: 2026-09-07T21:54:36-03:00

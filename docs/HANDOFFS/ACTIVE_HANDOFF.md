@@ -1,3 +1,99 @@
+# Handoff tecnico: simulador PSP determinista en memoria
+
+## Aprobacion independiente previa a integracion
+
+Timestamp: 2026-09-08T22:37:42-03:00
+Estado: READY_TO_RESUME
+Resultado: SIMULADOR_PSP_EN_MEMORIA_APROBADO_PARA_COMMIT
+Agente: Codex - revisor tecnico y funcional independiente
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+
+- Revision independiente emitida el `2026-09-08T22:28:13-03:00`:
+  `APROBADO_PARA_COMMIT`, sin hallazgos P0-P3.
+- Focal: 21/21 aprobadas. Suite completa en Docker: 310/315 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados.
+- La evidencia no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+  autenticidad de webhooks ni viabilidad de Mercado Pago, y no implementa o
+  valida ARCA.
+- El simulador permanece aislado de flujos productivos. El diseño general 2.0
+  continua `PROPUESTO_NO_APROBADO`; Mercado Pago y la revision
+  juridica/contable siguen pendientes.
+- Estado Git: cinco archivos locales, sin staging ni commit al registrar esta
+  aprobacion. Push, merge y deploy: no realizados.
+
+Timestamp: 2026-09-07T22:40:12-03:00
+Estado: READY_TO_RESUME
+Resultado: SIMULADOR_PSP_EN_MEMORIA_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Objetivo: implementar exclusivamente un simulador PSP determinista, aislado y
+en memoria para probar el contrato basico sin integracion productiva.
+Rama y commit base: `develop` en
+`1e85c6e592f970b2640a1e71d5b9a7019f8b3383`
+Estado Git inicial: limpio y sin divergencia informada
+Estado Git final: cambios locales sin staging ni commit
+Push, PR, merge y deploy: NO realizados; no autorizados
+
+## Reanudacion y revalidacion
+
+Timestamp: 2026-09-08T21:46:39-03:00
+
+- Los cinco archivos locales fueron reconocidos expresamente como trabajo
+  previo esperado y se inspeccionaron completos.
+- El simulador y sus 21 pruebas ya satisfacian el alcance; no se modifico su
+  comportamiento.
+- Focal repetida: 21 aprobadas, 0 fallidas y 0 omitidas.
+- Suite completa repetida: 54 descubiertas, 21 aprobadas, 0 fallos de asercion,
+  33 errores de importacion y 0 omitidas por dependencias ausentes.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados. El estado
+  Git final conserva exclusivamente los cinco archivos esperados.
+
+## Trabajo completado
+
+- Se creo `app/services/psp_simulator.py` con almacenamiento privado por
+  instancia, DTO inmutable, identificadores y reloj inyectados, estados
+  `APPROVED`, `REJECTED` y `PENDING`, y resultado de llamada `UNCERTAIN`.
+- La incertidumbre de transporte crea internamente un intento `PENDING`, eleva
+  una excepcion especifica y permite recuperarlo mediante replay idempotente.
+- La huella canonica compara referencia recortada, valor numerico exacto
+  `Decimal` y moneda recortada en mayusculas. No cuantiza ni redondea.
+- Se distinguen errores de no encontrado, conflicto idempotente, respuesta
+  incierta y configuracion invalida.
+- Los resultados devueltos son inmutables y no existe estado global mutable.
+
+## Validacion y limitacion
+
+- Focal `tests.test_psp_simulator`: 21/21 aprobadas; 0 fallidas; 0 omitidas.
+- Suite completa: 54 descubiertas; 21 aprobadas; 0 fallos de asercion; 33
+  errores de importacion; 0 omitidas.
+- Limitacion de entorno: Python 3.12.14 de Codex Desktop no contiene Flask,
+  SQLAlchemy, Alembic ni Werkzeug. No se instalaron dependencias y, por la
+  exclusion del incremento, no se uso Docker.
+- `python -m compileall -q app scripts tests`: aprobado.
+- Enlaces relativos y `git diff --check`: aprobados.
+- Queda pendiente repetir la suite en un runtime del proyecto con dependencias
+  disponibles.
+
+## Limites
+
+El simulador no acredita persistencia, atomicidad o concurrencia PostgreSQL,
+autenticidad, entrega u orden de webhooks, ni viabilidad tecnica, contractual o
+comercial de Mercado Pago. No selecciona proveedor o arquitectura productiva y
+no se conecta con ningun flujo operativo.
+
+Archivos creados: `app/services/psp_simulator.py` y
+`tests/test_psp_simulator.py`. Documentacion modificada:
+`docs/CHANGELOG.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md` y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+
+Proximo paso: revisar el diff; para cerrar la validacion completa, repetir la
+suite en un runtime ya configurado con las dependencias del proyecto. No
+instalar, integrar ni publicar sin autorizacion.
+
+---
+
 # Handoff tecnico: cierre documental Sprint 1 PRO
 
 Timestamp: 2026-09-07T21:54:36-03:00
