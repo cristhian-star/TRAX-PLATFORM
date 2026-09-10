@@ -191,6 +191,30 @@ Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
 
 ### Incremento 2.0-B: contrato neutral PSP
 
+Validacion local post-merge registrada el `2026-09-10T13:42:55-03:00` por
+Codex - implementador tecnico local, sobre `develop`. Estado:
+`PSP_ADAPTER_CONTRACT_INTEGRADO_POST_MERGE_VALIDADO_LOCALMENTE_PENDIENTE_DE_REVISION_DOCUMENTAL`.
+
+Se confirmo la integracion de PR #8 en el merge
+`f9c0e394af413cfcb0c1aa8142a85af16ad3729b`, con base previa
+`2e7de49dfde6c20bc798089139ea235534ea0a75` y segundo padre correctivo
+`8f709e64149d7dfbdeb9c2e1a319f7134ae6f0f4`. `develop` y
+`origin/develop` coincidieron sin divergencia.
+
+El alcance integrado comprende el contrato PSP neutral, intento inmutable,
+estados y errores neutrales diferenciados, ID opcional ante incertidumbre,
+simulador determinista en memoria, controlador FIFO, replay idempotente y
+recuperacion mediante consulta. La focal aprobo 24/24. La suite completa en
+Docker ejecuto 318 pruebas: 313 aprobadas, 5 omitidas, 0 fallos y 0 errores.
+`compileall`, enlaces relativos y `git diff --check` aprobaron.
+
+PostgreSQL no se ejecuto porque no aplica. Esta evidencia no acredita
+persistencia, concurrencia o atomicidad PostgreSQL, autenticidad u orden de
+webhooks ni viabilidad tecnica, contractual o comercial de un PSP. No se
+integraron Mercado Pago, ARCA, SDK, HTTP o flujos productivos. El diseño 2.0
+permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la revision
+juridica/contable continuan pendientes.
+
 Correccion P2 preparada el `2026-09-09T20:42:09-03:00` por Codex en
 `feature/psp-adapter-contract`, PR #8, sobre el commit observado
 `64eed3fdbf16ff55f7994b246a87b514a41a31bb`. Estado:

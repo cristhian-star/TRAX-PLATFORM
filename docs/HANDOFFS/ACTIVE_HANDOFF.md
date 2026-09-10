@@ -1,5 +1,50 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Validacion local post-merge de PR #8
+
+Timestamp: 2026-09-10T13:42:55-03:00
+Estado: COMPLETED
+Resultado: PSP_ADAPTER_CONTRACT_INTEGRADO_POST_MERGE_VALIDADO_LOCALMENTE_PENDIENTE_DE_REVISION_DOCUMENTAL
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Objetivo: validar localmente el contrato neutral PSP despues de su integracion
+Rama: `develop`
+Base previa: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+PR: #8
+Merge/HEAD: `f9c0e394af413cfcb0c1aa8142a85af16ad3729b`
+Segundo padre: `8f709e64149d7dfbdeb9c2e1a319f7134ae6f0f4`
+Estado remoto: `origin/develop` coincide con el merge validado
+Integracion Git de esta sesion: no realizada; no autorizada
+
+- Se confirmaron ubicacion, remoto, rama, HEAD, upstream, ausencia de
+  divergencia y parentesco del merge. El staging permanecio vacio.
+- Alcance validado: `PSPAdapter` neutral, intento inmutable, estados y errores
+  neutrales diferenciados, ID opcional ante incertidumbre, simulador en
+  memoria determinista, controlador FIFO, idempotencia y recuperacion por
+  consulta.
+- Pruebas focales: 24 ejecutadas y aprobadas, 0 fallos, 0 errores y 0
+  omisiones. Suite completa Docker: 318 ejecutadas, 313 aprobadas, 5 omitidas,
+  0 fallos y 0 errores. `compileall`, enlaces relativos y `git diff --check`:
+  aprobados.
+- PostgreSQL no se ejecuto y no aplica a este incremento. No hubo migraciones,
+  cambios de dependencias ni modificaciones de codigo durante esta sesion.
+- Limitaciones: la evidencia no acredita persistencia, concurrencia o
+  atomicidad PostgreSQL, autenticidad u orden de webhooks ni viabilidad
+  tecnica, contractual o comercial de un PSP. No conecta Mercado Pago, ARCA,
+  HTTP, SDK o flujos productivos.
+- El diseño general 2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la
+  revision juridica/contable continuan pendientes.
+
+Cambios sin commit: este handoff, `docs/CHANGELOG.md` y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`, exclusivamente
+documentales y sin staging. Tests no ejecutados: PostgreSQL, por no aplicar.
+Errores conocidos: ninguno del incremento; se observaron advertencias legacy
+y deprecaciones no bloqueantes ya existentes durante la suite.
+
+Proximo paso recomendado: revision independiente del diff documental y, solo
+con autorizacion posterior, su integracion. No hacer staging, commit, push,
+PR, merge, rebase, deploy ni eliminar ramas como parte de este handoff.
+
 ## Correccion P2 de determinismo en PR #8
 
 Timestamp: 2026-09-09T20:42:09-03:00

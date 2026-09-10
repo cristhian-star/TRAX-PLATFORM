@@ -1,5 +1,31 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-10 - Validacion local post-merge del contrato neutral PSP
+
+Timestamp: 2026-09-10T13:42:55-03:00
+Estado: PSP_ADAPTER_CONTRACT_INTEGRADO_POST_MERGE_VALIDADO_LOCALMENTE_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador tecnico local
+Rama: `develop`
+Base previa: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+PR: #8
+Merge validado: `f9c0e394af413cfcb0c1aa8142a85af16ad3729b`
+
+- Se verifico que `develop` y `origin/develop` apuntan al merge de PR #8 y
+  que su segundo padre es el commit correctivo
+  `8f709e64149d7dfbdeb9c2e1a319f7134ae6f0f4`.
+- Alcance integrado: contrato PSP neutral, DTO y estados inmutables, errores
+  diferenciados, ID opcional ante incertidumbre, simulador determinista en
+  memoria, controlador FIFO e idempotencia con consulta posterior.
+- Focal: 24/24 aprobadas. Suite completa Docker: 318 ejecutadas, 313
+  aprobadas, 5 omitidas, 0 fallos y 0 errores. `compileall`, enlaces relativos
+  y `git diff --check`: aprobados.
+- PostgreSQL no fue ejecutado porque no aplica. No se acreditan persistencia,
+  concurrencia o atomicidad PostgreSQL, autenticidad u orden de webhooks ni
+  viabilidad tecnica, contractual o comercial de un PSP.
+- No se integraron Mercado Pago, ARCA, SDK, HTTP ni flujos productivos. El
+  diseño 2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la revision
+  juridica/contable continuan pendientes.
+
 ## 2026-09-09 - Correccion P2 de determinismo del simulador PSP
 
 Timestamp: 2026-09-09T20:42:09-03:00
