@@ -1,3 +1,135 @@
+# Handoff tecnico: contrato neutral PSP y simulador determinista
+
+## Correccion P2 de determinismo en PR #8
+
+Timestamp: 2026-09-09T20:42:09-03:00
+Estado: READY_TO_RESUME
+Resultado: PSP_ADAPTER_CONTRACT_P2_CORREGIDO_PR_ACTUALIZADO_PENDIENTE_DE_RETEST
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-adapter-contract`
+PR: #8
+Commit observado: `64eed3fdbf16ff55f7994b246a87b514a41a31bb`
+
+- Hallazgo P2: una cola vacia fallaba despues de invocar `id_factory` y
+  `clock`, por lo que dependencias con estado podian avanzar sin creacion.
+- Correccion: `ScenarioController` permite inspeccionar sin consumir; la
+  creacion valida primero la existencia del escenario, luego ID y reloj, y
+  consume exactamente un escenario inmediatamente antes de almacenar.
+- ID duplicado, reloj invalido, validacion, replay, conflicto y consulta no
+  consumen escenarios.
+- Focal: 24/24. Suite completa Docker: 318/318 ejecutadas, 313 aprobadas,
+  5 omisiones historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos
+  y `git diff --check`: aprobados.
+- PostgreSQL no aplica. No se agregaron persistencia, locks, capas, modelos,
+  migraciones ni integraciones productivas.
+- PR #8 permanece abierto y no esta aprobado para merge; requiere retest
+  independiente despues del nuevo commit y push autorizados.
+
+## Retest independiente aprobado para commit
+
+Timestamp: 2026-09-09T20:23:34-03:00
+Estado: READY_TO_RESUME
+Resultado: PSP_ADAPTER_CONTRACT_APROBADO_PARA_COMMIT
+Agente: Codex - ejecutor de integracion autorizado
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+Retest independiente: `APROBADO_PARA_COMMIT` del
+`2026-09-09T20:14:06-03:00`
+
+- P1 y P3: `RESUELTO`; hallazgos actuales P0-P3: ninguno.
+- Focal 22/22; suite completa 311/316, con 5 omisiones historicas,
+  0 fallos y 0 errores.
+- `compileall`, enlaces relativos y `git diff --check`: aprobados.
+- PostgreSQL no se ejecuto ni se acredita; no aplica al incremento en memoria.
+- Estado Git al registrar el retest: seis archivos locales, staging vacio,
+  sin commit, push o PR todavia.
+- Permanecen fuera de alcance persistencia, webhooks, Mercado Pago, ARCA e
+  integracion productiva. El diseño general 2.0 continua
+  `PROPUESTO_NO_APROBADO`.
+
+## Correcciones posteriores a revision independiente
+
+Timestamp: 2026-09-09T20:01:57-03:00
+Estado: READY_TO_RESUME
+Resultado: PSP_ADAPTER_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+Revision recibida: `REQUIERE_CORRECCIONES` del
+`2026-09-09T19:53:36-03:00`, con P1 contractual y P3 de cobertura
+
+- P1: `UncertainResponseError` admite omitir `attempt_id`; la ausencia se
+  representa con `None`, un ID conocido debe ser cadena no vacia y se conserva
+  sin normalizar. El simulador adjunta su ID conocido; un proveedor real puede
+  no tenerlo y la conciliacion conserva la clave idempotente del llamador.
+- P3: la proteccion de dependencias inspecciona imports mediante AST en ambos
+  modulos; las cinco reexportaciones historicas se validan por identidad; se
+  cubrieron orden, rechazo atomico y aislamiento de `enqueue`, y diferenciacion
+  observable de los tres errores neutrales.
+- Focal: 22/22 aprobadas. Suite completa Docker: 311/316 aprobadas, 5 omisiones
+  historicas, 0 fallos y 0 errores. `compileall`, enlaces relativos y
+  `git diff --check`: aprobados. Gates PostgreSQL: no ejecutados; no aplican al
+  incremento en memoria.
+- Estado Git: seis archivos locales, staging vacio, sin commit ni push.
+- Limitaciones: sin persistencia, garantias PostgreSQL, HTTP, SDK, webhooks,
+  Mercado Pago, ARCA o integracion productiva. El diseño 2.0 continua
+  `PROPUESTO_NO_APROBADO`; revision juridica/contable pendiente.
+
+Proximo paso: retest independiente focal. No declarar aprobado ni ejecutar
+staging, commit, push, PR, merge, rebase o deploy sin autorizacion.
+
+## Incremento 2.0-B implementado localmente
+
+Timestamp: 2026-09-08T23:01:15-03:00
+Estado: READY_TO_RESUME
+Resultado: PSP_ADAPTER_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: 02 - Implementacion - Builder
+Objetivo: separar el contrato PSP neutral de la configuracion artificial de
+escenarios del simulador.
+Rama: `feature/psp-adapter-contract`
+Commit base: `2e7de49dfde6c20bc798089139ea235534ea0a75`
+Estado Git inicial: limpio y sincronizado con `origin/develop`
+Estado Git final: cambios locales sin staging ni commit
+Push, PR, merge y deploy: no realizados; no autorizados
+
+- Se creo `app/services/psp_contract.py` como autoridad unica del `Protocol`,
+  DTO inmutable, estados financieros y errores neutrales.
+- `InMemoryPSPSimulator.create_attempt` conserva solo referencia, `Decimal`,
+  moneda y clave idempotente. `ScenarioController` configura por separado una
+  secuencia FIFO determinista y aislada por instancia.
+- Nuevas operaciones consumen un escenario; replay, conflictos y validaciones
+  no lo consumen. La falta de escenario falla antes de almacenar estado.
+- En el simulador, la incertidumbre crea un solo intento `PENDING`, adjunta el
+  identificador que conoce y permite consulta y replay sin repetir el error ni
+  consumir otro escenario. El contrato neutral admite que otro adaptador no
+  conozca el ID y lo represente con `None`.
+- Compatibilidad: el simulador reexporta los nombres historicos del estado y
+  DTO, referenciando las definiciones neutrales sin duplicarlas.
+
+Archivos modificados: `app/services/psp_simulator.py`,
+`tests/test_psp_simulator.py`, `docs/CHANGELOG.md`, este handoff y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`. Archivo creado:
+`app/services/psp_contract.py`. Migraciones y dependencias: ninguna.
+
+Validaciones: focal 17/17; suite completa Docker 306/311, con 5 omisiones
+historicas, 0 fallos y 0 errores; `compileall`, enlaces relativos y
+`git diff --check` aprobados. PostgreSQL gates no ejecutados porque el
+incremento permanece exclusivamente en memoria.
+
+Limitaciones: no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+autenticidad de webhooks ni viabilidad PSP. No conecta Mercado Pago o ARCA ni
+flujos productivos. El diseño 2.0 continua `PROPUESTO_NO_APROBADO` y la revision
+juridica/contable sigue pendiente.
+
+Proximo paso: revision independiente del diff de los seis archivos. No hacer
+staging, commit, push, PR, merge, rebase, deploy ni iniciar obligaciones de
+pago sin autorizacion expresa.
+
+---
+
 # Handoff tecnico: simulador PSP determinista en memoria
 
 ## Integracion confirmada
