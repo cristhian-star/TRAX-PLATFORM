@@ -1,5 +1,58 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-11 - Workflow persistente de pagos con semantica de incertidumbre aprobada
+
+Timestamp: 2026-09-11T19:22:09-03:00
+Estado: PERSISTENT_PAYMENT_WORKFLOW_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/persistent-payment-workflow`
+Commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+
+- La definicion inicial que exigia representar una respuesta incierta como
+  `PENDING` fue reemplazada, tras contrastarla con el esquema vigente y la
+  semantica del dominio. La incertidumbre de transporte persiste con
+  `financial_status=NULL`, resultado `RECONCILIATION_REQUIRED`, conciliacion
+  requerida e identificador externo opcional.
+- `PENDING` queda reservado para una respuesta autoritativa del PSP. La
+  conciliacion explicita desde estado financiero desconocido admite
+  `PENDING`, `APPROVED` o `REJECTED` sin interpretar la incertidumbre como
+  rechazo o aprobacion.
+- Focal del workflow: 13/13. Focal mas regresiones de persistencia,
+  orquestacion, contrato/simulador y guard: 68/68. Gate PostgreSQL: 10/10 en
+  `trax_payment_persistence_test_workflow_contract_20260911`. Suite completa:
+  372 ejecutadas, 367 aprobadas, 5 omisiones historicas, 0 fallos y 0 errores.
+  `compileall`, head Alembic unico `20260910_01`, enlaces relativos y
+  `git diff --check`: aprobados.
+- La base PostgreSQL descartable quedo en cero tablas, fue eliminada y su
+  ausencia se confirmo. No se creo ni modifico una migracion.
+- Permanecen fuera de alcance Mercado Pago, HTTP, webhooks, checkout,
+  creditos, PRO, ARCA, interfaz, dependencias y procesamiento automatico.
+
+## 2026-09-11 - Workflow persistente de pagos, avance bloqueado por contrato de estado
+
+Timestamp: 2026-09-11T19:09:43-03:00
+Estado: PERSISTENT_PAYMENT_WORKFLOW_BLOQUEADO_POR_DEFINICION_DE_ESTADO_INCIERTO
+Agente: Codex - implementador tecnico local
+Rama: `feature/persistent-payment-workflow`
+Commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+
+- Se implemento un coordinador de aplicacion con una transaccion breve para
+  confirmar la obligacion, llamada neutral fuera de sesion activa y una segunda
+  transaccion atomica para persistir el resultado.
+- Incluye replay sin nueva llamada, conflicto previo al adaptador, reanudacion
+  tras fallos, conciliacion explicita por ID o replay y ausencia de retries.
+- Focal y regresiones: 67/67. Gate PostgreSQL: 10/10 en una base descartable
+  eliminada. Suite completa: 371 ejecutadas, 366 aprobadas, 5 omisiones
+  historicas, 0 fallos y 0 errores. `compileall` y head Alembic
+  `20260910_01`: aprobados.
+- Bloqueo: el nuevo alcance pide persistir incertidumbre con estado financiero
+  `PENDING`, pero el esquema vigente `20260910_01` exige
+  `financial_status IS NULL` cuando el resultado es
+  `RECONCILIATION_REQUIRED`. No se altero la migracion sin autorizacion; el
+  flujo conserva temporalmente la representacion canónica integrada (`NULL`).
+- No se conectaron Mercado Pago, HTTP, webhooks, checkout, creditos, PRO, ARCA
+  ni componentes productivos.
+
 ## 2026-09-11 - Integracion de la persistencia neutral de pagos
 
 Timestamp: 2026-09-11T15:46:40-03:00

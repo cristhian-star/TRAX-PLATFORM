@@ -8,6 +8,64 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Workflow persistente de pagos - contrato de incertidumbre resuelto
+
+Timestamp: 2026-09-11T19:22:09-03:00
+Estado: PERSISTENT_PAYMENT_WORKFLOW_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/persistent-payment-workflow`
+Commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+
+La definicion inicial del incremento que vinculaba incertidumbre de transporte
+con `PENDING` fue reemplazada tras contrastarla con el esquema integrado y la
+semantica financiera. La representacion aprobada conserva estado financiero
+`NULL`, resultado `RECONCILIATION_REQUIRED`, conciliacion requerida e
+identificador PSP opcional. `PENDING` queda reservado para una respuesta
+autoritativa del PSP.
+
+Las pruebas cubren incertidumbre con y sin identificador, conciliacion desde
+estado desconocido hacia `PENDING`, `APPROVED` y `REJECTED`, no inferencia de
+rechazo o aprobacion, replay, conflictos y dos transacciones breves sin llamada
+al adaptador dentro de ellas. Workflow: 13/13; focal mas regresiones: 68/68;
+PostgreSQL real: 10/10; suite completa: 372 ejecutadas, 367 aprobadas y 5
+omisiones historicas, sin fallos ni errores. `compileall`, head Alembic unico
+`20260910_01`, enlaces relativos y `git diff --check`: aprobados. La base
+descartable `trax_payment_persistence_test_workflow_contract_20260911` fue
+vaciada por el gate, eliminada y verificada ausente. No existe migracion nueva.
+
+Mercado Pago, HTTP, webhooks, checkout, creditos, PRO, ARCA, interfaz,
+dependencias, procesamiento automatico y la arquitectura 2.0 completa
+permanecen fuera de alcance. El incremento queda pendiente de revision
+independiente y sin integracion Git.
+
+## Workflow persistente de pagos - avance local bloqueado
+
+Timestamp: 2026-09-11T19:09:43-03:00
+Estado: PERSISTENT_PAYMENT_WORKFLOW_BLOQUEADO_POR_DEFINICION_DE_ESTADO_INCIERTO
+Agente: Codex - implementador tecnico local
+Rama: `feature/persistent-payment-workflow`
+Commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+
+Se implemento la coordinacion entre el orquestador neutral y la persistencia
+existente usando dos transacciones breves separadas por la llamada al adaptador.
+El flujo admite replay, fallos antes y despues de la llamada, reanudacion
+idempotente y conciliacion explicita con y sin identificador externo. No llama
+controles internos del simulador desde el servicio ni agrega retries.
+
+Focal y regresiones: 67/67. Gate PostgreSQL: 10/10 sobre
+`trax_payment_persistence_test_workflow_20260911`, limpiada y eliminada. Suite
+completa: 371 ejecutadas, 366 aprobadas, 5 omisiones historicas, sin fallos ni
+errores. `compileall` y head unico `20260910_01`: aprobados.
+
+El estado objetivo no se declara alcanzado porque existe una contradiccion:
+el nuevo paquete exige `PENDING` como estado financiero de una respuesta
+incierta, pero `20260910_01` exige `NULL` para un resultado
+`RECONCILIATION_REQUIRED`. No se modifico Alembic sin autorizacion. Debe
+definirse cual representacion es canónica antes de cerrar el incremento.
+
+Mercado Pago, pagos productivos, webhooks, checkout, creditos, PRO, ARCA y la
+arquitectura 2.0 completa permanecen fuera de alcance.
+
 ## Integracion verificada de payment-persistence-foundation
 
 Timestamp: 2026-09-11T15:46:40-03:00
