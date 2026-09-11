@@ -73,3 +73,14 @@ columna `source_type` y pierde los valores `TRANSACTIONAL`/`SUBSCRIPTION`. Un
 re-upgrade recrea la columna nullable y esas filas vuelven con
 `source_type=NULL`. No ejecutar el downgrade cuando deba conservarse esa
 clasificacion sin respaldo y autorizacion explicita.
+
+# Persistencia neutral de pagos `20260910_01`
+
+Timestamp: 2026-09-11T14:00:30-03:00
+
+La revision `20260910_01`, descendiente de `20260904_01`, crea
+`payment_obligations` y luego `payment_attempts`. El downgrade elimina primero
+los intentos y despues las obligaciones. No contiene backfills ni altera otras
+tablas. `alembic upgrade head` debe resolver un unico head dinamico; no aplicar
+esta migracion ni ejecutar su downgrade sobre `trax_db` durante la etapa de
+revision local.
