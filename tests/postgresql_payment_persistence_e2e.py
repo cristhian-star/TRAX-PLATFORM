@@ -6,6 +6,7 @@ import unittest
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 import sqlalchemy as sa
 from alembic import command
@@ -22,10 +23,12 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.models.payment_attempt import PaymentAttemptRecord
 from app.models.payment_obligation import PaymentObligation
 from app.services.payment_orchestration import (
+    InMemoryPaymentOrchestrator,
     PaymentObligation as PaymentObligationRequest,
     PaymentOrchestrationResult,
     PaymentOutcome,
 )
+from app.services.persistent_payment_workflow import PersistentPaymentWorkflow
 from app.services.payment_persistence_service import (
     PaymentPersistenceConflictError,
     apply_reconciliation,
@@ -33,6 +36,11 @@ from app.services.payment_persistence_service import (
     register_or_get_attempt,
 )
 from app.services.psp_contract import PaymentAttemptStatus
+from app.services.psp_simulator import (
+    InMemoryPSPSimulator,
+    ScenarioController,
+    SimulationScenario,
+)
 from tests.alembic_head_validation import assert_database_at_repository_head
 
 
@@ -365,6 +373,122 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             1,
         )
         session.close()
+
+    def test_persistent_workflow_commits_obligation_before_external_call(self):
+        request = self._request("workflow-visible", "25.50", "workflow-visible-key")
+        observations = []
+        simulator = InMemoryPSPSimulator(
+            id_factory=lambda: "workflow-visible-attempt",
+            clock=lambda: datetime(2026, 9, 11, 22, 0, tzinfo=timezone.utc),
+            scenario_controller=ScenarioController((SimulationScenario.APPROVED,)),
+        )
+
+        class Adapter:
+            def create_attempt(adapter_self, **values):
+                with self.Session() as independent:
+                    observations.append(
+                        independent.query(PaymentObligation).filter_by(
+                            internal_reference=request.internal_reference
+                        ).count()
+                    )
+                return simulator.create_attempt(**values)
+
+            def get_attempt(adapter_self, attempt_id):
+                return simulator.get_attempt(attempt_id)
+
+        workflow = PersistentPaymentWorkflow(
+            session_factory=self.Session,
+            orchestrator=InMemoryPaymentOrchestrator(Adapter()),
+        )
+        result = workflow.process(request)
+        self.assertEqual(observations, [1])
+        self.assertEqual(result.outcome, PaymentOutcome.APPROVED)
+        with self.Session() as independent:
+            self.assertEqual(independent.query(PaymentObligation).count(), 1)
+            self.assertEqual(independent.query(PaymentAttemptRecord).count(), 1)
+
+    def test_persistent_workflow_rolls_back_result_and_recovers_by_adapter_replay(self):
+        request = self._request("workflow-recovery", "90", "workflow-recovery-key")
+        simulator = InMemoryPSPSimulator(
+            id_factory=lambda: "workflow-recovery-attempt",
+            clock=lambda: datetime(2026, 9, 11, 22, 5, tzinfo=timezone.utc),
+            scenario_controller=ScenarioController((SimulationScenario.APPROVED,)),
+        )
+        orchestrator = InMemoryPaymentOrchestrator(simulator)
+        workflow = PersistentPaymentWorkflow(
+            session_factory=self.Session,
+            orchestrator=orchestrator,
+        )
+        original = register_or_get_attempt
+
+        def fail_after_flush(session, obligation, result):
+            original(session, obligation, result)
+            raise RuntimeError("forced failure after result flush")
+
+        with patch(
+            "app.services.persistent_payment_workflow.register_or_get_attempt",
+            side_effect=fail_after_flush,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "forced failure"):
+                workflow.process(request)
+        with self.Session() as independent:
+            self.assertEqual(independent.query(PaymentObligation).count(), 1)
+            self.assertEqual(independent.query(PaymentAttemptRecord).count(), 0)
+
+        result = workflow.process(request)
+        self.assertEqual(result.outcome, PaymentOutcome.APPROVED)
+        self.assertEqual(simulator.attempt_count, 1)
+        with self.Session() as independent:
+            self.assertEqual(independent.query(PaymentAttemptRecord).count(), 1)
+
+    def test_persistent_workflow_reconciles_with_external_call_between_transactions(self):
+        request = self._request("workflow-reconcile", "75", "workflow-reconcile-key")
+        observations = []
+        simulator = InMemoryPSPSimulator(
+            id_factory=lambda: "workflow-reconcile-attempt",
+            clock=lambda: datetime(2026, 9, 11, 22, 10, tzinfo=timezone.utc),
+            scenario_controller=ScenarioController((SimulationScenario.UNCERTAIN,)),
+        )
+
+        class Adapter:
+            def create_attempt(adapter_self, **values):
+                return simulator.create_attempt(**values)
+
+            def get_attempt(adapter_self, attempt_id):
+                with self.Session() as independent:
+                    observations.append(
+                        independent.query(PaymentAttemptRecord).filter_by(
+                            idempotency_key=request.idempotency_key,
+                            requires_reconciliation=True,
+                        ).count()
+                    )
+                return simulator.get_attempt(attempt_id)
+
+        workflow = PersistentPaymentWorkflow(
+            session_factory=self.Session,
+            orchestrator=InMemoryPaymentOrchestrator(Adapter()),
+        )
+        uncertain = workflow.process(request)
+        self.assertEqual(uncertain.outcome, PaymentOutcome.RECONCILIATION_REQUIRED)
+        self.assertIsNone(uncertain.financial_status)
+        self.assertTrue(uncertain.requires_reconciliation)
+        self.assertEqual(uncertain.attempt_id, "workflow-reconcile-attempt")
+        with self.Session() as independent:
+            stored = independent.query(PaymentAttemptRecord).filter_by(
+                idempotency_key=request.idempotency_key
+            ).one()
+            self.assertIsNone(stored.financial_status)
+            self.assertEqual(
+                stored.orchestration_result,
+                PaymentOutcome.RECONCILIATION_REQUIRED.value,
+            )
+            self.assertTrue(stored.requires_reconciliation)
+            self.assertEqual(
+                stored.external_attempt_id, "workflow-reconcile-attempt"
+            )
+        result = workflow.reconcile(request)
+        self.assertEqual(observations, [1])
+        self.assertEqual(result.outcome, PaymentOutcome.PENDING)
 
 
 if __name__ == "__main__":

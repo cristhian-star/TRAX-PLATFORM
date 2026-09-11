@@ -1,5 +1,84 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Workflow persistente de pagos - semantica aprobada implementada
+
+Timestamp: 2026-09-11T19:22:09-03:00
+Estado: COMPLETED
+Resultado: PERSISTENT_PAYMENT_WORKFLOW_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/persistent-payment-workflow`
+HEAD/commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+Estado Git inicial: seis cambios locales esperados, sin staging
+Estado Git final: seis cambios locales sin staging, commit ni push
+
+Definicion resuelta: la regla inicial que exigia `PENDING` ante incertidumbre
+fue reemplazada despues de contrastarla con el esquema `20260910_01` y la
+semantica del dominio. Una respuesta incierta queda con estado financiero
+`NULL`, resultado `RECONCILIATION_REQUIRED`, conciliacion requerida e ID
+externo opcional. `PENDING` se usa solo ante una respuesta autoritativa. La
+conciliacion explicita puede resolver el estado desconocido a `PENDING`,
+`APPROVED` o `REJECTED`.
+
+Trabajo completado: se formalizo la regla en el workflow y se reforzaron las
+pruebas portables y PostgreSQL, incluyendo observacion independiente de la
+fila incierta, variantes con y sin ID, las tres transiciones autorizadas,
+replay, conflictos y el limite de dos transacciones sin adaptador dentro de
+ellas. No se creo ni modifico una migracion.
+
+Validacion: workflow 13/13; focal mas regresiones 68/68; gate PostgreSQL 10/10
+sobre `trax_payment_persistence_test_workflow_contract_20260911`; suite
+completa 372 ejecutadas, 367 aprobadas, 5 omisiones historicas, 0 fallos y 0
+errores; `compileall` aprobado; head Alembic unico `20260910_01`; enlaces
+relativos y `git diff --check` aprobados. La base descartable quedo en cero
+tablas, fue eliminada y su ausencia se confirmo.
+
+Limitaciones y pendientes: revision independiente e integracion Git. No se
+agregaron Mercado Pago, HTTP, webhooks, checkout, creditos, PRO, ARCA,
+interfaz, dependencias ni procesamiento automatico. No hubo commit, push, PR,
+merge ni deploy. Proximo paso: revision independiente de los seis archivos
+locales; no integrar sin nueva autorizacion explicita.
+
+## Workflow persistente de pagos - definicion requerida
+
+Timestamp: 2026-09-11T19:09:43-03:00
+Estado: BLOCKED
+Resultado: PERSISTENT_PAYMENT_WORKFLOW_BLOQUEADO_POR_DEFINICION_DE_ESTADO_INCIERTO
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/persistent-payment-workflow`
+HEAD/commit base: `dfbb7e3f53e61638eb52113286870eca1b59d031`
+Estado Git inicial: limpio, staging vacio y `develop` sincronizado 0/0
+Estado Git final: cambios locales sin staging, commit ni push
+
+Trabajo completado: servicio `PersistentPaymentWorkflow`, pruebas portables y
+extensiones del gate PostgreSQL. La obligacion se confirma antes de invocar al
+adaptador; no existe sesion activa durante la llamada; el resultado se confirma
+en otra transaccion. Replays terminales no llaman nuevamente, los conflictos
+se detectan antes de la llamada, y los fallos posteriores pueden recuperarse
+mediante la idempotencia neutral del adaptador. La conciliacion es explicita y
+sin loops, cron o retries automaticos.
+
+Validacion ejecutada: focal y regresiones 67/67; gate PostgreSQL 10/10 sobre
+`trax_payment_persistence_test_workflow_20260911`; suite completa 371
+ejecutadas, 366 aprobadas, 5 omisiones historicas, 0 fallos y 0 errores;
+`compileall` aprobado; head Alembic unico `20260910_01`. La base descartable
+quedo en cero tablas, fue eliminada y su ausencia se confirmo. Enlaces
+relativos y `git diff --check`: aprobados en el control documental final.
+
+Bloqueante: el paquete exige que una respuesta incierta se persista con
+`financial_status=PENDING`, mientras el constraint integrado
+`ck_payment_attempts_result_coherent` exige `financial_status IS NULL` para
+`RECONCILIATION_REQUIRED`. Cumplir ambos es imposible con el esquema actual.
+No se creo ni modifico una migracion. Se requiere decidir si se conserva
+`NULL` como estado financiero desconocido o se autoriza una revisión de esquema
+y contrato para representar `PENDING`.
+
+No se modificaron rutas ni UI y no se incorporaron Mercado Pago, HTTP, SDK,
+OAuth, webhooks, checkout, creditos, suscripciones, PRO, ARCA o deploy. No se
+realizo commit, push, PR ni merge. Proximo paso: resolver exclusivamente la
+representacion de incertidumbre y luego repetir la validacion afectada.
+
 ## Integracion y verificacion post-merge de persistencia neutral
 
 Timestamp: 2026-09-11T15:46:40-03:00
