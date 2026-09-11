@@ -4,12 +4,26 @@ from flask import (
     current_app,
     redirect,
     render_template,
+    request,
     session,
 )
+from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
 
 from app.models.user import User
 from app.services.subscription_service import has_pro_access
 from app.services.verification_service import has_approved_verification
+from app.services.payment_orchestration import (
+    InMemoryPaymentOrchestrator,
+    InvalidPaymentRequestError,
+    PaymentObligation,
+    PaymentOutcome,
+)
+from app.services.psp_simulator import (
+    InMemoryPSPSimulator,
+    ScenarioController,
+    SimulationScenario,
+)
 
 dev = Blueprint("dev", __name__)
 
@@ -53,6 +67,82 @@ def _user_row(user):
     }
 
 
+_PAYMENT_SCENARIOS = {
+    "APPROVED": SimulationScenario.APPROVED,
+    "REJECTED": SimulationScenario.REJECTED,
+    "PENDING": SimulationScenario.PENDING,
+    "UNCERTAIN": SimulationScenario.UNCERTAIN,
+}
+
+_PAYMENT_RESULT_PRESENTATION = {
+    PaymentOutcome.APPROVED: (
+        "success",
+        "Pago aprobado",
+        "El adaptador informo una aprobacion financiera.",
+    ),
+    PaymentOutcome.REJECTED: (
+        "danger",
+        "Pago rechazado",
+        "El adaptador informo un rechazo financiero.",
+    ),
+    PaymentOutcome.PENDING: (
+        "warning",
+        "Pago pendiente",
+        "El intento existe, pero su resultado financiero sigue pendiente.",
+    ),
+    PaymentOutcome.RECONCILIATION_REQUIRED: (
+        "warning",
+        "Conciliacion requerida",
+        "La respuesta de transporte fue incierta; no equivale a un rechazo.",
+    ),
+}
+
+
+def _payment_form_values():
+    return {
+        "internal_reference": request.form.get("internal_reference", ""),
+        "amount": request.form.get("amount", ""),
+        "currency": request.form.get("currency", "ARS"),
+        "idempotency_key": request.form.get("idempotency_key", ""),
+        "scenario": request.form.get("scenario", "APPROVED"),
+    }
+
+
+def _payment_form_submission(values):
+    errors = {}
+    amount = None
+    try:
+        amount = Decimal(values["amount"].strip())
+    except (InvalidOperation, AttributeError):
+        errors["amount"] = "Ingresa un importe numerico valido."
+
+    if not values["internal_reference"].strip():
+        errors["internal_reference"] = "Ingresa una referencia interna."
+    if not values["currency"].strip():
+        errors["currency"] = "Ingresa una moneda."
+    if not values["idempotency_key"].strip():
+        errors["idempotency_key"] = "Ingresa una clave idempotente."
+    elif values["idempotency_key"] != values["idempotency_key"].strip():
+        errors["idempotency_key"] = "La clave no puede tener espacios al inicio o final."
+    scenario = _PAYMENT_SCENARIOS.get(values["scenario"])
+    if scenario is None:
+        errors["scenario"] = "Selecciona un escenario valido."
+    if errors:
+        return None, None, errors
+
+    try:
+        obligation = PaymentObligation(
+            internal_reference=values["internal_reference"],
+            amount=amount,
+            currency=values["currency"],
+            idempotency_key=values["idempotency_key"],
+        )
+    except InvalidPaymentRequestError:
+        errors["amount"] = "El importe debe ser mayor que cero y finito."
+        return None, None, errors
+    return obligation, scenario, errors
+
+
 @dev.route("/dev/qa", methods=["GET"])
 def qa_panel():
     _require_dev_qa_panel()
@@ -65,6 +155,42 @@ def qa_panel():
         current_user_id=session.get("user_id"),
         current_user_name=session.get("user_name"),
         current_user_role=session.get("user_role"),
+    )
+
+
+@dev.route("/dev/qa/payments/simulator", methods=["GET", "POST"])
+def payment_simulator():
+    _require_dev_qa_panel()
+
+    values = {
+        "internal_reference": "",
+        "amount": "",
+        "currency": "ARS",
+        "idempotency_key": "",
+        "scenario": "APPROVED",
+    }
+    errors = {}
+    result = None
+    presentation = None
+
+    if request.method == "POST":
+        values = _payment_form_values()
+        obligation, scenario, errors = _payment_form_submission(values)
+        if not errors:
+            simulator = InMemoryPSPSimulator(
+                id_factory=lambda: "dev-payment-attempt-001",
+                clock=lambda: datetime.now(timezone.utc),
+                scenario_controller=ScenarioController((scenario,)),
+            )
+            result = InMemoryPaymentOrchestrator(simulator).process(obligation)
+            presentation = _PAYMENT_RESULT_PRESENTATION[result.outcome]
+
+    return render_template(
+        "dev_payment_simulator.html",
+        form_values=values,
+        errors=errors,
+        result=result,
+        presentation=presentation,
     )
 
 

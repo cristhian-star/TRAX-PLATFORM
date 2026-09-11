@@ -1,5 +1,34 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-10 - Interfaz interna del simulador de pagos
+
+Timestamp: 2026-09-10T21:46:04-03:00
+Estado: PAYMENT_ORCHESTRATION_AND_SIMULATOR_UI_APROBADOS_PARA_COMMIT_Y_PR
+Agente: Codex - implementador tecnico y frontend local
+Dispositivo: laptop / Codex Desktop local
+Rama: `feature/payment-orchestration-in-memory`
+Commit base observado: `a4951a27f0f0bef5fa834ad25159abfc875ec59e`
+Revision independiente: `APROBADO_PARA_SEGUNDO_COMMIT_Y_PR` del
+`2026-09-10T22:02:38-03:00`; hallazgos P0-P3: ninguno.
+
+- Se agrego `/dev/qa/payments/simulator` dentro del blueprint de desarrollo,
+  protegido por ambiente y `ENABLE_DEV_QA_PANEL`; produccion no registra la
+  ruta y el estado deshabilitado responde 404.
+- La pantalla compone por solicitud un simulador aislado y el orquestador
+  neutral para visualizar aprobado, rechazado, pendiente o conciliacion
+  requerida. No conserva historial ni modifica datos.
+- Usa componentes y tokens del Design System v2, formulario semantico,
+  mensajes accesibles, `aria-live` y composicion responsive sin JavaScript
+  propio.
+- Focal interfaz + orquestador: 29/29; contrato/simulador: 24/24. Suite
+  completa: 347 ejecutadas, 342 aprobadas, 5 omisiones historicas, 0 fallos y
+  0 errores. `compileall`, HTML, enlaces y `git diff --check`: aprobados.
+- QA visual aprobada en claro/oscuro, movil/desktop y teclado. PostgreSQL no
+  aplica.
+- No es checkout ni mueve dinero. Mercado Pago, persistencia, webhooks,
+  creditos, PRO y revision juridica/contable siguen fuera de alcance; el
+  diseño 2.0 permanece `PROPUESTO_NO_APROBADO`.
+
 ## 2026-09-10 - Orquestacion neutral de pagos en memoria
 
 Timestamp: 2026-09-10T21:23:10-03:00
