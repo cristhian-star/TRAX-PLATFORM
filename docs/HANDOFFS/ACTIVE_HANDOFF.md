@@ -1,5 +1,88 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Correccion P2 - clasificacion de violaciones de integridad
+
+Timestamp: 2026-09-11T14:41:40-03:00
+Estado: READY_TO_RESUME
+Resultado: PAYMENT_PERSISTENCE_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/payment-persistence-foundation`
+HEAD/commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+Estado Git: 14 cambios locales autorizados, sin staging, commit ni push
+Revision independiente historica: `REQUIERE_CORRECCIONES`; se conserva como
+evidencia del P2 y no se reemplaza por una aprobacion anticipada
+
+Se ajusto unicamente `register_or_get_attempt()`: el camino de recuperación de
+la carrera idempotente exige SQLSTATE `23505` y
+`diag.constraint_name=uq_payment_attempts_idempotency_key`. Si el driver no
+identifica ambos valores, o informa FK/check/otra constraint, el
+`IntegrityError` se relanza intacto. El servicio mantiene `flush()`, savepoint
+y transaccion superior controlada por el llamador, sin commits internos.
+
+Validacion: focal 55/55; gate PostgreSQL real 7/7 sobre
+`trax_payment_persistence_test_p2_20260911`; suite completa 359 ejecutadas, 354
+aprobadas, 5 omisiones historicas, 0 fallos y 0 errores; `compileall` aprobado;
+head Alembic unico `20260910_01`. La base descartable quedo en cero tablas, fue
+eliminada y su ausencia se confirmo. Enlaces relativos y `git diff --check`:
+aprobados en el control final.
+
+No se modificaron esquema ni migracion. `trax_db`, Mercado Pago, PSP real,
+webhooks, produccion y diseño general 2.0 no fueron acreditados. Proximo paso:
+retest independiente del P2 y del paquete local completo. No ejecutar commit,
+push, PR, merge o deploy sin autorizacion expresa.
+
+## Persistencia neutral minima de pagos
+
+Timestamp: 2026-09-11T14:00:30-03:00
+Estado: READY_TO_RESUME
+Resultado: PAYMENT_PERSISTENCE_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Objetivo: persistir obligaciones e intentos ya producidos por el orquestador
+neutral, con idempotencia, conciliacion y limites transaccionales explicitos
+Rama: `feature/payment-persistence-foundation`
+HEAD/commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+Estado Git inicial: limpio; `develop` y `origin/develop` sincronizados
+Estado Git final: cambios locales sin staging, commit ni push
+Push, PR, merge y deploy: no realizados; no autorizados
+Integracion previa: PR #9 integrado mediante
+`c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+
+Trabajo completado:
+
+- Modelos `PaymentObligation` y `PaymentAttemptRecord` registrados en el
+  metadata de SQLAlchemy.
+- Migracion `20260910_01` sobre `20260904_01`, con dos tablas, constraints e
+  indice nombrados y downgrade inverso.
+- Servicio de persistencia con sesion explicita, replay, conflicto,
+  recuperacion y conciliacion; no ejecuta `commit()` ni llama al PSP.
+- Pruebas portables y de migracion, prueba adversarial de la guarda y gate
+  PostgreSQL real de concurrencia, visibilidad, locks, FK, rollback y
+  recuperacion de sesion.
+
+Validaciones:
+
+- Focal portable mas regresiones PSP/orquestador: 55/55.
+- Gate PostgreSQL: 6/6 sobre
+  `trax_payment_persistence_test_20260911a`; ciclo
+  upgrade/downgrade/upgrade aprobado, limpieza a cero tablas verificada y base
+  eliminada con cero coincidencias posteriores.
+- Suite completa Docker/SQLite aislada: 359 ejecutadas, 354 aprobadas, 5
+  omisiones historicas, 0 fallos y 0 errores.
+- `compileall`: aprobado. Head Alembic unico: `20260910_01`.
+- Enlaces relativos y `git diff --check`: aprobados en la verificacion final.
+
+No se modifico ni reseteo `trax_db`. No se implementaron llamadas PSP,
+Mercado Pago, HTTP, SDK, OAuth, webhooks, checkout, interfaz persistente,
+creditos, comisiones, suscripciones, PRO, ARCA o Enterprise. La coordinacion
+durable alrededor de una llamada externa queda pendiente de otro incremento y
+el diseño 2.0 permanece `PROPUESTO_NO_APROBADO`.
+
+Proximo paso recomendado: revision independiente del diff local, incluida la
+migracion y la evidencia PostgreSQL. No hacer commit, push, PR o merge sin una
+autorizacion posterior expresa.
+
 ## Interfaz interna del simulador de pagos
 
 Timestamp: 2026-09-10T21:46:04-03:00

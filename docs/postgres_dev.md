@@ -134,3 +134,31 @@ El gate PRO incluye una ruta administrativa real con autenticacion
 confirma desde una conexion independiente que ambas revocaciones se revierten,
 que no queda auditoria parcial, que la sesion se recupera y que una operacion
 valida posterior confirma conjuntamente revocacion y auditoria.
+
+## Gate PostgreSQL de persistencia neutral de pagos
+
+Timestamp: 2026-09-11T14:00:30-03:00
+
+El gate usa `TRAX_POSTGRES_PAYMENT_TEST_URL` y exige
+`TRAX_POSTGRES_TEST_ALLOW_RESET=1`. El nombre normalizado debe cumplir:
+
+```text
+^trax_payment_persistence_test(?:_[a-z0-9]+(?:_[a-z0-9]+)*)?$
+```
+
+El nombre completo admite hasta 63 bytes. La guarda rechaza `trax_db`,
+`postgres`, templates, parametros, nombres arbitrarios y caracteres fuera de
+los segmentos ASCII permitidos antes de crear el engine o mutar datos.
+
+Ejemplo para una base creada exclusivamente para una corrida:
+
+```powershell
+$env:TRAX_POSTGRES_PAYMENT_TEST_URL = "postgresql+psycopg2://usuario:clave@localhost/trax_payment_persistence_test_revision_01"
+$env:TRAX_POSTGRES_TEST_ALLOW_RESET = "1"
+python -m unittest tests.postgresql_payment_persistence_e2e
+```
+
+El gate obtiene el head Alembic dinamicamente, exige un solo head y valida el
+grafo historico. Ejecuta upgrade/downgrade/upgrade, concurrencia y rollback; al
+final baja a `base`, elimina `alembic_version` y exige cero tablas. La base
+descartable debe eliminarse despues de verificar la limpieza.

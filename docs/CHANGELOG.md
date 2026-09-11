@@ -1,5 +1,54 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-11 - Correccion focal de integridad en intentos de pago
+
+Timestamp: 2026-09-11T14:41:40-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/payment-persistence-foundation`
+Commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+
+- Se corrigio el P2 de la revision independiente: el replay de intentos se
+  recupera exclusivamente ante SQLSTATE `23505` y la constraint estructurada
+  `uq_payment_attempts_idempotency_key`.
+- Violaciones FK, checks u otras constraints conservan el `IntegrityError`
+  original; no se transforman en `NoResultFound`.
+- Regresion PostgreSQL: el FK inexistente expone `23503` y
+  `fk_payment_attempts_obligation`, no deja escritura parcial y permite
+  reutilizar la sesion tras el rollback del llamador.
+- Focal: 55/55. Gate PostgreSQL: 7/7. Suite completa: 359 ejecutadas, 354
+  aprobadas, 5 omisiones historicas, 0 fallos y 0 errores. `compileall` y head
+  Alembic `20260910_01`: aprobados.
+- La correccion no modifica esquema, migracion, contrato PSP, simulador,
+  orquestacion o interfaz. No acredita Mercado Pago, webhooks, produccion ni el
+  diseño general 2.0.
+
+## 2026-09-11 - Base de persistencia neutral de pagos
+
+Timestamp: 2026-09-11T14:00:30-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo: laptop / Codex Desktop local
+Rama: `feature/payment-persistence-foundation`
+Commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+
+- Se registraron dos modelos neutrales: obligaciones monetarias e intentos de
+  pago, con `NUMERIC` sin precision o escala impuesta, claves unicas, FK
+  `RESTRICT` y constraints de dominio/coherencia.
+- La migracion `20260910_01`, descendiente de `20260904_01`, crea y elimina las
+  tablas en orden seguro sin backfills ni cambios sobre datos existentes.
+- El servicio usa una sesion explicita, `flush()` y transacciones controladas
+  por el llamador; implementa replay, conflictos y conciliaciones permitidas
+  sin llamar a un PSP ni ejecutar commits internos.
+- Focal portable y regresiones PSP/orquestador: 55/55. Gate PostgreSQL real:
+  6/6 en una base reservada descartable. Suite completa: 359 ejecutadas, 354
+  aprobadas, 5 omisiones historicas, 0 fallos y 0 errores. `compileall` y head
+  Alembic `20260910_01`: aprobados.
+- PR #9 fue integrado mediante
+  `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`. Este incremento no conecta
+  Mercado Pago ni acredita checkout, webhooks, creditos, PRO, ARCA o una
+  arquitectura 2.0 integral, que permanece `PROPUESTO_NO_APROBADO`.
+
 ## 2026-09-10 - Interfaz interna del simulador de pagos
 
 Timestamp: 2026-09-10T21:46:04-03:00

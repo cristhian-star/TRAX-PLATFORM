@@ -8,6 +8,59 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Correccion focal P2 de persistencia
+
+Timestamp: 2026-09-11T14:41:40-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/payment-persistence-foundation`
+Commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+
+La revision independiente `REQUIERE_CORRECCIONES` detecto que una violacion FK
+durante `register_or_get_attempt()` podia reinterpretarse como replay y terminar
+en `NoResultFound`. La correccion limita la recuperacion a la unicidad
+idempotente comprobada mediante SQLSTATE `23505` y nombre estructurado de la
+constraint. FK, checks y errores no identificables conservan su
+`IntegrityError` original.
+
+La regresion PostgreSQL confirma SQLSTATE `23503`, constraint
+`fk_payment_attempts_obligation`, cero escrituras parciales y recuperacion de
+la sesion tras rollback. Focal: 55/55; gate PostgreSQL: 7/7; suite completa:
+359 ejecutadas, 354 aprobadas, 5 omisiones historicas, 0 fallos y 0 errores;
+`compileall` y head unico `20260910_01`: aprobados. La base descartable
+`trax_payment_persistence_test_p2_20260911` fue limpiada y eliminada.
+
+No cambia el esquema ni acredita Mercado Pago, webhooks, produccion o el diseño
+general 2.0. El paquete permanece pendiente de retest independiente.
+
+## Incremento local - persistencia neutral minima de pagos
+
+Timestamp: 2026-09-11T14:00:30-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/payment-persistence-foundation`
+Commit base: `c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`
+Migracion: `20260910_01`, descendiente de `20260904_01`
+
+Se agrego una base minima de dos tablas para persistir obligaciones monetarias
+e intentos/resultados ya obtenidos por el orquestador. El servicio no llama al
+PSP y deja `commit()`/rollback bajo control del llamador. Unicidad, FK, importe
+positivo, estados y coherencia se protegen en el esquema; la conciliacion usa
+lock de fila solamente para serializar cambios concurrentes del mismo intento.
+
+Focal portable y regresiones PSP/orquestador: 55/55. Gate PostgreSQL real: 6/6
+en `trax_payment_persistence_test_20260911a`, con carreras idempotentes y
+conflictivas, visibilidad transaccional, rollback, recuperacion y ciclo
+upgrade/downgrade/upgrade. La base quedo sin tablas y fue eliminada. Suite
+completa: 359 ejecutadas, 354 aprobadas, 5 omisiones historicas, 0 fallos y 0
+errores. `compileall` y head unico `20260910_01`: aprobados.
+
+PR #9 fue integrado mediante
+`c78c5176cf3c43cdbab673454fc6a625b1b3c0fa`. No se toco `trax_db` y no se
+implementaron persistencia de coordinacion externa, Mercado Pago, checkout,
+webhooks, creditos, comisiones, PRO, ARCA ni Enterprise. El diseño general 2.0
+continua `PROPUESTO_NO_APROBADO`.
+
 ## Alcance y continuidad historica
 
 Esta secuencia no reinicia la numeracion historica ni modifica el cierre de

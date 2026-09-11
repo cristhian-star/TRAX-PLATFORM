@@ -74,6 +74,8 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.negotiation_event import NegotiationEvent
     from app.models.whatsapp_contact_session import WhatsAppContactSession
     from app.models.professional_media import ProfessionalMedia
+    from app.models.payment_obligation import PaymentObligation
+    from app.models.payment_attempt import PaymentAttemptRecord
 
     if initialize_schema:
         if not app.config.get("ALLOW_SCHEMA_CREATE_ALL"):
