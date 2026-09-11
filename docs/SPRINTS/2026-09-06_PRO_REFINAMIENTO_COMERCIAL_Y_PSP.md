@@ -191,6 +191,74 @@ Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
 
 ### Incremento 2.0-B: contrato neutral PSP
 
+#### Interfaz interna de desarrollo para simulacion visual
+
+Timestamp: 2026-09-10T21:46:04-03:00
+Estado: `PAYMENT_ORCHESTRATION_AND_SIMULATOR_UI_APROBADOS_PARA_COMMIT_Y_PR`
+Agente: Codex - implementador tecnico y frontend local
+Dispositivo: laptop / Codex Desktop local
+Rama y commit base: `feature/payment-orchestration-in-memory` sobre
+`a4951a27f0f0bef5fa834ad25159abfc875ec59e`
+Revision independiente: `APROBADO_PARA_SEGUNDO_COMMIT_Y_PR` del
+`2026-09-10T22:02:38-03:00`, sin hallazgos P0-P3.
+
+Se implemento `/dev/qa/payments/simulator` como pantalla server-rendered del
+blueprint interno. Solo se registra en development/testing, requiere
+`ENABLE_DEV_QA_PANEL` y responde 404 cuando no esta habilitada o cuando la
+aplicacion usa configuracion de produccion.
+
+Cada envio compone una instancia nueva del controlador de escenarios,
+simulador y orquestador. La interfaz permite observar aprobacion, rechazo,
+pendiente financiero e incertidumbre como conciliacion requerida, conserva
+valores ante validacion fallida y no usa `float`, historial, estado global,
+polling o retries. Usa el Design System v2 y no agrega JavaScript.
+
+La focal de interfaz y orquestacion aprobo 29/29 y la del contrato/simulador
+24/24. La suite completa ejecuto 347 pruebas: 342 aprobadas, 5 omisiones
+historicas, 0 fallos y 0 errores. `compileall`, HTML, enlaces y
+`git diff --check` aprobaron. QA visual aprobada en claro/oscuro,
+movil/desktop y teclado. PostgreSQL no aplica.
+
+Esta herramienta no es checkout, no mueve dinero y no acredita integracion o
+viabilidad PSP. No agrega persistencia, modelos, migraciones, HTTP, SDK, OAuth,
+webhooks, creditos, reservas, comisiones, suscripciones, PRO, Mercado Pago o
+ARCA. El diseño general 2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y
+la revision juridica/contable continuan pendientes.
+
+#### Incremento local posterior: orquestacion neutral de pagos en memoria
+
+Timestamp: 2026-09-10T21:23:10-03:00
+Estado: `PAYMENT_ORCHESTRATION_IN_MEMORY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION`
+Agente: Codex - implementador tecnico local
+Dispositivo: laptop / Codex Desktop local
+Rama y commit base: `feature/payment-orchestration-in-memory` sobre
+`e7ec86f217ebbbd836f7434092041e6abefbbe4a`
+
+Se implemento una orquestacion aislada y en memoria que recibe una obligacion
+monetaria inmutable, depende unicamente de `PSPAdapter` y diferencia pago
+aprobado, rechazado, pendiente financiero e incertidumbre que requiere
+conciliacion. El resultado conserva referencia, importe exacto, moneda, clave
+idempotente, ID opcional, estado financiero conocido e indicador de
+conciliacion.
+
+La conciliacion es siempre explicita: con ID consulta `get_attempt`; sin ID
+repite una unica vez la creacion con los mismos datos y clave. Una nueva
+incertidumbre conserva `RECONCILIATION_REQUIRED`. No existe almacenamiento
+propio, retries automaticos, esperas, temporizadores, aleatoriedad o IDs
+inventados. Los importes usan `Decimal`, deben ser positivos y finitos y no se
+cuantizan ni redondean.
+
+La focal nueva aprobo 19/19 y la focal del contrato/simulador 24/24. La suite
+completa Docker ejecuto 337 pruebas: 332 aprobadas, 5 omitidas, 0 fallos y 0
+errores. `compileall` aprobo. PostgreSQL no se ejecuto porque no aplica.
+
+No se incorporaron persistencia, SQLAlchemy, modelos, migraciones, HTTP, SDK,
+OAuth, webhooks, rutas, UI, creditos, reservas, comisiones, suscripciones, PRO,
+Mercado Pago o ARCA. La evidencia no acredita persistencia, concurrencia o
+atomicidad PostgreSQL, autenticidad u orden de webhooks ni viabilidad PSP. El
+diseño general 2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la
+revision juridica/contable continuan pendientes.
+
 Validacion local post-merge registrada el `2026-09-10T13:42:55-03:00` por
 Codex - implementador tecnico local, sobre `develop`. Estado:
 `PSP_ADAPTER_CONTRACT_INTEGRADO_POST_MERGE_VALIDADO_LOCALMENTE_PENDIENTE_DE_REVISION_DOCUMENTAL`.

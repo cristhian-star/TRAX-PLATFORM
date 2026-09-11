@@ -1,0 +1,105 @@
+.payment-simulator-page .trax-container {
+    max-width: var(--trax-ds-container-wide);
+}
+
+.payment-simulator-layout {
+    display: grid;
+    gap: var(--trax-ds-grid-gap);
+}
+
+.payment-simulator-layout h2,
+.payment-simulator-layout p {
+    margin-block: 0;
+}
+
+.payment-simulator-fields {
+    display: grid;
+    gap: var(--trax-ds-space-4);
+}
+
+.payment-simulator-scenarios {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.payment-simulator-option {
+    display: flex;
+    min-height: var(--trax-ds-control-height-md);
+    align-items: center;
+    gap: var(--trax-ds-space-3);
+    padding: var(--trax-ds-space-3) var(--trax-ds-space-4);
+    border: var(--trax-ds-border-width) var(--trax-ds-border-style) var(--trax-ds-border-subtle);
+    border-radius: var(--trax-ds-radius-md);
+    background: var(--trax-ds-surface-soft);
+    color: var(--trax-ds-text);
+    cursor: pointer;
+}
+
+.payment-simulator-option:focus-within {
+    box-shadow: var(--trax-ds-shadow-focus);
+}
+
+.payment-simulator-submit {
+    padding-inline: 0;
+    padding-bottom: 0;
+}
+
+.payment-simulator-result {
+    align-self: start;
+}
+
+.payment-simulator-facts {
+    display: grid;
+    gap: var(--trax-ds-space-4);
+    margin: 0;
+}
+
+.payment-simulator-facts div {
+    display: grid;
+    gap: var(--trax-ds-space-1);
+    padding-bottom: var(--trax-ds-space-3);
+    border-bottom: var(--trax-ds-border-width) var(--trax-ds-border-style) var(--trax-ds-border-subtle);
+}
+
+.payment-simulator-facts dt {
+    color: var(--trax-ds-text-muted);
+    font-size: var(--trax-ds-font-size-sm);
+    font-weight: var(--trax-ds-font-weight-bold);
+}
+
+.payment-simulator-facts dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--trax-ds-text-strong);
+    font-weight: var(--trax-ds-font-weight-extrabold);
+}
+
+.payment-simulator-empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--trax-ds-space-3);
+    color: var(--trax-ds-text-muted);
+}
+
+@media (min-width: 42rem) {
+    .payment-simulator-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .payment-simulator-scenarios {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .payment-simulator-scenarios legend,
+    .payment-simulator-scenarios .trax-field__error {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 64rem) {
+    .payment-simulator-layout {
+        grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+        align-items: start;
+    }
+}

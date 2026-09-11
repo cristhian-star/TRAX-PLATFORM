@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dev-payment-simulator.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="trax-page payment-simulator-page">
+    <div class="trax-container trax-stack">
+        <header class="trax-page__header">
+            <span class="trax-badge trax-badge--info">Herramienta interna MANDOBRA</span>
+            <h1 class="trax-page__title">Simulador de pagos</h1>
+            <p class="trax-page__description">
+                Carga una obligacion y observa como MANDOBRA interpreta una respuesta simulada.
+            </p>
+        </header>
+
+        <div class="trax-alert trax-alert--warning" role="note">
+            <div class="trax-alert__content">
+                <strong class="trax-alert__title">Entorno de prueba. No mueve dinero real.</strong>
+                <p class="trax-alert__body">Cada envio usa una simulacion nueva, aislada y sin persistencia.</p>
+            </div>
+        </div>
+
+        <div class="payment-simulator-layout">
+            <section class="trax-card" aria-labelledby="payment-simulator-form-title">
+                <div class="trax-card__header">
+                    <h2 id="payment-simulator-form-title">Obligacion simulada</h2>
+                    <p>Todos los campos son obligatorios.</p>
+                </div>
+                <form method="POST" class="trax-card__body trax-stack" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    {% if errors %}
+                        <div class="trax-alert trax-alert--danger" role="alert" aria-live="assertive">
+                            <strong class="trax-alert__title">Revisa los datos ingresados</strong>
+                            <p class="trax-alert__body">La simulacion no fue ejecutada.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="trax-field">
+                        <label class="trax-field__label" for="payment-reference">Referencia interna</label>
+                        <input class="trax-input" id="payment-reference" name="internal_reference"
+                               value="{{ form_values.internal_reference }}" required
+                               aria-invalid="{{ 'true' if errors.internal_reference else 'false' }}"
+                               {% if errors.internal_reference %}aria-describedby="payment-reference-error"{% endif %}>
+                        {% if errors.internal_reference %}<p class="trax-field__error" id="payment-reference-error">{{ errors.internal_reference }}</p>{% endif %}
+                    </div>
+
+                    <div class="payment-simulator-fields">
+                        <div class="trax-field">
+                            <label class="trax-field__label" for="payment-amount">Importe</label>
+                            <input class="trax-input" id="payment-amount" name="amount" inputmode="decimal"
+                                   value="{{ form_values.amount }}" required
+                                   aria-invalid="{{ 'true' if errors.amount else 'false' }}"
+                                   {% if errors.amount %}aria-describedby="payment-amount-error"{% endif %}>
+                            {% if errors.amount %}<p class="trax-field__error" id="payment-amount-error">{{ errors.amount }}</p>{% endif %}
+                        </div>
+                        <div class="trax-field">
+                            <label class="trax-field__label" for="payment-currency">Moneda</label>
+                            <input class="trax-input" id="payment-currency" name="currency"
+                                   value="{{ form_values.currency }}" required
+                                   aria-invalid="{{ 'true' if errors.currency else 'false' }}"
+                                   {% if errors.currency %}aria-describedby="payment-currency-error"{% endif %}>
+                            <small class="trax-field__help">ARS es el valor inicial, no una moneda exclusiva.</small>
+                            {% if errors.currency %}<p class="trax-field__error" id="payment-currency-error">{{ errors.currency }}</p>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="trax-field">
+                        <label class="trax-field__label" for="payment-idempotency-key">Clave idempotente</label>
+                        <input class="trax-input" id="payment-idempotency-key" name="idempotency_key"
+                               value="{{ form_values.idempotency_key }}" required
+                               aria-invalid="{{ 'true' if errors.idempotency_key else 'false' }}"
+                               {% if errors.idempotency_key %}aria-describedby="payment-key-error"{% endif %}>
+                        <small class="trax-field__help">Identifica este pedido sin generar ni reemplazar la clave.</small>
+                        {% if errors.idempotency_key %}<p class="trax-field__error" id="payment-key-error">{{ errors.idempotency_key }}</p>{% endif %}
+                    </div>
+
+                    <fieldset class="trax-field payment-simulator-scenarios"
+                              {% if errors.scenario %}aria-describedby="payment-scenario-error"{% endif %}>
+                        <legend class="trax-field__label">Escenario simulado</legend>
+                        {% for value, label in [('APPROVED', 'Aprobado'), ('REJECTED', 'Rechazado'), ('PENDING', 'Pendiente'), ('UNCERTAIN', 'Respuesta incierta')] %}
+                            <label class="payment-simulator-option">
+                                <input class="trax-radio" type="radio" name="scenario" value="{{ value }}"
+                                       {{ 'checked' if form_values.scenario == value else '' }}>
+                                <span>{{ label }}</span>
+                            </label>
+                        {% endfor %}
+                        {% if errors.scenario %}<p class="trax-field__error" id="payment-scenario-error">{{ errors.scenario }}</p>{% endif %}
+                    </fieldset>
+
+                    <div class="trax-card__footer payment-simulator-submit">
+                        <button class="trax-button trax-button--primary" type="submit">Simular pago</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="trax-card payment-simulator-result" aria-labelledby="payment-result-title" aria-live="polite">
+                <div class="trax-card__header">
+                    <h2 id="payment-result-title">Interpretacion de MANDOBRA</h2>
+                </div>
+                <div class="trax-card__body">
+                    {% if result %}
+                        <div class="trax-alert trax-alert--{{ presentation[0] }}" role="status">
+                            <strong class="trax-alert__title">{{ presentation[1] }}</strong>
+                            <p class="trax-alert__body">{{ presentation[2] }}</p>
+                        </div>
+                        <dl class="payment-simulator-facts">
+                            <div><dt>Estado interpretado</dt><dd><span class="trax-badge trax-badge--{{ presentation[0] }}">{{ result.outcome.value }}</span></dd></div>
+                            <div><dt>Referencia</dt><dd>{{ result.internal_reference }}</dd></div>
+                            <div><dt>Importe y moneda</dt><dd>{{ result.amount }} {{ result.currency }}</dd></div>
+                            <div><dt>Clave idempotente</dt><dd>{{ result.idempotency_key }}</dd></div>
+                            <div><dt>Identificador del intento</dt><dd>{{ result.attempt_id or 'No informado' }}</dd></div>
+                            <div><dt>Estado financiero conocido</dt><dd>{{ result.financial_status.value if result.financial_status else 'No confirmado por la respuesta' }}</dd></div>
+                            <div><dt>Requiere conciliacion</dt><dd>{{ 'Si' if result.requires_reconciliation else 'No' }}</dd></div>
+                        </dl>
+                    {% else %}
+                        <div class="payment-simulator-empty">
+                            <span class="trax-badge trax-badge--info">Sin simulacion</span>
+                            <p>Completa el formulario para visualizar un unico resultado.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}

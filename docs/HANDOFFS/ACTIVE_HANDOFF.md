@@ -1,5 +1,113 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Interfaz interna del simulador de pagos
+
+Timestamp: 2026-09-10T21:46:04-03:00
+Estado: READY_TO_RESUME
+Resultado: PAYMENT_ORCHESTRATION_AND_SIMULATOR_UI_APROBADOS_PARA_COMMIT_Y_PR
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico y frontend local
+Objetivo: permitir una inspeccion visual interna de una obligacion y de la
+interpretacion neutral de la respuesta PSP simulada
+Rama: `feature/payment-orchestration-in-memory`
+HEAD/commit base observado: `a4951a27f0f0bef5fa834ad25159abfc875ec59e`
+Estado Git inicial: limpio y sin staging; rama sin upstream remoto
+Push, PR, merge y deploy: no realizados; no autorizados
+Revision independiente: `APROBADO_PARA_SEGUNDO_COMMIT_Y_PR` del
+`2026-09-10T22:02:38-03:00`; hallazgos P0-P3: ninguno
+
+- Se agrego la ruta GET/POST `/dev/qa/payments/simulator` al blueprint `dev`.
+  Reutiliza `_require_dev_qa_panel()`, solo existe en development/testing y
+  exige `ENABLE_DEV_QA_PANEL`; deshabilitada o en produccion responde 404.
+- Cada POST crea `ScenarioController`, `InMemoryPSPSimulator` y
+  `InMemoryPaymentOrchestrator` nuevos. La seleccion artificial queda en la
+  ruta de desarrollo; no se modificaron `PSPAdapter`, el orquestador ni el
+  simulador ya versionados.
+- La pantalla server-rendered usa `Decimal`, conserva entradas ante error y
+  presenta aprobado, rechazado, pendiente e incertidumbre como conciliacion
+  requerida. No expone excepciones, inventa IDs o conserva historial.
+- Se usaron componentes `.trax-*`, tokens `--trax-ds-*`, etiquetas,
+  `fieldset`/`legend`, errores textuales, foco visible y `aria-live`; no se
+  agrego JavaScript ni dependencia.
+
+Archivos creados: `app/templates/dev_payment_simulator.html`,
+`app/static/css/dev-payment-simulator.css` y
+`tests/test_dev_payment_simulator.py`. Archivos modificados:
+`app/routes/dev_routes.py`, `docs/CHANGELOG.md`, este handoff y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+Migraciones y dependencias: ninguna.
+
+Validaciones finales informadas por la revision independiente: interfaz +
+orquestador 29/29; contrato/simulador 24/24; suite completa 347 ejecutadas,
+342 aprobadas, 5 omisiones historicas, 0 fallos y 0 errores. `compileall`,
+HTML, enlaces y `git diff --check`: aprobados. QA visual aprobada en temas
+claro/oscuro, movil/desktop y teclado. PostgreSQL no se ejecuto porque no
+aplica.
+
+Limitaciones: interfaz interna de desarrollo, un procesamiento aislado por
+envio, sin persistencia, historial, polling o conciliacion automatica. No
+acredita checkout, pagos reales, viabilidad PSP, HTTP, SDK, OAuth, webhooks,
+creditos, reservas, suscripciones, PRO, Mercado Pago o ARCA. El diseño general
+2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la revision
+juridica/contable continuan pendientes.
+
+Proximo paso: preparar el segundo commit y un unico PR solo con autorizacion
+expresa posterior. Esta aprobacion documental no autoriza staging, commit,
+push, PR, merge o deploy.
+
+## Orquestacion neutral de pagos implementada localmente
+
+Timestamp: 2026-09-10T21:23:10-03:00
+Estado: READY_TO_RESUME
+Resultado: PAYMENT_ORCHESTRATION_IN_MEMORY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Objetivo: traducir una obligacion monetaria y la respuesta de `PSPAdapter` a
+un resultado neutral, inmutable y conciliable para MANDOBRA
+Rama: `feature/payment-orchestration-in-memory`
+Commit base: `e7ec86f217ebbbd836f7434092041e6abefbbe4a`
+Estado Git inicial: limpio, staging vacio y `develop` sincronizado 0/0 con
+`origin/develop`
+Push, PR, merge y deploy: no realizados; no autorizados
+
+- Se creo `app/services/payment_orchestration.py` con `PaymentObligation`,
+  `PaymentOrchestrationResult`, cuatro resultados diferenciados y el servicio
+  `InMemoryPaymentOrchestrator`.
+- La creacion delega una sola vez en el contrato neutral. Aprobacion, rechazo y
+  pendiente conservan el estado financiero; la incertidumbre produce
+  `RECONCILIATION_REQUIRED` y puede conservar un ID o `None`.
+- La conciliacion es una accion unica y explicita: consulta por ID cuando
+  existe o repite la misma solicitud idempotente cuando no existe. Una nueva
+  incertidumbre permanece conciliable. No se inventan IDs ni se ejecutan
+  reintentos, temporizadores o bucles.
+- La solicitud exige `Decimal` positivo y finito, rechaza `float`, cero,
+  negativos, `NaN` e infinitos, y no cuantiza ni redondea.
+- Los errores de no encontrado e idempotencia permanecen diferenciados desde
+  el contrato; la solicitud invalida usa un error propio y neutral.
+
+Archivos creados: `app/services/payment_orchestration.py` y
+`tests/test_payment_orchestration.py`. Documentacion modificada:
+`docs/CHANGELOG.md`, este handoff y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+Migraciones y dependencias: ninguna.
+
+Validaciones: focal del orquestador 19/19; focal PSP 24/24; suite completa
+Docker 337 ejecutadas, 332 aprobadas, 5 omitidas, 0 fallos y 0 errores;
+`compileall` aprobado. PostgreSQL no se ejecuto porque no aplica al incremento
+en memoria. Se observaron solo advertencias legacy/deprecaciones preexistentes
+y el contenedor huerfano `trax-pro-contrast-qa`, que no fue eliminado.
+
+Limitaciones: no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+autenticidad u orden de webhooks ni viabilidad tecnica, contractual o
+comercial de un PSP. No conecta Mercado Pago, ARCA, HTTP, SDK, rutas, creditos,
+reservas, suscripciones, PRO o flujos productivos. El diseño 2.0 permanece
+`PROPUESTO_NO_APROBADO`; Mercado Pago y la revision juridica/contable siguen
+pendientes.
+
+Proximo paso recomendado: revision independiente del diff local. No hacer
+staging, commit, push, PR, merge, rebase, deploy ni iniciar otro incremento sin
+autorizacion expresa.
+
 ## Validacion local post-merge de PR #8
 
 Timestamp: 2026-09-10T13:42:55-03:00
