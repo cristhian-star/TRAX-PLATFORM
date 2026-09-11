@@ -191,6 +191,40 @@ Pago, ARCA y revision juridica/contable continuan pendientes; el diseño general
 
 ### Incremento 2.0-B: contrato neutral PSP
 
+#### Incremento local posterior: orquestacion neutral de pagos en memoria
+
+Timestamp: 2026-09-10T21:23:10-03:00
+Estado: `PAYMENT_ORCHESTRATION_IN_MEMORY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION`
+Agente: Codex - implementador tecnico local
+Dispositivo: laptop / Codex Desktop local
+Rama y commit base: `feature/payment-orchestration-in-memory` sobre
+`e7ec86f217ebbbd836f7434092041e6abefbbe4a`
+
+Se implemento una orquestacion aislada y en memoria que recibe una obligacion
+monetaria inmutable, depende unicamente de `PSPAdapter` y diferencia pago
+aprobado, rechazado, pendiente financiero e incertidumbre que requiere
+conciliacion. El resultado conserva referencia, importe exacto, moneda, clave
+idempotente, ID opcional, estado financiero conocido e indicador de
+conciliacion.
+
+La conciliacion es siempre explicita: con ID consulta `get_attempt`; sin ID
+repite una unica vez la creacion con los mismos datos y clave. Una nueva
+incertidumbre conserva `RECONCILIATION_REQUIRED`. No existe almacenamiento
+propio, retries automaticos, esperas, temporizadores, aleatoriedad o IDs
+inventados. Los importes usan `Decimal`, deben ser positivos y finitos y no se
+cuantizan ni redondean.
+
+La focal nueva aprobo 19/19 y la focal del contrato/simulador 24/24. La suite
+completa Docker ejecuto 337 pruebas: 332 aprobadas, 5 omitidas, 0 fallos y 0
+errores. `compileall` aprobo. PostgreSQL no se ejecuto porque no aplica.
+
+No se incorporaron persistencia, SQLAlchemy, modelos, migraciones, HTTP, SDK,
+OAuth, webhooks, rutas, UI, creditos, reservas, comisiones, suscripciones, PRO,
+Mercado Pago o ARCA. La evidencia no acredita persistencia, concurrencia o
+atomicidad PostgreSQL, autenticidad u orden de webhooks ni viabilidad PSP. El
+diseño general 2.0 permanece `PROPUESTO_NO_APROBADO`; Mercado Pago y la
+revision juridica/contable continuan pendientes.
+
 Validacion local post-merge registrada el `2026-09-10T13:42:55-03:00` por
 Codex - implementador tecnico local, sobre `develop`. Estado:
 `PSP_ADAPTER_CONTRACT_INTEGRADO_POST_MERGE_VALIDADO_LOCALMENTE_PENDIENTE_DE_REVISION_DOCUMENTAL`.

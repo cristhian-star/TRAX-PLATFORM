@@ -1,5 +1,58 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Orquestacion neutral de pagos implementada localmente
+
+Timestamp: 2026-09-10T21:23:10-03:00
+Estado: READY_TO_RESUME
+Resultado: PAYMENT_ORCHESTRATION_IN_MEMORY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Dispositivo/origen: laptop / Codex Desktop local
+Agente: Codex - implementador tecnico local
+Objetivo: traducir una obligacion monetaria y la respuesta de `PSPAdapter` a
+un resultado neutral, inmutable y conciliable para MANDOBRA
+Rama: `feature/payment-orchestration-in-memory`
+Commit base: `e7ec86f217ebbbd836f7434092041e6abefbbe4a`
+Estado Git inicial: limpio, staging vacio y `develop` sincronizado 0/0 con
+`origin/develop`
+Push, PR, merge y deploy: no realizados; no autorizados
+
+- Se creo `app/services/payment_orchestration.py` con `PaymentObligation`,
+  `PaymentOrchestrationResult`, cuatro resultados diferenciados y el servicio
+  `InMemoryPaymentOrchestrator`.
+- La creacion delega una sola vez en el contrato neutral. Aprobacion, rechazo y
+  pendiente conservan el estado financiero; la incertidumbre produce
+  `RECONCILIATION_REQUIRED` y puede conservar un ID o `None`.
+- La conciliacion es una accion unica y explicita: consulta por ID cuando
+  existe o repite la misma solicitud idempotente cuando no existe. Una nueva
+  incertidumbre permanece conciliable. No se inventan IDs ni se ejecutan
+  reintentos, temporizadores o bucles.
+- La solicitud exige `Decimal` positivo y finito, rechaza `float`, cero,
+  negativos, `NaN` e infinitos, y no cuantiza ni redondea.
+- Los errores de no encontrado e idempotencia permanecen diferenciados desde
+  el contrato; la solicitud invalida usa un error propio y neutral.
+
+Archivos creados: `app/services/payment_orchestration.py` y
+`tests/test_payment_orchestration.py`. Documentacion modificada:
+`docs/CHANGELOG.md`, este handoff y
+`docs/SPRINTS/2026-09-06_PRO_REFINAMIENTO_COMERCIAL_Y_PSP.md`.
+Migraciones y dependencias: ninguna.
+
+Validaciones: focal del orquestador 19/19; focal PSP 24/24; suite completa
+Docker 337 ejecutadas, 332 aprobadas, 5 omitidas, 0 fallos y 0 errores;
+`compileall` aprobado. PostgreSQL no se ejecuto porque no aplica al incremento
+en memoria. Se observaron solo advertencias legacy/deprecaciones preexistentes
+y el contenedor huerfano `trax-pro-contrast-qa`, que no fue eliminado.
+
+Limitaciones: no acredita persistencia, concurrencia o atomicidad PostgreSQL,
+autenticidad u orden de webhooks ni viabilidad tecnica, contractual o
+comercial de un PSP. No conecta Mercado Pago, ARCA, HTTP, SDK, rutas, creditos,
+reservas, suscripciones, PRO o flujos productivos. El diseño 2.0 permanece
+`PROPUESTO_NO_APROBADO`; Mercado Pago y la revision juridica/contable siguen
+pendientes.
+
+Proximo paso recomendado: revision independiente del diff local. No hacer
+staging, commit, push, PR, merge, rebase, deploy ni iniciar otro incremento sin
+autorizacion expresa.
+
 ## Validacion local post-merge de PR #8
 
 Timestamp: 2026-09-10T13:42:55-03:00

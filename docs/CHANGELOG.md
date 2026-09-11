@@ -1,5 +1,28 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-10 - Orquestacion neutral de pagos en memoria
+
+Timestamp: 2026-09-10T21:23:10-03:00
+Estado: PAYMENT_ORCHESTRATION_IN_MEMORY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo: laptop / Codex Desktop local
+Rama: `feature/payment-orchestration-in-memory`
+Commit base: `e7ec86f217ebbbd836f7434092041e6abefbbe4a`
+
+- Se agrego una obligacion monetaria inmutable y un orquestador que depende
+  exclusivamente de `PSPAdapter`, sin almacenamiento propio.
+- Los resultados distinguen aprobacion, rechazo, pendiente financiero y
+  conciliacion requerida por incertidumbre de transporte.
+- La conciliacion explicita consulta por ID conocido o repite idempotentemente
+  la misma creacion cuando el proveedor no entrego ID; no existen reintentos
+  automaticos, esperas ni identificadores inventados.
+- Focal del orquestador: 19/19. Focal PSP: 24/24. Suite completa Docker: 337
+  ejecutadas, 332 aprobadas, 5 omitidas, 0 fallos y 0 errores. `compileall`:
+  aprobado.
+- Sin PostgreSQL, persistencia, modelos, migraciones, rutas, HTTP, SDK,
+  webhooks o integracion productiva. Mercado Pago y revision juridica/contable
+  continuan pendientes; el diseño 2.0 permanece `PROPUESTO_NO_APROBADO`.
+
 ## 2026-09-10 - Validacion local post-merge del contrato neutral PSP
 
 Timestamp: 2026-09-10T13:42:55-03:00
