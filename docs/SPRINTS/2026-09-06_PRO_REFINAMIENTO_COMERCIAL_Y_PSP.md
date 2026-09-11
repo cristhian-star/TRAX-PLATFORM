@@ -8,6 +8,36 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Integracion verificada de payment-persistence-foundation
+
+Timestamp: 2026-09-11T15:46:40-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_INTEGRADA_Y_VERIFICADA_POST_MERGE
+Agente: Codex - implementador tecnico local
+Rama: `develop`
+PR: `#10`
+Commit de caracteristica: `fae81e62f1526a0daa229f03efbc19c918dc8ff0`
+Merge commit: `8dd773692004453d663742be02048f79cae0aa0c`
+
+Quedaron integrados los 14 archivos del incremento con Alembic head
+`20260910_01`. `develop` local y remoto coinciden en el merge commit y el arbol
+previo a este registro estaba limpio.
+
+El merge ocurrio antes de completar el gate final solicitado y Testing no pudo
+emitir una autorizacion preventiva. La verificacion post-merge confirmo que el
+contenido remoto es exactamente el commit previamente probado y aprobado, sin
+diferencias de alcance ni defectos funcionales detectados. Se conserva la
+integracion sin iniciar una reversion; la desviacion es de proceso y no una
+regresion del codigo.
+
+No se repitieron pruebas despues del merge. Evidencia historica conservada:
+focal portable y regresiones 55/55; PostgreSQL real 7/7; suite completa 359
+ejecutadas, 354 aprobadas y 5 omisiones historicas, sin fallos ni errores;
+`compileall`, enlaces y `git diff --check` aprobados; base PostgreSQL
+descartable eliminada y `trax_db` intacta.
+
+No quedan acreditados Mercado Pago, pagos productivos, webhooks, checkout,
+creditos, PRO, ARCA, deploy ni la arquitectura 2.0 completa.
+
 ## Correccion focal P2 de persistencia
 
 Timestamp: 2026-09-11T14:41:40-03:00

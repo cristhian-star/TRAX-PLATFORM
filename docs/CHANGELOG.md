@@ -1,5 +1,33 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-11 - Integracion de la persistencia neutral de pagos
+
+Timestamp: 2026-09-11T15:46:40-03:00
+Estado: PAYMENT_PERSISTENCE_FOUNDATION_INTEGRADA_Y_VERIFICADA_POST_MERGE
+Agente: Codex - implementador tecnico local
+Rama: `develop`
+Commit de caracteristica: `fae81e62f1526a0daa229f03efbc19c918dc8ff0`
+Merge commit / HEAD: `8dd773692004453d663742be02048f79cae0aa0c`
+Pull Request: `#10`
+
+- Se verifico la integracion de los 14 archivos del incremento y el head
+  Alembic `20260910_01`. `develop` local y `origin/develop` coinciden en el
+  merge commit y el arbol previo a este registro estaba limpio.
+- Desviacion de proceso: el PR fue fusionado antes de completar el gate final
+  solicitado, por lo que Testing no pudo emitir una autorizacion preventiva de
+  merge. Se conservo la integracion y no se inicio una reversion porque la
+  verificacion post-merge confirmo que el contenido remoto coincide exactamente
+  con el commit previamente probado y aprobado, sin diferencias de alcance ni
+  defectos funcionales detectados. Es una observacion de proceso, no una
+  regresion del codigo.
+- No se repitieron pruebas post-merge. La evidencia historica del commit
+  identificado permanece: focal y regresiones 55/55; PostgreSQL real 7/7;
+  suite completa 359 ejecutadas, 354 aprobadas y 5 omisiones historicas, sin
+  fallos ni errores; `compileall`, enlaces y `git diff --check` aprobados; base
+  descartable eliminada y `trax_db` intacta.
+- La integracion no acredita Mercado Pago, pagos productivos, webhooks,
+  checkout, creditos, PRO, ARCA, deploy ni la arquitectura 2.0 completa.
+
 ## 2026-09-11 - Correccion focal de integridad en intentos de pago
 
 Timestamp: 2026-09-11T14:41:40-03:00

@@ -1,5 +1,39 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Integracion y verificacion post-merge de persistencia neutral
+
+Timestamp: 2026-09-11T15:46:40-03:00
+Estado: COMPLETED
+Resultado: PAYMENT_PERSISTENCE_FOUNDATION_INTEGRADA_Y_VERIFICADA_POST_MERGE
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama actual/destino: `develop`
+Commit de caracteristica: `fae81e62f1526a0daa229f03efbc19c918dc8ff0`
+Merge commit / HEAD local y remoto: `8dd773692004453d663742be02048f79cae0aa0c`
+Pull Request integrado: `#10`
+Archivos integrados: 14
+Alembic head: `20260910_01`
+Estado Git previo al registro: arbol limpio, staging vacio y divergencia 0/0
+
+El PR fue fusionado antes de completar el gate final solicitado. Por esa
+desviacion, Testing no pudo emitir una autorizacion preventiva de merge. La
+verificacion post-merge comprobo que el contenido remoto integrado coincide
+exactamente con el commit previamente probado y aprobado, sin diferencias de
+alcance ni defectos funcionales detectados. Se decidio conservar la integracion
+y no iniciar una reversion. La observacion corresponde al proceso y no
+constituye una regresion del codigo.
+
+Las pruebas no se repitieron despues del merge. Se conserva como evidencia
+historica del commit probado: focal portable y regresiones 55/55; PostgreSQL
+real 7/7; suite completa 359 ejecutadas, 354 aprobadas, 5 omisiones historicas,
+0 fallos y 0 errores; `compileall`, enlaces y `git diff --check` aprobados. La
+base PostgreSQL descartable fue eliminada y `trax_db` permanecio intacta.
+
+Esta integracion no acredita Mercado Pago, pagos productivos, webhooks,
+checkout, creditos, PRO, ARCA, deploy o la arquitectura general 2.0. Esta
+actualizacion modifica unicamente los tres documentos autorizados y debe quedar
+sin staging ni commit hasta su revision.
+
 ## Correccion P2 - clasificacion de violaciones de integridad
 
 Timestamp: 2026-09-11T14:41:40-03:00
