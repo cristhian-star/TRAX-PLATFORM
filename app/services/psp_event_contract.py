@@ -6,6 +6,12 @@ from datetime import datetime
 _SHA256_HEX = re.compile(r"[0-9a-fA-F]{64}")
 
 
+def normalize_psp_provider(value):
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("provider must be a non-empty string")
+    return value.strip().lower()
+
+
 @dataclass(frozen=True, slots=True)
 class PSPEvent:
     provider: str
@@ -19,8 +25,9 @@ class PSPEvent:
     payload_hash: str
 
     def __post_init__(self):
+        object.__setattr__(self, "provider", normalize_psp_provider(self.provider))
         for name in (
-            "provider", "external_event_id", "topic", "action",
+            "external_event_id", "topic", "action",
             "external_resource_id",
         ):
             value = getattr(self, name)

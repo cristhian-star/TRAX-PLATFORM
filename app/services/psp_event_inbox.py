@@ -3,7 +3,7 @@ from datetime import timezone
 from sqlalchemy.exc import IntegrityError
 
 from app.models.psp_event import PSPEventRecord
-from app.services.psp_event_contract import PSPEvent
+from app.services.psp_event_contract import PSPEvent, normalize_psp_provider
 
 
 IDENTITY_CONSTRAINT = "uq_psp_event_inbox_identity"
@@ -58,6 +58,7 @@ def get_event(session, event_id):
 
 
 def get_event_by_identity(session, provider, test_mode, external_event_id, *, required=True):
+    provider = normalize_psp_provider(provider)
     record = session.query(PSPEventRecord).filter_by(
         provider=provider, test_mode=test_mode, external_event_id=external_event_id
     ).one_or_none()

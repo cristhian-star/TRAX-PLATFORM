@@ -25,6 +25,24 @@ class PaymentAttemptRecord(db.Model):
             "(orchestration_result <> 'RECONCILIATION_REQUIRED' AND requires_reconciliation = false AND financial_status = orchestration_result)",
             name="ck_payment_attempts_result_coherent",
         ),
+        db.CheckConstraint(
+            "(psp_provider IS NULL AND psp_live_mode IS NULL) OR "
+            "(psp_provider IS NOT NULL AND psp_live_mode IS NOT NULL)",
+            name="ck_payment_attempts_psp_context_complete",
+        ),
+        db.Index(
+            "uq_payment_attempts_psp_identity",
+            "psp_provider", "psp_live_mode", "external_attempt_id",
+            unique=True,
+            postgresql_where=db.text(
+                "psp_provider IS NOT NULL AND psp_live_mode IS NOT NULL "
+                "AND external_attempt_id IS NOT NULL"
+            ),
+            sqlite_where=db.text(
+                "psp_provider IS NOT NULL AND psp_live_mode IS NOT NULL "
+                "AND external_attempt_id IS NOT NULL"
+            ),
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -36,6 +54,8 @@ class PaymentAttemptRecord(db.Model):
     )
     idempotency_key = db.Column(db.String(160), nullable=False)
     external_attempt_id = db.Column(db.String(255), nullable=True)
+    psp_provider = db.Column(db.String(64), nullable=True)
+    psp_live_mode = db.Column(db.Boolean, nullable=True)
     financial_status = db.Column(db.String(32), nullable=True)
     orchestration_result = db.Column(db.String(32), nullable=False)
     requires_reconciliation = db.Column(db.Boolean, nullable=False)

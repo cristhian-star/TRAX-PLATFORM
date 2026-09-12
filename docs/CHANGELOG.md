@@ -1,5 +1,63 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-11 - Correccion P2/P3 de identidad PSP
+
+Timestamp: 2026-09-11T22:54:46-03:00
+Estado: PAYMENT_ATTEMPT_PSP_IDENTITY_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- La recuperación concurrente de obligaciones ahora sólo admite SQLSTATE
+  `23505` y la constraint exacta `uq_payment_obligations_reference`, obtenidos
+  desde atributos estructurados del driver. Cualquier otro diagnóstico vuelve
+  a propagar el `IntegrityError` original.
+- Se corrigió el whitespace final de la prueba de migración y se comprobaron
+  explícitamente todos los archivos no rastreados.
+- Focal 14/14; regresiones 82/82; PostgreSQL real 13/13; suite completa 390
+  ejecutadas, 385 aprobadas y 5 omitidas, sin fallos ni errores; `compileall` y
+  head Alembic único `20260911_02` aprobados.
+- Se conserva el `REQUIERE_CORRECCIONES` histórico. La corrección queda
+  pendiente de retest independiente; no se implementó el procesador PSP.
+
+## 2026-09-11 - Identidad PSP contextual en intentos de pago
+
+Timestamp: 2026-09-11T22:26:39-03:00
+Estado: PAYMENT_ATTEMPT_PSP_IDENTITY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- Se adoptó la decisión `INCORPORAR_IDENTIDAD_PSP_CONTEXTUAL_EN_PAYMENT_ATTEMPTS`:
+  proveedor canónico, modo y ID externo forman la identidad contextual.
+- La migración `20260911_02`, descendiente de `20260911_01`, agrega contexto
+  nullable, constraint de pareja completa e índice único parcial. No atribuye
+  contexto a filas históricas ni impone unicidad global al ID externo.
+- Los servicios permiten crear/asociar contexto, impiden reemplazarlo y buscan
+  exclusivamente por identidad completa. Los intentos legacy quedan excluidos.
+- Focal 23/23; regresiones 81/81; PostgreSQL 12/12; suite completa 389
+  ejecutadas, 384 aprobadas y 5 omitidas, sin fallos ni errores.
+- El bloqueo histórico de correlación se conserva. No se implementó todavía el
+  procesador, Mercado Pago real, HTTP, firmas, workers ni lógica financiera.
+
+## 2026-09-11 - Procesador de eventos PSP bloqueado por correlacion
+
+Timestamp: 2026-09-11T22:16:16-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_BLOQUEADO_POR_DEFINICION_DE_CORRELACION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+HEAD: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- El inbox identifica eventos por proveedor, modo e ID externo, pero
+  `payment_attempts` sólo conserva `external_attempt_id`: no registra proveedor
+  ni modo y ese campo no posee unicidad.
+- Una búsqueda global por ID de recurso sería ambigua ante colisiones entre
+  proveedores o modos. No se implementó esa asociación insegura ni se creó una
+  migración sin contrato aprobado.
+- Se requiere definir una identidad PSP completa en el intento o una relación
+  explícita evento-intento, incluyendo reglas de alta, unicidad y compatibilidad
+  con datos existentes. No se ejecutaron pruebas porque no hubo cambio de código.
+
 ## 2026-09-11 - Correccion P1/P2 de la bandeja de eventos PSP
 
 Timestamp: 2026-09-11T20:57:36-03:00

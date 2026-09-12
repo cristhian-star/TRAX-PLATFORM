@@ -1,10 +1,10 @@
 # Alembic en MANDOBRA
 
-## Head de bandeja de eventos PSP
+## Head de identidad PSP contextual
 
-Desde 2026-09-11, `20260911_01` es el head unico y desciende de
-`20260910_01`. Crea exclusivamente `psp_event_inbox`; su downgrade elimina esa
-tabla sin modificar las tablas de pagos existentes.
+Desde 2026-09-11, `20260911_02` es el head único y desciende de
+`20260911_01`. Agrega contexto PSP nullable a `payment_attempts`; no realiza
+backfill y su downgrade conserva la bandeja creada por su revisión padre.
 
 ## Que es Alembic
 

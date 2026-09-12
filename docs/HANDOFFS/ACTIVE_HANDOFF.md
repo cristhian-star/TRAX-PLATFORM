@@ -1,5 +1,81 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Identidad PSP contextual - P2/P3 corregidos
+
+Timestamp: 2026-09-11T22:54:46-03:00
+Estado: COMPLETED
+Resultado: PAYMENT_ATTEMPT_PSP_IDENTITY_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+Estado Git: cambios locales sin staging, commit ni push
+
+Corrección: `create_or_get_obligation()` recupera un replay sólo cuando el
+driver expone SQLSTATE `23505` y `diag.constraint_name` igual a
+`uq_payment_obligations_reference`. Diagnósticos ausentes, `23514` u otra
+constraint propagan el `IntegrityError` original; el rollback continúa bajo
+control del llamador. También se eliminó el whitespace final señalado.
+
+Validación: focal 14/14; regresiones 82/82; gate PostgreSQL 13/13 sobre
+`trax_payment_persistence_test_integrity_20260911`; suite completa 390
+ejecutadas, 385 aprobadas, 5 omitidas, 0 fallos y 0 errores; `compileall` y head
+único `20260911_02` aprobados. La base descartable se eliminó y se verificó
+ausente. El `REQUIERE_CORRECCIONES` histórico se conserva y esta corrección
+requiere retest independiente. No hubo commit, push, PR, merge ni deploy.
+
+## Identidad PSP contextual - decisión implementada
+
+Timestamp: 2026-09-11T22:26:39-03:00
+Estado: COMPLETED
+Resultado: PAYMENT_ATTEMPT_PSP_IDENTITY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+Estado Git: cambios locales sin staging, commit ni push
+
+Se conserva el bloqueo histórico y se registra su resolución contractual:
+proveedor, `psp_live_mode` e ID externo conforman la identidad PSP. La migración
+`20260911_02` agrega los campos nullable, exige proveedor/modo juntos y aplica
+unicidad parcial sólo con los tres valores presentes. No existe backfill; filas
+anteriores permanecen legacy/unscoped.
+
+Servicios: alta con contexto opcional, búsqueda contextual exacta, asociación
+única y no reemplazable, canonicalización compartida de proveedor y exclusión
+de intentos legacy. Los flujos neutrales existentes continúan sin contexto.
+
+Validación: focal 23/23; regresiones 81/81; gate PostgreSQL 12/12 sobre
+`trax_payment_persistence_test_pspidentity_20260911`; suite completa 389
+ejecutadas, 384 aprobadas, 5 omitidas, 0 fallos y 0 errores. Pendientes del
+cierre: `compileall`, head, whitespace, eliminación de la base y revisión
+independiente. No se implementó el procesador ni integración productiva.
+
+## Procesador de conciliacion de eventos PSP - bloqueo contractual
+
+Timestamp: 2026-09-11T22:16:16-03:00
+Estado: BLOCKED
+Resultado: PSP_EVENT_RECONCILIATION_PROCESSOR_BLOQUEADO_POR_DEFINICION_DE_CORRELACION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+Estado Git inicial: limpio y staging vacío
+Estado Git final: tres documentos modificados sin staging, commit ni push
+
+Diagnóstico: `psp_event_inbox` conserva proveedor, modo e ID externo del
+recurso; `payment_attempts` sólo conserva `external_attempt_id`, sin proveedor,
+modo ni unicidad sobre ese valor. Por ello no existe una clave que permita
+correlacionar inequívocamente y una búsqueda global podría actualizar un pago
+de otro proveedor o entorno.
+
+Decisión pendiente: aprobar una identidad PSP completa en el intento y sus
+reglas de unicidad/backfill, o aprobar una relación explícita evento-intento y
+el mecanismo confiable que la crea. Hasta entonces no implementar el
+procesador, no agregar una búsqueda global ni inferir la asociación. No hubo
+cambios de código, migraciones o tests ejecutados; tampoco commit, push, PR,
+merge ni deploy.
+
 ## Bandeja de eventos PSP - P1/P2 corregidos
 
 Timestamp: 2026-09-11T20:57:36-03:00

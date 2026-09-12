@@ -21,7 +21,13 @@ class PSPEventInboxMigrationTest(unittest.TestCase):
             engine = sa.create_engine(url)
             config = Config(str(ROOT / "alembic.ini"))
             try:
-                self.assertEqual(ScriptDirectory.from_config(config).get_heads(), ["20260911_01"])
+                script = ScriptDirectory.from_config(config)
+                heads = script.get_heads()
+                self.assertEqual(len(heads), 1)
+                self.assertIn(
+                    "20260911_01",
+                    {revision.revision for revision in script.walk_revisions("base", heads[0])},
+                )
                 command.upgrade(config, "20260910_01")
                 self.assertNotIn("psp_event_inbox", sa.inspect(engine).get_table_names())
                 command.upgrade(config, "head")
