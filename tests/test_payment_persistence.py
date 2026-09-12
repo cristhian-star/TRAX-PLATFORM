@@ -14,7 +14,9 @@ from app.services.payment_orchestration import (
     PaymentOutcome,
 )
 from app.services.payment_persistence_service import (
+    OBLIGATION_REFERENCE_CONSTRAINT,
     PaymentPersistenceConflictError,
+    _is_postgresql_constraint_violation,
     apply_reconciliation,
     create_or_get_obligation,
     get_attempts,
@@ -138,6 +140,36 @@ class PaymentPersistenceTest(unittest.TestCase):
         self.assertNotIn(".commit(", source)
         self.assertNotIn("PSPAdapter", source)
         self.assertNotIn("create_attempt(", source)
+
+    def test_obligation_replay_requires_exact_structured_diagnostics(self):
+        class Diagnostic:
+            def __init__(self, constraint_name):
+                self.constraint_name = constraint_name
+
+        class DriverError(Exception):
+            def __init__(self, sqlstate, constraint_name, with_diag=True):
+                self.sqlstate = sqlstate
+                if with_diag:
+                    self.diag = Diagnostic(constraint_name)
+
+        def integrity(sqlstate, constraint_name, with_diag=True):
+            return IntegrityError(
+                "INSERT", {}, DriverError(sqlstate, constraint_name, with_diag)
+            )
+
+        self.assertTrue(_is_postgresql_constraint_violation(
+            integrity("23505", OBLIGATION_REFERENCE_CONSTRAINT),
+            "23505", OBLIGATION_REFERENCE_CONSTRAINT,
+        ))
+        for error in (
+            integrity("23514", "ck_payment_obligations_amount_positive"),
+            integrity("23505", "uq_other_constraint"),
+            integrity("23505", OBLIGATION_REFERENCE_CONSTRAINT, False),
+        ):
+            with self.subTest(error=error.orig):
+                self.assertFalse(_is_postgresql_constraint_violation(
+                    error, "23505", OBLIGATION_REFERENCE_CONSTRAINT
+                ))
 
 
 if __name__ == "__main__":

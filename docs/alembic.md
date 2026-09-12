@@ -1,5 +1,11 @@
 # Alembic en MANDOBRA
 
+## Head de identidad PSP contextual
+
+Desde 2026-09-11, `20260911_02` es el head único y desciende de
+`20260911_01`. Agrega contexto PSP nullable a `payment_attempts`; no realiza
+backfill y su downgrade conserva la bandeja creada por su revisión padre.
+
 ## Que es Alembic
 
 Alembic es el sistema oficial de migraciones para el schema SQLAlchemy de MANDOBRA. Permite versionar cambios de estructura, aplicarlos de forma ordenada y preparar una futura transicion desde SQLite DEV hacia PostgreSQL.

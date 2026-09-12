@@ -36,7 +36,12 @@ class PaymentPersistenceMigrationTest(unittest.TestCase):
 
     def test_upgrade_downgrade_upgrade_and_constraints(self):
         script = ScriptDirectory.from_config(self.config)
-        self.assertEqual(script.get_heads(), ["20260910_01"])
+        heads = script.get_heads()
+        self.assertEqual(len(heads), 1)
+        self.assertIn(
+            "20260910_01",
+            {revision.revision for revision in script.walk_revisions("base", heads[0])},
+        )
         command.upgrade(self.config, "20260904_01")
         self.assertNotIn("payment_obligations", self._tables())
 

@@ -22,6 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.models.payment_attempt import PaymentAttemptRecord
 from app.models.payment_obligation import PaymentObligation
+from app.models.psp_event import PSPEventRecord
 from app.services.payment_orchestration import (
     InMemoryPaymentOrchestrator,
     PaymentObligation as PaymentObligationRequest,
@@ -36,6 +37,13 @@ from app.services.payment_persistence_service import (
     register_or_get_attempt,
 )
 from app.services.psp_contract import PaymentAttemptStatus
+from app.services.psp_contract import PaymentAttempt
+from app.services.psp_event_contract import PSPEvent
+from app.services.psp_event_inbox import register_or_get_event
+from app.services.psp_event_reconciliation import (
+    PSPEventProcessingStatus,
+    PSPEventReconciliationProcessor,
+)
 from app.services.psp_simulator import (
     InMemoryPSPSimulator,
     ScenarioController,
@@ -119,7 +127,10 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
     def setUp(self):
         with self.engine.begin() as connection:
             connection.execute(
-                sa.text("TRUNCATE TABLE payment_attempts, payment_obligations RESTART IDENTITY")
+                sa.text(
+                    "TRUNCATE TABLE psp_event_inbox, payment_attempts, "
+                    "payment_obligations RESTART IDENTITY"
+                )
             )
 
     @staticmethod
@@ -173,7 +184,7 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             ).scalars().all()
         self.assertEqual(
             assert_database_at_repository_head(self.config, revisions),
-            "20260910_01",
+            "20260911_02",
         )
 
     def test_concurrent_identical_obligations_converge_and_preserve_decimal(self):
@@ -187,6 +198,37 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             rows = session.query(PaymentObligation).all()
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0].amount.as_tuple(), request.amount.as_tuple())
+
+    def test_invalid_obligation_preserves_integrity_error_and_session_recovers(self):
+        session = self.Session()
+        invalid = self._request("invalid-obligation", "1", "invalid-obligation-key")
+        # This regression targets PostgreSQL's real constraint diagnostics, so
+        # it deliberately bypasses the already-covered DTO boundary.
+        object.__setattr__(invalid, "amount", Decimal("0"))
+        received = None
+        try:
+            create_or_get_obligation(session, invalid)
+        except Exception as exc:
+            received = exc
+        self.assertIsInstance(received, IntegrityError)
+        self.assertNotIsInstance(received, NoResultFound)
+        self.assertEqual(
+            getattr(received.orig, "sqlstate", None)
+            or getattr(received.orig, "pgcode", None),
+            "23514",
+        )
+        self.assertEqual(
+            received.orig.diag.constraint_name,
+            "ck_payment_obligations_amount_positive",
+        )
+        session.rollback()
+        recovered = create_or_get_obligation(
+            session,
+            self._request("recovered-obligation", "1", "recovered-obligation-key"),
+        )
+        session.commit()
+        self.assertIsNotNone(recovered.id)
+        session.close()
 
     def test_concurrent_obligation_conflict_has_one_winner(self):
         first = self._request(amount="10")
@@ -229,6 +271,57 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             PaymentPersistenceConflictError,
         )
 
+    def test_contextual_psp_identity_is_unique_under_concurrency(self):
+        requests = (
+            self._request("psp-one", "10", "psp-one-key"),
+            self._request("psp-two", "10", "psp-two-key"),
+        )
+        with self.Session.begin() as session:
+            obligation_ids = [
+                create_or_get_obligation(session, request).id for request in requests
+            ]
+
+        def register(session, index):
+            obligation = session.get(PaymentObligation, obligation_ids[index])
+            return register_or_get_attempt(
+                session, obligation, self._result(requests[index]),
+                psp_provider="provider", psp_live_mode=False,
+            ).id
+
+        results = self._race([
+            lambda session: register(session, 0),
+            lambda session: register(session, 1),
+        ])
+        self.assertEqual(sum(kind == "ok" for kind, _ in results), 1)
+        error = next(value for kind, value in results if kind == "error")
+        self.assertIsInstance(error, IntegrityError)
+        self.assertEqual(error.orig.diag.constraint_name, "uq_payment_attempts_psp_identity")
+        with self.Session() as session:
+            self.assertEqual(session.query(PaymentAttemptRecord).count(), 1)
+
+    def test_contextual_identity_boundaries_and_legacy_rows(self):
+        legacy_request = self._request("legacy-psp", "10", "legacy-psp-key")
+        with self.Session.begin() as session:
+            legacy_obligation = create_or_get_obligation(session, legacy_request)
+            legacy = register_or_get_attempt(
+                session, legacy_obligation, self._result(legacy_request)
+            )
+            self.assertIsNone(legacy.psp_provider)
+            self.assertIsNone(legacy.psp_live_mode)
+
+        for index, (provider, live_mode) in enumerate((
+            ("provider-a", True), ("provider-b", True), ("provider-a", False),
+        )):
+            request = self._request(f"boundary-{index}", "10", f"boundary-key-{index}")
+            with self.Session.begin() as session:
+                obligation = create_or_get_obligation(session, request)
+                register_or_get_attempt(
+                    session, obligation, self._result(request),
+                    psp_provider=provider, psp_live_mode=live_mode,
+                )
+        with self.Session() as session:
+            self.assertEqual(session.query(PaymentAttemptRecord).count(), 4)
+
     def test_concurrent_reconciliation_serializes_identical_and_incompatible_results(self):
         request = self._request()
         with self.Session.begin() as session:
@@ -263,6 +356,65 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             next(value for kind, value in conflict if kind == "error"),
             PaymentPersistenceConflictError,
         )
+
+    def test_concurrent_event_processing_converges_without_duplicate_financial_rows(self):
+        request = self._request("event-reconciliation", "10", "event-key")
+        with self.Session.begin() as session:
+            obligation = create_or_get_obligation(session, request)
+            attempt = register_or_get_attempt(
+                session,
+                obligation,
+                self._result(request, PaymentOutcome.PENDING, "event-attempt"),
+                psp_provider="provider",
+                psp_live_mode=False,
+            )
+            event = register_or_get_event(session, PSPEvent(
+                "provider", "event-id", "payment", "updated", "event-attempt",
+                True, None, datetime.now(timezone.utc), "a" * 64,
+            ))
+            event_id = event.id
+            attempt_id = attempt.id
+
+        class Adapter:
+            def create_attempt(self, **kwargs):
+                raise AssertionError("processor must not create attempts")
+
+            def get_attempt(self, external_attempt_id):
+                return PaymentAttempt(
+                    external_attempt_id,
+                    request.internal_reference,
+                    request.amount,
+                    request.currency,
+                    request.idempotency_key,
+                    PaymentAttemptStatus.APPROVED,
+                    datetime.now(timezone.utc),
+                )
+
+        processor = PSPEventReconciliationProcessor(
+            session_factory=self.Session,
+            adapter=Adapter(),
+            provider="provider",
+            live_mode=False,
+            payment_topics=("payment",),
+        )
+        results = self._race([
+            lambda session: processor.process(event_id).status,
+            lambda session: processor.process(event_id).status,
+        ])
+        self.assertEqual([kind for kind, _ in results], ["ok", "ok"])
+        self.assertTrue(all(
+            value in {
+                PSPEventProcessingStatus.RECONCILED,
+                PSPEventProcessingStatus.ALREADY_TERMINAL,
+            }
+            for _, value in results
+        ))
+        with self.Session() as session:
+            rows = session.query(PaymentAttemptRecord).all()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0].id, attempt_id)
+            self.assertEqual(rows[0].financial_status, "APPROVED")
+            self.assertEqual(session.query(PSPEventRecord).count(), 1)
 
     def test_constraints_foreign_key_rollback_visibility_and_session_recovery(self):
         session = self.Session()

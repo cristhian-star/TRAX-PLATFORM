@@ -1,5 +1,146 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-12 - Correccion P1 de topicos del procesador PSP
+
+Timestamp: 2026-09-12T13:32:58-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+
+- El procesador exige una colección explícita, no vacía e inmutable de tópicos
+  de pago. Los valores se normalizan con trim y minúsculas; entradas vacías,
+  inválidas o una cadena usada como colección se rechazan al configurarlo.
+- Un tópico no configurado devuelve `UNSUPPORTED_TOPIC` antes de buscar el
+  intento o llamar al adaptador. El tópico sólo decide procesabilidad y nunca
+  determina un estado financiero.
+- Se reprodujo `merchant_order` con ID coincidente y acción engañosa
+  `payment.approved`: cero búsquedas financieras, cero llamadas y pago intacto.
+- Focal 9/9; regresiones 26/26 y 65/65; PostgreSQL 14/14; suite completa 399
+  ejecutadas, 394 aprobadas y 5 omitidas, sin fallos ni errores.
+- El `REQUIERE_CORRECCIONES` histórico se conserva. La corrección queda
+  pendiente de retest independiente y no agrega integración PSP productiva.
+
+## 2026-09-12 - Procesador neutral de conciliacion por eventos PSP
+
+Timestamp: 2026-09-12T13:10:46-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+
+- Se agregó un coordinador que usa el evento persistido sólo como señal,
+  correlaciona por proveedor, modo e ID externo y consulta una vez al adaptador
+  fuera de toda sesión o transacción.
+- El estado financiero procede exclusivamente de `PSPAdapter`; eventos
+  inexistentes, contextos incompatibles, intentos legacy/sin correlación y
+  terminales producen resultados explícitos sin escrituras indebidas.
+- La persistencia reutiliza `apply_reconciliation()`, con una segunda
+  transacción y lock breve. No se creó migración: `20260911_02` sigue siendo el
+  único head.
+- Focal 7/7; regresiones 24/24 y 65/65; PostgreSQL 14/14; suite completa 397
+  ejecutadas, 392 aprobadas y 5 omitidas, sin fallos ni errores.
+- Todavía no existe integración real con Mercado Pago ni endpoint webhook
+  productivo; tampoco HTTP, SDK, workers, retries o procesamiento automático.
+
+## 2026-09-11 - Correccion P2/P3 de identidad PSP
+
+Timestamp: 2026-09-11T22:54:46-03:00
+Estado: PAYMENT_ATTEMPT_PSP_IDENTITY_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- La recuperación concurrente de obligaciones ahora sólo admite SQLSTATE
+  `23505` y la constraint exacta `uq_payment_obligations_reference`, obtenidos
+  desde atributos estructurados del driver. Cualquier otro diagnóstico vuelve
+  a propagar el `IntegrityError` original.
+- Se corrigió el whitespace final de la prueba de migración y se comprobaron
+  explícitamente todos los archivos no rastreados.
+- Focal 14/14; regresiones 82/82; PostgreSQL real 13/13; suite completa 390
+  ejecutadas, 385 aprobadas y 5 omitidas, sin fallos ni errores; `compileall` y
+  head Alembic único `20260911_02` aprobados.
+- Se conserva el `REQUIERE_CORRECCIONES` histórico. La corrección queda
+  pendiente de retest independiente; no se implementó el procesador PSP.
+
+## 2026-09-11 - Identidad PSP contextual en intentos de pago
+
+Timestamp: 2026-09-11T22:26:39-03:00
+Estado: PAYMENT_ATTEMPT_PSP_IDENTITY_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- Se adoptó la decisión `INCORPORAR_IDENTIDAD_PSP_CONTEXTUAL_EN_PAYMENT_ATTEMPTS`:
+  proveedor canónico, modo y ID externo forman la identidad contextual.
+- La migración `20260911_02`, descendiente de `20260911_01`, agrega contexto
+  nullable, constraint de pareja completa e índice único parcial. No atribuye
+  contexto a filas históricas ni impone unicidad global al ID externo.
+- Los servicios permiten crear/asociar contexto, impiden reemplazarlo y buscan
+  exclusivamente por identidad completa. Los intentos legacy quedan excluidos.
+- Focal 23/23; regresiones 81/81; PostgreSQL 12/12; suite completa 389
+  ejecutadas, 384 aprobadas y 5 omitidas, sin fallos ni errores.
+- El bloqueo histórico de correlación se conserva. No se implementó todavía el
+  procesador, Mercado Pago real, HTTP, firmas, workers ni lógica financiera.
+
+## 2026-09-11 - Procesador de eventos PSP bloqueado por correlacion
+
+Timestamp: 2026-09-11T22:16:16-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_BLOQUEADO_POR_DEFINICION_DE_CORRELACION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+HEAD: `f45f32ce3c032b6a4b7404886b9c2558cdb5e62a`
+
+- El inbox identifica eventos por proveedor, modo e ID externo, pero
+  `payment_attempts` sólo conserva `external_attempt_id`: no registra proveedor
+  ni modo y ese campo no posee unicidad.
+- Una búsqueda global por ID de recurso sería ambigua ante colisiones entre
+  proveedores o modos. No se implementó esa asociación insegura ni se creó una
+  migración sin contrato aprobado.
+- Se requiere definir una identidad PSP completa en el intento o una relación
+  explícita evento-intento, incluyendo reglas de alta, unicidad y compatibilidad
+  con datos existentes. No se ejecutaron pruebas porque no hubo cambio de código.
+
+## 2026-09-11 - Correccion P1/P2 de la bandeja de eventos PSP
+
+Timestamp: 2026-09-11T20:57:36-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+
+- Se conserva la revision historica `REQUIERE_CORRECCIONES`. P1 queda corregido:
+  una redelivery con distinto `received_at` es replay y conserva sin actualizar
+  la fecha de la primera fila. El contenido material estable sigue detectando
+  conflictos.
+- P2 queda corregido: el DTO acepta SHA-256 hexadecimal y lo normaliza a
+  minusculas antes de persistir o comparar; mayusculas/minusculas son el mismo
+  digest y un digest diferente continúa siendo conflicto.
+- Focal 11/11; regresiones de pagos 75/75; PostgreSQL 3/3; suite completa 383
+  ejecutadas, 378 aprobadas y 5 omitidas, sin fallos ni errores. Pendiente de
+  retest independiente antes del primer commit.
+
+## 2026-09-11 - Contrato neutral y bandeja persistente de eventos PSP
+
+Timestamp: 2026-09-11T20:09:34-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+
+- Primer incremento de una rama agrupada; el PR se abrira despues del segundo
+  commit. Se registro como antecedente el PR #11, feature `f10616c` y merge
+  `3b6bc44`.
+- Se agregaron un DTO inmutable de evento PSP normalizado, almacenamiento
+  idempotente y consultas por ID interno e identidad externa. No contiene
+  estado financiero, firma, headers completos ni payload crudo.
+- Migracion `20260911_01`, descendiente de `20260910_01`, con tabla
+  `psp_event_inbox` e identidad proveedor/modo/ID externo.
+- Focal: 9/9; regresiones de pagos: 73/73; PostgreSQL real: 3/3; suite completa:
+  381 ejecutadas, 376 aprobadas y 5 omitidas, sin fallos ni errores.
+- No se implementaron endpoint, firma, HTTP, Mercado Pago, procesamiento,
+  workers, creditos, PRO, ARCA ni interfaz.
+
 ## 2026-09-11 - Workflow persistente de pagos con semantica de incertidumbre aprobada
 
 Timestamp: 2026-09-11T19:22:09-03:00
