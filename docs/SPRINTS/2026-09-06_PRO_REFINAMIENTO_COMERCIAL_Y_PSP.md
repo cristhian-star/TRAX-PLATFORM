@@ -8,6 +8,60 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P2 del contrato de notificación Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T19:03:04-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+Se conserva el hallazgo histórico y se registra su corrección. El parseo ISO
+8601 quedó encapsulado en un helper que transforma `ValueError` o `TypeError`
+en un sentinel interno; la excepción neutral se produce fuera del bloque de
+captura y no conserva causa ni contexto del parser.
+
+Una regresión con marcador sensible confirma que el dato no aparece en
+`str`, `repr` ni el traceback de la excepción y que `__cause__` y `__context__`
+son nulos. La revisión de otros parseos del contrato no encontró otra
+conversión equivalente. No cambiaron firma, normalización, hash ni DTO.
+
+Focal 21/21, regresiones PSP 47/47, regresiones de pagos 65/65 y suite completa
+420 ejecutadas, 415 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`
+y el head único `20260911_02` fueron aprobados. PostgreSQL no aplica.
+
+La corrección queda pendiente de retest independiente y no agrega endpoint,
+HTTP, persistencia, SDK, credenciales ni integración real con Mercado Pago.
+
+## Contrato de notificacion Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T18:42:12-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+Se implementó el segundo incremento como frontera pura entre la notificación
+específica de Mercado Pago y el DTO neutral del inbox. La firma se verifica
+antes de producir el evento; query, headers y cuerpo se validan sin ambigüedad,
+y el identificador firmado debe coincidir con el recurso informado. El valor
+original se conserva y la minúscula se limita al manifiesto criptográfico.
+
+El DTO usa proveedor `mercadopago`, modo derivado de `live_mode`, timestamps
+con zona y un SHA-256 canónico del contenido validado estable. No guarda payload
+crudo ni atribuye significado financiero a `action`; tampoco consulta al PSP
+ni invoca conciliación.
+
+Focal de firma y contrato 20/20, regresiones PSP 46/46, regresiones de pagos
+65/65 y suite completa 419 ejecutadas, 414 aprobadas y 5 omitidas, sin fallos
+ni errores. `compileall`, whitespace y Alembic head único `20260911_02`
+aprobados. PostgreSQL no aplica y `trax_db` permaneció fuera de uso.
+
+El incremento queda pendiente de revisión independiente. No agrega ruta Flask,
+endpoint público, HTTP, SDK, OAuth, credenciales, migración, persistencia,
+webhook productivo, procesador, Mercado Pago real, créditos, PRO, ARCA ni
+deploy, y no declara completa la arquitectura 2.0.
+
 ## Corrección P2 del verificador de firma Webhook de Mercado Pago
 
 Timestamp: 2026-09-12T18:20:35-03:00

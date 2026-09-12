@@ -1,5 +1,53 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-12 - Correccion P2 del contrato de notificacion Webhook
+
+Timestamp: 2026-09-12T19:03:04-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+- Se conserva el hallazgo histórico y se corrigió la filtración del error
+  interno de `datetime.fromisoformat()`: un helper captura `ValueError` y
+  `TypeError`, devuelve un sentinel privado y la excepción neutral se crea
+  después, fuera del bloque `except`.
+- La regresión con un marcador sensible confirma ausencia del valor en
+  `str`, `repr` y el traceback, además de `__cause__` y `__context__` nulos.
+- Se revisaron los restantes parseos del contrato y no existe otra conversión
+  de fecha equivalente. Las reglas de firma, normalización, hash y DTO no se
+  modificaron.
+- Focal 21/21; regresiones PSP 47/47; regresiones de pagos 65/65; suite completa
+  420 ejecutadas, 415 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic conserva el head único `20260911_02`.
+- PostgreSQL no aplica. La corrección queda pendiente de retest independiente.
+
+## 2026-09-12 - Contrato de notificacion Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T18:42:12-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+- Se agregó un normalizador puro que recibe parámetros de query, headers y
+  cuerpo JSON ya decodificado, valida primero la firma y produce el `PSPEvent`
+  neutral usado por el inbox.
+- El contrato exige estructuras inequívocas, coherencia entre el `data.id`
+  firmado y el recurso del cuerpo, `type`, `action`, `live_mode`, timestamps
+  con zona y versión `v1`. Proveedor y modo se mapean a `mercadopago` y al
+  inverso de `live_mode`, sin interpretar estados financieros.
+- El identificador original se conserva; su minúscula se limita al manifiesto
+  criptográfico. El hash SHA-256 canónico cubre el contenido validado estable,
+  excluye `received_at` y no conserva payload crudo.
+- Focal de firma y notificación 20/20; regresiones PSP 46/46; regresiones de
+  pagos 65/65; suite completa 419 ejecutadas, 414 aprobadas y 5 omitidas, sin
+  fallos ni errores; `compileall` aprobado y Alembic conserva el head único
+  `20260911_02`.
+- No se agregaron ruta Flask, persistencia, migración, consulta al proveedor,
+  procesador, dependencia, credencial ni integración productiva. PostgreSQL no
+  aplica a este contrato puro.
+
 ## 2026-09-12 - Correccion P2 del parser de x-signature
 
 Timestamp: 2026-09-12T18:20:35-03:00

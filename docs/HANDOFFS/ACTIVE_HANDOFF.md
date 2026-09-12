@@ -1,5 +1,69 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Contrato de notificacion Webhook - P2 corregido
+
+Timestamp: 2026-09-12T19:03:04-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+Estado Git: cinco cambios locales conocidos, staging vacío, sin commit ni push
+
+Corrección P2: `_parse_iso_datetime()` encapsula `datetime.fromisoformat()`,
+captura internamente `ValueError`/`TypeError` y devuelve un sentinel privado.
+La excepción de dominio neutral se lanza posteriormente fuera del `except`,
+por lo que no conserva el error interno como causa ni contexto. Ningún mensaje,
+representación o metadato incorpora el timestamp recibido.
+
+La prueba adversarial usa un marcador sensible y verifica `str`, `repr`,
+`traceback.format_exception`, `__cause__` y `__context__`. Se revisó el resto
+del contrato: no hay otro parseo de fecha equivalente. Firma, normalización,
+hash y DTO permanecen intactos.
+
+Validación: focal 21/21; regresiones PSP 47/47; persistencia, orquestación y
+workflow 65/65; suite completa 420 ejecutadas, 415 aprobadas, 5 omitidas,
+0 fallos y 0 errores; `compileall` aprobado; head Alembic único `20260911_02`.
+PostgreSQL no aplica a este contrato puro.
+
+Se conserva el hallazgo histórico. Pendiente: retest independiente antes del
+segundo commit. No existen ruta pública, persistencia, SDK ni integración real
+con Mercado Pago. No hubo staging, commit, push, PR, merge, rebase ni deploy.
+
+## Contrato de notificacion Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T18:42:12-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+Estado Git: cinco cambios locales conocidos, staging vacío, sin commit ni push
+
+Trabajo completado: parser/normalizador puro de notificaciones ya decodificadas
+que recibe query, headers, cuerpo y tiempo de recepción de forma explícita.
+Verifica la firma antes de validar el cuerpo, rechaza estructuras ambiguas o
+inesperadas y exige coherencia exacta de recurso y tópico. Produce el DTO
+neutral `PSPEvent` con proveedor `mercadopago`, modo derivado de `live_mode` y
+hash SHA-256 determinista del contenido validado estable. El payload crudo no
+se almacena y `received_at` no participa en el hash de redelivery.
+
+Validación: firma y notificación 20/20; regresiones PSP 46/46; persistencia,
+orquestación y workflow 65/65; suite completa 419 ejecutadas, 414 aprobadas,
+5 omitidas, 0 fallos y 0 errores; `compileall`, whitespace y head Alembic único
+`20260911_02` aprobados. Todo se ejecutó con SQLite en memoria; PostgreSQL no
+aplica y no se utilizó ni modificó `trax_db`.
+
+Archivos locales: `app/services/mercadopago_webhook_notification.py`,
+`tests/test_mercadopago_webhook_notification.py` y los tres registros
+documentales autorizados. Pendiente: revisión independiente antes del segundo
+commit. No existen ruta Flask, endpoint público, base de datos conectada,
+consulta a Mercado Pago, SDK, credenciales, migración, interpretación
+financiera ni procesador invocado. No hubo staging, commit, push, PR, merge,
+rebase ni deploy.
+
 ## Verificador de firma Webhook de Mercado Pago - P2 corregido
 
 Timestamp: 2026-09-12T18:20:35-03:00
