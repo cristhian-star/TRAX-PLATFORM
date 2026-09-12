@@ -1,5 +1,51 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-12 - Correccion P2 del parser de x-signature
+
+Timestamp: 2026-09-12T18:20:35-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+
+- Se corrigió el hallazgo P2 conservando el `REQUIERE_CORRECCIONES`
+  histórico: las claves de cada componente de `x-signature` se normalizan con
+  trim y minúsculas antes de almacenarlas o compararlas.
+- `ts`/`TS` y `v1`/`V1` representan el mismo componente semántico. Toda
+  repetición posterior a esa normalización se rechaza, incluso cuando los
+  valores coinciden; nunca se sobrescribe silenciosamente un valor previo.
+- Los valores de `ts` y `v1` permanecen sin normalización de casing o contenido,
+  fuera del trim estructural ya admitido por el contrato previo.
+- Focal 10/10; regresiones PSP 36/36; regresiones de pagos 65/65; suite completa
+  409 ejecutadas, 404 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic conserva el head único `20260911_02`.
+- PostgreSQL no aplica a esta corrección criptográfica pura. Continúan
+  pendientes el retest independiente y la futura capa HTTP.
+
+## 2026-09-12 - Verificador de firma Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T16:17:29-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+Fuente oficial: [Notificaciones de pago de Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-preferences/payment-notifications)
+
+- Se implementó un verificador puro del header `x-signature`: extrae `ts` y
+  `v1`, construye el manifiesto oficial y valida HMAC-SHA256 hexadecimal con
+  comparación en tiempo constante.
+- Conforme a la fuente oficial vigente, `data.id` se convierte a minúsculas
+  sólo para el manifiesto; el valor original se conserva fuera del cálculo.
+  `x-request-id`, `ts`, secreto y demás componentes no se normalizan.
+- Como política local más estricta de MANDOBRA, todos los campos del manifiesto
+  y el secreto son obligatorios. Esta decisión fail-closed no se atribuye a
+  Mercado Pago y no incorpora una ventana temporal no definida por la fuente.
+- Focal 9/9; regresiones PSP 35/35; regresiones de pagos 65/65; suite completa
+  408 ejecutadas, 403 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic permanece en `20260911_02`.
+- No existe todavía ruta Flask, endpoint público, respuesta HTTP, lectura de
+  secretos productivos, registro en inbox, SDK ni conexión real con Mercado Pago.
+
 ## 2026-09-12 - Integracion post-merge del procesamiento de eventos PSP
 
 Timestamp: 2026-09-12T14:03:46-03:00

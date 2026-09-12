@@ -8,6 +8,57 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P2 del verificador de firma Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T18:20:35-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `08471f76900cde263a7a4590ff77f60751ffd704`
+
+Se conserva el `REQUIERE_CORRECCIONES` histórico y se registra su corrección:
+las claves de `x-signature` se canonicalizan mediante trim y minúsculas antes
+de almacenarlas o compararlas. Por ello, variantes de casing de `ts` o `v1`
+son el mismo componente y cualquier duplicado se rechaza sin sobrescritura,
+aun cuando repita el mismo valor. Los valores de esos componentes no se
+normalizan y permanecen sujetos a las validaciones previas.
+
+Focal 10/10, regresiones PSP 36/36, regresiones de pagos 65/65 y suite completa
+409 ejecutadas, 404 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`
+y el head único `20260911_02` fueron aprobados. PostgreSQL no aplica.
+
+La corrección queda pendiente de retest independiente. No agrega ruta Flask,
+endpoint público, respuesta HTTP, SDK, credenciales, persistencia ni conexión
+real con Mercado Pago, y no amplía el alcance funcional del diseño 2.0.
+
+## Verificador de firma Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T16:17:29-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `08471f76900cde263a7a4590ff77f60751ffd704`
+Fuente oficial: [Notificaciones de pago de Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-preferences/payment-notifications)
+
+Se implementó un componente puro, sin Flask, base de datos ni SDK, que valida
+el manifiesto oficial mediante HMAC-SHA256 y comparación en tiempo constante.
+`data.id` se convierte a minúsculas exclusivamente dentro del manifiesto y su
+valor original se conserva; no se normalizan los demás componentes firmados.
+
+La documentación oficial admite omitir determinados pares ausentes. La
+política local de MANDOBRA es deliberadamente más estricta: para aceptar una
+notificación exige todos los componentes y el secreto. No se implementó una
+ventana para `ts` porque la fuente no define una tolerancia obligatoria.
+
+Focal 9/9, regresiones PSP 35/35, regresiones de pagos 65/65 y suite completa
+408 ejecutadas, 403 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`
+y el head único `20260911_02` fueron aprobados. PostgreSQL no aplica.
+
+Continúan pendientes la revisión independiente, la ruta Flask, el endpoint
+público, la traducción de firma inválida a HTTP 401, configuración segura del
+secreto, registro en inbox y consulta del pago. No existe integración real con
+Mercado Pago ni procesamiento financiero.
+
 ## Integración post-merge del procesamiento de eventos PSP
 
 Timestamp: 2026-09-12T14:03:46-03:00

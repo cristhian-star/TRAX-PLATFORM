@@ -1,5 +1,68 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Verificador de firma Webhook de Mercado Pago - P2 corregido
+
+Timestamp: 2026-09-12T18:20:35-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+Estado Git: cinco cambios locales conocidos, staging vacío, sin commit ni push
+
+Corrección P2: el parser aplica trim y minúsculas a las claves antes de
+registrarlas. De este modo `ts`/`TS` y `v1`/`V1` son una misma clave semántica,
+y cualquier duplicado se rechaza antes de poder sobrescribir el primero,
+incluso si ambos valores coinciden. Los valores de `ts` y `v1` no se
+normalizan; se conserva el tratamiento estructural previo de espacios.
+
+Validación: focal 10/10; firma más regresiones PSP 36/36; persistencia,
+orquestación y workflow 65/65; suite completa 409 ejecutadas, 404 aprobadas,
+5 omitidas, 0 fallos y 0 errores; `compileall` aprobado; head Alembic único
+`20260911_02`. PostgreSQL no aplica por tratarse de lógica criptográfica pura.
+
+Se conserva el `REQUIERE_CORRECCIONES` histórico. Pendientes: retest
+independiente y futura capa HTTP. No se implementaron rutas, endpoint público,
+SDK, credenciales, inbox conectado ni integración real con Mercado Pago. No
+hubo staging, commit, push, PR, merge, rebase ni deploy.
+
+## Verificador de firma Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T16:17:29-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+Estado Git: cambios locales sin staging, commit ni push
+Fuente oficial: [Notificaciones de pago de Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-preferences/payment-notifications)
+
+Trabajo completado: verificador criptográfico aislado que extrae sin ambigüedad
+`ts` y `v1`, arma `id:<data.id>;request-id:<x-request-id>;ts:<ts>;`, calcula
+HMAC-SHA256 hexadecimal y compara mediante `hmac.compare_digest()`. La decisión
+aprobada reemplaza el uso literal previo: sólo la copia de `data.id` destinada
+al manifiesto se pasa a minúsculas; el resultado inmutable conserva el valor
+original. No se normalizan `x-request-id`, `ts`, secreto u otros valores.
+
+Distinción contractual: la estructura de firma, el manifiesto, HMAC-SHA256 y
+la minúscula de `data.id` proceden de la documentación oficial. MANDOBRA adopta
+por separado una política fail-closed más estricta: exige `x-signature`,
+`x-request-id`, `data.id`, `ts`, `v1` y secreto. No se agregó ventana temporal
+porque la fuente no fija una tolerancia obligatoria.
+
+Validación: focal 9/9; firma más regresiones PSP 35/35; persistencia,
+orquestación y workflow 65/65; suite completa 408 ejecutadas, 403 aprobadas,
+5 omitidas, 0 fallos y 0 errores; `compileall` aprobado; head Alembic único
+`20260911_02`; PostgreSQL no aplica por ser lógica criptográfica pura.
+
+Pendientes: revisión independiente y futura capa web que traduzca una firma
+inválida a HTTP 401. No existen aún ruta Flask, endpoint público, configuración
+productiva, inbox conectado, consulta de pagos, SDK, OAuth, QR, checkout,
+workers, retries ni procesamiento financiero. No hubo staging, commit, push,
+PR, merge, rebase ni deploy.
+
 ## Integracion post-merge del procesamiento de eventos PSP
 
 Timestamp: 2026-09-12T14:03:46-03:00
