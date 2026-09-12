@@ -22,6 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.models.payment_attempt import PaymentAttemptRecord
 from app.models.payment_obligation import PaymentObligation
+from app.models.psp_event import PSPEventRecord
 from app.services.payment_orchestration import (
     InMemoryPaymentOrchestrator,
     PaymentObligation as PaymentObligationRequest,
@@ -36,6 +37,13 @@ from app.services.payment_persistence_service import (
     register_or_get_attempt,
 )
 from app.services.psp_contract import PaymentAttemptStatus
+from app.services.psp_contract import PaymentAttempt
+from app.services.psp_event_contract import PSPEvent
+from app.services.psp_event_inbox import register_or_get_event
+from app.services.psp_event_reconciliation import (
+    PSPEventProcessingStatus,
+    PSPEventReconciliationProcessor,
+)
 from app.services.psp_simulator import (
     InMemoryPSPSimulator,
     ScenarioController,
@@ -119,7 +127,10 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
     def setUp(self):
         with self.engine.begin() as connection:
             connection.execute(
-                sa.text("TRUNCATE TABLE payment_attempts, payment_obligations RESTART IDENTITY")
+                sa.text(
+                    "TRUNCATE TABLE psp_event_inbox, payment_attempts, "
+                    "payment_obligations RESTART IDENTITY"
+                )
             )
 
     @staticmethod
@@ -345,6 +356,65 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             next(value for kind, value in conflict if kind == "error"),
             PaymentPersistenceConflictError,
         )
+
+    def test_concurrent_event_processing_converges_without_duplicate_financial_rows(self):
+        request = self._request("event-reconciliation", "10", "event-key")
+        with self.Session.begin() as session:
+            obligation = create_or_get_obligation(session, request)
+            attempt = register_or_get_attempt(
+                session,
+                obligation,
+                self._result(request, PaymentOutcome.PENDING, "event-attempt"),
+                psp_provider="provider",
+                psp_live_mode=False,
+            )
+            event = register_or_get_event(session, PSPEvent(
+                "provider", "event-id", "payment", "updated", "event-attempt",
+                True, None, datetime.now(timezone.utc), "a" * 64,
+            ))
+            event_id = event.id
+            attempt_id = attempt.id
+
+        class Adapter:
+            def create_attempt(self, **kwargs):
+                raise AssertionError("processor must not create attempts")
+
+            def get_attempt(self, external_attempt_id):
+                return PaymentAttempt(
+                    external_attempt_id,
+                    request.internal_reference,
+                    request.amount,
+                    request.currency,
+                    request.idempotency_key,
+                    PaymentAttemptStatus.APPROVED,
+                    datetime.now(timezone.utc),
+                )
+
+        processor = PSPEventReconciliationProcessor(
+            session_factory=self.Session,
+            adapter=Adapter(),
+            provider="provider",
+            live_mode=False,
+            payment_topics=("payment",),
+        )
+        results = self._race([
+            lambda session: processor.process(event_id).status,
+            lambda session: processor.process(event_id).status,
+        ])
+        self.assertEqual([kind for kind, _ in results], ["ok", "ok"])
+        self.assertTrue(all(
+            value in {
+                PSPEventProcessingStatus.RECONCILED,
+                PSPEventProcessingStatus.ALREADY_TERMINAL,
+            }
+            for _, value in results
+        ))
+        with self.Session() as session:
+            rows = session.query(PaymentAttemptRecord).all()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0].id, attempt_id)
+            self.assertEqual(rows[0].financial_status, "APPROVED")
+            self.assertEqual(session.query(PSPEventRecord).count(), 1)
 
     def test_constraints_foreign_key_rollback_visibility_and_session_recovery(self):
         session = self.Session()

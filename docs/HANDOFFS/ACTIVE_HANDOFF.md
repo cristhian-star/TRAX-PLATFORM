@@ -1,5 +1,67 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Procesador PSP - P1 de topicos corregido
+
+Timestamp: 2026-09-12T13:32:58-03:00
+Estado: COMPLETED
+Resultado: PSP_EVENT_RECONCILIATION_PROCESSOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+Estado Git: seis cambios locales conocidos, staging vacío, sin commit ni push
+
+Corrección: el constructor recibe obligatoriamente tópicos de pago, los
+canonicaliza mediante trim/minúsculas y conserva un `frozenset` privado. No hay
+comodín ni tópico hardcodeado en el servicio. Tras validar proveedor y modo,
+un tópico ajeno devuelve el resultado inmutable `UNSUPPORTED_TOPIC` antes de
+cualquier correlación o llamada externa.
+
+La reproducción adversarial `merchant_order`, con ID coincidente y
+`action=payment.approved`, se ejecutó dos veces: no buscó el intento, no llamó
+al adaptador y dejó el estado financiero `PENDING` sin cambios. Proveedor y
+modo incompatibles conservan el mismo corte temprano sin llamada.
+
+Validación: focal 9/9; inbox, identidad y procesador 26/26; persistencia,
+orquestación y workflow 65/65; PostgreSQL 14/14 sobre
+`trax_payment_persistence_test_topics_20260912`; suite completa 399 ejecutadas,
+394 aprobadas, 5 omitidas, 0 fallos y 0 errores; `compileall` y head único
+`20260911_02` aprobados. Sin migración nueva.
+
+El `REQUIERE_CORRECCIONES` histórico permanece como evidencia. Pendiente:
+retest independiente. No existen Mercado Pago real, endpoint webhook, HTTP,
+firmas, SDK, workers, retries ni integración productiva. No hubo staging,
+commit, push, PR, merge, rebase ni deploy.
+
+## Procesador neutral de conciliacion por eventos PSP
+
+Timestamp: 2026-09-12T13:10:46-03:00
+Estado: COMPLETED
+Resultado: PSP_EVENT_RECONCILIATION_PROCESSOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+Estado Git: cambios locales sin staging, commit ni push
+
+Trabajo completado: coordinador neutral con resultados inmutables y explícitos;
+lectura/correlación contextual en una transacción breve; cierre total de sesión
+antes de una única consulta por invocación a `PSPAdapter`; segunda transacción
+con lock y transición mediante `apply_reconciliation()`. El evento nunca se
+interpreta como estado financiero. Los intentos legacy no correlacionan y los
+terminales no provocan otra llamada.
+
+Validación: focal 7/7; inbox e identidad 24/24; persistencia, orquestación y
+workflow 65/65; gate PostgreSQL 14/14 sobre
+`trax_payment_persistence_test_eventprocessor_20260912`; suite completa 397
+ejecutadas, 392 aprobadas, 5 omitidas, 0 fallos y 0 errores; `compileall` y head
+Alembic único `20260911_02` aprobados. No se agregó migración.
+
+Pendientes: revisión independiente antes del tercer commit y del PR único.
+No existe Mercado Pago real, endpoint webhook público, validación de firma,
+HTTP, SDK, credenciales, workers, retries ni integración productiva. No hubo
+staging, commit, push, PR, merge, rebase ni deploy.
+
 ## Identidad PSP contextual - P2/P3 corregidos
 
 Timestamp: 2026-09-11T22:54:46-03:00

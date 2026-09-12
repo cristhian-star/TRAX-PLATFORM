@@ -8,6 +8,52 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P1 de tópicos del procesador PSP
+
+Timestamp: 2026-09-12T13:32:58-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+
+El procesador neutral ahora requiere una colección explícita y no vacía de
+tópicos de pago, normalizada con trim y minúsculas y conservada como conjunto
+inmutable. Cada adaptador futuro definirá sus tópicos; el servicio no contiene
+valores de Mercado Pago ni un comodín implícito.
+
+Un tópico no configurado produce `UNSUPPORTED_TOPIC` antes de correlacionar o
+consultar al PSP. La reproducción con `merchant_order`, ID coincidente y acción
+`payment.approved` dejó el intento en `PENDING`, sin búsquedas ni llamadas, aun
+al reprocesarse. El tópico sólo clasifica la procesabilidad del recurso.
+
+Focal 9/9, regresiones 26/26 y 65/65, PostgreSQL 14/14 y suite completa 399
+ejecutadas, 394 aprobadas y 5 omitidas, sin fallos ni errores. `compileall` y
+head único `20260911_02` aprobados; no se agregó migración. Se conserva el
+`REQUIERE_CORRECCIONES` histórico y falta retest independiente. No existe
+integración real con Mercado Pago ni endpoint webhook productivo.
+
+## Procesador neutral de conciliación por eventos PSP
+
+Timestamp: 2026-09-12T13:10:46-03:00
+Estado: PSP_EVENT_RECONCILIATION_PROCESSOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Base: `9951d2503d9b70353ddcd674d6c750cbb2436997`
+
+El tercer incremento implementa un coordinador neutral que toma un evento ya
+registrado únicamente como aviso. Correlaciona mediante proveedor, modo e ID
+externo, libera la sesión antes de consultar `PSPAdapter` y persiste después el
+estado autoritativo con las transiciones existentes. No deriva estado desde el
+tópico, acción o contenido del evento.
+
+Focal 7/7, regresiones 24/24 y 65/65, PostgreSQL real 14/14 y suite completa
+397 ejecutadas, 392 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`
+y el head único `20260911_02` fueron aprobados; no existe migración nueva.
+
+Permanece pendiente la revisión independiente antes del tercer commit. No hay
+integración real con Mercado Pago, endpoint webhook productivo, HTTP, firmas,
+SDK, workers, retries, checkout, créditos, PRO, ARCA ni interfaz.
+
 ## Corrección P2/P3 de identidad PSP
 
 Timestamp: 2026-09-11T22:54:46-03:00
