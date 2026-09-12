@@ -1,5 +1,63 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Bandeja de eventos PSP - P1/P2 corregidos
+
+Timestamp: 2026-09-11T20:57:36-03:00
+Estado: COMPLETED
+Resultado: PSP_EVENT_INBOX_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+Estado Git final: 14 cambios locales conocidos, staging vacio, sin commit ni push
+
+La revision independiente historica `REQUIERE_CORRECCIONES` se preserva. Se
+corrigieron P1 y P2 exclusivamente: `received_at` ya no integra la comparación
+material de replay y la primera recepción permanece inmutable; el SHA-256 se
+normaliza a minúsculas en el DTO. La misma regla fue comprobada en replay
+secuencial y en recuperación concurrente PostgreSQL.
+
+Validación: focal 11/11; regresiones 75/75; gate PostgreSQL 3/3 sobre
+`trax_psp_event_test_retest_20260911`; suite completa 383 ejecutadas, 378
+aprobadas, 5 omitidas, 0 fallos y 0 errores. `compileall`, head Alembic único,
+whitespace y limpieza de la base se verifican en el cierre. Migración
+`20260911_01` preservada sin cambios adicionales.
+
+Pendiente: retest independiente antes del primer commit. No se implementaron
+procesamiento financiero, payload crudo, firmas, HTTP, PSP real, workers,
+relación con intentos, dependencias ni integración Git.
+
+## Bandeja persistente de eventos PSP - primer incremento local
+
+Timestamp: 2026-09-11T20:09:34-03:00
+Estado: COMPLETED
+Resultado: PSP_EVENT_INBOX_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/psp-event-processing`
+HEAD/commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+Antecedente integrado: PR #11, feature `f10616c`, merge `3b6bc44`
+Estado Git: cambios locales sin staging, commit ni push
+
+Trabajo completado: contrato inmutable de evento neutral, modelo y servicio de
+bandeja, migracion `20260911_01` descendiente de `20260910_01`, pruebas
+portables y gate PostgreSQL. Replay identico converge; contenido distinto bajo
+la misma identidad produce conflicto; eventos distintos del mismo recurso se
+conservan. El helper no confirma transacciones ni llama proveedores.
+
+Validacion: focal 9/9; regresiones 73/73; PostgreSQL 3/3 sobre
+`trax_psp_event_test_foundation_20260911`; suite completa 381 ejecutadas, 376
+aprobadas, 5 omitidas, 0 fallos y 0 errores. La base descartable fue eliminada
+y su ausencia confirmada. `compileall`, head Alembic, enlaces y whitespace se
+registran en el cierre final.
+
+Limitaciones: no acredita autenticidad, recepción HTTP ni orden de entrega; no
+guarda payload crudo, firmas o secretos y no interpreta estados financieros.
+No se agregaron Mercado Pago, consultas externas, workers, créditos, PRO,
+ARCA, interfaz ni dependencias. Es el primer incremento de una rama con dos
+commits; falta revisión independiente y el segundo incremento antes de abrir
+un único PR. No hubo commit, push, PR, merge ni deploy en esta sesión.
+
 ## Workflow persistente de pagos - semantica aprobada implementada
 
 Timestamp: 2026-09-11T19:22:09-03:00

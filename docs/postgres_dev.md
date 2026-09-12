@@ -1,5 +1,12 @@
 # PostgreSQL DEV con Docker
 
+## Gate de bandeja de eventos PSP
+
+El gate usa exclusivamente bases descartables llamadas `trax_psp_event_test`
+o `trax_psp_event_test_<segmentos_ascii>`, con hasta 63 bytes, y requiere
+`TRAX_POSTGRES_TEST_ALLOW_RESET=1`. Nunca debe apuntar a `trax_db`, `postgres`
+o las bases template.
+
 ## Alcance
 
 Este entorno incorpora PostgreSQL para desarrollo en Docker. No migra los datos existentes de SQLite y no elimina ninguna base ni volumen previo. El backup local previo se conserva en `instance/trax_backup_before_postgres.db`.

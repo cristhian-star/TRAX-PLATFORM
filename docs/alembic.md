@@ -1,5 +1,11 @@
 # Alembic en MANDOBRA
 
+## Head de bandeja de eventos PSP
+
+Desde 2026-09-11, `20260911_01` es el head unico y desciende de
+`20260910_01`. Crea exclusivamente `psp_event_inbox`; su downgrade elimina esa
+tabla sin modificar las tablas de pagos existentes.
+
 ## Que es Alembic
 
 Alembic es el sistema oficial de migraciones para el schema SQLAlchemy de MANDOBRA. Permite versionar cambios de estructura, aplicarlos de forma ordenada y preparar una futura transicion desde SQLite DEV hacia PostgreSQL.

@@ -8,6 +8,44 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P1/P2 de bandeja de eventos PSP
+
+Timestamp: 2026-09-11T20:57:36-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+
+Sin eliminar el dictamen histórico `REQUIERE_CORRECCIONES`, se corrigieron sus
+dos hallazgos. Una entrega repetida puede tener otro `received_at` sin cambiar
+el contenido material: devuelve la fila original y preserva su primera fecha.
+El hash SHA-256 se canonicaliza a minúsculas en la frontera del DTO; diferencias
+de casing son replay y diferencias reales continúan bloqueadas como conflicto.
+
+Resultados locales: focal 11/11; regresiones 75/75; PostgreSQL 3/3; suite
+completa 383 ejecutadas, 378 aprobadas y 5 omitidas, sin fallos ni errores.
+La migración `20260911_01` permanece vigente. El incremento sigue pendiente de
+retest independiente y no está autorizado para su primer commit.
+
+## Bandeja persistente de eventos PSP - primer incremento
+
+Timestamp: 2026-09-11T20:09:34-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Base: merge `3b6bc44` del PR #11; feature previa `f10616c`
+
+Se implemento exclusivamente el contrato neutral normalizado y su bandeja
+persistente idempotente. La notificacion conserva identidad, tópico, acción,
+recurso, modo, tiempos y hash, pero no es evidencia financiera ni acredita
+autenticidad. La migracion `20260911_01` desciende de `20260910_01`.
+
+Resultados: focal 9/9; regresiones 73/73; PostgreSQL 3/3; suite completa 381
+ejecutadas, 376 aprobadas y 5 omitidas, sin fallos ni errores. Este es el primer
+incremento de la rama agrupada; el PR se abrira solamente despues del segundo
+commit. Endpoint, HMAC, respuesta HTTP, consulta a Mercado Pago, procesamiento,
+workers, creditos, PRO, ARCA e interfaz permanecen fuera de alcance.
+
 ## Workflow persistente de pagos - contrato de incertidumbre resuelto
 
 Timestamp: 2026-09-11T19:22:09-03:00

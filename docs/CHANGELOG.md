@@ -1,5 +1,45 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-11 - Correccion P1/P2 de la bandeja de eventos PSP
+
+Timestamp: 2026-09-11T20:57:36-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_CORREGIDA_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+
+- Se conserva la revision historica `REQUIERE_CORRECCIONES`. P1 queda corregido:
+  una redelivery con distinto `received_at` es replay y conserva sin actualizar
+  la fecha de la primera fila. El contenido material estable sigue detectando
+  conflictos.
+- P2 queda corregido: el DTO acepta SHA-256 hexadecimal y lo normaliza a
+  minusculas antes de persistir o comparar; mayusculas/minusculas son el mismo
+  digest y un digest diferente continúa siendo conflicto.
+- Focal 11/11; regresiones de pagos 75/75; PostgreSQL 3/3; suite completa 383
+  ejecutadas, 378 aprobadas y 5 omitidas, sin fallos ni errores. Pendiente de
+  retest independiente antes del primer commit.
+
+## 2026-09-11 - Contrato neutral y bandeja persistente de eventos PSP
+
+Timestamp: 2026-09-11T20:09:34-03:00
+Estado: PSP_EVENT_INBOX_FOUNDATION_IMPLEMENTADA_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/psp-event-processing`
+Commit base: `3b6bc44d0bddfa108b4b18e6d04e23f5c0b34fee`
+
+- Primer incremento de una rama agrupada; el PR se abrira despues del segundo
+  commit. Se registro como antecedente el PR #11, feature `f10616c` y merge
+  `3b6bc44`.
+- Se agregaron un DTO inmutable de evento PSP normalizado, almacenamiento
+  idempotente y consultas por ID interno e identidad externa. No contiene
+  estado financiero, firma, headers completos ni payload crudo.
+- Migracion `20260911_01`, descendiente de `20260910_01`, con tabla
+  `psp_event_inbox` e identidad proveedor/modo/ID externo.
+- Focal: 9/9; regresiones de pagos: 73/73; PostgreSQL real: 3/3; suite completa:
+  381 ejecutadas, 376 aprobadas y 5 omitidas, sin fallos ni errores.
+- No se implementaron endpoint, firma, HTTP, Mercado Pago, procesamiento,
+  workers, creditos, PRO, ARCA ni interfaz.
+
 ## 2026-09-11 - Workflow persistente de pagos con semantica de incertidumbre aprobada
 
 Timestamp: 2026-09-11T19:22:09-03:00
