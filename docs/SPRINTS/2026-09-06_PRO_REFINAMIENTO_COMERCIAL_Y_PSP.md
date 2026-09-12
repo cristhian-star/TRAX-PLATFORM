@@ -8,6 +8,33 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Integración post-merge del procesamiento de eventos PSP
+
+Timestamp: 2026-09-12T14:03:46-03:00
+Estado: POST_MERGE_PSP_EVENT_PROCESSING_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador tecnico local
+Rama destino: `develop`
+PR: `#12`
+Merge: `a96a55311283d331c70e49aad3550ec6f7b1a566`
+
+La rama `feature/psp-event-processing` fue integrada limpiamente y sin
+conflictos con sus tres commits: `f45f32c`, `9951d25` y `3c243b5`. El merge
+incorporó 23 archivos, 1996 inserciones y 9 eliminaciones, incluidas las
+migraciones `20260911_01` y `20260911_02`; el head final registrado es
+`20260911_02`. La revisión remota final fue `APROBADO_PARA_MERGE`.
+
+`develop` local y `origin/develop` coinciden en el merge SHA y en el árbol
+exactamente probado. Por esa identidad continúa siendo válida la evidencia
+histórica: procesador 9/9; procesador, inbox e identidad 26/26; persistencia,
+orquestación y workflow 65/65; PostgreSQL 14/14; suite completa 399 ejecutadas,
+394 aprobadas y 5 omitidas; `compileall`, enlaces y `git diff --check`
+aprobados. No se repitieron estas validaciones después del merge.
+
+El incremento integrado es infraestructura neutral. No acredita webhook
+público, firmas, HTTP, SDK, OAuth, credenciales, integración real con Mercado
+Pago, workers, retries, QR, checkout, créditos, PRO, ARCA ni producción. Este
+registro queda pendiente de revisión documental independiente.
+
 ## Corrección P1 de tópicos del procesador PSP
 
 Timestamp: 2026-09-12T13:32:58-03:00

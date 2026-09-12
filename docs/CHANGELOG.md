@@ -1,5 +1,31 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-12 - Integracion post-merge del procesamiento de eventos PSP
+
+Timestamp: 2026-09-12T14:03:46-03:00
+Estado: POST_MERGE_PSP_EVENT_PROCESSING_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador tecnico local
+Rama: `develop`
+Pull Request: `#12`
+Merge commit: `a96a55311283d331c70e49aad3550ec6f7b1a566`
+
+- Se verificó la integración limpia y sin conflictos de la rama
+  `feature/psp-event-processing`, compuesta por `f45f32c` (inbox), `9951d25`
+  (identidad contextual) y `3c243b5` (procesador de conciliación).
+- El merge incorporó 23 archivos, 1996 inserciones y 9 eliminaciones, incluidas
+  las migraciones `20260911_01` y `20260911_02`; el head final registrado es
+  `20260911_02`.
+- La revisión remota final fue `APROBADO_PARA_MERGE`. HEAD, `origin/develop` y
+  el árbol remoto coinciden exactamente con el contenido probado.
+- Se conserva como evidencia histórica del SHA probado: procesador 9/9;
+  procesador, inbox e identidad 26/26; persistencia, orquestación y workflow
+  65/65; PostgreSQL 14/14; suite completa 399 ejecutadas, 394 aprobadas y 5
+  omitidas; `compileall`, enlaces y `git diff --check` aprobados. Estas pruebas
+  no fueron repetidas post-merge.
+- La integración aporta infraestructura neutral. No acredita webhook público,
+  firmas, HTTP, SDK, OAuth, credenciales, Mercado Pago real, workers, retries,
+  QR, checkout, créditos, PRO, ARCA ni producción.
+
 ## 2026-09-12 - Correccion P1 de topicos del procesador PSP
 
 Timestamp: 2026-09-12T13:32:58-03:00

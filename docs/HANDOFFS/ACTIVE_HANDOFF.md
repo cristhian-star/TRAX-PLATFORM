@@ -1,5 +1,39 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Integracion post-merge del procesamiento de eventos PSP
+
+Timestamp: 2026-09-12T14:03:46-03:00
+Estado: COMPLETED
+Resultado: POST_MERGE_PSP_EVENT_PROCESSING_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama actual/destino: `develop`
+Rama origen: `feature/psp-event-processing`
+HEAD local y `origin/develop`: `a96a55311283d331c70e49aad3550ec6f7b1a566`
+Pull Request integrado: `#12`
+Estado Git previo: árbol limpio, staging vacío y divergencia `0/0`
+
+Integración verificada: merge limpio y sin conflictos de `f45f32c` (inbox
+PSP), `9951d25` (identidad contextual PSP) y `3c243b5` (procesador de
+conciliación). El diff del merge contiene 23 archivos, 1996 inserciones y 9
+eliminaciones. Incluye las migraciones `20260911_01` y `20260911_02`, con
+`20260911_02` como head final registrado. La revisión remota concluyó
+`APROBADO_PARA_MERGE`.
+
+Identidad de evidencia: el SHA local, el remoto y su árbol coinciden
+exactamente con el contenido revisado y probado. Por eso continúa vigente la
+evidencia histórica: procesador 9/9; procesador, inbox e identidad 26/26;
+persistencia, orquestación y workflow 65/65; PostgreSQL 14/14; suite completa
+399 ejecutadas, 394 aprobadas y 5 omitidas; `compileall`, enlaces y
+`git diff --check` aprobados. No se repitieron pruebas, Docker, PostgreSQL ni
+Alembic después del merge.
+
+Límites: infraestructura neutral solamente. No acredita webhook público,
+validación de firma, HTTP, SDK, OAuth, credenciales, Mercado Pago real,
+workers, retries automáticos, QR, checkout, créditos, PRO, ARCA ni producción.
+Pendiente: revisión documental independiente de estos tres Markdown. Esta
+sesión no realiza staging, commit, push, PR, merge, rebase ni deploy.
+
 ## Procesador PSP - P1 de topicos corregido
 
 Timestamp: 2026-09-12T13:32:58-03:00
