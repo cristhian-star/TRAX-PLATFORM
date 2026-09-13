@@ -1,5 +1,151 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-12 - Correcciones P2 del ingreso HTTP de Webhooks
+
+Timestamp: 2026-09-12T23:27:36-03:00
+Estado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+
+- Se conservan los hallazgos históricos y se corrigió `X-Request-Id`: se
+  rechazan valores múltiples, vacíos, con whitespace exterior o con coma por
+  posible plegado WSGI, antes de verificar la firma o acceder al inbox. El
+  valor válido no se transforma para construir el manifiesto.
+- `request.get_json()` dejó de ser la decodificación autoritativa. El cuerpo
+  original se decodifica como UTF-8 y con `json.loads()` estricto, usando pares
+  para rechazar claves duplicadas en cualquier nivel y bloqueando `NaN` e
+  `Infinity`.
+- Una frontera con sentinel absorbe `JSONDecodeError`, `UnicodeDecodeError` y
+  errores internos controlados sin exponer payload, claves, valores, traceback,
+  causa o contexto. Las respuestas y logs permanecen genéricos.
+- Focal HTTP, firma, contrato y configuración 44/44; regresiones PSP 63/63;
+  regresiones de pagos 65/65; PostgreSQL 2/2; suite completa 436 ejecutadas,
+  431 aprobadas y 5 omitidas, sin fallos ni errores. `compileall` aprobado y
+  Alembic conserva el head único `20260911_02`.
+- La base `trax_mp_webhook_test_ingress_p2_20260912` fue eliminada y confirmada
+  ausente; `trax_db` permaneció intacta. No se agregó migración ni dependencia.
+
+## 2026-09-12 - Ingreso HTTP de Webhooks de Mercado Pago
+
+Timestamp: 2026-09-12T19:34:39-03:00
+Estado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+
+- Se agregó `POST /api/webhooks/mercadopago`, público y exento de autenticación
+  de usuario/CSRF, protegido por la firma HMAC y por un secreto leído desde
+  `MERCADOPAGO_WEBHOOK_SECRET`.
+- La ruta conserva query y headers como secuencias de pares, verifica la firma
+  antes de interpretar JSON y entrega el contenido validado al contrato neutral.
+  El tiempo de recepción se genera en UTC del servidor.
+- El evento se registra con `psp_event_inbox` y el endpoint controla
+  `commit()`/`rollback()`. Nuevo y replay responden el mismo `200` mínimo;
+  firma inválida usa `401`, solicitud malformada `400`, conflicto `409`, secreto
+  ausente `503` y fallo de persistencia `500`, todos con respuestas genéricas.
+- Focal HTTP, firma, contrato y configuración 39/39; regresiones PSP 58/58;
+  regresiones de pagos 65/65; PostgreSQL real 2/2; suite completa 431
+  ejecutadas, 426 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`
+  aprobado y Alembic conserva el head único `20260911_02`.
+- La base descartable `trax_mp_webhook_test_ingress_20260912` se eliminó y se
+  confirmó ausente; `trax_db` permaneció presente e intacta. No se agregó
+  migración, SDK, OAuth, worker, retry ni conciliación automática.
+
+## 2026-09-12 - Correccion P2 del contrato de notificacion Webhook
+
+Timestamp: 2026-09-12T19:03:04-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+- Se conserva el hallazgo histórico y se corrigió la filtración del error
+  interno de `datetime.fromisoformat()`: un helper captura `ValueError` y
+  `TypeError`, devuelve un sentinel privado y la excepción neutral se crea
+  después, fuera del bloque `except`.
+- La regresión con un marcador sensible confirma ausencia del valor en
+  `str`, `repr` y el traceback, además de `__cause__` y `__context__` nulos.
+- Se revisaron los restantes parseos del contrato y no existe otra conversión
+  de fecha equivalente. Las reglas de firma, normalización, hash y DTO no se
+  modificaron.
+- Focal 21/21; regresiones PSP 47/47; regresiones de pagos 65/65; suite completa
+  420 ejecutadas, 415 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic conserva el head único `20260911_02`.
+- PostgreSQL no aplica. La corrección queda pendiente de retest independiente.
+
+## 2026-09-12 - Contrato de notificacion Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T18:42:12-03:00
+Estado: MERCADOPAGO_WEBHOOK_NOTIFICATION_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `73b3fd951315d6f2876b7745347dea04c63b3a64`
+
+- Se agregó un normalizador puro que recibe parámetros de query, headers y
+  cuerpo JSON ya decodificado, valida primero la firma y produce el `PSPEvent`
+  neutral usado por el inbox.
+- El contrato exige estructuras inequívocas, coherencia entre el `data.id`
+  firmado y el recurso del cuerpo, `type`, `action`, `live_mode`, timestamps
+  con zona y versión `v1`. Proveedor y modo se mapean a `mercadopago` y al
+  inverso de `live_mode`, sin interpretar estados financieros.
+- El identificador original se conserva; su minúscula se limita al manifiesto
+  criptográfico. El hash SHA-256 canónico cubre el contenido validado estable,
+  excluye `received_at` y no conserva payload crudo.
+- Focal de firma y notificación 20/20; regresiones PSP 46/46; regresiones de
+  pagos 65/65; suite completa 419 ejecutadas, 414 aprobadas y 5 omitidas, sin
+  fallos ni errores; `compileall` aprobado y Alembic conserva el head único
+  `20260911_02`.
+- No se agregaron ruta Flask, persistencia, migración, consulta al proveedor,
+  procesador, dependencia, credencial ni integración productiva. PostgreSQL no
+  aplica a este contrato puro.
+
+## 2026-09-12 - Correccion P2 del parser de x-signature
+
+Timestamp: 2026-09-12T18:20:35-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+
+- Se corrigió el hallazgo P2 conservando el `REQUIERE_CORRECCIONES`
+  histórico: las claves de cada componente de `x-signature` se normalizan con
+  trim y minúsculas antes de almacenarlas o compararlas.
+- `ts`/`TS` y `v1`/`V1` representan el mismo componente semántico. Toda
+  repetición posterior a esa normalización se rechaza, incluso cuando los
+  valores coinciden; nunca se sobrescribe silenciosamente un valor previo.
+- Los valores de `ts` y `v1` permanecen sin normalización de casing o contenido,
+  fuera del trim estructural ya admitido por el contrato previo.
+- Focal 10/10; regresiones PSP 36/36; regresiones de pagos 65/65; suite completa
+  409 ejecutadas, 404 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic conserva el head único `20260911_02`.
+- PostgreSQL no aplica a esta corrección criptográfica pura. Continúan
+  pendientes el retest independiente y la futura capa HTTP.
+
+## 2026-09-12 - Verificador de firma Webhook de Mercado Pago
+
+Timestamp: 2026-09-12T16:17:29-03:00
+Estado: MERCADOPAGO_WEBHOOK_SIGNATURE_VALIDATOR_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Commit base: `08471f76900cde263a7a4590ff77f60751ffd704`
+Fuente oficial: [Notificaciones de pago de Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-preferences/payment-notifications)
+
+- Se implementó un verificador puro del header `x-signature`: extrae `ts` y
+  `v1`, construye el manifiesto oficial y valida HMAC-SHA256 hexadecimal con
+  comparación en tiempo constante.
+- Conforme a la fuente oficial vigente, `data.id` se convierte a minúsculas
+  sólo para el manifiesto; el valor original se conserva fuera del cálculo.
+  `x-request-id`, `ts`, secreto y demás componentes no se normalizan.
+- Como política local más estricta de MANDOBRA, todos los campos del manifiesto
+  y el secreto son obligatorios. Esta decisión fail-closed no se atribuye a
+  Mercado Pago y no incorpora una ventana temporal no definida por la fuente.
+- Focal 9/9; regresiones PSP 35/35; regresiones de pagos 65/65; suite completa
+  408 ejecutadas, 403 aprobadas y 5 omitidas, sin fallos ni errores;
+  `compileall` aprobado y Alembic permanece en `20260911_02`.
+- No existe todavía ruta Flask, endpoint público, respuesta HTTP, lectura de
+  secretos productivos, registro en inbox, SDK ni conexión real con Mercado Pago.
+
 ## 2026-09-12 - Integracion post-merge del procesamiento de eventos PSP
 
 Timestamp: 2026-09-12T14:03:46-03:00

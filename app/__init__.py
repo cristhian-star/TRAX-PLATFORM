@@ -43,6 +43,9 @@ def create_app(config_class=None, initialize_schema=False):
     from app.routes.whatsapp_routes import whatsapp
     app.register_blueprint(whatsapp)
 
+    from app.routes.mercadopago_webhook_routes import mercadopago_webhooks
+    app.register_blueprint(mercadopago_webhooks)
+
     if app.config.get("REGISTER_DEV_ROUTES"):
         from app.routes.dev_routes import dev
         app.register_blueprint(dev)
