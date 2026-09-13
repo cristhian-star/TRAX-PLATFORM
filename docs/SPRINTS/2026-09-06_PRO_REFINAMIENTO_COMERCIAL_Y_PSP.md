@@ -8,6 +8,37 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Integración post-merge del Webhook de Mercado Pago
+
+Timestamp: 2026-09-13T00:00:12-03:00
+Estado: POST_MERGE_MERCADOPAGO_WEBHOOK_INGRESS_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador documental local
+Rama destino: `develop`
+Rama integrada: `feature/mercadopago-webhook-ingress`
+PR: `#13`
+Base previa: `08471f76900cde263a7a4590ff77f60751ffd704`
+Merge: `c8dc017be48a2a3526947de50c9121986047e2d4`
+
+El PR #13 integró los commits `73b3fd9`, `199be11` y `540d953`: 12 archivos,
+1851 inserciones y 0 eliminaciones. El head Alembic permaneció en
+`20260911_02`. `develop` local y remoto coinciden, y el árbol de `c8dc017`
+coincide exactamente con el del commit de característica `540d953`.
+
+La evidencia previa continúa siendo la del SHA probado: focal 44/44,
+regresiones PSP 63/63, pagos 65/65, PostgreSQL 2/2 y suite completa 436
+ejecutadas, 431 aprobadas y 5 omitidas, sin fallos ni errores. No se repitieron
+pruebas post-merge; la continuidad de la evidencia se basa en la identidad Git
+verificada.
+
+Se registra una desviación procesal: el merge se realizó con aprobación local
+para commit y apertura de PR, pero antes de un gate remoto independiente
+`APROBADO_PARA_MERGE`. No se clasifica como defecto o regresión funcional y no
+se presenta como aprobación remota retroactiva.
+
+Continúan ausentes credenciales productivas, consulta al PSP, conciliación
+automática, OAuth, SDK, workers, retries y deploy. El diseño general 2.0 no se
+declara completo por esta integración.
+
 ## Correcciones P2 del ingreso HTTP de Webhooks de Mercado Pago
 
 Timestamp: 2026-09-12T23:27:36-03:00

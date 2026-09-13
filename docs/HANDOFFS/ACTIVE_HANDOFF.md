@@ -1,5 +1,41 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Integracion post-merge del Webhook de Mercado Pago
+
+Timestamp: 2026-09-13T00:00:12-03:00
+Estado: COMPLETED
+Resultado: POST_MERGE_MERCADOPAGO_WEBHOOK_INGRESS_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador documental local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama actual/destino: `develop`
+Rama integrada: `feature/mercadopago-webhook-ingress`
+HEAD local y `origin/develop`: `c8dc017be48a2a3526947de50c9121986047e2d4`
+Base previa: `08471f76900cde263a7a4590ff77f60751ffd704`
+Pull Request integrado: `#13`
+Estado Git previo: árbol limpio, staging vacío y divergencia `0/0`
+
+Integración registrada: el PR #13 incorporó `73b3fd9` (firma), `199be11`
+(contrato de notificación) y `540d953` (ingreso HTTP). El merge `c8dc017`
+contiene 12 archivos, 1851 inserciones y 0 eliminaciones; no agregó migraciones
+y mantiene `20260911_02` como head Alembic.
+
+Identidad de evidencia: los árboles Git de `540d953` y `c8dc017` coinciden
+exactamente. Por esa identidad se conserva como evidencia previa la validación
+del commit integrado: focal 44/44, regresiones PSP 63/63, pagos 65/65,
+PostgreSQL 2/2 y suite completa 436 ejecutadas, 431 aprobadas y 5 omitidas,
+sin fallos ni errores. No se repitieron pruebas después del merge.
+
+Desviación de proceso: la integración ocurrió después de una aprobación local
+para crear commit y abrir PR, pero antes de obtener un gate remoto independiente
+`APROBADO_PARA_MERGE`. Esta observación no representa una regresión funcional,
+no reemplaza el gate omitido y no atribuye validaciones posteriores al merge.
+
+Límites vigentes: no existen credenciales productivas, consulta al PSP,
+conciliación automática, OAuth, SDK, workers, retries ni deploy. Pendiente:
+revisión documental independiente de este registro antes de su integración.
+Esta sesión no ejecuta pruebas, staging, commit, push, PR, merge, rebase,
+reset, clean, stash ni deploy.
+
 ## Ingreso HTTP de Webhooks de Mercado Pago - P2 corregidos
 
 Timestamp: 2026-09-12T23:27:36-03:00

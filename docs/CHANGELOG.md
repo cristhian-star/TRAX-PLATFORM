@@ -1,5 +1,32 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-13 - Integracion post-merge del Webhook de Mercado Pago
+
+Timestamp: 2026-09-13T00:00:12-03:00
+Estado: POST_MERGE_MERCADOPAGO_WEBHOOK_INGRESS_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador documental local
+Rama: `develop`
+Pull Request: `#13`
+Rama integrada: `feature/mercadopago-webhook-ingress`
+Base previa: `08471f76900cde263a7a4590ff77f60751ffd704`
+Merge commit: `c8dc017be48a2a3526947de50c9121986047e2d4`
+
+- El PR #13 integró `73b3fd9` (validador de firma), `199be11` (contrato de
+  notificación) y `540d953` (ingreso HTTP): 12 archivos, 1851 inserciones y
+  0 eliminaciones. El head Alembic se conservó en `20260911_02`.
+- `develop` local y `origin/develop` coinciden en `c8dc017`; el árbol del merge
+  coincide exactamente con el árbol del commit integrado `540d953`.
+- Se conserva como evidencia previa del commit integrado: focal 44/44,
+  regresiones PSP 63/63, pagos 65/65, PostgreSQL 2/2 y suite completa 436
+  ejecutadas, 431 aprobadas y 5 omitidas, sin fallos ni errores. Las pruebas no
+  se repitieron después del merge porque la identidad del árbol fue confirmada.
+- Desviación procesal: el merge ocurrió con aprobación local para commit y
+  apertura del PR, pero antes de un gate remoto independiente
+  `APROBADO_PARA_MERGE`. Se registra como observación de proceso, no como
+  regresión funcional ni como evidencia adicional de calidad.
+- Todavía no existen credenciales productivas, consulta al PSP, conciliación
+  automática, OAuth, SDK, workers, retries ni deploy.
+
 ## 2026-09-12 - Correcciones P2 del ingreso HTTP de Webhooks
 
 Timestamp: 2026-09-12T23:27:36-03:00
