@@ -1,5 +1,72 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Corrección P2 del contrato de consulta de pagos
+
+Timestamp: 2026-09-13T12:13:00-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-payment-query-adapter`
+HEAD/commit base: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+Estado Git: cinco cambios locales esperados, staging vacío, sin commit ni push
+
+Se conserva el registro histórico previo y se corrige exclusivamente el P2 de
+`status_detail`. El valor opcional continúa limitado a 128 caracteres, pero
+ahora debe ser un token que comience con letra ASCII minúscula y contenga solo
+letras ASCII minúsculas, números o guion bajo. Se bloquean tokens puramente
+numéricos y cualquier secuencia de 13 a 19 dígitos consecutivos.
+
+La regresión cubre PAN numérico, secuencias largas con prefijo/sufijo, espacios,
+mayúsculas, guiones, Unicode y ausencia de filtración mediante texto,
+representación, traceback, causa, contexto, argumentos o atributos. Se
+mantienen válidos los tokens oficiales representativos y quedan intactos la
+identidad, el modo y los mapeos financieros.
+
+Validación: focal 14/14, regresiones PSP/pagos 139/139 y suite completa 450
+ejecutadas, 445 aprobadas, 5 omitidas, 0 fallos y 0 errores. Los controles
+finales de enlaces, whitespace y `git diff --check` quedaron aprobados.
+
+Pendiente: retest independiente antes de autorizar integración. No se agregan
+HTTP, SDK, credenciales, persistencia, dependencias ni migraciones. No hubo
+staging, commit, push, PR, merge, rebase ni deploy.
+
+## Contrato de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T11:52:01-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-payment-query-adapter`
+HEAD/commit base: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+Estado Git: cinco cambios locales esperados, staging vacío, sin commit ni push
+
+Trabajo completado: contrato puro para transformar una respuesta ya
+decodificada de `GET /v1/payments/{id}` a estado neutral. Valida un ID de path
+numérico ASCII y acotado, objeto JSON inequívoco en la frontera, `id` entero
+estricto, coincidencia de identidad, `live_mode` booleano estricto y entorno.
+El DTO resultante es inmutable y no conserva el payload.
+
+Mapeo explícito: `approved` a `APPROVED`; `pending`, `in_process` y `authorized`
+a `PENDING`; `rejected` y `cancelled` a `REJECTED`. `refunded`, `charged_back`
+y estados desconocidos producen una excepción neutral que exige conciliación
+explícita. `status_detail` se conserva solo como token seguro de hasta 128
+caracteres; ningún error expone los valores recibidos.
+
+Validación: focal 13/13, regresiones PSP/pagos 138/138 y suite completa 449
+ejecutadas, 444 aprobadas, 5 omitidas, 0 fallos y 0 errores. La primera corrida
+agrupada usó por herencia PostgreSQL y un test portable falló al ejecutar
+`PRAGMA`; se clasificó como configuración de entorno y la repetición aislada
+con SQLite aprobó 138/138. `compileall`, head Alembic único, enlaces,
+whitespace y `git diff --check` se verifican en el cierre.
+
+Fuente: [Obtener pago - Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/reference/online-payments/subscriptions/get-payment/get).
+No aplica PostgreSQL y no se agregó migración. Permanecen fuera de alcance
+HTTP, credenciales, SDK, persistencia, actualización financiera y conexión real
+con Mercado Pago. Pendiente: revisión independiente antes de autorizar commit.
+No hubo staging, commit, push, PR, merge, rebase ni deploy.
+
 ## Integracion post-merge del Webhook de Mercado Pago
 
 Timestamp: 2026-09-13T00:00:12-03:00

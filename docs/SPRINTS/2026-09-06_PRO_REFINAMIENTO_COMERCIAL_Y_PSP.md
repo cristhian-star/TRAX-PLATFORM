@@ -8,6 +8,57 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P2 del contrato de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T12:13:00-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+
+El hallazgo P2 queda preservado históricamente y corregido: `status_detail` es
+un token técnico opcional, de hasta 128 caracteres, iniciado por letra ASCII
+minúscula y compuesto solo por letras ASCII minúsculas, números y guion bajo.
+Se rechazan valores numéricos y secuencias de 13 a 19 dígitos consecutivos aun
+cuando posean prefijo o sufijo, además de espacios, mayúsculas, guiones y
+Unicode. El error neutral no conserva ni expone el valor rechazado.
+
+Los tokens `accredited`, `pending_contingency` y
+`cc_rejected_bad_filled_card_number` permanecen válidos. Identidad, entorno y
+mapeos de estados continúan sin cambios. La corrección queda pendiente de
+retest independiente y no amplía el alcance a HTTP, persistencia o integración
+productiva con Mercado Pago.
+
+Validación: focal 14/14, regresiones PSP/pagos 139/139 y suite completa 450
+ejecutadas, 445 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## Contrato de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T11:52:01-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Base: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+
+Se implementó una frontera pura e inmutable para validar una respuesta ya
+decodificada de `GET /v1/payments/{id}`. La identidad solicitada se restringe a
+un segmento numérico ASCII seguro; la respuesta exige objeto inequívoco, `id`
+entero estricto coincidente y `live_mode` booleano coincidente con el entorno.
+
+El contrato mapea únicamente estados representables al enum neutral existente:
+`approved`; `pending`/`in_process`/`authorized`; y
+`rejected`/`cancelled`. Reembolsos, contracargos y estados desconocidos exigen
+conciliación explícita mediante una excepción neutral. No se conserva payload
+crudo y `status_detail` solo se expone como token seguro acotado.
+
+Validación: focal 13/13, regresiones PSP/pagos 138/138 y suite completa 449
+ejecutadas, 444 aprobadas y 5 omitidas, sin fallos ni errores. PostgreSQL no
+aplica. Fuente oficial: [Obtener pago - Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/reference/online-payments/subscriptions/get-payment/get).
+
+Este incremento no realiza HTTP, no lee credenciales, no persiste ni modifica
+estados financieros y no agrega SDK, dependencias o migraciones. La integración
+real con Mercado Pago y la aprobación integral del diseño 2.0 siguen pendientes.
+
 ## Integración post-merge del Webhook de Mercado Pago
 
 Timestamp: 2026-09-13T00:00:12-03:00
