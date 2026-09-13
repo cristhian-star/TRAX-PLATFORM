@@ -65,6 +65,7 @@ class Config:
     LOCAL_MEDIA_PUBLIC_BASE_URL = "/static/uploads/professional_media"
     CLOUDINARY_FOLDER = "trax/professional_media"
     MEDIA_AUTO_PUBLISH = True
+    MERCADOPAGO_WEBHOOK_SECRET = None
 
     REQUIRED_ENV_VARS = ()
 
@@ -92,6 +93,7 @@ class Config:
         app_config["CLOUDINARY_API_SECRET"] = _env("CLOUDINARY_API_SECRET")
         app_config["CLOUDINARY_FOLDER"] = _env("CLOUDINARY_FOLDER") or cls.CLOUDINARY_FOLDER
         app_config["MEDIA_AUTO_PUBLISH"] = _env_bool("MEDIA_AUTO_PUBLISH", cls.MEDIA_AUTO_PUBLISH)
+        app_config["MERCADOPAGO_WEBHOOK_SECRET"] = _env("MERCADOPAGO_WEBHOOK_SECRET")
 
 
 class DevelopmentConfig(Config):
@@ -120,6 +122,9 @@ class TestingConfig(Config):
     def apply_runtime_config(cls, app_config):
         app_config["SECRET_KEY"] = _env("SECRET_KEY") or "test-secret-key"
         app_config["SQLALCHEMY_DATABASE_URI"] = _env("DATABASE_URL") or "sqlite:///:memory:"
+        app_config["MERCADOPAGO_WEBHOOK_SECRET"] = _env(
+            "MERCADOPAGO_WEBHOOK_SECRET"
+        )
         app_config["ENABLE_DEV_QA_PANEL"] = _env_bool(
             "ENABLE_DEV_QA_PANEL",
             False,

@@ -8,6 +8,66 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Correcciones P2 del ingreso HTTP de Webhooks de Mercado Pago
+
+Timestamp: 2026-09-12T23:27:36-03:00
+Estado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+
+Se conservan los hallazgos históricos. El endpoint ahora rechaza un
+`X-Request-Id` plegado con coma, múltiple, vacío o con whitespace ambiguo antes
+de verificar la firma o iniciar actividad de base de datos. Un valor válido no
+se normaliza ni se modifica para el manifiesto.
+
+El JSON se decodifica desde el cuerpo original mediante una frontera estricta:
+UTF-8, `json.loads()`, pares de objetos para detectar cualquier clave repetida
+y rechazo explícito de `NaN`/`Infinity`. Un sentinel evita propagar o encadenar
+errores del decoder, y no se exponen payload, claves, valores ni detalles
+internos en respuestas, excepciones o logs.
+
+Focal HTTP, firma, contrato y configuración 44/44; regresiones PSP 63/63;
+regresiones de pagos 65/65; PostgreSQL 2/2 y suite completa 436 ejecutadas,
+431 aprobadas y 5 omitidas, sin fallos ni errores. `compileall` y el head único
+`20260911_02` fueron aprobados. La base descartable
+`trax_mp_webhook_test_ingress_p2_20260912` fue eliminada y confirmada ausente;
+`trax_db` permaneció intacta.
+
+No se agregó migración, dependencia, conciliación automática ni conexión nueva
+con el PSP. La corrección queda pendiente de retest independiente.
+
+## Ingreso HTTP de Webhooks de Mercado Pago
+
+Timestamp: 2026-09-12T19:34:39-03:00
+Estado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-webhook-ingress`
+Base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+
+El tercer incremento conecta el verificador, el contrato de notificación y el
+inbox mediante `POST /api/webhooks/mercadopago`. El endpoint es público, sin
+autenticación de usuario, y exige la firma HMAC con el secreto obtenido de
+configuración. Conserva la multiplicidad de query y headers, valida la firma
+antes del JSON y crea el tiempo de recepción en UTC.
+
+La transacción pertenece a la ruta: el evento se registra con el servicio
+existente, se confirma antes del `200` y se revierte ante conflicto o fallo.
+Nuevo y replay comparten una respuesta mínima idéntica; los errores utilizan
+estados `400`, `401`, `409`, `500` o `503` y mensajes genéricos sin datos
+sensibles ni detalles internos.
+
+Focal HTTP, firma, contrato y configuración 39/39; regresiones PSP 58/58;
+regresiones de pagos 65/65; PostgreSQL 2/2 y suite completa 431 ejecutadas,
+426 aprobadas y 5 omitidas, sin fallos ni errores. `compileall` y el head único
+`20260911_02` fueron aprobados. La base descartable
+`trax_mp_webhook_test_ingress_20260912` fue eliminada y confirmada ausente;
+`trax_db` permaneció intacta.
+
+No hay migración nueva, SDK, OAuth, consulta al PSP, conciliación automática,
+worker, retry, QR, checkout, créditos, PRO ni ARCA. El incremento queda
+pendiente de revisión independiente y no declara completa la arquitectura 2.0.
+
 ## Corrección P2 del contrato de notificación Webhook de Mercado Pago
 
 Timestamp: 2026-09-12T19:03:04-03:00

@@ -1,5 +1,88 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Ingreso HTTP de Webhooks de Mercado Pago - P2 corregidos
+
+Timestamp: 2026-09-12T23:27:36-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+Estado Git: ocho cambios locales conocidos, staging vacío, sin commit ni push
+
+Corrección de metadatos: `X-Request-Id` se valida como un único valor exacto.
+Se rechaza si WSGI plegó múltiples headers con coma, si aparece más de una vez,
+si está vacío o si contiene whitespace exterior. Este corte devuelve `400`
+antes de llamar al verificador o tocar la sesión; el valor válido permanece
+literalmente intacto para el manifiesto.
+
+Corrección JSON: la ruta lee los bytes originales y usa una frontera auxiliar
+con sentinel. La decodificación UTF-8 y `json.loads()` emplean
+`object_pairs_hook` para detectar duplicados en cualquier objeto, incluido
+`data`, y `parse_constant` para rechazar `NaN`/`Infinity`. Los errores internos
+se absorben dentro del helper y no quedan encadenados ni se filtran en
+excepciones, respuestas o logs.
+
+Validación: focal HTTP, firma, contrato y configuración 44/44; regresiones PSP
+63/63; persistencia, orquestación y workflow 65/65; PostgreSQL real 2/2 sobre
+`trax_mp_webhook_test_ingress_p2_20260912`; suite completa 436 ejecutadas, 431
+aprobadas, 5 omitidas, 0 fallos y 0 errores; `compileall` aprobado y head
+Alembic único `20260911_02`.
+
+Durante la validación se corrigió además el aislamiento de la nueva captura de
+logs para no materializar un logger que Alembic pudiera deshabilitar en pruebas
+posteriores. La reproducción exacta y la suite completa final quedaron verdes.
+
+Limpieza: la base descartable fue eliminada y confirmada ausente; `trax_db`
+permaneció intacta. Se conservan los hallazgos previos como historia. Pendiente:
+retest independiente antes del tercer commit. No hubo staging, commit, push,
+PR, merge, rebase ni deploy.
+
+## Ingreso HTTP de Webhooks de Mercado Pago
+
+Timestamp: 2026-09-12T19:34:39-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_WEBHOOK_HTTP_INGRESS_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-webhook-ingress`
+HEAD/commit base: `199be11cb6b85cd5a9b963e93097aebca31d3638`
+Estado Git: cambios locales sin staging, commit ni push
+
+Trabajo completado: blueprint público con `POST /api/webhooks/mercadopago`,
+registrado en la aplicación y exento de sesión de usuario y CSRF. La única
+credencial de ingreso es la firma HMAC validada con el secreto de configuración
+`MERCADOPAGO_WEBHOOK_SECRET`; el secreto nunca se hardcodea ni se registra.
+Query y headers se conservan como pares para no colapsar duplicados.
+
+Orden de seguridad: se valida la firma antes de interpretar el cuerpo; después
+se exige un tipo JSON apropiado y JSON válido, se invoca el contrato de
+notificación y se genera `received_at` en UTC. La ruta registra mediante el
+servicio existente, confirma la transacción antes de responder y ejecuta
+rollback ante conflicto o error. Nuevo y replay son indistinguibles con
+`200 {"status":"accepted"}` y no exponen IDs internos. Los errores `400`,
+`401`, `409`, `500` y `503` son genéricos y no contienen payload, SQL, firma,
+secreto, manifiesto ni traceback.
+
+Validación: focal HTTP, firma, contrato y configuración 39/39; regresiones PSP
+58/58; persistencia, orquestación y workflow 65/65; suite completa 431
+ejecutadas, 426 aprobadas, 5 omitidas, 0 fallos y 0 errores; PostgreSQL real
+2/2 sobre `trax_mp_webhook_test_ingress_20260912`; `compileall` aprobado y
+head Alembic único `20260911_02`.
+
+Limpieza: la base descartable fue migrada, validada, vaciada y eliminada; se
+confirmó su ausencia y la presencia intacta de `trax_db`. No existe migración
+nueva. La ruta no consulta al PSP, no concilia, no interpreta `action` como
+estado financiero y no agrega SDK, OAuth, workers ni retries.
+
+Pendiente: revisión independiente antes del tercer commit. Archivos locales:
+`app/__init__.py`, `app/config/config.py`,
+`app/routes/mercadopago_webhook_routes.py`,
+`tests/test_mercadopago_webhook_routes.py`,
+`tests/postgresql_mercadopago_webhook_ingress_e2e.py` y los tres registros
+documentales. No hubo staging, commit, push, PR, merge, rebase ni deploy.
+
 ## Contrato de notificacion Webhook - P2 corregido
 
 Timestamp: 2026-09-12T19:03:04-03:00
