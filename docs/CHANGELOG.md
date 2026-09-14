@@ -1,5 +1,37 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-14 - Integración del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-14T09:06:21-03:00
+Estado: POST_MERGE_MERCADOPAGO_PAYMENT_QUERY_ADAPTER_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador técnico documental
+Rama: `develop`
+Merge: `b816c69026f329466619291c413e7b15c758e9df`
+
+- El PR #14, `feat: agregar adaptador de consulta de pagos de Mercado Pago`,
+  fusionó sin conflictos informados la rama
+  `feature/mercadopago-payment-query-adapter` hacia `develop`.
+- Se integraron `2547f483329b6c17c5cbc86e25ab73e4f9d2463c`,
+  `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e` y
+  `47632ad4d008e7b414a3699793578343a8595bd4`: 13 archivos, 2044
+  inserciones y 35 eliminaciones. El árbol del commit final y el del merge son
+  idénticos; el veredicto remoto previo fue `APROBADO_PARA_MERGE`.
+- La evidencia local histórica del contenido evaluado fue: focales 49/49,
+  regresiones PSP/pagos 165/165, PostgreSQL 15/15 y suite completa 476
+  ejecutadas, 471 aprobadas y 5 omitidas, sin fallos ni errores; `compileall`,
+  enlaces, whitespace y `git diff --check` aprobados. No se repitieron pruebas
+  ni PostgreSQL después del merge porque el árbol integrado coincide.
+- Quedaron integrados el contrato, el cliente HTTP y el adaptador neutral de
+  consulta, manteniendo separadas consulta y creación, las sesiones cerradas
+  durante HTTP, una segunda transacción breve, configuración inmutable,
+  protección del token y cierre seguro de `HTTPError`. El webhook no consulta
+  ni concilia automáticamente.
+- No se agregaron migraciones ni dependencias; Alembic conserva el head único
+  `20260911_02`. No hubo checks ni GitHub Actions remotos, limitación de
+  evidencia CI que no constituye un fallo funcional.
+- No existen creación de cobros, QR, credenciales reales, SDK, retries,
+  workers, frontend ni deploy. Esta integración no autoriza producción.
+
 ## 2026-09-13 - Correcciones P2 del adaptador PSP Mercado Pago
 
 Timestamp: 2026-09-13T23:27:35-03:00

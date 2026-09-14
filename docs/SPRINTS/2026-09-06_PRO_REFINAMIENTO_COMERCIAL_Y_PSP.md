@@ -8,6 +8,42 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Integración post-merge del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-14T09:06:21-03:00
+Estado: POST_MERGE_MERCADOPAGO_PAYMENT_QUERY_ADAPTER_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador técnico documental
+Rama y merge: `develop` en
+`b816c69026f329466619291c413e7b15c758e9df`
+
+El PR #14 integró desde `feature/mercadopago-payment-query-adapter` los commits
+`2547f483329b6c17c5cbc86e25ab73e4f9d2463c`,
+`c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e` y
+`47632ad4d008e7b414a3699793578343a8595bd4` sobre la base previa
+`1cb89cdb647cd358d66b4a013f9f671d1cfb8388`. El merge comprende 13 archivos,
+2044 inserciones y 35 eliminaciones, sin conflictos informados. El árbol final
+publicado coincide exactamente con el aprobado e integrado y el veredicto
+remoto previo fue `APROBADO_PARA_MERGE`.
+
+La evidencia local histórica del SHA evaluado permanece: focales 49/49,
+regresiones PSP/pagos 165/165, PostgreSQL 15/15 y suite 476 ejecutadas, 471
+aprobadas y 5 omitidas, sin fallos ni errores; `compileall`, enlaces, whitespace
+y `git diff --check` aprobados. No se repitieron pruebas ni PostgreSQL tras el
+merge porque su árbol es idéntico. La ausencia de checks o GitHub Actions
+remotos limita la evidencia CI, pero no constituye un fallo funcional.
+
+El alcance integrado agrega contrato de consulta, cliente HTTP y adaptador PSP
+neutral. Mantiene separadas consulta y creación, cierra la sesión de base antes
+de HTTP y usa una segunda transacción breve para persistir conciliación. La
+configuración es inmutable, el token permanece protegido y los recursos HTTP,
+incluidos los `HTTPError`, se cierran con seguridad. El webhook sigue sin
+consultar ni conciliar automáticamente.
+
+No se agregaron migraciones o dependencias y el head único continúa en
+`20260911_02`. No existen creación de cobros, QR, credenciales reales, SDK,
+retries, workers, frontend o deploy. La integración no autoriza producción y
+queda pendiente la revisión documental independiente.
+
 ## Correcciones P2 del adaptador PSP de consulta Mercado Pago
 
 Timestamp: 2026-09-13T23:27:35-03:00

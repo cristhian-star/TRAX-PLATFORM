@@ -1,5 +1,52 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Post-merge PR #14 - adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-14T09:06:21-03:00
+Estado: COMPLETED
+Resultado: POST_MERGE_MERCADOPAGO_PAYMENT_QUERY_ADAPTER_REGISTRADO_PENDIENTE_DE_REVISION_DOCUMENTAL
+Agente: Codex - implementador técnico documental
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `develop`
+HEAD local/remoto: `b816c69026f329466619291c413e7b15c758e9df`
+Rama integrada: `feature/mercadopago-payment-query-adapter`
+Base previa: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+
+El PR #14, `feat: agregar adaptador de consulta de pagos de Mercado Pago`, fue
+fusionado hacia `develop` sin conflictos informados. Integró, en orden,
+`2547f483329b6c17c5cbc86e25ab73e4f9d2463c` (contrato),
+`c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e` (cliente HTTP) y
+`47632ad4d008e7b414a3699793578343a8595bd4` (adaptador PSP). El cambio acumulado
+abarca 13 archivos, 2044 inserciones y 35 eliminaciones.
+
+Verificación Git post-merge: el commit final es ancestro de `develop`, segundo
+padre del merge `b816c69026f329466619291c413e7b15c758e9df`; ambos árboles tienen identidad
+`da0d0a86ca664b4216545f243821cbec1ef2d43b`. `develop`, `origin/develop` y la
+referencia remota consultada coinciden, con divergencia 0/0. El veredicto remoto
+previo fue `APROBADO_PARA_MERGE`; no se informaron conflictos. No hubo checks ni
+GitHub Actions remotos, una limitación de evidencia CI y no un fallo funcional.
+
+Evidencia local histórica reutilizada del mismo árbol: focales 49/49,
+regresiones PSP/pagos 165/165, PostgreSQL real 15/15 y suite completa 476
+ejecutadas, 471 aprobadas, 5 omitidas, 0 fallos y 0 errores; `compileall`,
+enlaces, whitespace y `git diff --check` aprobados. No se repitieron las pruebas
+ni PostgreSQL después del merge porque el contenido integrado es idéntico al
+aprobado y probado.
+
+Quedaron integradas las capacidades neutrales de contrato, cliente HTTP y
+adaptador de consulta, separadas de la creación. No hay sesión de base abierta
+durante HTTP y la conciliación persiste después en una segunda transacción
+breve. La configuración es inmutable, el token está protegido y los recursos
+HTTP —incluido `HTTPError`— se cierran de forma segura. El webhook permanece sin
+consulta ni conciliación financiera automática.
+
+Alembic conserva el único head `20260911_02`; no se agregaron migraciones ni
+dependencias. No existen creación de pagos/cobros, QR, credenciales reales,
+SDK, retries, workers, frontend o deploy, y la integración no autoriza
+producción. Pendiente: revisión documental independiente. En esta sesión no se
+ejecutaron pruebas de aplicación, Docker, PostgreSQL, Alembic ni operaciones de
+integración Git.
+
 ## Adaptador PSP Mercado Pago - P2 corregidos
 
 Timestamp: 2026-09-13T23:27:35-03:00
