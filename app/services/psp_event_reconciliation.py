@@ -15,9 +15,9 @@ from app.services.payment_persistence_service import (
     get_attempt_by_psp_identity,
 )
 from app.services.psp_contract import (
-    PSPAdapter,
+    PSPPaymentQueryAdapter,
+    PSPPaymentQueryUncertainError,
     PaymentAttemptStatus,
-    UncertainResponseError,
 )
 from app.services.psp_event_contract import normalize_psp_provider
 
@@ -48,14 +48,19 @@ class PSPEventReconciliationProcessor:
     ):
         if not callable(session_factory):
             raise TypeError("session_factory must be callable")
-        if not isinstance(adapter, PSPAdapter):
-            raise TypeError("adapter must satisfy PSPAdapter")
+        if not isinstance(adapter, PSPPaymentQueryAdapter):
+            raise TypeError("adapter must satisfy PSPPaymentQueryAdapter")
         if type(live_mode) is not bool:
             raise TypeError("live_mode must be a boolean")
         self._session_factory = session_factory
         self._adapter = adapter
         self._provider = normalize_psp_provider(provider)
         self._live_mode = live_mode
+        if (
+            normalize_psp_provider(adapter.provider) != self._provider
+            or adapter.live_mode is not self._live_mode
+        ):
+            raise ValueError("adapter context does not match processor context")
         self._payment_topics = _normalize_topics(payment_topics)
 
     def process(self, event_id):
@@ -65,15 +70,15 @@ class PSPEventReconciliationProcessor:
         attempt_id, external_attempt_id, obligation = loaded
 
         try:
-            authoritative = self._adapter.get_attempt(external_attempt_id)
-        except UncertainResponseError as exc:
-            if exc.attempt_id not in (None, external_attempt_id):
+            authoritative = self._adapter.query_payment(external_attempt_id)
+        except PSPPaymentQueryUncertainError as exc:
+            if exc.external_attempt_id != external_attempt_id:
                 raise PaymentPersistenceConflictError(
                     "PSP response belongs to a different external attempt"
                 ) from exc
             result = _uncertain_result(obligation, external_attempt_id)
         else:
-            if authoritative.attempt_id != external_attempt_id:
+            if authoritative.external_attempt_id != external_attempt_id:
                 raise PaymentPersistenceConflictError(
                     "PSP response belongs to a different external attempt"
                 )

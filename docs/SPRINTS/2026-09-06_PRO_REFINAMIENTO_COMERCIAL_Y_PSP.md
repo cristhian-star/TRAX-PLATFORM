@@ -8,6 +8,81 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Correcciones P2 del adaptador PSP de consulta Mercado Pago
+
+Timestamp: 2026-09-13T23:27:35-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+Los hallazgos P2 quedan conservados como evidencia histórica. El contexto del
+adaptador y la configuración del cliente quedaron congelados estructuralmente:
+proveedor, modo, cliente, token, transporte y timeout no admiten reasignación.
+El proveedor sigue siendo exclusivamente `mercadopago` y las propiedades de
+contexto expuestas son de solo lectura.
+
+El transporte cierra una única vez todo `HTTPError` sin leer cuerpo ni retener
+headers. Incluso si el cierre falla, la excepción queda aislada y se conserva
+la clasificación neutral por código sin filtraciones del proveedor.
+
+Focal completa 49/49, regresiones PSP/pagos 131/131, PostgreSQL 15/15 y suite
+completa 476 ejecutadas, 471 aprobadas y 5 omitidas, sin fallos ni errores. La
+base descartable fue eliminada y `trax_db` permaneció intacta. No se agregó
+migración ni se amplió el alcance; queda pendiente el retest independiente.
+
+## Adaptador PSP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T22:54:24-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+La decisión aprobada segrega creación y consulta sin modificar `PSPAdapter`.
+La nueva capacidad `PSPPaymentQueryAdapter` devuelve un DTO mínimo inmutable con
+identidad externa y estado neutral. Así, el adaptador Mercado Pago no fabrica
+referencia, importe, moneda, idempotencia o fecha y no accede a persistencia.
+
+El proveedor queda fijo en `mercadopago` y el modo es explícito. El procesador
+valida ambos contra el evento antes de consultar, realiza como máximo una
+llamada y conserva la separación entre transacción de lectura, red y segunda
+transacción de persistencia. Incertidumbres y estados no representables no se
+convierten en rechazo; errores contractuales/configuración quedan explícitos y
+sin escritura.
+
+El transporte estándar usa TLS verificado, host fijo, timeout y ningún redirect
+o retry; los tests inyectan transporte simulado. Focal 45/45, regresiones
+PSP/pagos 161/161, PostgreSQL 15/15 y suite completa 472 ejecutadas, 467
+aprobadas y 5 omitidas, sin fallos ni errores. La base descartable fue eliminada
+y `trax_db` permaneció presente.
+
+No hay procesamiento automático desde webhook, creación de cobros, SDK,
+worker, nueva migración ni credencial real. El incremento queda pendiente de
+revisión independiente.
+
+## Bloqueo contractual del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-13T22:43:20-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_BLOQUEADO_POR_CONTRATO_NEUTRAL
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+La inspección previa detectó que el contrato neutral actual no permite conectar
+la consulta sin fabricar información. `get_attempt()` promete un
+`PaymentAttempt` completo, pero la respuesta aprobada aporta únicamente ID,
+estado, modo y detalle; referencia interna, importe, moneda, idempotencia y fecha
+no están disponibles. El mismo protocolo exige además `create_attempt()`, fuera
+del alcance autorizado.
+
+No se simuló compatibilidad mediante valores ficticios, un tipo de retorno
+distinto o un método de creación inutilizable. Se requiere decidir entre
+segregar las capacidades neutrales de creación/consulta o hacer que el
+procesador dependa de un resultado mínimo explícito. El desarrollo y sus gates
+quedan suspendidos hasta esa definición; los dos commits previos permanecen
+intactos.
+
 ## Corrección P2 del Bearer del cliente HTTP de pagos
 
 Timestamp: 2026-09-13T22:16:45-03:00

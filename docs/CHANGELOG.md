@@ -1,5 +1,68 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-13 - Correcciones P2 del adaptador PSP Mercado Pago
+
+Timestamp: 2026-09-13T23:27:35-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- Se conservan como antecedente los dos hallazgos P2: el contexto del adaptador
+  y del cliente dependía de atributos reasignables, y el transporte no cerraba
+  explícitamente los `HTTPError` de `urllib`.
+- Adaptador y cliente son ahora estructuras congeladas con slots. Proveedor,
+  modo, referencia al cliente, token, transporte y timeout no pueden
+  reasignarse después de validar la construcción; `provider` y `live_mode` se
+  exponen como propiedades de solo lectura.
+- Todo `HTTPError` se cierra exactamente una vez sin leer el cuerpo. Se descartan
+  cuerpo y headers, y hasta una excepción del cierre queda contenida antes de
+  aplicar la clasificación neutral por código.
+- Focal completa 49/49, regresiones PSP/pagos 131/131, PostgreSQL real 15/15 y
+  suite completa 476 ejecutadas, 471 aprobadas y 5 omitidas, sin fallos ni
+  errores. La corrección queda pendiente de retest independiente.
+
+## 2026-09-13 - Adaptador PSP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T22:54:24-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- La decisión arquitectónica aprobada segregó la consulta en
+  `PSPPaymentQueryAdapter` y `PSPPaymentQueryResult`, preservando sin cambios la
+  capacidad existente `PSPAdapter` y su `get_attempt()`.
+- `MercadoPagoPSPAdapter` implementa solo consulta, expone proveedor
+  `mercadopago` y modo inmutable, valida el ID y traduce estados autoritativos o
+  incertidumbre sin fabricar datos de creación ni acceder a persistencia.
+- El procesador depende de la capacidad mínima, exige que proveedor y modo del
+  adaptador coincidan antes de consultar y mantiene la llamada HTTP entre sus
+  dos transacciones.
+- Se agregó transporte estándar con TLS verificado, host fijo, timeout
+  obligatorio y sin redirects/retries. Las pruebas usan transporte simulado.
+- Focal 45/45, regresiones PSP/pagos 161/161, PostgreSQL real 15/15 y suite
+  completa 472 ejecutadas, 467 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Bloqueo contractual del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-13T22:43:20-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_BLOQUEADO_POR_CONTRATO_NEUTRAL
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- La inspección previa confirmó que `PSPAdapter.get_attempt()` exige un
+  `PaymentAttempt` completo, con referencia interna, importe, moneda, clave
+  idempotente y fecha. `GET /v1/payments/{id}` solo fue contratado para aportar
+  identidad, estado, modo y detalle; los campos restantes no pueden inferirse.
+- `PSPAdapter` también exige `create_attempt()`, operación fuera del alcance de
+  esta rama de consulta. No se fabricaron datos, no se devolvió un DTO distinto
+  bajo una anotación falsa y no se agregó un método nominal que siempre falle.
+- Se requiere aprobar si el contrato neutral se separa en capacidades de
+  creación/consulta o si el procesador debe depender de un resultado mínimo de
+  consulta. No se modificó código ni se ejecutaron pruebas.
+
 ## 2026-09-13 - Corrección P2 del Bearer del cliente de pagos
 
 Timestamp: 2026-09-13T22:16:45-03:00

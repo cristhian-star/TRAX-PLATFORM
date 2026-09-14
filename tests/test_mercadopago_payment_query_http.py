@@ -1,6 +1,9 @@
+from dataclasses import FrozenInstanceError
 import json
 import traceback
 import unittest
+import urllib.error
+from unittest.mock import patch
 
 from app.services.mercadopago_payment_query_http import (
     MercadoPagoHTTPResponse,
@@ -10,6 +13,7 @@ from app.services.mercadopago_payment_query_http import (
     MercadoPagoPaymentRecoverableError,
     MercadoPagoPaymentRequestRejectedError,
     MercadoPagoPaymentResponseError,
+    UrllibMercadoPagoTransport,
 )
 from app.services.psp_contract import PaymentAttemptStatus
 
@@ -25,6 +29,34 @@ class RecordingTransport:
         if self.error is not None:
             raise self.error
         return self.response
+
+
+class ControlledHTTPErrorBody:
+    def __init__(self, *, close_error=None):
+        self.closed = False
+        self.close_count = 0
+        self.read_count = 0
+        self.close_error = close_error
+
+    def read(self, *_args, **_kwargs):
+        self.read_count += 1
+        raise AssertionError("provider error body must not be read")
+
+    def close(self):
+        self.close_count += 1
+        self.closed = True
+        if self.close_error is not None:
+            raise self.close_error
+
+
+class HTTPErrorOpener:
+    def __init__(self, error):
+        self.error = error
+        self.calls = 0
+
+    def open(self, *_args, **_kwargs):
+        self.calls += 1
+        raise self.error
 
 
 class MercadoPagoPaymentQueryHTTPClientTest(unittest.TestCase):
@@ -162,6 +194,22 @@ class MercadoPagoPaymentQueryHTTPClientTest(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 self._client(timeout=value)
 
+    def test_client_configuration_is_structurally_immutable(self):
+        client, transport = self._client()
+        replacements = {
+            "_access_token": "REPLACED_TOKEN",
+            "_transport": RecordingTransport(self._response()),
+            "_timeout": 1.0,
+        }
+        for attribute, value in replacements.items():
+            with self.subTest(attribute=attribute), self.assertRaises(
+                FrozenInstanceError
+            ):
+                setattr(client, attribute, value)
+        self.assertEqual(client._access_token, self.TOKEN)
+        self.assertIs(client._transport, transport)
+        self.assertEqual(client._timeout, 7.0)
+
     def test_status_codes_have_neutral_classification_without_reading_body(self):
         cases = {
             401: MercadoPagoPaymentAuthenticationError,
@@ -259,6 +307,99 @@ class MercadoPagoPaymentQueryHTTPClientTest(unittest.TestCase):
         }).encode()))
         with self.assertRaises(ValueError):
             client.get_payment("123456789", expected_live_mode=False)
+
+    def test_standard_transport_builds_verified_tls_opener_without_redirects(self):
+        sentinel_context = object()
+        with patch(
+            "app.services.mercadopago_payment_query_http.ssl.create_default_context",
+            return_value=sentinel_context,
+        ) as create_context, patch(
+            "app.services.mercadopago_payment_query_http.urllib.request.build_opener"
+        ) as build_opener:
+            transport = UrllibMercadoPagoTransport()
+        create_context.assert_called_once_with()
+        handlers = build_opener.call_args.args
+        self.assertEqual(handlers[0]._context, sentinel_context)
+        self.assertIsNone(handlers[1].redirect_request(
+            None, None, 302, "redirect", {}, "https://invalid.example"
+        ))
+        self.assertNotIn(self.TOKEN, repr(transport))
+
+    def test_standard_transport_closes_every_http_error_once_without_reading_body(self):
+        cases = {
+            401: MercadoPagoPaymentAuthenticationError,
+            403: MercadoPagoPaymentAuthenticationError,
+            404: MercadoPagoPaymentNotFoundError,
+            429: MercadoPagoPaymentRecoverableError,
+            422: MercadoPagoPaymentRequestRejectedError,
+            500: MercadoPagoPaymentRecoverableError,
+            302: MercadoPagoPaymentResponseError,
+        }
+        for status_code, expected in cases.items():
+            marker = f"PRIVATE-HTTP-ERROR-{status_code}"
+            body = ControlledHTTPErrorBody()
+            error = urllib.error.HTTPError(
+                f"https://api.mercadopago.com/v1/payments/{marker}",
+                status_code,
+                marker,
+                {"X-Private": marker},
+                body,
+            )
+            transport = UrllibMercadoPagoTransport()
+            opener = HTTPErrorOpener(error)
+            transport._opener = opener
+            client = MercadoPagoPaymentQueryHTTPClient(
+                access_token=self.TOKEN,
+                transport=transport,
+            )
+            with self.subTest(status_code=status_code), self.assertRaises(
+                expected
+            ) as ctx:
+                client.get_payment("123456789", expected_live_mode=False)
+            exposed = " ".join((
+                str(ctx.exception),
+                repr(ctx.exception),
+                "".join(traceback.format_exception(ctx.exception)),
+            ))
+            self.assertTrue(body.closed)
+            self.assertEqual(body.close_count, 1)
+            self.assertEqual(body.read_count, 0)
+            self.assertEqual(opener.calls, 1)
+            self.assertNotIn(marker, exposed)
+            self.assertNotIn(self.TOKEN, exposed)
+            self.assertIsNone(ctx.exception.__cause__)
+            self.assertIsNone(ctx.exception.__context__)
+
+    def test_http_error_close_failure_is_neutral_and_does_not_leak(self):
+        marker = "PRIVATE-CLOSE-FAILURE"
+        body = ControlledHTTPErrorBody(close_error=RuntimeError(marker))
+        error = urllib.error.HTTPError(
+            f"https://api.mercadopago.com/v1/payments/{marker}",
+            503,
+            marker,
+            {"X-Private": marker},
+            body,
+        )
+        transport = UrllibMercadoPagoTransport()
+        transport._opener = HTTPErrorOpener(error)
+        client = MercadoPagoPaymentQueryHTTPClient(
+            access_token=self.TOKEN,
+            transport=transport,
+        )
+        with self.assertRaises(MercadoPagoPaymentRecoverableError) as ctx:
+            client.get_payment("123456789", expected_live_mode=False)
+        exposed = " ".join((
+            str(ctx.exception),
+            repr(ctx.exception),
+            "".join(traceback.format_exception(ctx.exception)),
+        ))
+        self.assertTrue(body.closed)
+        self.assertEqual(body.close_count, 1)
+        self.assertEqual(body.read_count, 0)
+        self.assertNotIn(marker, exposed)
+        self.assertNotIn(self.TOKEN, exposed)
+        self.assertIsNone(ctx.exception.__cause__)
+        self.assertIsNone(ctx.exception.__context__)
 
 
 if __name__ == "__main__":

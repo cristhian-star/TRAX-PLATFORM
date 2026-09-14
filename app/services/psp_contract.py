@@ -29,6 +29,16 @@ class UncertainResponseError(RuntimeError):
         self.attempt_id = attempt_id
 
 
+class PSPPaymentQueryError(RuntimeError):
+    pass
+
+
+class PSPPaymentQueryUncertainError(PSPPaymentQueryError):
+    def __init__(self, *, external_attempt_id: str):
+        super().__init__("payment status requires reconciliation")
+        self.external_attempt_id = external_attempt_id
+
+
 @dataclass(frozen=True, slots=True)
 class PaymentAttempt:
     attempt_id: str
@@ -38,6 +48,23 @@ class PaymentAttempt:
     idempotency_key: str
     status: PaymentAttemptStatus
     created_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class PSPPaymentQueryResult:
+    external_attempt_id: str
+    status: PaymentAttemptStatus
+
+
+@runtime_checkable
+class PSPPaymentQueryAdapter(Protocol):
+    @property
+    def provider(self) -> str: ...
+
+    @property
+    def live_mode(self) -> bool: ...
+
+    def query_payment(self, external_attempt_id: str) -> PSPPaymentQueryResult: ...
 
 
 @runtime_checkable

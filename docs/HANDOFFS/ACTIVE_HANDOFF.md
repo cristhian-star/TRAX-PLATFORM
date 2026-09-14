@@ -1,5 +1,109 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Adaptador PSP Mercado Pago - P2 corregidos
+
+Timestamp: 2026-09-13T23:27:35-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-payment-query-adapter`
+HEAD/commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+Estado Git inicial: once cambios locales conocidos, staging vacío y dos commits
+previos preservados
+
+Se preservan los dos hallazgos P2 recibidos como antecedente. El adaptador y el
+cliente HTTP quedaron implementados como dataclasses congeladas con slots. No
+es posible reasignar proveedor, modo, referencia al cliente, token, transporte
+o timeout después de construirlos. `provider` conserva siempre
+`mercadopago`; `provider` y `live_mode` son propiedades de lectura.
+
+El transporte estándar cierra explícitamente cada `urllib.error.HTTPError` una
+sola vez para autenticación, ausencia, rate limit, otros 4xx, 5xx y códigos
+inesperados. Nunca lee el cuerpo y tampoco conserva sus headers. Un fallo del
+cierre se contiene sin encadenarlo ni exponer URL, token, headers o cuerpo; la
+clasificación neutral original permanece intacta.
+
+Validación: focal completa 49/49; regresiones PSP/pagos 131/131; PostgreSQL real
+15/15 sobre `trax_payment_persistence_test_mp_adapter_p2_20260913`; suite
+completa 476 ejecutadas, 471 aprobadas, 5 omitidas, 0 fallos y 0 errores. La
+base descartable fue bajada a base por el gate, eliminada y confirmada ausente;
+`trax_db` permaneció presente. Pendiente: retest independiente.
+
+No hubo migraciones nuevas ni cambios de alcance. No hubo staging, commit,
+push, PR, merge, rebase ni deploy.
+
+## Adaptador PSP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T22:54:24-03:00
+Estado: COMPLETED
+Resultado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-payment-query-adapter`
+HEAD/commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+Estado Git inicial: árbol y staging limpios; dos commits previos preservados
+
+Decisión aplicada: se agregaron el protocolo neutral de consulta
+`PSPPaymentQueryAdapter` y el DTO mínimo inmutable `PSPPaymentQueryResult`, con
+identificador externo y `PaymentAttemptStatus`. `PSPAdapter`, su creación y
+`get_attempt()` permanecen intactos. El bloqueo histórico previo se conserva.
+
+`MercadoPagoPSPAdapter` implementa únicamente esa capacidad, con proveedor fijo
+`mercadopago`, modo explícito e inmutable y cliente inyectado. Valida el ID
+antes de la única consulta. Estados autoritativos se entregan al procesador;
+`404`, transporte, `429`, `5xx` y estados no representables se traducen a
+incertidumbre neutral. Autenticación, configuración y contrato producen error
+neutral explícito sin escritura.
+
+El procesador ahora exige coincidencia del proveedor y modo del adaptador antes
+de leer/correlacionar eventos. La lectura termina y cierra su sesión antes de la
+consulta; `apply_reconciliation()` se ejecuta después en una segunda transacción
+atómica. El webhook no invoca automáticamente este recorrido.
+
+Se agregó transporte productivo de biblioteca estándar con contexto TLS
+verificado, host fijo, timeout obligatorio y redirects/retries deshabilitados.
+Las pruebas no usan red ni credenciales reales.
+
+Validación: focal 45/45; regresiones PSP/pagos 161/161; PostgreSQL real 15/15
+sobre `trax_payment_persistence_test_mp_adapter_20260913`; suite completa 472
+ejecutadas, 467 aprobadas, 5 omitidas, 0 fallos y 0 errores. La base descartable
+fue eliminada y confirmada ausente; `trax_db` permaneció presente. `compileall`,
+Alembic, enlaces, whitespace y `git diff --check` se verifican al cierre.
+
+No se agregaron migraciones, SDK, workers, retries, frontend ni creación de
+cobros. Pendiente: revisión independiente antes del tercer commit. No hubo
+staging, commit, push, PR, merge, rebase ni deploy.
+
+## Bloqueo contractual del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-13T22:43:20-03:00
+Estado: BLOCKED
+Resultado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_BLOQUEADO_POR_CONTRATO_NEUTRAL
+Agente: Codex - implementador tecnico local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/mercadopago-payment-query-adapter`
+HEAD/commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+Estado Git inicial: árbol y staging limpios; dos commits previos preservados
+
+Bloqueante confirmado contra código: `PSPAdapter.get_attempt()` declara como
+salida `PaymentAttempt`, que requiere `internal_reference`, `amount`, `currency`,
+`idempotency_key` y `created_at`, además de identidad y estado. El contrato HTTP
+aprobado de `GET /v1/payments/{id}` no obtiene esos metadatos y el procesador
+solo consume `attempt_id` y `status`. Completar el DTO exigiría inventar valores,
+abrir persistencia desde el adaptador o ampliar el contrato HTTP sin autoridad.
+
+También falta una definición para `create_attempt()`, método obligatorio de
+`PSPAdapter` pero expresamente fuera del incremento de consulta. Implementar un
+método ficticio que siempre falle satisfaría solo la comprobación estructural,
+no el contrato neutral.
+
+Decisión requerida: aprobar una segregación de capacidades del contrato
+neutral o definir que el procesador dependa de un resultado mínimo de consulta.
+Hasta entonces no se implementaron adaptador ni transporte productivo y no se
+ejecutaron pruebas, PostgreSQL ni controles posteriores de implementación. No
+hubo staging, commit, push, PR, merge, rebase ni deploy.
+
 ## Corrección P2 del Bearer del cliente HTTP de pagos
 
 Timestamp: 2026-09-13T22:16:45-03:00

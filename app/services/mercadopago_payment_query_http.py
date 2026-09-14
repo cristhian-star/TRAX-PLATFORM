@@ -1,6 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 import re
+import ssl
+import urllib.error
+import urllib.request
 
 from app.services.mercadopago_payment_query import (
     MercadoPagoPaymentQueryError,
@@ -48,15 +51,75 @@ _TRANSPORT_FAILURE = object()
 _DECODE_FAILURE = object()
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+class UrllibMercadoPagoTransport:
+    """Standard-library transport with verified TLS and redirects disabled."""
+
+    def __init__(self):
+        context = ssl.create_default_context()
+        self._opener = urllib.request.build_opener(
+            urllib.request.HTTPSHandler(context=context),
+            _NoRedirectHandler(),
+        )
+
+    def __repr__(self):
+        return "UrllibMercadoPagoTransport()"
+
+    def __call__(
+        self, *, method, url, headers, timeout, allow_redirects, body
+    ):
+        if (
+            method != "GET"
+            or not url.startswith(f"{_BASE_URL}/v1/payments/")
+            or allow_redirects is not False
+            or body is not None
+        ):
+            raise ValueError("invalid transport request")
+        request = urllib.request.Request(url, headers=headers, method="GET")
+        try:
+            with self._opener.open(request, timeout=timeout) as response:
+                return _stdlib_response(response)
+        except urllib.error.HTTPError as error:
+            status_code = error.code
+            _close_http_error(error)
+            return MercadoPagoHTTPResponse(status_code, (), b"")
+
+
+def _close_http_error(error):
+    try:
+        error.close()
+    except Exception:
+        pass
+
+
+def _stdlib_response(response):
+    body = response.read(_MAX_RESPONSE_BYTES + 1)
+    return MercadoPagoHTTPResponse(
+        response.status,
+        tuple(response.headers.items()),
+        body,
+    )
+
+
+@dataclass(frozen=True, slots=True, repr=False, init=False)
 class MercadoPagoPaymentQueryHTTPClient:
+    _access_token: str = field(repr=False)
+    _transport: object = field(repr=False)
+    _timeout: float
+
     def __init__(self, *, access_token, transport, timeout=10.0):
-        self._access_token = _validate_access_token(access_token)
+        validated_token = _validate_access_token(access_token)
         if not callable(transport):
             raise TypeError("transport must be callable")
         if type(timeout) not in (int, float) or not 0 < timeout <= 30:
             raise ValueError("timeout must be between 0 and 30 seconds")
-        self._transport = transport
-        self._timeout = float(timeout)
+        object.__setattr__(self, "_access_token", validated_token)
+        object.__setattr__(self, "_transport", transport)
+        object.__setattr__(self, "_timeout", float(timeout))
 
     def __repr__(self):
         return "MercadoPagoPaymentQueryHTTPClient(timeout=<configured>)"
