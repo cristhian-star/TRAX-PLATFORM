@@ -1,5 +1,160 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-13 - Correcciones P2 del adaptador PSP Mercado Pago
+
+Timestamp: 2026-09-13T23:27:35-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- Se conservan como antecedente los dos hallazgos P2: el contexto del adaptador
+  y del cliente dependía de atributos reasignables, y el transporte no cerraba
+  explícitamente los `HTTPError` de `urllib`.
+- Adaptador y cliente son ahora estructuras congeladas con slots. Proveedor,
+  modo, referencia al cliente, token, transporte y timeout no pueden
+  reasignarse después de validar la construcción; `provider` y `live_mode` se
+  exponen como propiedades de solo lectura.
+- Todo `HTTPError` se cierra exactamente una vez sin leer el cuerpo. Se descartan
+  cuerpo y headers, y hasta una excepción del cierre queda contenida antes de
+  aplicar la clasificación neutral por código.
+- Focal completa 49/49, regresiones PSP/pagos 131/131, PostgreSQL real 15/15 y
+  suite completa 476 ejecutadas, 471 aprobadas y 5 omitidas, sin fallos ni
+  errores. La corrección queda pendiente de retest independiente.
+
+## 2026-09-13 - Adaptador PSP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T22:54:24-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- La decisión arquitectónica aprobada segregó la consulta en
+  `PSPPaymentQueryAdapter` y `PSPPaymentQueryResult`, preservando sin cambios la
+  capacidad existente `PSPAdapter` y su `get_attempt()`.
+- `MercadoPagoPSPAdapter` implementa solo consulta, expone proveedor
+  `mercadopago` y modo inmutable, valida el ID y traduce estados autoritativos o
+  incertidumbre sin fabricar datos de creación ni acceder a persistencia.
+- El procesador depende de la capacidad mínima, exige que proveedor y modo del
+  adaptador coincidan antes de consultar y mantiene la llamada HTTP entre sus
+  dos transacciones.
+- Se agregó transporte estándar con TLS verificado, host fijo, timeout
+  obligatorio y sin redirects/retries. Las pruebas usan transporte simulado.
+- Focal 45/45, regresiones PSP/pagos 161/161, PostgreSQL real 15/15 y suite
+  completa 472 ejecutadas, 467 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Bloqueo contractual del adaptador de consulta Mercado Pago
+
+Timestamp: 2026-09-13T22:43:20-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_PSP_ADAPTER_BLOQUEADO_POR_CONTRATO_NEUTRAL
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `c2cdc1aaa920b74b4ba4fb3581a935fdea72cd5e`
+
+- La inspección previa confirmó que `PSPAdapter.get_attempt()` exige un
+  `PaymentAttempt` completo, con referencia interna, importe, moneda, clave
+  idempotente y fecha. `GET /v1/payments/{id}` solo fue contratado para aportar
+  identidad, estado, modo y detalle; los campos restantes no pueden inferirse.
+- `PSPAdapter` también exige `create_attempt()`, operación fuera del alcance de
+  esta rama de consulta. No se fabricaron datos, no se devolvió un DTO distinto
+  bajo una anotación falsa y no se agregó un método nominal que siempre falle.
+- Se requiere aprobar si el contrato neutral se separa en capacidades de
+  creación/consulta o si el procesador debe depender de un resultado mínimo de
+  consulta. No se modificó código ni se ejecutaron pruebas.
+
+## 2026-09-13 - Corrección P2 del Bearer del cliente de pagos
+
+Timestamp: 2026-09-13T22:16:45-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+- Se conserva el hallazgo P2 como antecedente y se reemplaza la validación del
+  Bearer por una allowlist ASCII compatible con `b64token`: parte principal no
+  vacía con letras, números, `-`, `.`, `_`, `~`, `+` y `/`, seguida únicamente
+  por padding `=` opcional.
+- El límite explícito es 2048 caracteres. Se rechazan whitespace, controles C0
+  y C1, `DEL`, caracteres invisibles o bidireccionales, Unicode visualmente
+  similar y padding intermedio, sin normalizar el token.
+- Toda configuración inválida falla antes de construir headers o invocar el
+  transporte. La excepción neutral no conserva ni expone el token.
+- Focal cliente/contrato 26/26; regresiones PSP/pagos 151/151; suite completa
+  462 ejecutadas, 457 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Cliente HTTP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T12:38:36-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+- Se agregó un cliente autenticado desacoplado por transporte inyectable para
+  consultar exclusivamente `GET https://api.mercadopago.com/v1/payments/{id}`.
+  Valida el ID antes de construir la URL, envía headers mínimos, timeout
+  acotado y deshabilita redirects; no realiza retries.
+- El Bearer es obligatorio y no se expone mediante DTO, representación del
+  cliente, errores o tracebacks. El cliente no lee variables de entorno.
+- Las respuestas `200` exigen `application/json` UTF-8, cuerpo de hasta 1 MiB,
+  objeto inequívoco, claves únicas y JSON estándar antes de delegar al contrato
+  neutral aprobado.
+- Se clasifican autenticación, pago inexistente, rechazo de solicitud e
+  incertidumbre recuperable sin leer ni exponer cuerpos de error. No se agregó
+  persistencia, red real en pruebas, dependencia ni migración.
+- Focal cliente/contrato 25/25; regresiones PSP/pagos 150/150; suite completa
+  461 ejecutadas, 456 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Corrección P2 del detalle de estado de pagos
+
+Timestamp: 2026-09-13T12:13:00-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+
+- Se conserva el hallazgo P2 como antecedente y se restringe `status_detail` a
+  un token técnico de hasta 128 caracteres: comienza con letra ASCII minúscula
+  y admite únicamente letras ASCII minúsculas, números y guion bajo.
+- Se rechazan valores numéricos, casing o whitespace no canónico, guiones,
+  Unicode y cualquier secuencia de 13 a 19 dígitos consecutivos, incluso con
+  prefijo o sufijo. Los errores no incluyen el valor rechazado en mensaje,
+  traceback, causa, contexto, argumentos ni atributos.
+- Permanecen aceptados `accredited`, `pending_contingency` y
+  `cc_rejected_bad_filled_card_number`. Los demás contratos y mapeos no se
+  modificaron. La corrección queda pendiente de retest independiente.
+- Focal 14/14, regresiones PSP/pagos 139/139 y suite completa 450 ejecutadas,
+  445 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Contrato de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T11:52:01-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_CONTRACT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `1cb89cdb647cd358d66b4a013f9f671d1cfb8388`
+
+- Se agregó un contrato puro e inmutable que valida la respuesta ya decodificada
+  de `GET /v1/payments/{id}` y transforma estados representables a
+  `PaymentAttemptStatus`, sin realizar HTTP ni conservar el payload crudo.
+- El identificador solicitado admite solamente dígitos ASCII en un segmento
+  acotado; el `id` devuelto debe ser entero estricto, coincidir con la consulta
+  y no puede ser booleano. `live_mode` también se valida estrictamente contra
+  el entorno esperado.
+- `approved`, los estados pendientes autoritativos y los rechazos/cancelaciones
+  se mapean de forma explícita. Reembolsos, contracargos y estados desconocidos
+  requieren conciliación explícita y nunca se interpretan silenciosamente.
+- `status_detail` solo se conserva cuando es un token seguro y acotado. Las
+  excepciones son neutrales y no incluyen contenido recibido.
+- Focal 13/13; regresiones PSP/pagos 138/138; suite completa 449 ejecutadas,
+  444 aprobadas y 5 omitidas, sin fallos ni errores. `compileall`, Alembic,
+  enlaces, whitespace y `git diff --check` quedan registrados en el cierre de
+  esta sesión. PostgreSQL no aplica a este contrato puro.
+- Fuente oficial consultada: [Obtener pago - Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/reference/online-payments/subscriptions/get-payment/get).
+  No se incorporaron HTTP, credenciales, SDK, persistencia, migraciones ni
+  cambios financieros.
+
 ## 2026-09-13 - Integracion post-merge del Webhook de Mercado Pago
 
 Timestamp: 2026-09-13T00:00:12-03:00

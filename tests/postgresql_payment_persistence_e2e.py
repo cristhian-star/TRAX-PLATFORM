@@ -1,4 +1,5 @@
 import os
+import json
 import re
 import sys
 import threading
@@ -36,8 +37,16 @@ from app.services.payment_persistence_service import (
     create_or_get_obligation,
     register_or_get_attempt,
 )
-from app.services.psp_contract import PaymentAttemptStatus
-from app.services.psp_contract import PaymentAttempt
+from app.services.psp_contract import (
+    PSPPaymentQueryResult,
+    PaymentAttempt,
+    PaymentAttemptStatus,
+)
+from app.services.mercadopago_payment_query_http import (
+    MercadoPagoHTTPResponse,
+    MercadoPagoPaymentQueryHTTPClient,
+)
+from app.services.mercadopago_psp_adapter import MercadoPagoPSPAdapter
 from app.services.psp_event_contract import PSPEvent
 from app.services.psp_event_inbox import register_or_get_event
 from app.services.psp_event_reconciliation import (
@@ -376,18 +385,13 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             attempt_id = attempt.id
 
         class Adapter:
-            def create_attempt(self, **kwargs):
-                raise AssertionError("processor must not create attempts")
+            provider = "provider"
+            live_mode = False
 
-            def get_attempt(self, external_attempt_id):
-                return PaymentAttempt(
+            def query_payment(self, external_attempt_id):
+                return PSPPaymentQueryResult(
                     external_attempt_id,
-                    request.internal_reference,
-                    request.amount,
-                    request.currency,
-                    request.idempotency_key,
                     PaymentAttemptStatus.APPROVED,
-                    datetime.now(timezone.utc),
                 )
 
         processor = PSPEventReconciliationProcessor(
@@ -415,6 +419,63 @@ class PostgreSQLPaymentPersistenceGate(unittest.TestCase):
             self.assertEqual(rows[0].id, attempt_id)
             self.assertEqual(rows[0].financial_status, "APPROVED")
             self.assertEqual(session.query(PSPEventRecord).count(), 1)
+
+    def test_mercadopago_query_transport_reconciles_in_second_transaction(self):
+        request = self._request("mp-query", "10", "mp-query-key")
+        with self.Session.begin() as session:
+            obligation = create_or_get_obligation(session, request)
+            attempt = register_or_get_attempt(
+                session,
+                obligation,
+                self._result(request, PaymentOutcome.PENDING, "123456"),
+                psp_provider="mercadopago",
+                psp_live_mode=False,
+            )
+            event = register_or_get_event(session, PSPEvent(
+                "mercadopago", "mp-event", "payment", "payment.updated",
+                "123456", True, None, datetime.now(timezone.utc), "b" * 64,
+            ))
+            event_id = event.id
+            attempt_id = attempt.id
+
+        calls = []
+
+        def transport(**values):
+            with self.Session() as independent:
+                stored = independent.get(PaymentAttemptRecord, attempt_id)
+                self.assertEqual(stored.financial_status, "PENDING")
+            calls.append(values)
+            return MercadoPagoHTTPResponse(
+                200,
+                (("Content-Type", "application/json"),),
+                json.dumps({
+                    "id": 123456,
+                    "status": "approved",
+                    "live_mode": False,
+                }).encode(),
+            )
+
+        client = MercadoPagoPaymentQueryHTTPClient(
+            access_token="APP_USR-fake-postgresql-token",
+            transport=transport,
+            timeout=5,
+        )
+        processor = PSPEventReconciliationProcessor(
+            session_factory=self.Session,
+            adapter=MercadoPagoPSPAdapter(client=client, live_mode=False),
+            provider="mercadopago",
+            live_mode=False,
+            payment_topics=("payment",),
+        )
+        result = processor.process(event_id)
+        self.assertEqual(result.status, PSPEventProcessingStatus.RECONCILED)
+        self.assertEqual(result.financial_status, PaymentAttemptStatus.APPROVED)
+        self.assertEqual(len(calls), 1)
+        with self.Session() as session:
+            rows = session.query(PaymentAttemptRecord).all()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0].id, attempt_id)
+            self.assertEqual(rows[0].financial_status, "APPROVED")
 
     def test_constraints_foreign_key_rollback_visibility_and_session_recovery(self):
         session = self.Session()

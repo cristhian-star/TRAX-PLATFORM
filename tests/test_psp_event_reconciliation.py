@@ -17,10 +17,12 @@ from app.services.payment_persistence_service import (
     register_or_get_attempt,
 )
 from app.services.psp_contract import (
-    PaymentAttempt,
+    PSPPaymentQueryResult,
+    PSPPaymentQueryUncertainError,
     PaymentAttemptStatus,
-    UncertainResponseError,
 )
+from app.services.mercadopago_payment_query import MercadoPagoPaymentQueryResult
+from app.services.mercadopago_psp_adapter import MercadoPagoPSPAdapter
 from app.services.psp_event_contract import PSPEvent
 from app.services.psp_event_inbox import register_or_get_event
 from app.services.psp_event_reconciliation import (
@@ -30,15 +32,14 @@ from app.services.psp_event_reconciliation import (
 
 
 class Adapter:
-    def __init__(self, response=None, error=None):
+    def __init__(self, response=None, error=None, *, provider="provider", live_mode=False):
         self.response = response
         self.error = error
         self.calls = []
+        self.provider = provider
+        self.live_mode = live_mode
 
-    def create_attempt(self, **kwargs):
-        raise AssertionError("processor must not create PSP attempts")
-
-    def get_attempt(self, attempt_id):
+    def query_payment(self, attempt_id):
         self.calls.append(attempt_id)
         if self.error:
             raise self.error
@@ -82,10 +83,7 @@ class PSPEventReconciliationTest(unittest.TestCase):
 
     @staticmethod
     def _attempt(status, attempt_id="psp-1"):
-        return PaymentAttempt(
-            attempt_id, "ref-1", Decimal("10.00"), "ARS", "key-1",
-            status, datetime.now(timezone.utc),
-        )
+        return PSPPaymentQueryResult(attempt_id, status)
 
     def _processor(
         self, adapter, *, provider="provider", live_mode=False,
@@ -137,11 +135,26 @@ class PSPEventReconciliationTest(unittest.TestCase):
         missing = self._processor(adapter).process(999)
         self.assertEqual(missing.status, PSPEventProcessingStatus.EVENT_NOT_FOUND)
         event_id, _ = self._seed()
-        wrong_provider = self._processor(adapter, provider="other").process(event_id)
-        wrong_mode = self._processor(adapter, live_mode=True).process(event_id)
+        wrong_provider = self._processor(
+            Adapter(provider="other"), provider="other"
+        ).process(event_id)
+        wrong_mode = self._processor(
+            Adapter(live_mode=True), live_mode=True
+        ).process(event_id)
         self.assertEqual(wrong_provider.status, PSPEventProcessingStatus.INCOMPATIBLE_CONTEXT)
         self.assertEqual(wrong_mode.status, PSPEventProcessingStatus.INCOMPATIBLE_CONTEXT)
         self.assertEqual(adapter.calls, [])
+
+    def test_adapter_context_must_match_processor_before_any_event_lookup(self):
+        adapter = Adapter(provider="mercadopago", live_mode=False)
+        with patch(
+            "app.services.psp_event_reconciliation.get_attempt_by_psp_identity"
+        ) as lookup:
+            with self.assertRaises(ValueError):
+                self._processor(adapter, provider="other")
+            with self.assertRaises(ValueError):
+                self._processor(adapter, provider="mercadopago", live_mode=True)
+        lookup.assert_not_called()
 
     def test_unmatched_and_legacy_attempts_do_not_call_adapter(self):
         adapter = Adapter()
@@ -172,7 +185,9 @@ class PSPEventReconciliationTest(unittest.TestCase):
 
     def test_uncertain_response_preserves_reconciliation_required(self):
         event_id, _ = self._seed(state=PaymentOutcome.RECONCILIATION_REQUIRED)
-        adapter = Adapter(error=UncertainResponseError("timeout", attempt_id="psp-1"))
+        adapter = Adapter(error=PSPPaymentQueryUncertainError(
+            external_attempt_id="psp-1"
+        ))
         result = self._processor(adapter).process(event_id)
         self.assertEqual(result.status, PSPEventProcessingStatus.RECONCILIATION_REQUIRED)
         self.assertIsNone(result.financial_status)
@@ -209,9 +224,9 @@ class PSPEventReconciliationTest(unittest.TestCase):
                 open_sessions -= 1
 
         class InspectingAdapter(Adapter):
-            def get_attempt(self, attempt_id):
+            def query_payment(self, attempt_id):
                 self.test.assertEqual(open_sessions, 0)
-                return super().get_attempt(attempt_id)
+                return super().query_payment(attempt_id)
 
         adapter = InspectingAdapter(self._attempt(PaymentAttemptStatus.APPROVED))
         adapter.test = self
@@ -236,6 +251,36 @@ class PSPEventReconciliationTest(unittest.TestCase):
         recovered = processor.process(event_id)
         self.assertEqual(recovered.status, PSPEventProcessingStatus.RECONCILED)
         self.assertEqual(adapter.calls, ["psp-1", "psp-1"])
+
+    def test_mercadopago_query_adapter_completes_contextual_reconciliation(self):
+        event_id, attempt_id = self._seed(
+            provider="mercadopago", resource_id="123456"
+        )
+
+        class Client:
+            def __init__(self):
+                self.calls = []
+
+            def get_payment(self, payment_id, *, expected_live_mode):
+                self.calls.append((payment_id, expected_live_mode))
+                return MercadoPagoPaymentQueryResult(
+                    payment_id,
+                    PaymentAttemptStatus.APPROVED,
+                    expected_live_mode,
+                )
+
+        client = Client()
+        adapter = MercadoPagoPSPAdapter(client=client, live_mode=False)
+        result = self._processor(
+            adapter, provider="mercadopago", live_mode=False
+        ).process(event_id)
+        self.assertEqual(result.status, PSPEventProcessingStatus.RECONCILED)
+        self.assertEqual(result.financial_status, PaymentAttemptStatus.APPROVED)
+        self.assertEqual(result.attempt_id, attempt_id)
+        self.assertEqual(client.calls, [("123456", False)])
+        stored = db.session.get(PaymentAttemptRecord, attempt_id)
+        self.assertEqual(stored.financial_status, "APPROVED")
+        self.assertEqual(stored.orchestration_result, "APPROVED")
 
 
 if __name__ == "__main__":
