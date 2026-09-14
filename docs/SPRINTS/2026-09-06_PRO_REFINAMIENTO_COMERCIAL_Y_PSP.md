@@ -8,6 +8,56 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Corrección P2 del Bearer del cliente HTTP de pagos
+
+Timestamp: 2026-09-13T22:16:45-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+El hallazgo P2 queda preservado históricamente y corregido mediante una
+allowlist ASCII compatible con `b64token`. La parte principal debe ser no vacía
+y contener solo letras, números o `-._~+/`; `=` queda limitado al padding final.
+Se fija un máximo de 2048 caracteres y no se transforma el valor recibido.
+
+Se bloquean whitespace, controles C0/C1, `DEL`, caracteres invisibles,
+bidireccionales o Unicode visualmente similares y padding intermedio antes de
+construir headers o invocar el transporte. La excepción permanece neutral y no
+expone el token. El resto del contrato HTTP no cambia y la corrección queda
+pendiente de retest independiente.
+
+Validación: focal cliente/contrato 26/26, regresiones PSP/pagos 151/151 y suite
+completa 462 ejecutadas, 457 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## Cliente HTTP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T12:38:36-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama y base: `feature/mercadopago-payment-query-adapter` en
+`2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+El segundo incremento agrega un cliente autenticado con transporte inyectable
+para la consulta puntual de pagos al host productivo fijo. La solicitud es un
+único `GET`, sin body, query, redirects ni retries, con timeout acotado y los
+headers mínimos de Bearer y aceptación JSON. El token no se expone ni se lee
+desde configuración global.
+
+Las respuestas se clasifican sin confiar en cuerpos de error. El éxito requiere
+JSON UTF-8 acotado, objeto inequívoco, claves únicas y `Content-Type` válido;
+el contenido se transforma después mediante el contrato neutral aprobado. Los
+errores externos recuperables permanecen separados de autenticación, ausencia
+del pago y rechazo de solicitud.
+
+No se realiza red real en pruebas, no se integra aún `PSPAdapter`, no hay
+persistencia o modificación financiera y no se incorporan SDK, dependencia o
+migración. El diseño general 2.0 y la conexión productiva siguen pendientes.
+
+Validación: focal cliente/contrato 25/25, regresiones PSP/pagos 150/150 y suite
+completa 461 ejecutadas, 456 aprobadas y 5 omitidas, sin fallos ni errores.
+PostgreSQL no aplica al incremento HTTP aislado y sin persistencia.
+
 ## Corrección P2 del contrato de consulta de pagos Mercado Pago
 
 Timestamp: 2026-09-13T12:13:00-03:00

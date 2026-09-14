@@ -1,5 +1,48 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-13 - Corrección P2 del Bearer del cliente de pagos
+
+Timestamp: 2026-09-13T22:16:45-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_CORREGIDO_LOCALMENTE_PENDIENTE_DE_RETEST
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+- Se conserva el hallazgo P2 como antecedente y se reemplaza la validación del
+  Bearer por una allowlist ASCII compatible con `b64token`: parte principal no
+  vacía con letras, números, `-`, `.`, `_`, `~`, `+` y `/`, seguida únicamente
+  por padding `=` opcional.
+- El límite explícito es 2048 caracteres. Se rechazan whitespace, controles C0
+  y C1, `DEL`, caracteres invisibles o bidireccionales, Unicode visualmente
+  similar y padding intermedio, sin normalizar el token.
+- Toda configuración inválida falla antes de construir headers o invocar el
+  transporte. La excepción neutral no conserva ni expone el token.
+- Focal cliente/contrato 26/26; regresiones PSP/pagos 151/151; suite completa
+  462 ejecutadas, 457 aprobadas y 5 omitidas, sin fallos ni errores.
+
+## 2026-09-13 - Cliente HTTP de consulta de pagos Mercado Pago
+
+Timestamp: 2026-09-13T12:38:36-03:00
+Estado: MERCADOPAGO_PAYMENT_QUERY_HTTP_CLIENT_IMPLEMENTADO_LOCALMENTE_PENDIENTE_DE_REVISION
+Agente: Codex - implementador tecnico local
+Rama: `feature/mercadopago-payment-query-adapter`
+Commit base: `2547f483329b6c17c5cbc86e25ab73e4f9d2463c`
+
+- Se agregó un cliente autenticado desacoplado por transporte inyectable para
+  consultar exclusivamente `GET https://api.mercadopago.com/v1/payments/{id}`.
+  Valida el ID antes de construir la URL, envía headers mínimos, timeout
+  acotado y deshabilita redirects; no realiza retries.
+- El Bearer es obligatorio y no se expone mediante DTO, representación del
+  cliente, errores o tracebacks. El cliente no lee variables de entorno.
+- Las respuestas `200` exigen `application/json` UTF-8, cuerpo de hasta 1 MiB,
+  objeto inequívoco, claves únicas y JSON estándar antes de delegar al contrato
+  neutral aprobado.
+- Se clasifican autenticación, pago inexistente, rechazo de solicitud e
+  incertidumbre recuperable sin leer ni exponer cuerpos de error. No se agregó
+  persistencia, red real en pruebas, dependencia ni migración.
+- Focal cliente/contrato 25/25; regresiones PSP/pagos 150/150; suite completa
+  461 ejecutadas, 456 aprobadas y 5 omitidas, sin fallos ni errores.
+
 ## 2026-09-13 - Corrección P2 del detalle de estado de pagos
 
 Timestamp: 2026-09-13T12:13:00-03:00

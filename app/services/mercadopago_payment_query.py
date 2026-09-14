@@ -41,7 +41,7 @@ def parse_mercadopago_payment_query(
 ):
     """Validate a decoded GET /v1/payments/{id} response without side effects."""
 
-    requested_id = _normalize_requested_payment_id(requested_payment_id)
+    requested_id = normalize_mercadopago_payment_id(requested_payment_id)
     if type(expected_live_mode) is not bool:
         raise MercadoPagoPaymentQueryError("invalid expected payment environment")
     if type(response) is not dict or not all(
@@ -80,7 +80,7 @@ def parse_mercadopago_payment_query(
     )
 
 
-def _normalize_requested_payment_id(value):
+def normalize_mercadopago_payment_id(value):
     if type(value) is int:
         if value <= 0:
             raise MercadoPagoPaymentQueryError("invalid requested payment identity")
