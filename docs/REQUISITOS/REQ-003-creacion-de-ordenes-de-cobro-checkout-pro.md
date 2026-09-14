@@ -1,12 +1,12 @@
 ---
 id: REQ-003
 titulo: Creacion de ordenes de cobro Checkout Pro
-estado: APROBADO_DOCUMENTAL_IMPLEMENTACION_PENDIENTE
+estado: APROBADO
 fecha_aprobacion: 2026-09-14T10:05:02-03:00
 responsable: Cristian Sánchez
 rama_documental: feature/checkout-pro-payment-order-contract
 implementacion: PENDIENTE
-ultima_revision: 2026-09-14T10:30:15-03:00
+ultima_revision: 2026-09-14T20:43:27-03:00
 ---
 
 # REQ-003 - Creacion de ordenes de cobro Checkout Pro
@@ -188,24 +188,24 @@ forman parte de la taxonomía del primer incremento.
 
 ## Criterios de aceptación observables
 
-- [ ] Existen protocolo y DTOs inmutables separados de creación de intentos y
+- [x] Existen protocolo y DTOs inmutables separados de creación de intentos y
   consulta de pagos.
-- [ ] Los importes válidos usan `Decimal`; cero, negativos, no finitos, `float`
+- [x] Los importes válidos usan `Decimal`; cero, negativos, no finitos, `float`
   y más de dos decimales son rechazados.
-- [ ] Solo `ARS` es aceptada.
-- [ ] `expires_at` equivale exactamente a `created_at + 72 horas`.
-- [ ] `checkout_url` se rechaza si no es HTTPS absoluta con hostname válido, si
+- [x] Solo `ARS` es aceptada.
+- [x] `expires_at` equivale exactamente a `created_at + 72 horas`.
+- [x] `checkout_url` se rechaza si no es HTTPS absoluta con hostname válido, si
   incluye credenciales o fragmento, o si contiene controles o whitespace
   inseguro; no se aceptan esquemas alternativos.
-- [ ] Una URL estructuralmente válida no se presenta como URL comprobada de
+- [x] Una URL estructuralmente válida no se presenta como URL comprobada de
   Mercado Pago y nunca se interpreta como confirmación de pago.
-- [ ] El resultado coincide exactamente con todos los campos compartidos del
+- [x] El resultado coincide exactamente con todos los campos compartidos del
   comando y rechaza cualquier eco alterado.
 - [ ] El fake determinista demuestra creación, consulta y replay idempotente.
-- [ ] La misma clave con contenido material distinto produce conflicto.
+- [x] La misma clave con contenido material distinto produce conflicto.
 - [ ] Enlace y QR representan una sola URL y no crean órdenes adicionales.
 - [ ] Ninguna presentación, apertura o redirect se interpreta como pago.
-- [ ] Las pruebas no atribuyen al fake persistencia, concurrencia ni integración
+- [x] Las pruebas no atribuyen al fake persistencia, concurrencia ni integración
   productiva.
 
 ## Matriz de pruebas prevista
@@ -279,3 +279,28 @@ Hallazgos atendidos:
 La revisión histórica `REQUIERE_CORRECCIONES` del
 `2026-09-14T10:27:58-03:00` se conserva mediante este registro; no se presenta
 la corrección como implementación ni como revalidación aprobada.
+
+## Actualización del avance técnico
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD observado: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+Estado: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+
+El commit `6d6dd2f97ed6e891b4efbfae67aca25398f28e60` implementó el
+contrato neutral de creación, `PaymentOrderCreationCommand`,
+`PaymentOrderCreationResult`, sus validaciones puras, correspondencia canónica
+y errores tipados, junto con sus pruebas unitarias. El commit
+`12c64187bce3137057c6e3e4a261b1f600b2867b` agregó el adaptador determinista
+en memoria, idempotencia aislada por instancia, conflicto por contenido
+material y cobertura de concurrencia local.
+
+El contrato puro y el fake determinista constituyen un avance técnico parcial
+implementado y probado.
+Persistencia durable, ownership efectivo, unicidad activa entre procesos,
+integración real con Mercado Pago, HTTP, checkout productivo, QR o interfaz,
+conciliación, efectos financieros y efectos sobre PRO continúan pendientes.
+Por ello la implementación productiva completa de REQ-003 permanece pendiente
+y no está disponible como capacidad para usuarios.

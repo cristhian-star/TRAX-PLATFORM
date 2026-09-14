@@ -1,5 +1,23 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-14 - Avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+
+- `6d6dd2f` incorporó el contrato neutral, DTOs inmutables, validaciones puras,
+  correspondencia canónica, errores tipados y pruebas.
+- `12c6418` incorporó el adaptador determinista en memoria, replay idempotente,
+  conflictos materiales, aislamiento por instancia y concurrencia local.
+- Ambos incrementos forman un avance técnico parcial implementado y probado.
+- REQ-003 no está completo ni disponible productivamente: persistencia,
+  Mercado Pago real, HTTP, checkout, interfaz, conciliación y efectos
+  financieros o PRO permanecen pendientes.
+
 ## 2026-09-14 - Especificación de orden Checkout Pro
 
 Timestamp: 2026-09-14T10:21:05-03:00

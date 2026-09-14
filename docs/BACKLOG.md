@@ -2,6 +2,21 @@
 
 ## Ordenes de cobro Checkout Pro
 
+### Actualización del avance técnico
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+
+- Avance técnico parcial implementado y probado: contrato neutral, DTOs
+  inmutables, validaciones puras y adaptador determinista en memoria
+  (`6d6dd2f`, `12c6418`).
+- Pendientes: persistencia durable, ownership, unicidad activa entre procesos,
+  Mercado Pago real, HTTP, checkout productivo, QR/interfaz, conciliación y
+  efectos financieros o PRO.
+
+### Registro histórico de especificación
+
 Timestamp: 2026-09-14T10:21:05-03:00
 Estado: ESPECIFICACION_PREPARADA_IMPLEMENTACION_PENDIENTE
 

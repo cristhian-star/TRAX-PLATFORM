@@ -29,6 +29,22 @@ Todavía no existen implementación, persistencia, Mercado Pago real, QR gráfic
 frontend, conciliación automática ni activación PRO. Pendiente: revisión
 documental antes de implementar código.
 
+### Actualización del avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama y HEAD: `feature/checkout-pro-payment-order-contract` en `12c6418`
+
+Después del registro histórico anterior, `6d6dd2f` implementó el contrato
+neutral, sus DTOs, validaciones puras y pruebas; `12c6418` agregó el adaptador
+determinista en memoria y pruebas de idempotencia, aislamiento y concurrencia
+local. Ambos incrementos forman un avance técnico parcial implementado y
+probado. No se implementaron persistencia, integración real con Mercado Pago,
+HTTP, checkout productivo, QR/interfaz, conciliación ni efectos financieros o
+PRO. El sprint comercial continúa abierto para esas capacidades.
+
 ## Integración post-merge del adaptador de consulta Mercado Pago
 
 Timestamp: 2026-09-14T09:06:21-03:00

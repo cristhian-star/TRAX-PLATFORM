@@ -22,6 +22,22 @@ prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
 
+### 2026-09-14 - Avance técnico de la orden de cobro
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+
+- El contrato neutral, DTOs y validaciones puras existen desde `6d6dd2f`.
+- El adaptador determinista en memoria y sus pruebas existen desde `12c6418`.
+- Ambos incrementos forman un avance técnico parcial implementado y probado.
+- Esta implementación no procesa pagos ni habilita una experiencia productiva:
+  persistencia, ownership, Mercado Pago real, HTTP, checkout, interfaz,
+  conciliación y efectos financieros o PRO continúan pendientes.
+
 ### 2026-09-14 - Orden de cobro Checkout Pro
 
 Timestamp: 2026-09-14T10:21:05-03:00

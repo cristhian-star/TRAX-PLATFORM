@@ -1,5 +1,31 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado: COMPLETED
+Resultado: REQ_003_AVANCE_TECNICO_VALIDADO_LOCALMENTE_PUBLICACION_PR_Y_MERGE_PENDIENTES
+Agente: Codex - implementador documental local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+Push a GitHub: NO; la rama continúa sin publicación verificada en esta sesión
+Merge: NO; no autorizado
+
+Trabajo integrado en la rama: `6d6dd2f` implementó el contrato neutral de
+creación, DTOs, validaciones puras y pruebas; `12c6418` agregó el adaptador
+determinista en memoria y sus pruebas de idempotencia, aislamiento y
+concurrencia local. Este cierre documental no modificó código ni repitió tests
+de aplicación.
+
+REQ-003 conserva estado formal `APROBADO` y su implementación productiva
+completa permanece `PENDIENTE`. El contrato puro y el fake determinista son un
+avance técnico parcial implementado y probado. Persistencia, ownership,
+unicidad durable, Mercado Pago real, HTTP, checkout productivo, QR/interfaz,
+conciliación, efectos financieros y PRO siguen pendientes. No existe
+autorización de producción. La publicación de la rama, el PR y el merge
+continúan pendientes y requieren autorización separada.
+
 ## Especificación Checkout Pro Payment Order Contract
 
 Timestamp: 2026-09-14T10:21:05-03:00
