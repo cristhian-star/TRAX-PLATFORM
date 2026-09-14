@@ -1,5 +1,22 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-14 - Especificación de orden Checkout Pro
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: ESPECIFICACION_CHECKOUT_PRO_PAYMENT_ORDER_CONTRACT_PREPARADA_PENDIENTE_DE_REVISION
+Agente: Codex - implementador técnico documental
+Rama: `feature/checkout-pro-payment-order-contract`
+Commit base: `9199d548dd312f65d84414f30e6193ab386bdc53`
+
+- Se creó [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md)
+  para una orden en ARS, importe Decimal y vencimiento exacto a 72 horas.
+- Una única URL de Checkout Pro se reutiliza como enlace remoto o contenido de
+  QR; el producto QR de sucursales/cajas queda fuera del MVP.
+- Se definió una capacidad neutral de creación separada de intentos y consultas,
+  con DTOs, validaciones, errores y fake determinista previstos.
+- No existe implementación: HTTP, SDK, credenciales, ORM, migraciones, QR,
+  frontend, conciliación, PRO y producción permanecen fuera de alcance.
+
 ## 2026-09-14 - Integración del adaptador de consulta Mercado Pago
 
 Timestamp: 2026-09-14T09:06:21-03:00

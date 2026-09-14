@@ -111,6 +111,11 @@ horas permanecen como pendientes selectivos. El diseño 2.0 sigue
 [ ] Sprint 2 PRO comercial - cobros transaccionales, checkout/enlace/QR, lotes
 de creditos y periodos de 30 dias por umbral
 
+Estado documental al `2026-09-14T10:21:05-03:00`: REQ-003 define la orden de
+cobro Checkout Pro y el primer incremento puro, todavía sin implementación.
+La única URL se reutiliza como enlace o QR; persistencia, interfaz, PSP real,
+conciliación y efectos PRO permanecen pendientes.
+
 [ ] Sprint 3 PRO comercial - suscripcion de 30 dias, pagos mixtos, renovacion,
 exencion, gracia y retorno transaccional
 
