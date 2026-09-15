@@ -8,6 +8,43 @@ Agente: 01 - Documentation Engineer
 Rama observada: `develop`
 Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
+## Especificación de orden de cobro Checkout Pro
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: ESPECIFICACION_CHECKOUT_PRO_PAYMENT_ORDER_CONTRACT_PREPARADA_PENDIENTE_DE_REVISION
+Responsable funcional: Cristian Sánchez
+Agente: Codex - implementador técnico documental
+Rama y base: `feature/checkout-pro-payment-order-contract` en
+`9199d548dd312f65d84414f30e6193ab386bdc53`
+
+La decisión aprobada queda formalizada en
+[REQ-003](../REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md):
+importe acordado en ARS, Decimal positivo y finito con dos decimales como
+máximo, vencimiento a 72 horas y una sola orden activa por obligación. Enlace y
+QR presentan la misma URL; el QR de sucursales/cajas queda fuera del MVP.
+
+El primer incremento se limita a contrato neutral separado, DTOs inmutables,
+validaciones puras, errores mínimos, fake determinista y pruebas unitarias.
+Todavía no existen implementación, persistencia, Mercado Pago real, QR gráfico,
+frontend, conciliación automática ni activación PRO. Pendiente: revisión
+documental antes de implementar código.
+
+### Actualización del avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama y HEAD: `feature/checkout-pro-payment-order-contract` en `12c6418`
+
+Después del registro histórico anterior, `6d6dd2f` implementó el contrato
+neutral, sus DTOs, validaciones puras y pruebas; `12c6418` agregó el adaptador
+determinista en memoria y pruebas de idempotencia, aislamiento y concurrencia
+local. Ambos incrementos forman un avance técnico parcial implementado y
+probado. No se implementaron persistencia, integración real con Mercado Pago,
+HTTP, checkout productivo, QR/interfaz, conciliación ni efectos financieros o
+PRO. El sprint comercial continúa abierto para esas capacidades.
+
 ## Integración post-merge del adaptador de consulta Mercado Pago
 
 Timestamp: 2026-09-14T09:06:21-03:00

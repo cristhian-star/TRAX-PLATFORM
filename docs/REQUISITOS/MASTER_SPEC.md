@@ -22,6 +22,40 @@ prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
 
+### 2026-09-14 - Avance técnico de la orden de cobro
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+
+- El contrato neutral, DTOs y validaciones puras existen desde `6d6dd2f`.
+- El adaptador determinista en memoria y sus pruebas existen desde `12c6418`.
+- Ambos incrementos forman un avance técnico parcial implementado y probado.
+- Esta implementación no procesa pagos ni habilita una experiencia productiva:
+  persistencia, ownership, Mercado Pago real, HTTP, checkout, interfaz,
+  conciliación y efectos financieros o PRO continúan pendientes.
+
+### 2026-09-14 - Orden de cobro Checkout Pro
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: CONTRATO_APROBADO_DOCUMENTAL_IMPLEMENTACION_PENDIENTE
+Responsable: Cristian Sánchez
+Rama: `feature/checkout-pro-payment-order-contract`
+Commit base: `9199d548dd312f65d84414f30e6193ab386bdc53`
+
+- [REQ-003](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md) define una
+  orden activa por obligación, en ARS, con importe Decimal y vencimiento exacto
+  a 72 horas.
+- La misma URL de Checkout Pro se comparte como enlace o se representa como QR;
+  no se adopta para este MVP el QR de sucursales/cajas del PSP.
+- Mostrar, compartir, abrir o recibir un redirect no confirma el pago. Solo una
+  aprobación conciliada e idempotente puede habilitar efectos futuros.
+- La aprobación es funcional y documental. Contrato neutral, fake, HTTP,
+  persistencia, QR, frontend y efectos financieros siguen sin implementarse.
+
 ### 2026-09-06 - Refinamiento comercial PRO y PSP
 
 Timestamp: 2026-09-06T19:22:08-03:00
@@ -463,6 +497,7 @@ extensiones de 60 dias no describe el modelo comercial vigente.
 
 - [REQ-001 - Activacion y vigencia de MANDOBRA PRO](REQ-001-activacion-y-vigencia-pro.md)
 - [REQ-002 - Facturacion MANDOBRA PRO MVP](REQ-002-facturacion-pro-mvp.md)
+- [REQ-003 - Creacion de ordenes de cobro Checkout Pro](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md)
 - [Auditoria documental del 2026-08-31](../AUDITORIA_DOCUMENTAL_2026-08-31.md)
 - [Decisiones de arquitectura](../DECISIONES_ARQUITECTURA.md)
 - [Roadmap](../ROADMAP.md)

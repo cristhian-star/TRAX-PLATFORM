@@ -1,5 +1,33 @@
 # BACKLOG MANDOBRA
 
+## Ordenes de cobro Checkout Pro
+
+### Actualización del avance técnico
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+
+- Avance técnico parcial implementado y probado: contrato neutral, DTOs
+  inmutables, validaciones puras y adaptador determinista en memoria
+  (`6d6dd2f`, `12c6418`).
+- Pendientes: persistencia durable, ownership, unicidad activa entre procesos,
+  Mercado Pago real, HTTP, checkout productivo, QR/interfaz, conciliación y
+  efectos financieros o PRO.
+
+### Registro histórico de especificación
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: ESPECIFICACION_PREPARADA_IMPLEMENTACION_PENDIENTE
+
+- Revisar [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md).
+- Primer incremento previsto: protocolo neutral, DTOs inmutables, validaciones
+  puras, errores mínimos, fake determinista y pruebas unitarias.
+- Diferir HTTP/SDK, credenciales, ORM, migraciones, concurrencia PostgreSQL, QR
+  gráfico, frontend, WhatsApp, webhooks, conciliación, PRO y producción.
+- Diseñar después la persistencia durable de una orden activa por obligación y
+  la derivación efectiva de ownership desde contratos internos.
+
 ## Infraestructura de coverage pendiente
 
 Timestamp: 2026-09-04T19:50:24-03:00

@@ -15,6 +15,11 @@ La linea base vigente esta en [MANDOBRA Master Spec](MASTER_SPEC.md).
 - [REQ-002 - Facturacion MANDOBRA PRO MVP](REQ-002-facturacion-pro-mvp.md)
   - Estado: `APROBADO`.
   - Implementacion: `PENDIENTE`.
+- [REQ-003 - Creacion de ordenes de cobro Checkout Pro](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md)
+  - Estado: `APROBADO`.
+  - Implementacion productiva completa: `PENDIENTE`.
+  - Avance técnico parcial implementado y probado: contrato puro y adaptador
+    determinista en memoria.
 
 ## Borradores activos
 

@@ -1,5 +1,40 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-14 - Avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+
+- `6d6dd2f` incorporó el contrato neutral, DTOs inmutables, validaciones puras,
+  correspondencia canónica, errores tipados y pruebas.
+- `12c6418` incorporó el adaptador determinista en memoria, replay idempotente,
+  conflictos materiales, aislamiento por instancia y concurrencia local.
+- Ambos incrementos forman un avance técnico parcial implementado y probado.
+- REQ-003 no está completo ni disponible productivamente: persistencia,
+  Mercado Pago real, HTTP, checkout, interfaz, conciliación y efectos
+  financieros o PRO permanecen pendientes.
+
+## 2026-09-14 - Especificación de orden Checkout Pro
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: ESPECIFICACION_CHECKOUT_PRO_PAYMENT_ORDER_CONTRACT_PREPARADA_PENDIENTE_DE_REVISION
+Agente: Codex - implementador técnico documental
+Rama: `feature/checkout-pro-payment-order-contract`
+Commit base: `9199d548dd312f65d84414f30e6193ab386bdc53`
+
+- Se creó [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md)
+  para una orden en ARS, importe Decimal y vencimiento exacto a 72 horas.
+- Una única URL de Checkout Pro se reutiliza como enlace remoto o contenido de
+  QR; el producto QR de sucursales/cajas queda fuera del MVP.
+- Se definió una capacidad neutral de creación separada de intentos y consultas,
+  con DTOs, validaciones, errores y fake determinista previstos.
+- No existe implementación: HTTP, SDK, credenciales, ORM, migraciones, QR,
+  frontend, conciliación, PRO y producción permanecen fuera de alcance.
+
 ## 2026-09-14 - Integración del adaptador de consulta Mercado Pago
 
 Timestamp: 2026-09-14T09:06:21-03:00

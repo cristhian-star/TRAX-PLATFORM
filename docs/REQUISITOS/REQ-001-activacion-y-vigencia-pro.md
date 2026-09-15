@@ -322,6 +322,12 @@ resolverse antes de implementar; este requisito no inventa su solucion tecnica.
 
 ## DECISIONES APROBADAS
 
+- La orden de cobro de contratos internos usa inicialmente `ARS`, importe
+  `Decimal` positivo y finito con hasta dos decimales, y vence a las 72 horas.
+  Solo existe una activa por obligación; su única URL puede compartirse o
+  representarse como QR. Esta decisión se detalla en
+  [REQ-003](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md) y no declara
+  implementados el cobro, la conciliación ni la activación PRO.
 - Catalogo canonico: `FREE`, `PRO`, `ENTERPRISE`.
 - `Plus` no pertenece al catalogo aprobado.
 - La primera implementacion de PRO corresponde a profesionales prestadores de

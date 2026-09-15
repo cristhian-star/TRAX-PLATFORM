@@ -1,5 +1,30 @@
 # DECISIONES DE ARQUITECTURA MANDOBRA
 
+## 2026-09-14 - Una orden Checkout Pro, enlace y QR
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: APROBADO_DOCUMENTAL_IMPLEMENTACION_PENDIENTE
+Responsable: Cristian Sánchez
+Rama: `feature/checkout-pro-payment-order-contract`
+Commit base: `9199d548dd312f65d84414f30e6193ab386bdc53`
+
+Para el MVP se eligió una orden de Checkout Pro con una única URL reutilizada
+como enlace remoto o contenido de un QR presencial. Ambos canales presentan la
+misma obligación y no crean órdenes ni cobros independientes. Mostrar, copiar,
+compartir, abrir o recibir un redirect no confirma pago.
+
+Se descarta en este MVP el producto QR presencial de Mercado Pago basado en
+sucursales y cajas porque introduce entidades operativas, ciclo de vida y
+contratos de integración distintos que no son necesarios para representar el
+mismo cobro acordado. La decisión reduce duplicación de identidad e
+idempotencia sin afirmar todavía viabilidad productiva del PSP.
+
+La creación se modelará mediante una capacidad neutral separada,
+`PSPPaymentOrderCreationAdapter`; no reutiliza creación de intentos ni amplía la
+consulta. La especificación canónica es
+[REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md). No
+autoriza HTTP, persistencia, QR gráfico, efectos financieros, PRO o producción.
+
 ## 2026-09-06 - Frontera documental previa a integraciones PRO
 
 Timestamp: 2026-09-06T19:22:08-03:00

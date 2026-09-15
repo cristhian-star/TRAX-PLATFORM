@@ -1,5 +1,59 @@
 # Handoff tecnico: contrato neutral PSP y simulador determinista
 
+## Avance técnico de REQ-003
+
+Timestamp: 2026-09-14T20:43:27-03:00
+Estado: COMPLETED
+Resultado: REQ_003_AVANCE_TECNICO_VALIDADO_LOCALMENTE_PUBLICACION_PR_Y_MERGE_PENDIENTES
+Agente: Codex - implementador documental local
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD: `12c64187bce3137057c6e3e4a261b1f600b2867b`
+Push a GitHub: NO; la rama continúa sin publicación verificada en esta sesión
+Merge: NO; no autorizado
+
+Trabajo integrado en la rama: `6d6dd2f` implementó el contrato neutral de
+creación, DTOs, validaciones puras y pruebas; `12c6418` agregó el adaptador
+determinista en memoria y sus pruebas de idempotencia, aislamiento y
+concurrencia local. Este cierre documental no modificó código ni repitió tests
+de aplicación.
+
+REQ-003 conserva estado formal `APROBADO` y su implementación productiva
+completa permanece `PENDIENTE`. El contrato puro y el fake determinista son un
+avance técnico parcial implementado y probado. Persistencia, ownership,
+unicidad durable, Mercado Pago real, HTTP, checkout productivo, QR/interfaz,
+conciliación, efectos financieros y PRO siguen pendientes. No existe
+autorización de producción. La publicación de la rama, el PR y el merge
+continúan pendientes y requieren autorización separada.
+
+## Especificación Checkout Pro Payment Order Contract
+
+Timestamp: 2026-09-14T10:21:05-03:00
+Estado: COMPLETED
+Resultado: ESPECIFICACION_CHECKOUT_PRO_PAYMENT_ORDER_CONTRACT_PREPARADA_PENDIENTE_DE_REVISION
+Responsable funcional: Cristian Sánchez
+Agente: Codex - implementador técnico documental
+Dispositivo/origen: laptop / Codex Desktop local
+Rama: `feature/checkout-pro-payment-order-contract`
+HEAD/base: `9199d548dd312f65d84414f30e6193ab386bdc53`
+Estado Git inicial: `develop` limpia, staging vacío y sincronización 0/0 con
+`origin/develop`; referencia remota verificada en el mismo SHA
+
+Trabajo completado: creación de REQ-003 y trazabilidad en Master Spec, REQ-001,
+decisiones de arquitectura, backlog, roadmap, sprint, changelog y handoff. Se
+documentó una orden en ARS con importe Decimal, vencimiento exacto a 72 horas y
+una única URL presentable como enlace o QR. El QR presencial basado en
+sucursales/cajas se excluye del MVP.
+
+Primer incremento autorizado para preparación: protocolo neutral separado,
+DTOs inmutables, validaciones puras, errores tipados mínimos, fake determinista
+y pruebas unitarias. No se implementó código. Persistencia, ownership efectivo,
+concurrencia PostgreSQL, HTTP/SDK, credenciales, QR gráfico, frontend, WhatsApp,
+workers, retries, webhooks, conciliación, PRO y producción permanecen fuera.
+
+Pendiente: revisión documental independiente. No hubo staging, commit, push,
+PR, merge, rebase, reset, clean, stash ni deploy. La rama no fue publicada.
+
 ## Post-merge PR #14 - adaptador de consulta Mercado Pago
 
 Timestamp: 2026-09-14T09:06:21-03:00
