@@ -19,7 +19,7 @@ from app.models.payment_order_reservation import PaymentOrderReservation
 from app.models.professional import Professional
 from app.models.user import User
 from app.services.in_memory_psp_payment_order_creation_adapter import InMemoryPSPPaymentOrderCreationAdapter
-from app.services.payment_order_application_service import PaymentOrderApplicationService
+from app.services.payment_order_application_service import PaymentOrderApplicationService, PaymentOrderExpiredError
 from app.services.psp_payment_order_contract import (
     InvalidPaymentOrderCreationRequestError,
     PaymentOrderCreationUncertainError,
@@ -122,7 +122,7 @@ class PaymentOrderApplicationTest(unittest.TestCase):
         self.assertEqual(first.expires_at, first.created_at + timedelta(hours=72))
         self.assertEqual(self.adapter.commands[0].professional_id, self.professional_id)
         self.assertEqual(self._counts(), (1, 1, 1, 1))
-        self.now += timedelta(days=10)
+        self.now += timedelta(hours=1)
         self.service = self._service()
         with patch.object(self.service, "_ids", side_effect=AssertionError("must not regenerate")):
             replay = self._create()
@@ -133,6 +133,14 @@ class PaymentOrderApplicationTest(unittest.TestCase):
             reservation = session.query(PaymentOrderReservation).one()
             self.assertEqual(obligation.contract_request_id, self.contract_id)
             self.assertEqual(reservation.status, "SUCCEEDED")
+
+    def test_expired_replay_does_not_deliver_checkout_or_call_adapter(self):
+        first = self._create()
+        self.now = first.expires_at
+        with self.assertRaises(PaymentOrderExpiredError):
+            self._create()
+        self.assertEqual(self.adapter.calls, 1)
+        self.assertEqual(self._counts(), (1, 1, 1, 1))
 
     def test_actor_adversarial_cases_make_no_reservation_or_adapter_call(self):
         for actor in (self.client_id, self.intruder_id, 999999, None, True, "1"):

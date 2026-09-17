@@ -1,3 +1,285 @@
+# Handoff vigente: cierre técnico local 4C
+
+Timestamp: 2026-09-17T15:07:04-03:00
+Estado: COMPLETED
+Objetivo: cierre documental del incremento técnico interno aprobado por Testing.
+
+## Cierre técnico local 4C aprobado por Testing
+
+Timestamp de aprobación final: 2026-09-17T15:07:04-03:00
+Estado: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+Commit técnico: `b859e6a`.
+Agente verificador: `03 - Testing - Test Executor`.
+Registro documental: Codex; dispositivo: laptop.
+
+Trazabilidad preservada:
+
+- Implementación: `2026-09-17T12:58:58-03:00`.
+- Hallazgo P2 de Testing: `2026-09-17T14:57:30-03:00`.
+- Corrección P2: `2026-09-17T15:02:03-03:00`.
+- Aprobación final: `2026-09-17T15:07:04-03:00`.
+
+Alcance acreditado por Testing: adaptador Orders API interno, deshabilitado
+por defecto. Credencial OAuth por profesional suministrada por un proveedor confiable inyectado. El onboarding, la custodia y la renovación OAuth permanecen pendientes.
+Configuración válida y comisión
+obtenida de política confiable antes del claim, enviada como `marketplace_fee`.
+Sin defaults de comisión ni
+fallback a token global de MANDOBRA. POST `/v1/orders`, importe ARS decimal
+exacto, `X-Idempotency-Key` durable sin truncar/regenerar y `expiration_time=PT72H`.
+Respuesta 201 validada: persistencia de `id` y `checkout_url` HTTPS con host
+permitido `www.mercadopago.com.ar`. Cero retries y bloqueo durable tras error
+o incertidumbre; ninguna llamada adicional automática.
+
+Doble vencimiento: `expires_at = created_at + 72 horas` conserva la autoridad
+contractual local; `PT72H` cuenta desde la creación remota. No se afirma que
+coincidan. Se rechaza entregar o reutilizar el checkout local vencido.
+Los pagos tardíos requieren conciliación/revisión y no generan automáticamente
+efectos PRO, contractuales, contables ni de comisión local.
+
+P2 corregido y revalidado: la excepción sensible retenida en `__context__`
+se elimina lanzando el error neutral después de salir del `except`, sin
+conservar la excepción original ni copiar sus argumentos. Secretos neutralizados,
+incluidos `__context__` y `__cause__`; sin hallazgos P0–P3 pendientes.
+
+Evidencia final acreditada de `03 - Testing - Test Executor`:
+
+- Focales: **52/52**.
+- Regresiones: **119/119**.
+- PostgreSQL: **12/12**.
+- Suite: **568 ejecutadas, 563 aprobadas, 5 omisiones históricas,
+  0 fallos y 0 errores**.
+- `compileall`, Alembic head único `20260917_01`, whitespace y
+  `git diff --check`: aprobados. 4C no agrega migraciones.
+
+REQ-003 conserva `APROBADO` con implementación productiva `PENDIENTE`.
+Se cierra únicamente el incremento técnico interno; no se declaran producción
+ni cobros disponibles. Pendientes: OAuth completo y custodia/renovación;
+fórmula de comisión; endpoint/UI 4D; retornos, webhook y conciliación;
+tratamiento productivo de pagos tardíos; credenciales y prueba real;
+activación en producción. La recuperación de incertidumbre sigue
+separada y deberá reutilizar la misma clave durable.
+
+Este cierre supera los pendientes históricos de implementación del adaptador
+y retest P2, preservando registros, timestamps y evidencia de etapas anteriores.
+
+
+---
+
+# Registros históricos preservados
+
+# Handoff vigente: corrección focal P2 de Testing 4C
+
+Timestamp: 2026-09-17T15:02:03-03:00
+Estado: READY_TO_RESUME
+Agente: Codex; dispositivo: laptop.
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+Base: `fc5eb0c77f1101ada270a2a30d29a8acc795b9dd`.
+
+Hallazgo P2 preservado: las excepciones neutrales lanzadas dentro de
+`except`, aun con `from None`, conservaban la excepción sensible en
+`__context__`. La supresión visual del traceback no eliminaba esa referencia.
+El registro original de implementación y sus resultados se conserva debajo;
+su afirmación de ausencia de fallos corresponde a esa validación anterior.
+
+Corrección posterior en
+[adaptador](../../app/services/mercadopago_order_creation_adapter.py): los fallos
+de OAuth, comisión, validación del token, transporte y respuesta/URL capturan
+únicamente una bandera no sensible. La excepción pública genérica se lanza
+después de salir completamente del `except`, sin guardar la excepción original
+ni copiar sus argumentos. Tipos/mensajes públicos y bloqueo durable 4B se
+mantienen; idempotencia, cero retries y doble vencimiento permanecen intactos.
+
+Se agregaron seis regresiones en
+[pruebas del adaptador](../../tests/test_mercadopago_order_creation_adapter.py),
+con marcadores sensibles por ruta: `__context__ is None`, `__cause__ is None`,
+ausencia del marcador en `repr`, argumentos, mensaje y traceback públicos,
+tipo/mensaje exactos y conteo de llamadas sin llamadas adicionales.
+
+Validación posterior: 52/52 focales 4C/4B (25 adaptador/transporte,
+11 integración y 16 servicio) y 148/148 regresiones relacionadas aprobadas.
+`compileall -q app tests` y `git diff --check`: aprobados.
+Suite completa y PostgreSQL no ejecutados: corresponden a revalidación
+independiente. Sin migraciones ni ampliación funcional.
+
+Resultado: corrección P2 pendiente de retest independiente. La activación
+productiva sigue bloqueada por los pendientes técnicos del registro anterior.
+Próximo paso: revalidar el hallazgo y el paquete 4C desde esta rama/base,
+conservando los ocho cambios existentes. No habilitar flujos públicos.
+
+---
+
+# Registro original preservado: adaptador interno Orders API - incremento 4C
+
+Timestamp: 2026-09-17T12:58:58-03:00
+Estado: READY_TO_RESUME
+Agente: Codex - implementación local; dispositivo: laptop.
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+Base: `fc5eb0c77f1101ada270a2a30d29a8acc795b9dd`.
+Objetivo: implementar únicamente creación interna Orders API con proveedores
+confiables inyectados, conservando reserva/claim y persistencia de 4B/4A.
+Resultado: implementación técnica preparada y validada focalmente,
+pendiente de revisión y Testing final; producto no activado.
+
+## Diseño y alcance implementado
+
+[Adaptador y composición interna](../../app/services/mercadopago_order_creation_adapter.py):
+configuración inmutable deshabilitada por defecto, OAuth explícito por
+profesional receptor/ambiente/ARS y política confiable de comisión sin defaults.
+Preparación resuelta una sola vez antes de escrituras de obligación/reserva y
+claim. Token y payload quedan en un objeto de llamada inmutable, nunca en ORM.
+No se implementa onboarding, refresh ni custodia OAuth.
+
+[Servicio 4B](../../app/services/payment_order_application_service.py):
+prepara el adaptador antes del claim, confirma el claim y cierra la sesión
+antes de exactamente un POST. Mantiene replay y bloqueo durable después de
+error, incertidumbre, caída o fallo de persistencia. No cambia claves ni
+reintenta. Una recuperación futura debe reutilizar clave y payload compatible;
+la conservación durable de comisión/contexto receptor para recuperación tendrá
+diseño propio, sin presumir que basta recalcular una política cambiante.
+
+POST a `https://api.mercadopago.com/v1/orders`, OAuth del receptor y clave
+durable sin truncar/regenerar. Importes como strings decimales exactos;
+ARS validado en contexto OAuth y respuesta. `marketplace_fee` explícito
+(incluido cero únicamente si lo devuelve la política). `expiration_time=PT72H`.
+Sin payer, DNI, teléfono, domicilio, metadata ni texto contractual; concepto
+genérico generado por 4B. Respuesta 201 con ID/URL y eco monetario/referencia
+validado, host exacto `www.mercadopago.com.ar` y URL HTTPS segura.
+TLS verificado, redirects prohibidos, JSON estricto, respuesta acotada a 1 MiB,
+timeout configurable 10 s (máximo 30 s), cero retries.
+Timeout/red/409/423/429/5xx: incertidumbre; 401/403: autenticación;
+resto 4xx: rechazo; éxito ilegible o incoherente: resultado inválido.
+4B conserva el bloqueo para todos los fallos posteriores al claim.
+
+Entrega y replay rechazados al vencer localmente, inclusive si el tiempo
+vence durante la respuesta o después de leer el replay. ID/URL externos
+válidos se conservan aunque la finalización ocurra al vencer; nunca se entregan
+por el servicio en ese caso. No se afirma igualdad con la expiración remota.
+
+## Evidencia y pendientes
+
+Pruebas focales: 46/46 aprobadas (19 adaptador/transporte, 11 integración HTTP
+falso con SQLite desechable, 16 servicio 4B). Regresiones relacionadas: 148/148
+aprobadas en once módulos PSP/pagos. `compileall -q app tests` y
+`git diff --check`: aprobados. Controles documentales UTF-8 y enlaces: aprobados.
+Una expectativa inicial de auditoría de finalización tardía se corrigió:
+4A registra tanto creación como expiración; se validó estado EXPIRED.
+Sin fallos pendientes ni troubleshooting técnico nuevo.
+Suite completa reservada a Testing final. PostgreSQL, Docker, migraciones,
+llamadas reales y validación operativa marketplace: no ejecutados.
+Sin nuevas dependencias declaradas ni migraciones; entorno local de pruebas
+preparado con las dependencias existentes de requirements.txt.
+
+Pendientes técnicos: revisión independiente/Testing final; OAuth completo y
+configuración real; tasa/fórmula/base/redondeo de comisión aprobados; endpoint,
+UI/QR y retornos (4D); recuperación y conciliación/revisión de pagos tardíos.
+No hay efectos PRO, contractuales, contables ni de comisión local implementados.
+La deducción externa marketplace y su tratamiento tardío requieren validación
+y conciliación antes de producción; no se promete control de efectos remotos.
+La activación productiva sigue bloqueada por la política completa de doble
+vencimiento y estos pendientes. Este incremento no habilita flujos públicos.
+
+Próximo paso: revisión de código y paquete de Testing final.
+Para retomar: verificar rama/base y revisar adaptador, servicio 4B,
+`tests/test_mercadopago_order_creation_adapter.py`,
+`tests/test_mercadopago_order_application.py` y pruebas 4B.
+Preservar claim/clave; no habilitar producción ni asumir conciliación de tardíos.
+Los registros siguientes permanecen históricos; sus afirmaciones de
+“4C no implementado” quedan superadas solo por este alcance técnico interno.
+
+---
+
+# Registro anterior preservado
+
+
+# Handoff vigente: realineación documental previa de 4C
+
+## 2026-09-17 - Política aprobada de doble vencimiento 4C
+
+Timestamp: 2026-09-17T12:51:16-03:00
+Estado: APROBADO
+Implementación: PENDIENTE
+Responsable: Cristian Sánchez; dispositivo: laptop; agente: Codex.
+Rama: `feature/mercadopago-payment-order-create-adapter`; base: `fc5eb0c`.
+
+MANDOBRA conserva `expires_at = created_at + 72 horas` como autoridad
+contractual exacta. Mercado Pago recibe `expiration_time = PT72H`, contado
+desde la creación remota. No se afirma igualdad entre ambos vencimientos.
+Después del vencimiento local no se debe entregar ni reutilizar el checkout.
+Un eventual pago tardío no genera automáticamente efectos PRO, contractuales,
+contables ni de comisión: queda pendiente de conciliación/revisión.
+La activación productiva permanece bloqueada hasta implementar esa política
+completa; 4C sigue limitado al adaptador interno deshabilitado por defecto.
+Esta decisión supera el bloqueo de diseño por igualdad de vencimientos,
+preservando los registros anteriores y sin crear migraciones.
+
+Fuente de semántica remota:
+[Vigencia de Orders](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-orders/additional-settings/define-order-validity).
+
+
+
+Timestamp: 2026-09-17T12:14:36-03:00
+Estado: READY_TO_RESUME
+Responsable de decisión: Cristian Sánchez
+Agente: Codex - documentación local; dispositivo/origen: laptop.
+Objetivo: realinear documentación a Orders API, OAuth por profesional y marketplace.
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+HEAD/último commit: `ad9ce5964f09919990b30cbf31df4efcfb709b0e`.
+Origin fetch/push: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+PR #17 ya fue fusionado en `develop` mediante `ad9ce59`, verificado en el
+commit local y `develop` local.
+El cierre 4B siguiente permanece histórico; sus pendientes de PR/merge quedan
+superados por esta constatación, sin alterar su evidencia de Testing.
+
+## Decisiones vigentes
+
+Checkout Pro moderno: `POST /v1/orders`; Preferences descartada para la nueva
+integración, con menciones históricas preservadas. `X-Idempotency-Key`
+obligatorio con la clave durable 4B; sin reintentos automáticos.
+La política queda aprobada; una recuperación futura, todavía no implementada, deberá reutilizar la misma clave durable.
+Se conserva el bloqueo durable. Persistir `id` como `external_order_id` y
+`checkout_url`. OAuth del profesional receptor; comisión MANDOBRA marketplace
+mediante `marketplace_fee`. Ningún token global MANDOBRA como receptor productivo.
+4C solo adaptador/cableado internos, apagado sin OAuth/configuración válida.
+OAuth completo, endpoint/UI 4D, retornos, recuperación y conciliación separados.
+Sin migración por esta decisión documental.
+Tasa/fórmula no aprobada: REQ-001 RESTRICCIONES y PREGUNTAS ABIERTAS; no inventar
+porcentaje/importe. Bloquea producción, no adaptador interno deshabilitado.
+Fuentes y límites oficiales:
+[REQ-003](../REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#realineación-vigente-4c-orders-api-y-marketplace).
+
+## Trabajo y estado de cierre
+
+Completado: realineación en REQ-003 y decisiones arquitectónicas; actualización
+normativa focal de REQ-001/Master Spec y de este handoff.
+Trabajo parcialmente completado: ninguno de implementación; 4C no implementado.
+
+Migraciones: ninguna creada/ejecutada; no requerida por esta decisión.
+Validaciones documentales: UTF-8 estricto, enlaces locales/anchors añadidos,
+diff completo y `git diff --check`. Resultado de cierre: aprobados.
+Tests, Docker, migraciones, compileall y llamadas API: NO ejecutados.
+Pendientes: revisión documental; diseño de contrato Orders y autorización
+de implementación 4C; OAuth/configuración, fórmula de comisión y validación
+operativa para producción; endpoint/UI 4D, retornos y conciliación separados.
+Bloqueantes productivos: OAuth receptor, configuración válida y comisión
+aprobada; no bloquean adaptador interno deshabilitado.
+Riesgos: reutilizar payload Preferences, cambiar clave ante 409, inventar
+comisión o usar token global. Mantener las reglas funcionales de REQ-001.
+Errores conocidos/troubleshooting: ningún error técnico nuevo; sin nuevo runbook.
+Estado final: documentación preparada, pendiente de revisión; sin activación productiva.
+
+Próximo paso: revisión de la realineación antes de preparar implementación.
+Para retomar: verificar rama/base/origin; leer este handoff,
+REQ-003 y la decisión 4C; diseñar vigencia/pagador/receptor/comisión y errores.
+No regenerar claves, liberar bloqueo 4B, introducir tokens, habilitar producción
+ni modificar código sin alcance autorizado.
+
+---
+
+# Registros históricos preservados
+
+
 # Handoff técnico: aplicación de órdenes Checkout Pro - incremento 4B
 
 ## Cierre técnico local 4B de REQ-003

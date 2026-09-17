@@ -6,7 +6,7 @@ fecha_aprobacion: 2026-09-03T20:38:47-03:00
 responsable: Cristian Sánchez
 rama_documental: docs/spec-pro-facturacion-mvp
 implementacion: IMPLEMENTACION_PARCIAL
-ultima_revision: 2026-09-06T19:38:40-03:00
+ultima_revision: 2026-09-17T12:14:36-03:00
 ---
 
 # REQ-001 - Activacion y vigencia de MANDOBRA PRO
@@ -187,9 +187,14 @@ presente requisito.
 - El porcentaje de comision no esta definido.
 - Precio, porcentaje, base de comision, conversion y moneda contable de los
   creditos no estan definidos. La periodicidad aprobada es de 30 dias fijos.
-- Mercado Pago es la direccion de producto para evaluar, pero producto/API,
-  marketplace, Split y estrategia tecnica no estan validados.
-- No se aprueba un modelo de datos, migracion, servicio o interfaz concretos.
+- Decisión documental de 2026-09-17T12:14:36-03:00, Cristian Sánchez: para REQ-003
+  se aprueban Checkout Pro vía Orders API, OAuth del profesional receptor y
+  comisión marketplace mediante `marketplace_fee`. Validación operativa y
+  producción siguen pendientes; recurrencia/suscripciones no quedan aprobadas.
+  Ver [realineación 4C](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#realineación-vigente-4c-orders-api-y-marketplace).
+- REQ-001 por sí solo no aprueba modelos de datos, migraciones, servicios ni
+  interfaces concretos adicionales. Esta limitación no invalida 4A/4B ni
+  la decisión 4C gobernada por REQ-003.
 - El catalogo completo de beneficios y limites PRO permanece pendiente.
 - La documentacion aprobada no autoriza implementacion ni promesa comercial.
 

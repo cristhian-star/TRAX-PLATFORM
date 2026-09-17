@@ -22,6 +22,10 @@ def _utcnow():
     return datetime.now(timezone.utc)
 
 
+class PaymentOrderExpiredError(ValueError):
+    pass
+
+
 class PaymentOrderApplicationService:
     """Reserve and claim durably before a single, session-free creation call.
 
@@ -43,11 +47,15 @@ class PaymentOrderApplicationService:
 
     def create_order(self, *, actor_user_id, contract_request_id):
         _require_identifiers(actor_user_id, contract_request_id)
-        reservation_id, command, stored = self._prepare(actor_user_id, contract_request_id)
+        validate_configuration = getattr(self._adapter, "validate_configuration", None)
+        if validate_configuration is not None:
+            validate_configuration()
+        reservation_id, command, stored, invocation = self._prepare(actor_user_id, contract_request_id)
         if stored is not None:
+            _require_unexpired(stored.expires_at, self._clock)
             return stored
 
-        result = _external_result(self._adapter, command)
+        result = _external_result(invocation, command)
         if result is None:
             self._mark_uncertain(reservation_id)
             raise PaymentOrderCreationUncertainError("payment order creation requires recovery")
@@ -58,9 +66,11 @@ class PaymentOrderApplicationService:
         if completed is None:
             # The initial committed claim survives the rolled-back completion.
             raise PaymentOrderCreationUncertainError("payment order creation requires recovery")
+        _require_unexpired(completed.expires_at, self._clock)
         return completed
 
     def _prepare(self, actor_id, contract_id):
+        invocation = self._adapter
         with self._sessions() as session:
             with session.begin():
                 contract = _authorized_contract(session, actor_id, contract_id)
@@ -80,9 +90,11 @@ class PaymentOrderApplicationService:
                         order = session.get(PaymentOrder, reservation.payment_order_id)
                         if order is None:
                             raise PaymentOrderIdempotencyConflictError("payment order reservation conflict")
-                        return reservation.id, command, _stored_result(order)
+                        _require_unexpired(command.expires_at, self._clock)
+                        return reservation.id, command, _stored_result(order), None
                     if reservation.status != "PREPARED":
                         raise PaymentOrderCreationUncertainError("payment order creation requires recovery")
+                    invocation = _prepare_adapter(self._adapter, command)
                 else:
                     created = _read_clock(self._clock)
                     reference = (
@@ -101,6 +113,7 @@ class PaymentOrderApplicationService:
                         created_at=created,
                         expires_at=created + timedelta(hours=72),
                     )
+                    invocation = _prepare_adapter(self._adapter, command)
                     if obligation is None:
                         obligation = PaymentObligation(
                             contract_request_id=contract.id,
@@ -117,9 +130,10 @@ class PaymentOrderApplicationService:
                         status="PREPARED",
                     )
                     session.add(reservation)
+                _require_unexpired(command.expires_at, self._clock)
                 reservation.status = "CALL_IN_PROGRESS"
                 session.flush()
-                return reservation.id, command, None
+                return reservation.id, command, None, invocation
 
     def _mark_uncertain(self, reservation_id):
         with self._sessions() as session:
@@ -168,6 +182,21 @@ def _require_identifiers(actor_id, contract_id):
         raise PermissionError("authenticated professional required")
     if type(contract_id) is not int or contract_id <= 0:
         raise ValueError("invalid contract identifier")
+
+
+def _require_unexpired(expires_at, clock):
+    if _read_clock(clock) >= expires_at:
+        raise PaymentOrderExpiredError("payment order has expired")
+
+
+def _prepare_adapter(adapter, command):
+    prepare = getattr(adapter, "prepare_payment_order", None)
+    if prepare is None:
+        return adapter
+    prepared = prepare(command)
+    if not callable(getattr(prepared, "create_payment_order", None)):
+        raise TypeError("invalid prepared payment order adapter")
+    return prepared
 
 
 def _authorized_contract(session, actor_id, contract_id):

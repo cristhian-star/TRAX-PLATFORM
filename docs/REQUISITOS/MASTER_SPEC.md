@@ -22,6 +22,23 @@ prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
 
+### 2026-09-17 - Dirección vigente de integración 4C
+
+Timestamp: 2026-09-17T12:14:36-03:00
+Responsable: Cristian Sánchez; agente documental: Codex; dispositivo: laptop.
+Rama: `feature/mercadopago-payment-order-create-adapter`; base: `ad9ce59`.
+
+REQ-003 adopta Checkout Pro vía Orders API, OAuth del profesional receptor y
+comisión marketplace mediante `marketplace_fee`; Preferences queda histórica.
+4C solo adaptador interno, deshabilitado sin OAuth/configuración válida.
+OAuth completo, endpoint/UI 4D, retornos y conciliación permanecen separados.
+No hay tasa/fórmula de comisión aprobada: bloquea producción, no el adaptador
+deshabilitado. La selección supera la indeterminación de producto/API para
+REQ-003, sin acreditar validación productiva ni aprobar recurrencia.
+PR #17 ya fue fusionado en `develop` mediante `ad9ce59`.
+No se requiere migración por esta decisión documental.
+Detalle y fuentes: [REQ-003](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#realineación-vigente-4c-orders-api-y-marketplace).
+
 ### 2026-09-16 - Persistencia interna de órdenes, incremento 4A
 
 Timestamp: 2026-09-16T22:40:04-03:00
@@ -513,7 +530,7 @@ extensiones de 60 dias no describe el modelo comercial vigente.
 
 1. Porcentaje y base de comision; precio, conversion y moneda de creditos;
    beneficios y limites completos de PRO; reversas y cambios de precio.
-2. Validacion de Mercado Pago, producto/API, marketplace/Split, recurrencia,
+2. Validación operativa/productiva de Orders API y marketplace de REQ-003; recurrencia,
    pagos mixtos, reintentos, cargos en transito e inicio diferido.
 3. Integracion fiscal directa o proveedor, custodia de certificados, retencion,
    contingencia ARCA, IA y revisiones legal, fiscal, contable y de seguridad.
