@@ -6,7 +6,7 @@ fecha_aprobacion: 2026-09-14T10:05:02-03:00
 responsable: Cristian Sánchez
 rama_documental: feature/checkout-pro-payment-order-contract
 implementacion: PENDIENTE
-ultima_revision: 2026-09-14T20:43:27-03:00
+ultima_revision: 2026-09-16T22:40:04-03:00
 ---
 
 # REQ-003 - Creacion de ordenes de cobro Checkout Pro
@@ -304,3 +304,90 @@ integración real con Mercado Pago, HTTP, checkout productivo, QR o interfaz,
 conciliación, efectos financieros y efectos sobre PRO continúan pendientes.
 Por ello la implementación productiva completa de REQ-003 permanece pendiente
 y no está disponible como capacidad para usuarios.
+
+## Actualización posterior - incremento técnico 4A
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: cierre documental controlado de la fundación interna de persistencia.
+Rama: `feature/checkout-pro-payment-order-persistence`
+Commit técnico: `4373b64e419360f7ca3f649efc8f97580c6b42d8`
+Estado del requisito: `APROBADO`
+Implementación productiva completa: `PENDIENTE`
+
+El incremento 4A está implementado y aprobado localmente. Agrega el modelo
+independiente `PaymentOrder`, tabla `payment_orders`, servicio
+`payment_order_persistence_service.py` y migración `20260916_01`,
+descendiente de `20260911_02`. El nuevo head Alembic único es
+`20260916_01`. No reutiliza `PaymentAttemptRecord` ni almacena una
+preferencia en `external_attempt_id`.
+
+La fundación registra comandos y resultados previamente validados; no invoca
+al adaptador externo. Persiste identificador externo, `checkout_url`,
+`provider`, `live_mode`, referencias, importe, timestamps y ciclo de vida.
+Acredita replay durable, conflictos materiales, bloqueo de obligación,
+unicidad activa por obligación, identidad PSP contextual, estados `ACTIVE`,
+`EXPIRED` y `CANCELLED`, vencimiento de 72 horas y sucesión local tras
+vencimiento o cancelación. Un replay terminal conserva la orden histórica.
+
+La creación, expiración y cancelación local incluyen auditoría atómica. Los
+helpers usan `flush()` y no ejecutan commit ni rollback global; la transacción
+pertenece al llamador. PostgreSQL utiliza un savepoint para recuperar carreras
+de inserción, además de locks y constraints concurrentes.
+SQLite acredita compatibilidad y rollback transaccional, no equivalencia de
+garantías concurrentes con PostgreSQL. El contrato calcula 72 horas exactas y
+PostgreSQL las exige mediante constraint; SQLite utiliza la comprobación
+temporal con tolerancia implementada, sin afirmar exactitud submilisegundo de
+su constraint.
+
+### Evidencia aprobada del commit técnico
+
+Evidencia suministrada por el usuario para este cierre, no ejecutada nuevamente
+en esta sesión documental:
+
+- Focales de persistencia y migración: 11/11.
+- Regresiones relacionadas: 141/141.
+- PostgreSQL real: 6/6.
+- Suite completa: 515 ejecutadas, 510 aprobadas, 5 omitidas históricas,
+  0 fallos y 0 errores.
+- `compileall`, Alembic y `git diff --check`: aprobados.
+- Revalidación independiente: sin hallazgos P0-P3.
+- Head Alembic único aprobado: `20260916_01`.
+
+### Criterios técnicos internos acreditados en 4A
+
+- [x] Existe `PaymentOrder` independiente de los intentos financieros y una
+  migración que crea su persistencia sin sobrecargar `PaymentAttemptRecord`.
+- [x] El registro durable conserva el comando y resultado canónicos; replay
+  idéntico devuelve la misma orden y contenido material distinto produce conflicto.
+- [x] El servicio bloquea la obligación y el índice único parcial impide dos
+  registros `ACTIVE` de la misma obligación en PostgreSQL.
+- [x] El servicio materializa expiración, conserva cierres históricos y admite
+  sucesión local solo cuando no queda una orden activa.
+- [x] La cancelación local y las transiciones de creación/expiración registran
+  auditoría en la transacción del llamador.
+- [x] Se almacenan identidad externa de orden, URL, proveedor, ambiente y
+  timestamps, con identidad PSP contextual separada de la identidad de pago.
+- [x] Existen pruebas de migración, regresión, concurrencia PostgreSQL y
+  rollback transaccional SQLite con la evidencia aprobada indicada.
+
+Los criterios originales sin marcar se conservan: el fake no implementa una
+operación de consulta, y presentación QR/enlace o retorno del navegador son
+criterios más amplios que esta persistencia. Las invariantes diferidas de los
+registros previos describen el alcance histórico del contrato puro; esta
+actualización acredita solo las garantías internas delimitadas de 4A.
+
+### Pendientes y próximo incremento
+
+4B debe preparar el servicio de aplicación y ownership contractual derivados
+de sesión y `ContractRequest`, todavía sin Mercado Pago real. Almacenar
+`professional_id` es un snapshot con FK, no prueba de autorización.
+
+Continúan pendientes el servicio público/autorizado, creación HTTP real,
+recuperación de resultados externos inciertos, checkout/QR visibles,
+integración de las órdenes con webhooks y conciliación, correlación con pagos,
+efectos PRO, comisiones y facturación. La infraestructura PSP previa no queda
+extendida por 4A. Cancelar localmente una orden no cancela una preferencia remota.
+
+Publicación, PR, merge de esta rama y producción permanecen pendientes. No
+existe un flujo de cobro disponible para usuarios ni se completa REQ-003.

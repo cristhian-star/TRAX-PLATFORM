@@ -1,5 +1,32 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-16 - Fundación durable de órdenes Checkout Pro, incremento 4A
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: cierre documental del incremento técnico aprobado localmente.
+Rama: `feature/checkout-pro-payment-order-persistence`
+Commit técnico: `4373b64e419360f7ca3f649efc8f97580c6b42d8`.
+
+- Modelo independiente `PaymentOrder`, servicio de persistencia y migración
+  `20260916_01`, nuevo head único descendiente de `20260911_02`.
+- Replay durable y conflictos materiales; orden activa única por obligación;
+  bloqueo de obligación; constraints e identidad PSP contextual.
+- Estados `ACTIVE/EXPIRED/CANCELLED`, vigencia de 72 horas, sucesión local,
+  cancelación auditable y auditoría atómica; separación de `PaymentAttemptRecord`.
+- Compatibilidad y rollback SQLite; concurrencia PostgreSQL, migración y regresión.
+- Evidencia aprobada suministrada por el usuario: focales 11/11; regresiones
+  141/141; PostgreSQL 6/6; suite 515 ejecutadas, 510 aprobadas, 5 omitidas
+  históricas, 0 fallos y 0 errores. Compileall, Alembic y diff check aprobados;
+  revalidación independiente sin hallazgos P0-P3. No se repitió en esta sesión.
+- REQ-003 permanece `APROBADO` e implementación productiva `PENDIENTE`.
+  Próximo paso 4B: aplicación y ownership contractual, sin Mercado Pago real.
+- Continúan pendientes HTTP real, recuperación externa incierta, checkout/QR
+  visibles, integración de órdenes con webhooks/conciliación, correlación con
+  pagos, efectos PRO, comisiones, facturación, publicación, PR, merge y producción.
+- Snapshot profesional no prueba autorización; cancelación local no cancela la
+  preferencia remota. No se habilitó un flujo de cobro para usuarios.
+
 ## 2026-09-14 - Avance técnico de REQ-003
 
 Timestamp: 2026-09-14T20:43:27-03:00

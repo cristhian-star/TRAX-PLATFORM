@@ -2,6 +2,25 @@
 
 ## Ordenes de cobro Checkout Pro
 
+### Actualización posterior - incremento 4A
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: separar persistencia interna completada de capacidades futuras.
+Rama: `feature/checkout-pro-payment-order-persistence`; commit: `4373b64`.
+REQ-003 conserva `APROBADO` e implementación productiva `PENDIENTE`.
+
+- 4A implementado y aprobado localmente: `PaymentOrder`, migración/head
+  `20260916_01`, replay durable, unicidad activa, ciclo local y auditoría atómica,
+  constraints/contexto PSP, concurrencia PostgreSQL y rollback SQLite.
+- Próximo incremento 4B: aplicación y ownership desde sesión/`ContractRequest`,
+  todavía sin Mercado Pago real. Snapshot profesional no equivale a autorización.
+- Pendientes posteriores: HTTP real, recuperación externa incierta, interfaz
+  checkout/QR, integración de órdenes con webhook/conciliación, correlación de
+  pagos, PRO, comisiones y facturación. Publicación, PR, merge y producción pendientes.
+- Cancelación local no cancela preferencias remotas; no hay flujo para usuarios.
+- Evidencia y criterios internos: [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-posterior---incremento-técnico-4a).
+
 ### Actualización del avance técnico
 
 Timestamp: 2026-09-14T20:43:27-03:00

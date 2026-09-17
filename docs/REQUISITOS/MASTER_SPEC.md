@@ -22,6 +22,35 @@ prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
 
+### 2026-09-16 - Persistencia interna de órdenes, incremento 4A
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: registrar el avance técnico interno aprobado localmente.
+Rama: `feature/checkout-pro-payment-order-persistence`
+Commit: `4373b64`
+Estado de REQ-003: `APROBADO`; implementación productiva: `PENDIENTE`.
+
+- `PaymentOrder` persiste órdenes separadas de `PaymentAttemptRecord`.
+- Migración `20260916_01`; nuevo head único, posterior a `20260911_02`.
+- Replay durable, conflictos materiales, bloqueo de obligación, unicidad
+  activa, identidad PSP contextual y estados `ACTIVE/EXPIRED/CANCELLED`.
+- Vigencia de 72 horas, cancelación local auditable y auditoría atómica;
+  concurrencia PostgreSQL y compatibilidad/rollback SQLite acreditados.
+- Evidencia aprobada suministrada: focales 11/11, regresiones 141/141,
+  PostgreSQL 6/6, suite 515/510/5/0/0; compileall, Alembic y whitespace
+  aprobados; revalidación independiente sin P0-P3. No se repitió en esta sesión.
+- Ownership efectivo, aplicación pública, Mercado Pago real, recuperación
+  externa incierta, presentación, correlación de pagos y efectos financieros
+  siguen pendientes. La integración de órdenes con webhooks/conciliación
+  tampoco está realizada; no se niega la infraestructura previa.
+- `professional_id` almacenado no autoriza al actor; cancelación local no
+  cancela una preferencia remota. No se ofrece cobro a usuarios.
+- Próximo paso: 4B, servicio de aplicación y ownership contractual, sin PSP real.
+  Publicación, PR, merge y producción pendientes.
+
+Detalle y criterios: [REQ-003](REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-posterior---incremento-técnico-4a).
+
 ### 2026-09-14 - Avance técnico de la orden de cobro
 
 Timestamp: 2026-09-14T20:43:27-03:00

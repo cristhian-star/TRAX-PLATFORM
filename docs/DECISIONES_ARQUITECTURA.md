@@ -25,6 +25,30 @@ consulta. La especificación canónica es
 [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md). No
 autoriza HTTP, persistencia, QR gráfico, efectos financieros, PRO o producción.
 
+### Actualización posterior - separación durable de órdenes (4A)
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: registrar la separación efectivamente implementada y aprobada localmente
+en `4373b64`, sin ampliar la decisión histórica ni aprobar arquitectura 2.0.
+
+`PaymentOrder` es una entidad durable independiente de `PaymentAttemptRecord`.
+Su migración `20260916_01` parte de `20260911_02`. La identidad de orden externa
+se conserva en `external_order_id`, contextualizada por `provider` y `live_mode`;
+no se guarda una preferencia en `external_attempt_id`. La orden referencia
+`PaymentObligation`; la correlación futura con pagos e intentos sigue pendiente.
+El servicio interno de persistencia bloquea la obligación y conserva replay,
+unicidad activa, transiciones y auditoría en la transacción del llamador, sin
+commit propio ni llamadas PSP. PostgreSQL aporta constraints y concurrencia
+durable; la compatibilidad SQLite no acredita concurrencia entre procesos.
+
+Esta actualización supera la exclusión histórica de persistencia solo para 4A.
+No acredita ownership: `professional_id` almacenado no prueba autorización.
+4B deberá derivarlo de sesión y `ContractRequest` en una aplicación autorizada.
+Cancelar localmente no cancela una preferencia remota. HTTP real, interfaz,
+webhooks/conciliación de órdenes y efectos financieros siguen fuera de este
+incremento. REQ-003 conserva `APROBADO` / implementación `PENDIENTE`.
+
 ## 2026-09-06 - Frontera documental previa a integraciones PRO
 
 Timestamp: 2026-09-06T19:22:08-03:00

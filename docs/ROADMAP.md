@@ -123,6 +123,21 @@ probado en `6d6dd2f` y `12c6418`. Sprint 2 continúa abierto: faltan
 persistencia, ownership, Mercado Pago real, HTTP, checkout productivo,
 interfaz, conciliación y efectos PRO.
 
+Actualización posterior al `2026-09-16T22:40:04-03:00`, agente 01 - Documentation
+Engineer, motivo: cierre técnico interno de 4A en `4373b64`. La fundación
+durable `PaymentOrder` está implementada y aprobada localmente: replay,
+conflictos materiales, unicidad activa, ciclo local de 72 horas, auditoría
+atómica y concurrencia PostgreSQL; head Alembic único `20260916_01`.
+Este registro supera únicamente la persistencia interna pendiente del registro
+anterior; no cierra Sprint 2 ni REQ-003 (`APROBADO` / `PENDIENTE`).
+Próximo incremento: 4B, servicio de aplicación y ownership contractual, todavía
+sin Mercado Pago real. Siguen pendientes PSP HTTP, recuperación externa incierta,
+checkout/QR visibles, integración con webhooks y conciliación, correlación de
+pagos, efectos PRO/comisiones/facturación, publicación, PR, merge y producción.
+La cancelación local no cancela una preferencia remota; almacenar
+`professional_id` no autoriza al actor. Evidencia y límites:
+[REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-posterior---incremento-técnico-4a).
+
 [ ] Sprint 3 PRO comercial - suscripcion de 30 dias, pagos mixtos, renovacion,
 exencion, gracia y retorno transaccional
 
