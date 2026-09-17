@@ -22,7 +22,15 @@ class PaymentAttemptPSPIdentityMigrationTest(unittest.TestCase):
             config = Config(str(ROOT / "alembic.ini"))
             try:
                 script = ScriptDirectory.from_config(config)
-                self.assertEqual(script.get_heads(), ["20260911_02"])
+                heads = script.get_heads()
+                self.assertEqual(len(heads), 1)
+                self.assertIn(
+                    "20260911_02",
+                    {
+                        revision.revision
+                        for revision in script.walk_revisions("base", heads[0])
+                    },
+                )
                 command.upgrade(config, "20260911_01")
                 with engine.begin() as connection:
                     obligation = connection.execute(sa.text(

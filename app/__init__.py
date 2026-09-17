@@ -79,6 +79,7 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.professional_media import ProfessionalMedia
     from app.models.payment_obligation import PaymentObligation
     from app.models.payment_attempt import PaymentAttemptRecord
+    from app.models.payment_order import PaymentOrder
     from app.models.psp_event import PSPEventRecord
 
     if initialize_schema:
