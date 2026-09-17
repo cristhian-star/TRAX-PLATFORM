@@ -6,12 +6,76 @@ fecha_aprobacion: 2026-09-14T10:05:02-03:00
 responsable: Cristian Sánchez
 rama_documental: feature/checkout-pro-payment-order-contract
 implementacion: PENDIENTE
-ultima_revision: 2026-09-16T22:40:04-03:00
+ultima_revision: 2026-09-17T12:14:36-03:00
 ---
 
 # REQ-003 - Creacion de ordenes de cobro Checkout Pro
 
+## Realineación vigente 4C: Orders API y marketplace
+
+Timestamp: 2026-09-17T12:14:36-03:00
+Estado: APROBADO
+Implementación: PENDIENTE
+Responsable: Cristian Sánchez; agente documental: Codex; dispositivo: laptop.
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+Commit base: `ad9ce5964f09919990b30cbf31df4efcfb709b0e`.
+
+Checkout Pro utilizará Orders API moderna: `POST /v1/orders`.
+Preferences API queda descartada para esta integración nueva. Sus menciones
+anteriores se conservan como historia y no gobiernan el incremento 4C.
+
+- `X-Idempotency-Key` obligatorio: usar la clave durable reservada por 4B.
+  Sin reintentos automáticos.
+  La política queda aprobada; una recuperación futura, todavía no implementada, deberá reutilizar la misma clave durable.
+  No regenerarla ni liberar el bloqueo durable ante errores o incertidumbre.
+- Persistir `id` en `PaymentOrder.external_order_id` y `checkout_url`
+  mediante 4A/4B; no almacenar la orden en `external_attempt_id`.
+- El profesional recibe el cobro en su cuenta: usar su token OAuth como receptor.
+  Ningún token global de MANDOBRA será receptor productivo.
+- MANDOBRA percibe comisión como marketplace mediante `marketplace_fee`,
+  importe monetario calculado por una política aprobada, no porcentaje directo.
+- 4C solo incluye adaptador interno y cableado con 4B; permanece deshabilitado
+  sin OAuth del receptor y configuración válida, sin fallback a token global.
+- OAuth completo (onboarding, custodia y renovación), endpoint público/UI (4D),
+  retornos, recuperación y conciliación permanecen separados.
+- No se requiere migración por esta decisión documental; ya existen los campos
+  de ID externo y URL. Futuras necesidades de OAuth/comisión tendrán alcance propio.
+- ARS, vencimiento exacto de 72 horas, orden única y ausencia de confirmación
+  por apertura/redirect siguen vigentes. No exponer tokens en documentos o logs.
+
+### Comisión pendiente
+
+No se encontró tasa ni fórmula aprobada en la búsqueda documental.
+[REQ-001, RESTRICCIONES](REQ-001-activacion-y-vigencia-pro.md#restricciones)
+mantiene pendientes porcentaje y base; su sección PREGUNTAS ABIERTAS también
+mantiene el porcentaje pendiente. Fórmula, base y redondeo deberán aprobarse:
+bloquean activación productiva, pero no el adaptador interno deshabilitado.
+No se inventa porcentaje ni importe. Se preserva la exención por suscripción
+paga de REQ-001; esta decisión no aprueba recargo al cliente ni cambia importe 4B.
+
+### Fuentes oficiales consultadas y límites
+
+Consulta: 2026-09-17T12:14:36-03:00.
+[Orders API](https://www.mercadopago.com.ar/developers/es/reference/online-payments/checkout-pro-orders/overview),
+[Crear order](https://www.mercadopago.com.ar/developers/es/reference/online-payments/checkout-pro/create-order/post),
+[Marketplace/OAuth](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/integrate-marketplace).
+
+Crear order confirma header obligatorio, `id`, `checkout_url` y
+`marketplace_fee`. La guía marketplace aún ejemplifica Preferences:
+se utiliza como fuente de OAuth por vendedor, no como payload Orders.
+La validación operativa conjunta sigue pendiente antes de producción.
+La clave Orders admite hasta 128 caracteres; el puerto neutral admite 160:
+validar compatibilidad sin truncar ni regenerar. La sugerencia genérica de
+nueva clave ante 409 no autoriza cambiar la reserva MANDOBRA.
+El mapeo de vigencia y datos mínimos del pagador requiere diseño posterior;
+no trasladar campos Preferences ni ampliar privacidad silenciosamente.
+
+
+
 ## Problema
+
+La dirección vigente de integración se define en la realineación 4C anterior;
+las referencias anteriores a preferencias describen el diseño histórico.
 
 Un profesional necesita cobrar el importe acordado de un contrato interno tanto
 a distancia como presencialmente, sin que presentar dos canales genere dos

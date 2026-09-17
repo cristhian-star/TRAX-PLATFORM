@@ -1,3 +1,66 @@
+# Handoff vigente: realineación documental previa de 4C
+
+Timestamp: 2026-09-17T12:14:36-03:00
+Estado: READY_TO_RESUME
+Responsable de decisión: Cristian Sánchez
+Agente: Codex - documentación local; dispositivo/origen: laptop.
+Objetivo: realinear documentación a Orders API, OAuth por profesional y marketplace.
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+HEAD/último commit: `ad9ce5964f09919990b30cbf31df4efcfb709b0e`.
+Origin fetch/push: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+PR #17 ya fue fusionado en `develop` mediante `ad9ce59`, verificado en el
+commit local y `develop` local.
+El cierre 4B siguiente permanece histórico; sus pendientes de PR/merge quedan
+superados por esta constatación, sin alterar su evidencia de Testing.
+
+## Decisiones vigentes
+
+Checkout Pro moderno: `POST /v1/orders`; Preferences descartada para la nueva
+integración, con menciones históricas preservadas. `X-Idempotency-Key`
+obligatorio con la clave durable 4B; sin reintentos automáticos.
+La política queda aprobada; una recuperación futura, todavía no implementada, deberá reutilizar la misma clave durable.
+Se conserva el bloqueo durable. Persistir `id` como `external_order_id` y
+`checkout_url`. OAuth del profesional receptor; comisión MANDOBRA marketplace
+mediante `marketplace_fee`. Ningún token global MANDOBRA como receptor productivo.
+4C solo adaptador/cableado internos, apagado sin OAuth/configuración válida.
+OAuth completo, endpoint/UI 4D, retornos, recuperación y conciliación separados.
+Sin migración por esta decisión documental.
+Tasa/fórmula no aprobada: REQ-001 RESTRICCIONES y PREGUNTAS ABIERTAS; no inventar
+porcentaje/importe. Bloquea producción, no adaptador interno deshabilitado.
+Fuentes y límites oficiales:
+[REQ-003](../REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#realineación-vigente-4c-orders-api-y-marketplace).
+
+## Trabajo y estado de cierre
+
+Completado: realineación en REQ-003 y decisiones arquitectónicas; actualización
+normativa focal de REQ-001/Master Spec y de este handoff.
+Trabajo parcialmente completado: ninguno de implementación; 4C no implementado.
+
+Migraciones: ninguna creada/ejecutada; no requerida por esta decisión.
+Validaciones documentales: UTF-8 estricto, enlaces locales/anchors añadidos,
+diff completo y `git diff --check`. Resultado de cierre: aprobados.
+Tests, Docker, migraciones, compileall y llamadas API: NO ejecutados.
+Pendientes: revisión documental; diseño de contrato Orders y autorización
+de implementación 4C; OAuth/configuración, fórmula de comisión y validación
+operativa para producción; endpoint/UI 4D, retornos y conciliación separados.
+Bloqueantes productivos: OAuth receptor, configuración válida y comisión
+aprobada; no bloquean adaptador interno deshabilitado.
+Riesgos: reutilizar payload Preferences, cambiar clave ante 409, inventar
+comisión o usar token global. Mantener las reglas funcionales de REQ-001.
+Errores conocidos/troubleshooting: ningún error técnico nuevo; sin nuevo runbook.
+Estado final: documentación preparada, pendiente de revisión; sin activación productiva.
+
+Próximo paso: revisión de la realineación antes de preparar implementación.
+Para retomar: verificar rama/base/origin; leer este handoff,
+REQ-003 y la decisión 4C; diseñar vigencia/pagador/receptor/comisión y errores.
+No regenerar claves, liberar bloqueo 4B, introducir tokens, habilitar producción
+ni modificar código sin alcance autorizado.
+
+---
+
+# Registros históricos preservados
+
+
 # Handoff técnico: aplicación de órdenes Checkout Pro - incremento 4B
 
 ## Cierre técnico local 4B de REQ-003
