@@ -1,5 +1,89 @@
 # DECISIONES DE ARQUITECTURA MANDOBRA
 
+## Cierre técnico local 4C aprobado por Testing
+
+Timestamp de aprobación final: 2026-09-17T15:07:04-03:00
+Estado: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/mercadopago-payment-order-create-adapter`.
+Commit técnico: `b859e6a`.
+Agente verificador: `03 - Testing - Test Executor`.
+Registro documental: Codex; dispositivo: laptop.
+
+Trazabilidad preservada:
+
+- Implementación: `2026-09-17T12:58:58-03:00`.
+- Hallazgo P2 de Testing: `2026-09-17T14:57:30-03:00`.
+- Corrección P2: `2026-09-17T15:02:03-03:00`.
+- Aprobación final: `2026-09-17T15:07:04-03:00`.
+
+Alcance acreditado por Testing: adaptador Orders API interno, deshabilitado
+por defecto. Credencial OAuth por profesional suministrada por un proveedor confiable inyectado. El onboarding, la custodia y la renovación OAuth permanecen pendientes.
+Configuración válida y comisión
+obtenida de política confiable antes del claim, enviada como `marketplace_fee`.
+Sin defaults de comisión ni
+fallback a token global de MANDOBRA. POST `/v1/orders`, importe ARS decimal
+exacto, `X-Idempotency-Key` durable sin truncar/regenerar y `expiration_time=PT72H`.
+Respuesta 201 validada: persistencia de `id` y `checkout_url` HTTPS con host
+permitido `www.mercadopago.com.ar`. Cero retries y bloqueo durable tras error
+o incertidumbre; ninguna llamada adicional automática.
+
+Doble vencimiento: `expires_at = created_at + 72 horas` conserva la autoridad
+contractual local; `PT72H` cuenta desde la creación remota. No se afirma que
+coincidan. Se rechaza entregar o reutilizar el checkout local vencido.
+Los pagos tardíos requieren conciliación/revisión y no generan automáticamente
+efectos PRO, contractuales, contables ni de comisión local.
+
+P2 corregido y revalidado: la excepción sensible retenida en `__context__`
+se elimina lanzando el error neutral después de salir del `except`, sin
+conservar la excepción original ni copiar sus argumentos. Secretos neutralizados,
+incluidos `__context__` y `__cause__`; sin hallazgos P0–P3 pendientes.
+
+Evidencia final acreditada de `03 - Testing - Test Executor`:
+
+- Focales: **52/52**.
+- Regresiones: **119/119**.
+- PostgreSQL: **12/12**.
+- Suite: **568 ejecutadas, 563 aprobadas, 5 omisiones históricas,
+  0 fallos y 0 errores**.
+- `compileall`, Alembic head único `20260917_01`, whitespace y
+  `git diff --check`: aprobados. 4C no agrega migraciones.
+
+REQ-003 conserva `APROBADO` con implementación productiva `PENDIENTE`.
+Se cierra únicamente el incremento técnico interno; no se declaran producción
+ni cobros disponibles. Pendientes: OAuth completo y custodia/renovación;
+fórmula de comisión; endpoint/UI 4D; retornos, webhook y conciliación;
+tratamiento productivo de pagos tardíos; credenciales y prueba real;
+activación en producción. La recuperación de incertidumbre sigue
+separada y deberá reutilizar la misma clave durable.
+
+Este cierre supera los pendientes históricos de implementación del adaptador
+y retest P2, preservando registros, timestamps y evidencia de etapas anteriores.
+
+## 2026-09-17 - Política aprobada de doble vencimiento 4C
+
+Timestamp: 2026-09-17T12:51:16-03:00
+Estado: APROBADO
+Implementación: PENDIENTE
+Responsable: Cristian Sánchez; dispositivo: laptop; agente: Codex.
+Rama: `feature/mercadopago-payment-order-create-adapter`; base: `fc5eb0c`.
+
+MANDOBRA conserva `expires_at = created_at + 72 horas` como autoridad
+contractual exacta. Mercado Pago recibe `expiration_time = PT72H`, contado
+desde la creación remota. No se afirma igualdad entre ambos vencimientos.
+Después del vencimiento local no se debe entregar ni reutilizar el checkout.
+Un eventual pago tardío no genera automáticamente efectos PRO, contractuales,
+contables ni de comisión: queda pendiente de conciliación/revisión.
+La activación productiva permanece bloqueada hasta implementar esa política
+completa; 4C sigue limitado al adaptador interno deshabilitado por defecto.
+Esta decisión supera el bloqueo de diseño por igualdad de vencimientos,
+preservando los registros anteriores y sin crear migraciones.
+
+Fuente de semántica remota:
+[Vigencia de Orders](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-orders/additional-settings/define-order-validity).
+
+
+
 ## Realineación vigente 4C: Orders API y marketplace
 
 Timestamp: 2026-09-17T12:14:36-03:00

@@ -1,5 +1,24 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-17 - Cierre técnico local 4C
+
+Timestamp: 2026-09-17T15:07:04-03:00
+Rama: `feature/mercadopago-payment-order-create-adapter`; commit técnico: `b859e6a`.
+Verificador: `03 - Testing - Test Executor`; registro documental: Codex.
+4C interno implementado y aprobado, deshabilitado por defecto; P2 de secretos
+corregido y revalidado, sin hallazgos P0–P3 pendientes. Se supera únicamente
+la creación HTTP interna y su retest pendientes en los registros históricos;
+no se cierra Sprint 2 ni la implementación productiva de REQ-003 (`APROBADO` / `PENDIENTE`).
+Evidencia final acreditada de Testing: focales 52/52,
+regresiones 119/119, PostgreSQL 12/12; suite 568 ejecutadas, 563 aprobadas,
+5 omisiones históricas, 0 fallos y 0 errores; compileall, Alembic head único
+`20260917_01`, whitespace y git diff --check aprobados. Sin migración nueva.
+Pendientes: OAuth completo y custodia/renovación; fórmula de comisión;
+endpoint/UI 4D; retornos, webhook y conciliación; tratamiento productivo de
+pagos tardíos; credenciales y prueba real; activación en producción.
+Recuperación incierta y sucesoras permanecen separadas. No hay cobros disponibles.
+Evidencia, trazabilidad y alcance: [cierre 4C](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#cierre-técnico-local-4c-aprobado-por-testing).
+
 ## 2026-09-17 - Aplicación de órdenes Checkout Pro, incremento 4B
 
 Timestamp: 2026-09-17T10:57:38-03:00
