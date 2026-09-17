@@ -66,6 +66,7 @@ class Config:
     CLOUDINARY_FOLDER = "trax/professional_media"
     MEDIA_AUTO_PUBLISH = True
     MERCADOPAGO_WEBHOOK_SECRET = None
+    CHECKOUT_PRO_DELIVERY_ENABLED = False
 
     REQUIRED_ENV_VARS = ()
 
@@ -94,6 +95,9 @@ class Config:
         app_config["CLOUDINARY_FOLDER"] = _env("CLOUDINARY_FOLDER") or cls.CLOUDINARY_FOLDER
         app_config["MEDIA_AUTO_PUBLISH"] = _env_bool("MEDIA_AUTO_PUBLISH", cls.MEDIA_AUTO_PUBLISH)
         app_config["MERCADOPAGO_WEBHOOK_SECRET"] = _env("MERCADOPAGO_WEBHOOK_SECRET")
+        app_config["CHECKOUT_PRO_DELIVERY_ENABLED"] = _env_bool(
+            "CHECKOUT_PRO_DELIVERY_ENABLED", cls.CHECKOUT_PRO_DELIVERY_ENABLED
+        )
 
 
 class DevelopmentConfig(Config):

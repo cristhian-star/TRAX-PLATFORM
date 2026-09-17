@@ -37,6 +37,9 @@ def create_app(config_class=None, initialize_schema=False):
     from app.routes.operation_routes import operations
     app.register_blueprint(operations)
 
+    from app.routes.payment_order_delivery_routes import payment_order_delivery
+    app.register_blueprint(payment_order_delivery)
+
     from app.routes.notification_routes import notifications
     app.register_blueprint(notifications)
 
@@ -170,6 +173,11 @@ def create_app(config_class=None, initialize_schema=False):
         )
         if app.config.get("ENV_NAME") == "production" and request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        parts = request.path.split("/")
+        if len(parts) >= 4 and parts[1] == "contratacion" and parts[3] == "orden-de-cobro":
+            # Also protect redirects, CSRF failures and unavailable responses.
+            response.headers["Cache-Control"] = "no-store, private"
+            response.headers["Referrer-Policy"] = "no-referrer"
         return response
 
     return app

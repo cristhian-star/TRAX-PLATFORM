@@ -93,6 +93,19 @@
         {% endif %}
     </section>
 
+    {% if is_professional and contract.estado == "CONFIRMADA" %}
+    <section class="contract-panel" aria-label="Orden de cobro">
+        {% if config.CHECKOUT_PRO_DELIVERY_ENABLED is sameas true %}
+        <form action="{{ url_for('payment_order_delivery.create_order', id=contract.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="trax-button trax-button--primary" type="submit">Crear o mostrar orden de cobro</button>
+        </form>
+        {% else %}
+        <p>Checkout no disponible.</p>
+        {% endif %}
+    </section>
+    {% endif %}
+
     {% if can_create_contract_review %}
         <section class="contract-panel">
             <h3>Evaluacion del trabajo</h3>
