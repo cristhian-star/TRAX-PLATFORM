@@ -138,6 +138,20 @@ La cancelación local no cancela una preferencia remota; almacenar
 `professional_id` no autoriza al actor. Evidencia y límites:
 [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-posterior---incremento-técnico-4a).
 
+Actualización al `2026-09-17T11:04:24-03:00`, Codex - implementador documental
+local, rama `feature/checkout-pro-payment-order-application`, commit `1ba5ab1`:
+4B está completado y aprobado por Testing. Servicio de aplicación y ownership en
+contrato/perfil, actor profesional activo y contratos `CONFIRMADA`, obligación
+final única y reserva durable antes del adaptador, finalización atómica y replay.
+Supera el próximo paso 4B del registro anterior, no cierra Sprint 2 ni REQ-003:
+`APROBADO`, implementación productiva completa `PENDIENTE`.
+Continúan pendientes Mercado Pago real, creación HTTP, endpoints, UI/checkout/QR,
+recuperación incierta, sucesoras desde la aplicación, integración de órdenes con
+webhooks/conciliación y efectos PRO/comisiones/facturación; publicación, PR, merge
+y producción pendientes. Próximo paso: creación real y frontera pública, con
+planificación y revisión separadas. Evidencia aprobada y límites:
+[REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-vigente---incremento-técnico-local-4b).
+
 [ ] Sprint 3 PRO comercial - suscripcion de 30 dias, pagos mixtos, renovacion,
 exencion, gracia y retorno transaccional
 
