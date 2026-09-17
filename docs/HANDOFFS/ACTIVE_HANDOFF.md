@@ -1,6 +1,77 @@
-# Handoff tecnico: contrato neutral PSP y simulador determinista
+# Handoff técnico: persistencia durable de órdenes Checkout Pro - incremento 4A
+
+## Cierre técnico interno del incremento 4A de REQ-003
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Estado: COMPLETED
+Agente: 01 - Documentation Engineer / Codex local
+Dispositivo/origen: laptop / repositorio local MANDOBRA
+Motivo: documentar 4A ya implementado y aprobado localmente, sin cerrar el
+producto ni aprobar arquitectura 2.0.
+Rama: `feature/checkout-pro-payment-order-persistence`
+HEAD: `4373b64e419360f7ca3f649efc8f97580c6b42d8`
+Commit: `feat: add durable payment order persistence`
+Push/publicación, PR y merge de este incremento: pendientes;
+no ejecutados ni verificados remotamente en esta sesión. Merge: NO, fuera de
+la autorización documental. No se actualizaron referencias ni ramas.
+
+Trabajo completado en `4373b64`: modelo independiente `PaymentOrder`, migración
+`20260916_01` (head único, padre `20260911_02`), replay durable y conflictos
+materiales, una orden activa por obligación, bloqueo de obligación, estados
+`ACTIVE`, `EXPIRED`, `CANCELLED`, vencimiento contractual de 72 horas,
+cancelación local auditable, constraints e identidad PSP contextual,
+auditoría atómica y comportamiento concurrente PostgreSQL. SQLite conserva
+compatibilidad y rollback transaccional; no sustituye las garantías PostgreSQL.
+El servicio participa de la transacción del llamador y no realiza commit propio.
+La orden externa no se almacena en `PaymentAttemptRecord.external_attempt_id`.
+
+Evidencia aprobada comunicada por el usuario, no reejecutada aquí: focales de
+persistencia/migración `11/11`; regresiones relacionadas `141/141`; PostgreSQL
+`6/6`; suite completa `515` ejecutadas, `510` aprobadas, `5` omisiones históricas,
+`0` fallos y `0` errores; compileall, Alembic y git diff --check aprobados;
+revalidación independiente sin hallazgos P0-P3. La inspección estática del
+commit y del grafo de migraciones confirma el head único `20260916_01`.
+Tests, compileall, Docker, PostgreSQL y Alembic NO ejecutados en esta sesión
+documental. No se modificaron modelos, servicios, pruebas ni migraciones.
+
+REQ-003 conserva `estado: APROBADO` e `implementacion: PENDIENTE`. Se agregan
+criterios internos estrechos acreditados por 4A; se mantienen sin marcar los
+criterios originales ambiguos o end-to-end. No existe un flujo disponible para
+usuarios. `professional_id` almacenado no prueba autorización y la cancelación
+local no cancela una preferencia remota.
+
+Pendientes y riesgos: ownership derivado de sesión y `ContractRequest`, servicio
+de aplicación público/autorizado, creación HTTP real en Mercado Pago,
+recuperación de resultados externos inciertos, checkout/QR visibles,
+webhooks/conciliación de órdenes, correlación con pagos, efectos PRO, comisiones,
+facturación y producción. Sin errores nuevos identificados por la inspección;
+no hubo troubleshooting ni decisiones comerciales nuevas.
+
+Documentación modificada: REQ-003, Master Spec, README de requisitos, Backlog,
+Roadmap, Changelog, sprint PSP, decisiones arquitectónicas y este handoff.
+Index revisado y conservado: no se crean documentos ni faltan enlaces de índice.
+Validaciones documentales completadas: UTF-8 estricto válido en los nueve archivos,
+sin mojibake detectado, enlaces relativos con destino existente, diff completo
+revisado y `git diff --check` sin errores. Alcance exclusivamente Markdown bajo
+`docs/`, sin archivos nuevos. Git advierte la conversión
+LF/CRLF configurada; no se ejecutó normalización ni formateo.
+
+Próximo paso recomendado: incremento 4B, servicio de aplicación y ownership
+contractual, todavía sin Mercado Pago real. Para retomar, verificar la identidad
+Git y preparar alcance y autorización específica
+de 4B contra REQ-003 y `ContractRequest`. Esta posta NO autoriza implementar 4B.
+El registro anterior se conserva como historia y queda
+superado únicamente en el alcance técnico interno 4A y la rama/HEAD actuales.
+
+Corrección documental focal: 2026-09-16T22:51:15-03:00, agente 01 - Documentation
+Engineer. Se actualizó el título, se retiró información operativa transitoria
+del cierre 4A y se precisó en REQ-003 el savepoint PostgreSQL, sin commit ni
+rollback global de los helpers. Se conserva el registro histórico siguiente.
 
 ## Avance técnico de REQ-003
+
+Título original del registro histórico: Handoff tecnico: contrato neutral PSP y
+simulador determinista.
 
 Timestamp: 2026-09-14T20:43:27-03:00
 Estado: COMPLETED

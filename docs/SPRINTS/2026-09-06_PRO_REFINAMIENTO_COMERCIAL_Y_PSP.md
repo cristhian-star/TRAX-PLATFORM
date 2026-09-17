@@ -10,6 +10,40 @@ Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
 ## Especificación de orden de cobro Checkout Pro
 
+### Actualización posterior - cierre técnico interno 4A
+
+Timestamp: 2026-09-16T22:40:04-03:00
+Agente: 01 - Documentation Engineer
+Motivo: registrar la fundación durable aprobada localmente.
+Rama: `feature/checkout-pro-payment-order-persistence`; commit: `4373b64`.
+REQ-003: `APROBADO`; implementación productiva completa: `PENDIENTE`.
+
+`PaymentOrder` y el servicio de persistencia mantienen órdenes independientes
+de `PaymentAttemptRecord`. La migración/head `20260916_01` acredita
+persistencia del ID/URL externos, provider/live_mode, timestamps, replay
+durable, conflictos materiales, bloqueo de obligación, constraints,
+identidad PSP contextual y una única orden activa por obligación.
+El ciclo `ACTIVE/EXPIRED/CANCELLED` conserva vigencia de 72 horas,
+sucesión local y cancelación auditable con auditoría atómica.
+
+Evidencia aprobada suministrada: focales 11/11; regresiones 141/141;
+PostgreSQL 6/6; suite 515 ejecutadas, 510 aprobadas, 5 omitidas históricas,
+0 fallos y 0 errores; compileall, Alembic y diff check aprobados;
+revalidación independiente sin P0-P3. SQLite acredita compatibilidad y
+rollback, no equivalencia de locks concurrentes. No se ejecutaron estas
+validaciones en la sesión documental.
+
+Se cierra solo 4A técnico local, no Sprint 2 ni el producto. Próximo paso:
+4B, servicio de aplicación y ownership desde sesión/`ContractRequest`,
+todavía sin Mercado Pago real. Continúan pendientes HTTP, recuperación de
+resultados externos inciertos, checkout/QR visibles, integración de órdenes
+con webhooks/conciliación, correlación de pagos, PRO, comisiones y facturación.
+Publicación, PR, merge y producción permanecen pendientes.
+Snapshot profesional no autoriza al actor y cancelación local no cancela una
+preferencia remota. No hay flujo de cobro para usuarios.
+
+### Registro histórico de especificación inicial
+
 Timestamp: 2026-09-14T10:21:05-03:00
 Estado: ESPECIFICACION_CHECKOUT_PRO_PAYMENT_ORDER_CONTRACT_PREPARADA_PENDIENTE_DE_REVISION
 Responsable funcional: Cristian Sánchez
