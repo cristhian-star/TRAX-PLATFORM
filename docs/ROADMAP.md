@@ -171,6 +171,27 @@ pagos tardíos; credenciales y prueba real; activación en producción.
 Recuperación incierta y sucesoras permanecen separadas. No hay cobros disponibles.
 Evidencia, trazabilidad y alcance: [cierre 4C](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#cierre-técnico-local-4c-aprobado-por-testing).
 
+### Cierre técnico local 4D aprobado por Testing
+
+Timestamp: 2026-09-17T16:14:10-03:00
+Rama: `feature/checkout-pro-payment-order-delivery`; commit técnico: `763eee3`.
+Verificador: `03 - Testing - Test Executor`; registro documental: Codex.
+POST autenticado de creación/replay con sesión, CSRF y ownership; GET autorizado
+sin creación ni llamada PSP; checkout y QR PNG con endpoint separado autenticado,
+`segno==1.6.6` local en memoria y exactamente la misma URL validada del enlace.
+Rechazo de órdenes no entregables por vencimiento/bloqueo, headers privados y
+errores genéricos; feature flags deshabilitados por defecto. No habilita cobros
+productivos ni cierra Sprint 2 o REQ-003: APROBADO / implementación PENDIENTE.
+Evidencia acreditada: 26/26 focales 4D, 52/52 4B–4C, 119/119 regresiones;
+PostgreSQL 6/6 más 3/3 reproducciones HTTP; suite 594 ejecutadas, 589 aprobadas,
+5 omisiones históricas y 0 fallos. Compileall, Alembic head `20260917_01`,
+UTF-8, enlaces, whitespace y git diff --check aprobados. Sin migración nueva.
+Supera únicamente endpoint/presentación 4D y su Testing pendientes en registros
+históricos. Pendientes: OAuth real, fórmula de comisión, retornos, webhooks,
+conciliación, pagos tardíos, efectos PRO/contables, credenciales reales y
+validación/activación en entornos de staging y producción.
+Detalle y límites: [cierre 4D](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#cierre-técnico-local-4d-aprobado-por-testing).
+
 [ ] Sprint 3 PRO comercial - suscripcion de 30 dias, pagos mixtos, renovacion,
 exencion, gracia y retorno transaccional
 

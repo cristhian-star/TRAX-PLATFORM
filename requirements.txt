@@ -16,3 +16,4 @@ python-dotenv==1.2.1
 Alembic==1.15.2
 psycopg2-binary==2.9.10
 Pillow==11.3.0
+segno==1.6.6

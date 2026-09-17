@@ -6,10 +6,63 @@ fecha_aprobacion: 2026-09-14T10:05:02-03:00
 responsable: Cristian Sánchez
 rama_documental: feature/checkout-pro-payment-order-contract
 implementacion: PENDIENTE
-ultima_revision: 2026-09-17T15:07:04-03:00
+ultima_revision: 2026-09-17T16:14:10-03:00
 ---
 
 # REQ-003 - Creacion de ordenes de cobro Checkout Pro
+
+## Cierre técnico local 4D aprobado por Testing
+
+Timestamp de aprobación de Testing: 2026-09-17T16:14:10-03:00
+Estado: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/checkout-pro-payment-order-delivery`.
+Commit técnico: `763eee3`.
+Agente verificador: `03 - Testing - Test Executor`.
+Registro documental: Codex; dispositivo: laptop.
+Implementación técnica: `2026-09-17T16:06:04-03:00`.
+
+Alcance acreditado: POST `/contratacion/<int:id>/orden-de-cobro` de creación/replay
+con sesión, actor desde `session["user_id"]`, CSRF y ownership contractual/perfil
+del profesional activo; solo contratos CONFIRMADA. Importe y clave durable
+proceden de 4B, sin overrides del navegador. Éxito/replay responde 303.
+GET de esa ruta y GET `/contratacion/<int:id>/orden-de-cobro/qr.png` requieren
+autorización y solo leen: no crean órdenes ni llaman al PSP ni resuelven OAuth/comisión.
+
+Checkout y QR PNG están limitados al profesional propietario, reserva exitosa,
+orden activa/coherente y vencimiento contractual vigente. `segno==1.6.6` genera
+localmente el PNG en memoria, desde exactamente la misma checkout_url HTTPS
+validada del enlace. Endpoint QR separado y autenticado; sin servicios externos,
+JavaScript remoto, SVG safe, data URI ni archivos persistentes. Componentes
+Design System V2, enlace alternativo, texto accesible y formato Decimal exacto.
+Abrir el enlace o escanear el QR no acredita pago.
+
+Órdenes vencidas, canceladas, bloqueadas, inciertas o no disponibles no entregan
+checkout ni QR. Vencimiento revalidado al finalizar render/generación; autoridad
+contractual local, sin afirmar igualdad con vencimiento remoto. Clave durable,
+replay, cero retries y bloqueo 4B preservados; sin renovación ni recuperación
+automáticas. Headers privados `Cache-Control: no-store, private`,
+`Referrer-Policy: no-referrer` y nosniff cubren errores y redirects.
+Errores públicos genéricos sin datos sensibles. Feature flags
+`CHECKOUT_PRO_DELIVERY_ENABLED=False` y `MercadoPagoOrderConfiguration.enabled=False`
+por defecto, composición explícita con proveedores confiables inyectados.
+
+Evidencia final acreditada de `03 - Testing - Test Executor`:
+
+- Focales 4D: **26/26**; focales 4B–4C: **52/52**.
+- Regresiones relacionadas: **119/119**.
+- PostgreSQL: **6/6**, más **3/3 reproducciones HTTP**.
+- Suite: **594 ejecutadas, 589 aprobadas, 5 omisiones históricas y 0 fallos**.
+- `compileall`, Alembic head `20260917_01`, UTF-8, enlaces, whitespace y
+  `git diff --check`: aprobados. Sin migración nueva en 4D.
+
+Se cierra únicamente el incremento técnico 4D: deshabilitado por defecto,
+sin habilitar cobros productivos. REQ-003 conserva `estado: APROBADO` e
+`implementacion: PENDIENTE`. Continúan pendientes OAuth real y custodia/renovación,
+fórmula de comisión, retornos, webhooks, conciliación, tratamiento de pagos
+tardíos, efectos PRO/contables, credenciales reales y validación/activación en
+entornos de staging y producción. El cierre supera endpoint/presentación 4D y
+Testing final pendientes en registros anteriores, preservados íntegramente.
 
 ## Cierre técnico local 4C aprobado por Testing
 

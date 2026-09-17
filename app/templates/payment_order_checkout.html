@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="trax-container" aria-labelledby="checkout-title">
+    <h1 id="checkout-title" class="trax-page__title">Orden de cobro</h1>
+    {% if error_message %}
+    <div class="trax-alert trax-alert--warning" role="alert">{{ error_message }}</div>
+    {% elif checkout %}
+    <article class="trax-card">
+        <div class="trax-card__body">
+            <p>Importe: <strong>ARS {{ checkout.amount_text }}</strong></p>
+            <p>Vencimiento contractual: <time datetime="{{ checkout.expires_at.isoformat() }}">{{ checkout.expires_at.strftime("%d/%m/%Y %H:%M") }} UTC</time></p>
+            <p id="checkout-warning">Abrir el enlace o escanear el QR no confirma un pago. El vencimiento de Mercado Pago se cuenta desde su creación remota y puede diferir del contractual.</p>
+            <a class="trax-button trax-button--primary" href="{{ checkout.checkout_url }}" rel="noreferrer noopener" referrerpolicy="no-referrer" aria-describedby="checkout-warning">Abrir Checkout Pro</a>
+            <p>Podés copiar el enlace para compartirlo. El QR representa el mismo enlace.</p>
+            <img src="{{ url_for('payment_order_delivery.qr_png', id=contract_id) }}" alt="QR del mismo enlace de Checkout Pro" aria-describedby="checkout-warning" referrerpolicy="no-referrer" style="max-width:100%;height:auto">
+        </div>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}
