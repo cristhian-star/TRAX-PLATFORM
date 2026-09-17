@@ -1,3 +1,161 @@
+# Handoff vigente: cierre técnico local 4D
+
+Timestamp: 2026-09-17T16:14:10-03:00
+Estado: COMPLETED
+Objetivo: cierre técnico 4D aprobado por Testing, sin activación productiva.
+
+## Cierre técnico local 4D aprobado por Testing
+
+Timestamp de aprobación de Testing: 2026-09-17T16:14:10-03:00
+Estado: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/checkout-pro-payment-order-delivery`.
+Commit técnico: `763eee3`.
+Agente verificador: `03 - Testing - Test Executor`.
+Registro documental: Codex; dispositivo: laptop.
+Implementación técnica: `2026-09-17T16:06:04-03:00`.
+
+Alcance acreditado: POST `/contratacion/<int:id>/orden-de-cobro` de creación/replay
+con sesión, actor desde `session["user_id"]`, CSRF y ownership contractual/perfil
+del profesional activo; solo contratos CONFIRMADA. Importe y clave durable
+proceden de 4B, sin overrides del navegador. Éxito/replay responde 303.
+GET de esa ruta y GET `/contratacion/<int:id>/orden-de-cobro/qr.png` requieren
+autorización y solo leen: no crean órdenes ni llaman al PSP ni resuelven OAuth/comisión.
+
+Checkout y QR PNG están limitados al profesional propietario, reserva exitosa,
+orden activa/coherente y vencimiento contractual vigente. `segno==1.6.6` genera
+localmente el PNG en memoria, desde exactamente la misma checkout_url HTTPS
+validada del enlace. Endpoint QR separado y autenticado; sin servicios externos,
+JavaScript remoto, SVG safe, data URI ni archivos persistentes. Componentes
+Design System V2, enlace alternativo, texto accesible y formato Decimal exacto.
+Abrir el enlace o escanear el QR no acredita pago.
+
+Órdenes vencidas, canceladas, bloqueadas, inciertas o no disponibles no entregan
+checkout ni QR. Vencimiento revalidado al finalizar render/generación; autoridad
+contractual local, sin afirmar igualdad con vencimiento remoto. Clave durable,
+replay, cero retries y bloqueo 4B preservados; sin renovación ni recuperación
+automáticas. Headers privados `Cache-Control: no-store, private`,
+`Referrer-Policy: no-referrer` y nosniff cubren errores y redirects.
+Errores públicos genéricos sin datos sensibles. Feature flags
+`CHECKOUT_PRO_DELIVERY_ENABLED=False` y `MercadoPagoOrderConfiguration.enabled=False`
+por defecto, composición explícita con proveedores confiables inyectados.
+
+Evidencia final acreditada de `03 - Testing - Test Executor`:
+
+- Focales 4D: **26/26**; focales 4B–4C: **52/52**.
+- Regresiones relacionadas: **119/119**.
+- PostgreSQL: **6/6**, más **3/3 reproducciones HTTP**.
+- Suite: **594 ejecutadas, 589 aprobadas, 5 omisiones históricas y 0 fallos**.
+- `compileall`, Alembic head `20260917_01`, UTF-8, enlaces, whitespace y
+  `git diff --check`: aprobados. Sin migración nueva en 4D.
+
+Se cierra únicamente el incremento técnico 4D: deshabilitado por defecto,
+sin habilitar cobros productivos. REQ-003 conserva `estado: APROBADO` e
+`implementacion: PENDIENTE`. Continúan pendientes OAuth real y custodia/renovación,
+fórmula de comisión, retornos, webhooks, conciliación, tratamiento de pagos
+tardíos, efectos PRO/contables, credenciales reales y validación/activación en
+entornos de staging y producción. El cierre supera endpoint/presentación 4D y
+Testing final pendientes en registros anteriores, preservados íntegramente.
+
+---
+
+# Registros históricos preservados
+
+# Handoff vigente: implementación técnica local 4D
+
+Timestamp: 2026-09-17T16:06:04-03:00
+Estado: READY_TO_RESUME
+Agente: Codex; dispositivo: laptop.
+Rama: `feature/checkout-pro-payment-order-delivery`.
+Base/último commit: `db9644764fe58572f28bbc431a2956b8bbaa862d`.
+Origin verificado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+La base confirma el merge del PR #18 del adaptador 4C; su commit técnico
+`b859e6a` y evidencia de Testing permanecen en el registro histórico siguiente.
+Objetivo: frontera HTTP por sesión y presentación privada de checkout/QR,
+limitadas al profesional propietario, reutilizando 4A–4C.
+Resultado: implementación focal validada, pendiente de revisión y Testing final.
+REQ-003 sigue APROBADO con implementación productiva PENDIENTE.
+
+## Implementación y decisiones
+
+POST `/contratacion/<int:id>/orden-de-cobro`: actor exclusivamente desde
+`session["user_id"]`, usuario activo/rol PROFESIONAL y CSRF global. Importe,
+identidad profesional y clave PSP no se obtienen del formulario. Autoriza
+ownership contractual/perfil y estado CONFIRMADA; delega claim/creación/replay
+al servicio 4B. Libera la sesión ORM del request antes de la llamada externa.
+Éxito/replay responde 303 a presentación GET, sin URL PSP en el redirect.
+
+GET de esa ruta y GET `/contratacion/<int:id>/orden-de-cobro/qr.png`:
+solo lectura autorizada; sin PSP ni resolución OAuth/comisión. Exigen reserva
+SUCCEEDED, orden ACTIVE, coherencia con obligación/comando y vencimiento
+contractual vigente. Revalidan URL HTTPS segura/host exacto
+`www.mercadopago.com.ar`. La presentación comprueba vencimiento después de
+renderizar; el QR lo comprueba después de generar. Rechazan vencidas/canceladas,
+bloqueadas e inciertas; no generan sucesoras ni recuperaciones.
+
+La misma checkout_url validada se muestra como enlace autoescapado y se pasa
+exactamente al encoder QR. `segno==1.6.6` fijado en requirements.txt, PNG local
+sobre BytesIO, negro/blanco, borde de cuatro módulos. Endpoint separado,
+autenticado; sin servicios externos, JS remoto nuevo, SVG safe, data URI ni
+archivos persistentes. Componentes Design System V2, enlace alternativo,
+texto accesible y advertencia de que apertura/escaneo no acredita pago.
+Importe mostrado mediante formato Decimal exacto, sin conversión a float.
+
+`CHECKOUT_PRO_DELIVERY_ENABLED=False` por defecto; 4C conserva
+`MercadoPagoOrderConfiguration.enabled=False`. Habilitar el flag por sí solo
+no configura un receptor ni permite llamar al PSP: falta composición explícita.
+`build_checkout_delivery_service(...)` admite únicamente proveedores confiables
+inyectados; se registra explícitamente en
+`app.extensions["payment_order_delivery_service"]`. Sin defaults OAuth/comisión
+ni fallback global. Tests usan configuración explícita y transporte falso.
+
+Errores públicos fijos: 400 entrada/CSRF, 403 autorización, 409 conflicto o
+bloqueo/ incertidumbre, 410 no vigente, 503 no disponible y 500 inesperado;
+anónimos/inactivos siguen el redirect al login existente. No se renderizan ni
+registran argumentos/excepciones sensibles. Todos los endpoints de delivery,
+incluidos redirects y errores CSRF, reciben `Cache-Control: no-store, private`,
+`Referrer-Policy: no-referrer` y nosniff. Sin ETag/304 de QR; cada GET revalida.
+Se conservan cero retries, la clave y el bloqueo durable de 4B.
+
+## Archivos y validación
+
+Cambios técnicos: `app/__init__.py`, `app/config/config.py`,
+`app/routes/payment_order_delivery_routes.py`,
+`app/services/payment_order_delivery_service.py`,
+`app/templates/contract_detail.html`, `app/templates/payment_order_checkout.html`,
+`requirements.txt`, `tests/test_payment_order_delivery.py`; este handoff actualizado.
+Sin migración, modelos modificados ni ampliación de 4B/4C.
+
+Focales 4D: 26/26 aprobadas; focales relacionadas 4B/4C: 52/52 aprobadas.
+La ejecución conjunta inicial finalizada tuvo 77/77 (25 4D + 52 relacionadas);
+la posterior focal 4D de 26/26 incluye la nueva regresión de escape HTML/URL.
+Regresiones relacionadas: 180/180, en quince módulos PSP/pagos, seguridad,
+configuración, contratación y reviews. SQLite desechable; ningún cobro real.
+compileall focal y git diff --check aprobados; UTF-8/whitespace revisados.
+Advertencias legacy SQLAlchemy/datetime existentes; no fallos de validación.
+Un fallo inicial de fixtures CSRF al cambiar sesión se resolvió limpiando el
+cache de Flask-WTF del app context sostenido por el test; CSRF productivo intacto.
+Suite completa y PostgreSQL reservados a Testing final, no ejecutados.
+Docker, migraciones, credenciales reales y llamadas PSP reales no ejecutados.
+
+Pendientes reales: revisión independiente/Testing final; OAuth completo y
+custodia/renovación; fórmula de comisión; retornos, webhook/conciliación;
+tratamiento productivo de pagos tardíos; credenciales/prueba real y producción.
+No se implementan efectos PRO, contabilidad, facturación ni activación productiva.
+El vencimiento local rige la entrega; no coincide necesariamente con el remoto
+ni puede revocar una URL ya copiada. Pagos tardíos requieren tratamiento futuro.
+
+Estado Git: nueve archivos con cambios locales, sin commit, staging vacío.
+Push/PR/merge/deploy no realizados: no autorizados en esta implementación.
+No hubo merge durante este incremento; el PR #18 pertenece a la base anterior.
+Próximo paso: revisión del diff y Testing final sobre esta rama/base; conservar
+claims/claves y flags deshabilitados. No activar producción ni ejecutar llamadas
+reales. Para retomar, leer este handoff y los módulos/pruebas de delivery y 4B/4C.
+
+---
+
+# Registros anteriores preservados
+
 # Handoff vigente: cierre técnico local 4C
 
 Timestamp: 2026-09-17T15:07:04-03:00
