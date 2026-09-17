@@ -2,11 +2,11 @@ from app import db
 from app.models.user import User
 
 
-def require_active_actor(actor_user_id, allowed_roles):
+def require_active_actor(actor_user_id, allowed_roles, *, session=None):
     if actor_user_id is None:
         raise PermissionError("Actor autenticado requerido")
 
-    actor = db.session.get(User, actor_user_id)
+    actor = (db.session if session is None else session).get(User, actor_user_id)
     if actor is None or actor.estado != "ACTIVO":
         raise PermissionError("Actor autenticado activo requerido")
     if actor.rol not in frozenset(allowed_roles):
