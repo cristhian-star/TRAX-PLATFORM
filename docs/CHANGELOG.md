@@ -1,5 +1,32 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-17 - Aplicación de órdenes Checkout Pro, incremento 4B
+
+Timestamp: 2026-09-17T10:57:38-03:00
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-application`; commit técnico: `1ba5ab1`.
+Implementación: 2026-09-17T10:39:29-03:00.
+Testing aprobado: 2026-09-17T10:46:15-03:00, `03 - Testing - Test Executor`.
+
+- Servicio de aplicación con actor profesional activo, ownership contractual y
+  del perfil, solo `CONFIRMADA`, importe desde `precio_acordado` y ARS.
+- Obligación final única por contrato mediante FK nullable compatible con legacy;
+  reserva durable del comando y clave antes del adaptador, sin sesión/transacción
+  abierta durante la llamada; segunda transacción atómica de orden, auditoría y resultado.
+- Replay de la misma orden, conflictos materiales y bloqueo durable tras error,
+  incertidumbre o caída posterior al claim; sin repetir automáticamente la llamada.
+- Migración/head único `20260917_01`, padre `20260916_01`.
+- Evidencia histórica de Testing: focales 26/26, regresiones PSP/pagos 141/141,
+  PostgreSQL 6/6; suite 531 ejecutadas, 526 aprobadas, 5 omisiones históricas,
+  0 fallos y 0 errores; compileall, Alembic, upgrade–downgrade–upgrade y diff check
+  aprobados, sin P0–P3. No se repitieron pruebas en esta sesión documental.
+- [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md) sigue
+  `APROBADO`, implementación `PENDIENTE`: no hay flujo disponible para usuarios.
+  Endpoints, creación HTTP real, checkout/QR, integración de órdenes con webhooks,
+  conciliación, PRO, comisiones, facturación y producción siguen pendientes.
+  Publicación, PR y merge pendientes; próximo paso de planificación/revisión:
+  creación real con Mercado Pago y frontera pública, con revisión separada.
+
 ## 2026-09-16 - Fundación durable de órdenes Checkout Pro, incremento 4A
 
 Timestamp: 2026-09-16T22:40:04-03:00

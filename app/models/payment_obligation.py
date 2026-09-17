@@ -10,6 +10,7 @@ def _utcnow():
 class PaymentObligation(db.Model):
     __tablename__ = "payment_obligations"
     __table_args__ = (
+        db.UniqueConstraint("contract_request_id", name="uq_payment_obligations_contract_request"),
         db.UniqueConstraint("internal_reference", name="uq_payment_obligations_reference"),
         db.CheckConstraint("amount > 0", name="ck_payment_obligations_amount_positive"),
         db.CheckConstraint("length(trim(internal_reference)) > 0", name="ck_payment_obligations_reference_nonempty"),
@@ -17,6 +18,11 @@ class PaymentObligation(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True)
+    contract_request_id = db.Column(
+        db.Integer,
+        db.ForeignKey("contract_requests.id", ondelete="RESTRICT", name="fk_payment_obligations_contract_request"),
+        nullable=True,
+    )
     internal_reference = db.Column(db.String(160), nullable=False)
     amount = db.Column(db.Numeric, nullable=False)
     currency = db.Column(db.String(16), nullable=False)

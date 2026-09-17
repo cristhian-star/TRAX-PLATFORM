@@ -80,6 +80,7 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.payment_obligation import PaymentObligation
     from app.models.payment_attempt import PaymentAttemptRecord
     from app.models.payment_order import PaymentOrder
+    from app.models.payment_order_reservation import PaymentOrderReservation
     from app.models.psp_event import PSPEventRecord
 
     if initialize_schema:

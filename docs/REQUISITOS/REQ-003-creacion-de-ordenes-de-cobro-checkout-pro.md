@@ -257,6 +257,54 @@ mínimos, fake determinista en memoria, pruebas unitarias y documentación.
 
 ## Estado de implementación
 
+### Actualización vigente - incremento técnico local 4B
+
+Timestamp: 2026-09-17T10:57:38-03:00
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-application`
+Commit técnico: `1ba5ab10c4606903f59b0562c698e233ff0dfbe5`
+Implementación: 2026-09-17T10:39:29-03:00
+Testing aprobado: 2026-09-17T10:46:15-03:00
+Agente verificador: `03 - Testing - Test Executor`
+Estado formal: `APROBADO`; implementación productiva completa: `PENDIENTE`.
+
+Al contrato puro, fake determinista y persistencia 4A se suma el servicio de
+aplicación `PaymentOrderApplicationService`. Recarga al actor profesional activo,
+comprueba ownership en contrato y perfil y autoriza únicamente `CONFIRMADA`.
+La obligación final tiene FK nullable y única a `ContractRequest`, conservando
+filas legacy sin vínculo inventado. El importe procede exclusivamente de
+`precio_acordado`, moneda ARS; no se acepta importe ni professional_id del cliente.
+Esto concreta la fuente backend aprobada sin modificar las reglas comerciales.
+
+La reserva durable conserva comando, referencias, concepto no sensible,
+timestamps UTC y clave idempotente generados una sola vez. Confirma el claim antes
+del adaptador y cierra la sesión/transacción durante la llamada. La segunda
+transacción revalida contexto y registra orden, auditoría y resultado atómicamente.
+Replay exitoso devuelve la misma orden; contenido material incompatible genera
+conflicto. Error, incertidumbre o caída tras el claim conservan el bloqueo y no
+generan otra clave ni llamada automática. Recuperación/conciliación y renovación
+desde esta capa de aplicación quedan diferidas. 4B no expone desde el servicio de
+aplicación la creación de órdenes sucesoras después de expiración o cancelación;
+esa evolución permanece pendiente.
+Migración/head único `20260917_01`, descendiente de `20260916_01`.
+
+Evidencia histórica aprobada de Testing, suministrada para este registro y no
+reejecutada: focales 26/26; regresiones PSP/pagos 141/141; PostgreSQL 6/6;
+suite 531 ejecutadas, 526 aprobadas, 5 omisiones históricas, 0 fallos y 0 errores.
+Compileall, Alembic, upgrade–downgrade–upgrade y git diff --check aprobados;
+ningún hallazgo P0–P3. La inspección directa del commit confirma modelo,
+migración, servicio y pruebas; no constituye una nueva ejecución de Testing.
+
+No existe flujo productivo disponible para usuarios. Continúan pendientes
+endpoints, creación HTTP real en Mercado Pago, checkout/QR, integración de órdenes
+con webhooks y conciliación, efectos PRO, comisiones, facturación, publicación,
+PR, merge y producción. Próximo paso: planificar/revisar creación real y frontera
+pública. Se preservan los criterios originales sin marcar y los registros
+históricos siguientes; sus garantías diferidas describen cada incremento anterior,
+no niegan las capacidades internas 4A/4B ahora acreditadas.
+
+### Registro histórico inicial
+
 Al `2026-09-14T10:21:05-03:00` no existe implementación de este contrato. Esta
 Feature Spec autoriza preparar el primer incremento delimitado, pero no acredita
 ninguna capacidad productiva ni autoriza commit, publicación o despliegue.

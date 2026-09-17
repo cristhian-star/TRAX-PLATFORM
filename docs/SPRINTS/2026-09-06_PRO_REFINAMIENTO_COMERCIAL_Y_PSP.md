@@ -10,6 +10,37 @@ Commit observado: `1d22f87adc358eae20121ea727142b0276cf337e`
 
 ## Especificación de orden de cobro Checkout Pro
 
+### Actualización posterior - cierre técnico local 4B
+
+Timestamp: 2026-09-17T10:57:38-03:00
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-application`; commit técnico: `1ba5ab1`.
+Implementación: 2026-09-17T10:39:29-03:00.
+Testing aprobado: 2026-09-17T10:46:15-03:00, `03 - Testing - Test Executor`.
+
+Servicio de aplicación implementado: actor profesional activo, ownership en
+contrato/perfil, solo `CONFIRMADA`, obligación final única vinculada por FK nullable
+compatible con legacy, importe exclusivamente desde `precio_acordado` y ARS.
+Reserva durable del comando/clave antes del adaptador; ninguna sesión/transacción
+abierta durante la llamada; segunda transacción atómica para orden, auditoría y
+resultado. Replay devuelve la misma orden, cambios materiales producen conflicto;
+error, incertidumbre o caída tras el claim bloquean nuevas llamadas automáticas.
+Migración/head único `20260917_01`, descendiente de `20260916_01`.
+
+Evidencia histórica de Testing suministrada, no reejecutada aquí: focales 26/26;
+regresiones PSP/pagos 141/141; PostgreSQL 6/6; suite 531 ejecutadas, 526 aprobadas,
+5 omisiones históricas, 0 fallos y 0 errores; compileall, Alembic,
+upgrade–downgrade–upgrade y git diff --check aprobados; ningún hallazgo P0–P3.
+
+Se cierra solo 4B técnico local. REQ-003 sigue `estado: APROBADO` e
+`implementacion: PENDIENTE`; no se cierra el producto ni se aprueba 2.0 completo.
+Pendientes: endpoints, creación HTTP real en Mercado Pago, checkout/QR,
+integración de órdenes con webhooks/conciliación, efectos PRO, comisiones,
+facturación, publicación, PR, merge y producción. Próximo paso: planificación y
+revisión separadas de la creación real con Mercado Pago y su frontera pública.
+El próximo paso 4B del registro histórico siguiente queda cumplido únicamente
+en este alcance interno, sin habilitar cobros para usuarios.
+
 ### Actualización posterior - cierre técnico interno 4A
 
 Timestamp: 2026-09-16T22:40:04-03:00

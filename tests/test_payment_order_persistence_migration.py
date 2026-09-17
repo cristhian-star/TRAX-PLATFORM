@@ -23,7 +23,12 @@ class PaymentOrderPersistenceMigrationTest(unittest.TestCase):
             config = Config(str(ROOT / "alembic.ini"))
             try:
                 script = ScriptDirectory.from_config(config)
-                self.assertEqual(script.get_heads(), ["20260916_01"])
+                heads = script.get_heads()
+                self.assertEqual(len(heads), 1)
+                self.assertIn(
+                    "20260916_01",
+                    {item.revision for item in script.walk_revisions("base", heads[0])},
+                )
                 command.upgrade(config, "20260911_02")
                 with engine.begin() as connection:
                     user_id = connection.execute(sa.text(

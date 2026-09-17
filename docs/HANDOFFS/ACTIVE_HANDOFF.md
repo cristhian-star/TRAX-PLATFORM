@@ -1,4 +1,66 @@
-# Handoff técnico: persistencia durable de órdenes Checkout Pro - incremento 4A
+# Handoff técnico: aplicación de órdenes Checkout Pro - incremento 4B
+
+## Cierre técnico local 4B de REQ-003
+
+Timestamp: 2026-09-17T10:57:38-03:00
+Estado: COMPLETED
+Agente documental: Codex - implementador documental local
+Dispositivo: laptop
+Rama: `feature/checkout-pro-payment-order-application`
+Commit técnico y HEAD: `1ba5ab10c4606903f59b0562c698e233ff0dfbe5`
+Implementación: 2026-09-17T10:39:29-03:00
+Aprobación de Testing: 2026-09-17T10:46:15-03:00
+Agente verificador: `03 - Testing - Test Executor`
+Resultado: incremento técnico validado localmente; publicación, PR y merge pendientes.
+
+`PaymentOrderApplicationService` recibe identidad confiable del actor y contrato,
+recarga al usuario activo con rol profesional y comprueba ownership tanto en
+`ContractRequest` como en `Professional`. Solo permite contratos `CONFIRMADA`.
+La obligación final es única por contrato mediante FK nullable y constraint única,
+sin atribuir contratos a registros legacy. El importe deriva exclusivamente de
+`precio_acordado`, en ARS; el cliente no proporciona importe ni `professional_id`.
+
+Referencias, concepto no sensible, clave idempotente y timestamps UTC del comando
+se generan una sola vez. `PaymentOrderReservation` conserva el comando durable
+con estados `PREPARED`, `CALL_IN_PROGRESS`, `SUCCEEDED` y `UNCERTAIN`. La primera
+transacción confirma la reserva y el claim antes del adaptador. Durante la llamada
+no queda sesión, conexión ni transacción propia abierta. Una segunda transacción
+registra mediante 4A la orden, auditoría y resultado de reserva atómicamente,
+revalidando autorización y contenido. Replay exitoso devuelve la misma orden;
+cambios materiales producen conflicto. Tras un claim durable, error, incertidumbre
+o caída conservan el bloqueo: no hay nueva clave ni llamada automática; la
+recuperación queda pendiente de una operación futura autorizada.
+
+Migración `20260917_01`, descendiente de `20260916_01`, head único.
+Commit técnico: diez archivos, 1070 inserciones y 3 eliminaciones, inspeccionados
+directamente. Evidencia de Testing suministrada para este cierre, no reejecutada:
+focales 26/26; regresiones PSP/pagos 141/141; PostgreSQL 6/6; suite 531 ejecutadas,
+526 aprobadas, 5 omisiones históricas, 0 fallos y 0 errores. `compileall`, Alembic,
+upgrade–downgrade–upgrade y `git diff --check`: aprobados; sin hallazgos P0–P3.
+
+REQ-003 conserva `estado: APROBADO` e `implementacion: PENDIENTE`. Se cierra
+únicamente 4B técnico local, no el flujo productivo ni la arquitectura 2.0.
+Pendientes: endpoints/frontera pública, creación HTTP real en Mercado Pago,
+checkout/QR, integración de órdenes con webhooks y conciliación, efectos PRO,
+comisiones, facturación, publicación, PR, merge y producción. Las capacidades
+previas de consulta/webhook del repositorio no constituyen este flujo de creación.
+Validaciones de esta sesión: controles documentales de UTF-8, mojibake, enlaces,
+diff completo y whitespace. Tests, Docker, PostgreSQL y Alembic no ejecutados.
+Sin troubleshooting nuevo ni decisiones comerciales adicionales.
+
+Próximo paso: planificar y revisar la integración real de creación de órdenes con
+Mercado Pago y su frontera pública, con planificación y revisión separadas.
+Para retomar, verificar Git, leer [REQ-003](../REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md)
+y este handoff y revisar este cierre documental antes de planificar el siguiente
+incremento.
+El registro 4A siguiente permanece histórico; su próximo paso 4B queda cumplido
+solo en el alcance técnico interno aquí descrito.
+
+Corrección documental focal: 2026-09-17T11:04:24-03:00, Codex - implementador
+documental local. Se retiraron controles operativos transitorios del cierre 4B;
+publicación, PR, merge y producción siguen pendientes. Se precisó la evolución
+de órdenes sucesoras y se actualizó el avance técnico vigente en Backlog/Roadmap,
+sin modificar la evidencia de Testing ni los registros históricos.
 
 ## Cierre técnico interno del incremento 4A de REQ-003
 

@@ -2,6 +2,25 @@
 
 ## Ordenes de cobro Checkout Pro
 
+### Actualización vigente - incremento técnico 4B completado
+
+Timestamp: 2026-09-17T11:04:24-03:00
+Agente: Codex - implementador documental local
+Rama: `feature/checkout-pro-payment-order-application`; commit técnico: `1ba5ab1`.
+REQ-003 conserva `APROBADO` e implementación productiva completa `PENDIENTE`.
+
+- 4B completado y aprobado por Testing: servicio de aplicación, actor profesional
+  activo, ownership en contrato/perfil, contratos `CONFIRMADA`, obligación final
+  única y reserva durable antes del adaptador, con finalización atómica y replay.
+- El próximo paso 4B del registro histórico siguiente queda cumplido en ese
+  alcance técnico interno. No se acredita un flujo productivo para usuarios.
+- Pendientes: Mercado Pago real y creación HTTP, endpoints, UI/checkout/QR,
+  recuperación de incertidumbre, creación de sucesoras desde la aplicación,
+  integración de órdenes con webhooks/conciliación y efectos PRO/comisiones/facturación.
+  Publicación, PR, merge y producción pendientes. Próximo paso con planificación
+  y revisión separadas: creación real y frontera pública.
+- Evidencia aprobada y límites: [REQ-003](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#actualización-vigente---incremento-técnico-local-4b).
+
 ### Actualización posterior - incremento 4A
 
 Timestamp: 2026-09-16T22:40:04-03:00
