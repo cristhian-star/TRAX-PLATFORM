@@ -1,0 +1,104 @@
+name: mandobra_stabilization
+
+# Disposable credentials only. No host .env interpolation, bind mounts or secrets.
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: mandobra_stabilization-app:local
+  init: true
+  environment: &environment
+    APP_ENV: development
+    FLASK_ENV: development
+    FLASK_DEBUG: "0"
+    PYTHON_DOTENV_DISABLED: "1"
+    SECRET_KEY: stabilization-disposable-only-not-production
+    DATABASE_URL: postgresql+psycopg2://stabilization_user:stabilization_disposable@postgres:5432/mandobra_stabilization_db?connect_timeout=3
+    ALLOW_DEV_CREATE_ALL: "false"
+    ENABLE_DEV_QA_PANEL: "true"
+    TRAX_DEMO_PASSWORD: stabilization-demo-only
+    RATELIMIT_STORAGE_URI: memory://
+    MEDIA_STORAGE_PROVIDER: local
+    LOCAL_MEDIA_UPLOAD_ROOT: /app/app/static/uploads/professional_media
+    LOCAL_MEDIA_PUBLIC_BASE_URL: /static/uploads/professional_media
+    MEDIA_AUTO_PUBLISH: "true"
+    GOOGLE_MAPS_API_KEY: ""
+    CLOUDINARY_CLOUD_NAME: ""
+    CLOUDINARY_API_KEY: ""
+    CLOUDINARY_API_SECRET: ""
+    MERCADOPAGO_WEBHOOK_SECRET: ""
+    CHECKOUT_PRO_DELIVERY_ENABLED: "false"
+    MERCADOPAGO_ORDER_WEBHOOK_ENABLED: "false"
+    MERCADOPAGO_ORDER_RECONCILIATION_ENABLED: "false"
+    PAYMENT_EFFECTS_ENABLED: "false"
+    TRANSACTIONAL_COMMISSION_ENABLED: "false"
+  volumes:
+    - instance:/app/instance
+    - uploads:/app/app/static/uploads/professional_media
+  networks:
+    - runtime
+  restart: "no"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mandobra_stabilization_db
+      POSTGRES_USER: stabilization_user
+      POSTGRES_PASSWORD: stabilization_disposable
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - runtime
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U stabilization_user -d mandobra_stabilization_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+
+  migrate:
+    <<: *app
+    command: [python, -m, alembic, upgrade, head]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    <<: *app
+    networks:
+      - runtime
+      - http
+    ports:
+      - "127.0.0.1:5050:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; assert urllib.request.urlopen('http://127.0.0.1:5000/healthz', timeout=3).status == 200"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 12
+
+  seed:
+    <<: *app
+    profiles: [tools]
+    command: [python, scripts/dev_seed_professionals.py]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
+  instance:
+  uploads:
+
+networks:
+  runtime:
+    internal: true
+  http:

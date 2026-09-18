@@ -27,6 +27,9 @@ def create_app(config_class=None, initialize_schema=False):
     csrf.init_app(app)
     limiter.init_app(app)
 
+    from app.routes.health_routes import register_health_routes
+    register_health_routes(app)
+
     # Blueprints
     from app.routes.main_routes import main
     app.register_blueprint(main)

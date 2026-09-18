@@ -10,7 +10,7 @@ RUN addgroup --system app && adduser --system --ingroup app appuser
 
 COPY --chown=appuser:app . .
 
-RUN mkdir -p /app/instance /app/app/database \
+RUN mkdir -p /app/instance /app/app/database /app/app/static/uploads/professional_media \
     && chown -R appuser:app /app
 
 EXPOSE 5000
