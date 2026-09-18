@@ -37,6 +37,7 @@ def parse_mercadopago_webhook_notification(
     query_topic = _required_field(query, "type", "query parameters")
     x_signature = _required_field(request_headers, "x-signature", "headers")
     x_request_id = _required_field(request_headers, "x-request-id", "headers")
+    received_at = _aware_datetime(received_at, "received_at", decoded=True)
 
     verification = verify_mercadopago_webhook_signature(
         x_signature=x_signature,

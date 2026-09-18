@@ -18,7 +18,7 @@ class MercadoPagoWebhookSignatureTest(unittest.TestCase):
     @classmethod
     def _signature(cls, data_id, *, secret=None, request_id=None, timestamp=None):
         manifest = (
-            f"id:{data_id.lower()};"
+            f"id:{data_id};"
             f"request-id:{request_id or cls.REQUEST_ID};"
             f"ts:{timestamp or cls.TIMESTAMP};"
         )
@@ -51,7 +51,7 @@ class MercadoPagoWebhookSignatureTest(unittest.TestCase):
         )
         compare.assert_called_once()
 
-    def test_uppercase_data_id_is_lowercased_only_for_manifest(self):
+    def test_uppercase_data_id_preserves_case_in_manifest(self):
         original = "ORD01JQ4S4KY8HWQ6NA5PXB65B3D3"
         result = self._verify(original)
         self.assertEqual(result.data_id, original)
@@ -59,9 +59,11 @@ class MercadoPagoWebhookSignatureTest(unittest.TestCase):
         numeric = self._verify("123456")
         self.assertEqual(numeric.data_id, "123456")
 
-    def test_data_id_is_signature_sensitive_after_official_lowercasing(self):
+    def test_data_id_is_case_sensitive(self):
         signature = self._signature("ORDER-A")
-        self._verify("order-a", signature=signature, received_data_id="ORDER-A")
+        self._verify("ORDER-A", signature=signature)
+        with self.assertRaises(MercadoPagoWebhookSignatureError):
+            self._verify("order-a", signature=signature)
         with self.assertRaises(MercadoPagoWebhookSignatureError):
             self._verify("order-b", signature=signature)
 

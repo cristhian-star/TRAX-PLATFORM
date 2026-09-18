@@ -67,6 +67,8 @@ class Config:
     MEDIA_AUTO_PUBLISH = True
     MERCADOPAGO_WEBHOOK_SECRET = None
     CHECKOUT_PRO_DELIVERY_ENABLED = False
+    MERCADOPAGO_ORDER_WEBHOOK_ENABLED = False
+    MERCADOPAGO_ORDER_RECONCILIATION_ENABLED = False
 
     REQUIRED_ENV_VARS = ()
 
@@ -98,6 +100,8 @@ class Config:
         app_config["CHECKOUT_PRO_DELIVERY_ENABLED"] = _env_bool(
             "CHECKOUT_PRO_DELIVERY_ENABLED", cls.CHECKOUT_PRO_DELIVERY_ENABLED
         )
+        for name in ("MERCADOPAGO_ORDER_WEBHOOK_ENABLED", "MERCADOPAGO_ORDER_RECONCILIATION_ENABLED"):
+            app_config[name] = _env_bool(name, False)
 
 
 class DevelopmentConfig(Config):

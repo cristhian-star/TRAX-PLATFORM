@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import re
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 
 _SHA256_HEX = re.compile(r"[0-9a-fA-F]{64}")
@@ -24,24 +25,27 @@ def verify_mercadopago_webhook_signature(
     """Validate Mercado Pago's HMAC-SHA256 webhook signature.
 
     MANDOBRA applies a stricter fail-closed policy than the provider template:
-    every manifest component is mandatory. ``data_id`` is lowercased only in
-    the cryptographic manifest, while the returned value remains unchanged.
+    every manifest component is mandatory. ``data_id`` retains its exact case.
+    Temporal acceptance is evaluated separately after cryptographic verification.
     """
     signature = _required_text(x_signature, "x-signature")
     request_id = _required_text(x_request_id, "x-request-id", preserve=True)
     original_data_id = _required_text(data_id, "data.id", preserve=True)
     secret_value = _required_text(secret, "secret", preserve=True)
+    if (len(signature) > 1024 or len(request_id) > 256 or len(original_data_id) > 160
+            or len(secret_value) > 2048):
+        raise MercadoPagoWebhookSignatureError("webhook signature fields exceed limit")
     components = _signature_components(signature)
     timestamp = components["ts"]
     received_signature = components["v1"]
 
-    if not timestamp.isascii() or not timestamp.isdecimal():
+    if len(timestamp) > 13 or not timestamp.isascii() or not timestamp.isdecimal():
         raise MercadoPagoWebhookSignatureError("invalid webhook signature timestamp")
     if _SHA256_HEX.fullmatch(received_signature) is None:
         raise MercadoPagoWebhookSignatureError("invalid webhook signature digest")
 
     manifest = (
-        f"id:{original_data_id.lower()};"
+        f"id:{original_data_id};"
         f"request-id:{request_id};"
         f"ts:{timestamp};"
     )
@@ -86,3 +90,13 @@ def _required_text(value, field_name, *, preserve=False):
             f"missing required webhook field: {field_name}"
         )
     return value if preserve else value.strip()
+
+
+def webhook_timestamp_in_window(verification, received_at):
+    """Temporal policy only; never replace cryptographic verification."""
+    if (type(verification) is not MercadoPagoWebhookSignatureVerification
+            or not verification.verified or not isinstance(received_at, datetime)
+            or received_at.tzinfo is None or received_at.utcoffset() is None):
+        raise ValueError("invalid webhook receipt timestamp")
+    received_ms = int(received_at.astimezone(timezone.utc).timestamp() * 1000)
+    return abs(received_ms - int(verification.timestamp)) <= 600_000

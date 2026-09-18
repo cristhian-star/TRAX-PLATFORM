@@ -8,18 +8,23 @@ from unittest.mock import patch
 from app import create_app, db
 from app.config.config import TestingConfig
 from app.models.psp_event import PSPEventRecord
-from app.services.psp_event_inbox import register_or_get_event
+from app.services.payment_order_reconciliation_service import receive_order_event
+from app.models.payment_order_reconciliation import PaymentOrderReconciliationWork, PaymentOrderReconciliationQuarantine
 
 
 class MercadoPagoWebhookRoutesTest(unittest.TestCase):
     SECRET = "fictional-http-ingress-secret"
     REQUEST_ID = "request-http-123"
-    TIMESTAMP = "1742505638683"
+    TIMESTAMP = str(int(datetime(2026, 9, 12, 22, tzinfo=timezone.utc).timestamp() * 1000))
     NOW = datetime(2026, 9, 12, 22, tzinfo=timezone.utc)
 
     def setUp(self):
         self.app = create_app(config_class=TestingConfig)
         self.app.config["MERCADOPAGO_WEBHOOK_SECRET"] = self.SECRET
+        self.app.config["MERCADOPAGO_ORDER_WEBHOOK_ENABLED"] = True
+        self.clock_patch = patch("app.routes.mercadopago_webhook_routes._utc_now", return_value=self.NOW)
+        self.clock_patch.start()
+        self.addCleanup(self.clock_patch.stop)
         self.context = self.app.app_context()
         self.context.push()
         db.create_all()
@@ -30,9 +35,9 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
         db.drop_all()
         self.context.pop()
 
-    def _signature(self, data_id="123456", *, secret=None, request_id=None):
+    def _signature(self, data_id="ORD123456", *, secret=None, request_id=None):
         manifest = (
-            f"id:{data_id.lower()};"
+            f"id:{data_id};"
             f"request-id:{request_id or self.REQUEST_ID};"
             f"ts:{self.TIMESTAMP};"
         )
@@ -40,11 +45,11 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
             (secret or self.SECRET).encode(), manifest.encode(), hashlib.sha256
         ).hexdigest()
 
-    def _body(self, data_id="123456", **changes):
+    def _body(self, data_id="ORD123456", **changes):
         body = {
             "id": 9001,
-            "type": "payment",
-            "action": "payment.updated",
+            "type": "order",
+            "action": "order.updated",
             "data": {"id": data_id},
             "live_mode": False,
             "date_created": "2026-09-12T20:59:00Z",
@@ -53,7 +58,7 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
         body.update(changes)
         return body
 
-    def _post(self, data_id="123456", **changes):
+    def _post(self, data_id="ORD123456", **changes):
         signature = changes.pop("signature", self._signature(data_id))
         headers = changes.pop(
             "headers",
@@ -63,7 +68,7 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
             },
         )
         return self.client.post(
-            changes.pop("path", f"/api/webhooks/mercadopago?data.id={data_id}&type=payment"),
+            changes.pop("path", f"/api/webhooks/mercadopago?data.id={data_id}&type=order"),
             headers=headers,
             json=changes.pop("body", self._body(data_id)),
             **changes,
@@ -71,7 +76,7 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
 
     def _post_raw(self, payload, *, content_type="application/json"):
         return self.client.post(
-            "/api/webhooks/mercadopago?data.id=123456&type=payment",
+            "/api/webhooks/mercadopago?data.id=ORD123456&type=order",
             headers={
                 "X-Signature": (
                     f"ts={self.TIMESTAMP},v1={self._signature()}"
@@ -94,9 +99,10 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
         row = PSPEventRecord.query.one()
         self.assertEqual(row.received_at.replace(tzinfo=timezone.utc), self.NOW)
         self.assertEqual(row.provider, "mercadopago")
+        self.assertEqual(PaymentOrderReconciliationWork.query.one().event_id, row.id)
 
     def test_identical_replay_is_indistinguishable_and_keeps_first_receipt(self):
-        moments = [self.NOW, self.NOW.replace(hour=23)]
+        moments = [self.NOW, self.NOW.replace(minute=1)]
         with patch(
             "app.routes.mercadopago_webhook_routes._utc_now",
             side_effect=moments,
@@ -110,16 +116,60 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
         stored = PSPEventRecord.query.one().received_at.replace(tzinfo=timezone.utc)
         self.assertEqual(stored, self.NOW)
 
-    def test_material_conflict_returns_generic_409_without_updating_row(self):
+    def test_material_conflict_is_committed_to_quarantine_without_updating_row(self):
         self.assertEqual(self._post().status_code, 200)
-        response = self._post(body=self._body(action="payment.created"))
-        self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.get_json(), {"error": "conflict"})
-        self.assertEqual(PSPEventRecord.query.one().action, "payment.updated")
+        response = self._post(body=self._body(action="order.created"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"status": "accepted"})
+        self.assertEqual(PSPEventRecord.query.one().action, "order.updated")
+        self.assertEqual(PaymentOrderReconciliationQuarantine.query.one().reason, "EVENT_COLLISION")
+        self.assertEqual(PaymentOrderReconciliationWork.query.one().status, "QUARANTINED")
+
+    def test_failed_commit_never_acknowledges_and_rolls_back_work(self):
+        with patch.object(db.session, "commit", side_effect=RuntimeError("PRIVATE-COMMIT-MARKER")):
+            response = self._post()
+        self.assertEqual(response.status_code, 500)
+        self.assertNotIn("PRIVATE", response.get_data(as_text=True))
+        self.assertEqual(PSPEventRecord.query.count(), 0)
+        self.assertEqual(PaymentOrderReconciliationWork.query.count(), 0)
+
+    def test_only_order_topic_and_safe_resource_are_accepted(self):
+        for topic in ("payment", "orders", "orders_v2", "ORDER"):
+            response = self._post(path=f"/api/webhooks/mercadopago?data.id=ORD123456&type={topic}", body=self._body(type=topic))
+            self.assertEqual(response.status_code, 400)
+        self.assertEqual(self._post("../evil").status_code, 400)
+        self.assertEqual(PSPEventRecord.query.count(), 0)
+
+    def test_timestamp_outside_window_commits_quarantine_and_deduplicates(self):
+        self.assertEqual(self._post_raw(b"x" * 65537).status_code, 413)
+        with patch("app.routes.mercadopago_webhook_routes._utc_now", return_value=self.NOW.replace(hour=23)), patch.object(db.session, "commit", wraps=db.session.commit) as commit:
+            self.assertEqual(self._post("ORDaBc").status_code, 200)
+            self.assertEqual(self._post("ORDaBc").status_code, 200)
+        self.assertEqual(commit.call_count, 2)
+        self.assertEqual(PSPEventRecord.query.one().external_resource_id, "ORDaBc")
+        self.assertEqual(PaymentOrderReconciliationQuarantine.query.one().reason, "TIMESTAMP_OUTSIDE_WINDOW")
+        work = PaymentOrderReconciliationWork.query.one()
+        self.assertEqual(work.status, "QUARANTINED")
+        self.assertEqual(work.attempt_count, 0)
+
+    def test_outside_window_invalid_hmac_never_persists(self):
+        with patch("app.routes.mercadopago_webhook_routes._utc_now", return_value=self.NOW.replace(hour=23)):
+            self.assertEqual(self._post(signature="0" * 64).status_code, 401)
+        self.assertEqual(PSPEventRecord.query.count(), 0)
+        self.assertEqual(PaymentOrderReconciliationQuarantine.query.count(), 0)
+
+    def test_outside_window_failed_commit_rolls_back_without_ack_or_secret(self):
+        with patch("app.routes.mercadopago_webhook_routes._utc_now", return_value=self.NOW.replace(hour=23)), patch.object(db.session, "commit", side_effect=RuntimeError(self.SECRET)):
+            result = self._post()
+        self.assertEqual(result.status_code, 500)
+        self.assertNotIn(self.SECRET, result.get_data(as_text=True))
+        self.assertEqual(PSPEventRecord.query.count(), 0)
+        self.assertEqual(PaymentOrderReconciliationQuarantine.query.count(), 0)
+        self.assertEqual(PaymentOrderReconciliationWork.query.count(), 0)
 
     def test_invalid_signature_is_401_even_before_body_interpretation(self):
         response = self.client.post(
-            "/api/webhooks/mercadopago?data.id=123456&type=payment",
+            "/api/webhooks/mercadopago?data.id=ORD123456&type=order",
             headers={
                 "X-Signature": f"ts={self.TIMESTAMP},v1={'0' * 64}",
                 "X-Request-Id": self.REQUEST_ID,
@@ -136,14 +186,14 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
             "X-Request-Id": self.REQUEST_ID,
         }
         cases = (
-            self._post(path="/api/webhooks/mercadopago?data.id=123456&data.id=123456&type=payment"),
+            self._post(path="/api/webhooks/mercadopago?data.id=ORD123456&data.id=ORD123456&type=order"),
             self.client.post(
-                "/api/webhooks/mercadopago?data.id=123456&type=payment",
+                "/api/webhooks/mercadopago?data.id=ORD123456&type=order",
                 headers={**valid_headers, "Content-Type": "text/plain"},
                 data="{}",
             ),
             self.client.post(
-                "/api/webhooks/mercadopago?data.id=123456&type=payment",
+                "/api/webhooks/mercadopago?data.id=ORD123456&type=order",
                 headers={**valid_headers, "Content-Type": "application/json"},
                 data="{broken",
             ),
@@ -171,7 +221,7 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
             "app.routes.mercadopago_webhook_routes."
             "verify_mercadopago_webhook_signature"
         ) as verifier, patch(
-            "app.routes.mercadopago_webhook_routes.register_or_get_event"
+            "app.routes.mercadopago_webhook_routes.receive_order_event"
         ) as register:
             response = self._post(
                 headers=[
@@ -200,12 +250,12 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
 
     def test_strict_json_rejects_duplicate_keys_at_every_depth(self):
         payloads = (
-            b'{"id":9001,"type":"payment","action":"payment.updated",'
-            b'"action":"payment.updated","data":{"id":"123456"},'
+            b'{"id":9001,"type":"order","action":"order.updated",'
+            b'"action":"order.updated","data":{"id":"ORD123456"},'
             b'"live_mode":false,"date_created":"2026-09-12T20:59:00Z",'
             b'"api_version":"v1"}',
-            b'{"id":9001,"type":"payment","action":"payment.updated",'
-            b'"data":{"id":"123456","id":"123456"},'
+            b'{"id":9001,"type":"order","action":"order.updated",'
+            b'"data":{"id":"ORD123456","id":"ORD123456"},'
             b'"live_mode":false,"date_created":"2026-09-12T20:59:00Z",'
             b'"api_version":"v1"}',
         )
@@ -217,8 +267,8 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
 
     def test_strict_json_rejects_invalid_utf8_and_nonstandard_constants(self):
         base = (
-            b'{"id":9001,"type":"payment","action":"payment.updated",'
-            b'"data":{"id":"123456"},"live_mode":false,'
+            b'{"id":9001,"type":"order","action":"order.updated",'
+            b'"data":{"id":"ORD123456"},"live_mode":false,'
             b'"date_created":"2026-09-12T20:59:00Z","api_version":"v1"'
         )
         for payload in (b"{broken", b'{"value":"\xff"}', base + b',"value":NaN}', base + b',"value":Infinity}'):
@@ -262,7 +312,7 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
 
     def test_persistence_failure_rolls_back_and_session_recovers(self):
         with patch(
-            "app.routes.mercadopago_webhook_routes.register_or_get_event",
+            "app.routes.mercadopago_webhook_routes.receive_order_event",
             side_effect=RuntimeError("PRIVATE SQL DETAIL"),
         ), patch.object(db.session, "rollback", wraps=db.session.rollback) as rollback:
             response = self._post()
@@ -275,10 +325,10 @@ class MercadoPagoWebhookRoutesTest(unittest.TestCase):
 
     def test_route_does_not_call_provider_or_financial_processor(self):
         with patch(
-            "app.routes.mercadopago_webhook_routes.register_or_get_event",
-            wraps=register_or_get_event,
+            "app.routes.mercadopago_webhook_routes.receive_order_event",
+            wraps=receive_order_event,
         ):
-            response = self._post(body=self._body(action="payment.approved"))
+            response = self._post(body=self._body(action="order.approved"))
         self.assertEqual(response.status_code, 200)
         self.assertFalse(hasattr(PSPEventRecord.query.one(), "financial_status"))
 

@@ -85,6 +85,10 @@ def create_app(config_class=None, initialize_schema=False):
     from app.models.payment_order import PaymentOrder
     from app.models.payment_order_reservation import PaymentOrderReservation
     from app.models.psp_event import PSPEventRecord
+    from app.models.payment_order_reconciliation import (
+        PaymentOrderReconciliationWork, PaymentOrderReconciliationAttempt,
+        PaymentOrderReconciliationEvidence, PaymentOrderReconciliationQuarantine,
+    )
 
     if initialize_schema:
         if not app.config.get("ALLOW_SCHEMA_CREATE_ALL"):
