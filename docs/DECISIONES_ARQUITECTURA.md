@@ -1,5 +1,82 @@
 # DECISIONES DE ARQUITECTURA MANDOBRA
 
+## Cierre técnico local 4E aprobado por Testing
+
+Timestamp de registro documental: 2026-09-17T21:24:48-03:00
+Estado técnico local: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/mercadopago-payment-reconciliation`.
+Commit técnico: `8dc0e12`.
+Registro documental: Codex; dispositivo: laptop.
+Evidencia final de Testing suministrada para este cierre.
+
+4E implementa recepción y conciliación verificada de evidencia durable de
+Orders, sin efectos PRO, contables o comerciales. POST
+`/api/webhooks/mercadopago` acepta únicamente el tópico `order`; HMAC-SHA256
+con comparación constante conserva `data.id` case-sensitive. Inbox y trabajo
+durables, deduplicación, cuarentena e intentos son independientes de los
+estados informados por el webhook. La confirmación HTTP 200 ocurre únicamente
+después del commit durable; firma inválida responde 401 sin persistencia.
+
+La validación criptográfica está separada de la temporal: firma válida con
+timestamp en milisegundos fuera de la ventana inclusiva ±10 minutos queda en
+cuarentena durable `TIMESTAMP_OUTSIDE_WINDOW`, sin trabajo ejecutable ni consulta
+PSP. Colisiones preservan la primera recepción y quedan en cuarentena.
+`LEASE_DURATION_SECONDS = 60` y `STALE_LEASE_RECOVERY_SECONDS = 120` separan
+vencimiento del permiso de despacho/finalización y recuperación del trabajo
+abandonado. Entre 60 y 119 segundos no hay consulta; desde 120 segundos puede
+recuperarse con otro token. Fencing impide finalizar con lease vencido;
+ocho intentos programados como máximo, sin retries del transporte HTTP.
+
+Consulta `GET /v1/orders/{id}` fuera de una transacción local abierta, con
+credencial OAuth por profesional suministrada por un proveedor confiable
+inyectado, vinculada a profesional, cuenta PSP y entorno; sin fallback global.
+El onboarding, la custodia y la renovación OAuth permanecen pendientes.
+Se correlacionan orden externa, PaymentOrder, obligación, contrato y reserva;
+solo una respuesta autoritativa validada permite registrar evidencia normalizada
+de pagos, reembolsos y reversos, incluidos contracargos y pagos tardíos.
+El vencimiento contractual local sigue siendo la autoridad de entrega del
+checkout; registrar un pago tardío no habilita automáticamente efecto alguno.
+
+Suma Decimal exacta de reembolsos por pago asociado y por orden, deduplicada por
+identidad externa. El snapshot remoto y la evidencia acumulada durable deben
+respetar ambos límites. La validación acumulada se serializa bajo lock de
+PaymentOrder y fence SQLite: contradicciones quedan en cuarentena sin insertar
+nueva evidencia financiera válida; se conserva la evidencia histórica válida.
+
+Migración `20260917_02`, descendiente de `20260917_01`, incorpora trabajo,
+intentos, evidencia y cuarentena durables. Feature flags
+`MERCADOPAGO_ORDER_WEBHOOK_ENABLED=False` y
+`MERCADOPAGO_ORDER_RECONCILIATION_ENABLED=False` permanecen deshabilitados por
+defecto. No se declaran credenciales reales, cobros productivos ni conciliación
+financiera con efectos habilitados.
+
+Evidencia final acreditada de Testing:
+
+- Focales 4E: **96/96**.
+- Regresiones relacionadas: **197/197**.
+- PostgreSQL: **37/37**.
+- Suite completa: **653 ejecutadas, 648 aprobadas y 5 omisiones históricas**.
+- Migraciones SQLite/PostgreSQL, `compileall`, Alembic y `git diff --check`:
+  aprobados; head `20260917_02`.
+- Sin hallazgos P0–P3 pendientes.
+
+Los hallazgos P1/P2 y su corrección de `2026-09-17T21:04:23-03:00`, junto con
+la implementación de `2026-09-17T20:42:27-03:00`, se conservan en el
+[historial del handoff](HANDOFFS/ACTIVE_HANDOFF.md). Los resultados de aquella corrección
+(207/207 regresiones) son históricos; este cierre acredita los **197/197**
+del paquete final suministrado, sin reemplazar la evidencia anterior.
+
+Se cierra únicamente 4E técnico local y su retest: supera esos pendientes en
+registros anteriores, conservados íntegramente. REQ-003 continúa
+`estado: APROBADO` e `implementacion: PENDIENTE`; no se cierra Sprint 2 productivo.
+Pendientes reales: OAuth completo y custodia/renovación, fórmula de comisión,
+retornos, credenciales y prueba real, validación/activación productiva de la
+recepción y consulta PSP. Los efectos PRO, comerciales y contables de evidencia
+conciliada, pagos tardíos y reversos corresponden a 4F; producción permanece
+pendiente. La recepción y evidencia local de webhook/Orders ya están
+implementadas en 4E; no confundirlas con su activación productiva.
+
 ## Cierre técnico local 4D aprobado por Testing
 
 Timestamp de aprobación de Testing: 2026-09-17T16:14:10-03:00
