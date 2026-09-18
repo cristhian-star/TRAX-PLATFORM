@@ -80,6 +80,16 @@ def quarantine(session, event_id, digest, reason, now):
         Attempt.work_id.in_(select(Work.id).where(Work.event_id == event_id)),
         Attempt.outcome == "STARTED",
     ).values(outcome="QUARANTINED", finished_at=now, error_code=reason))
+    # Effects and quarantine linearize on the same order row. Keep Work -> Order
+    # lock order consistent with reconciliation completion; no external I/O here.
+    event = session.get(PSPEventRecord, event_id)
+    order = session.query(PaymentOrder).filter_by(
+        provider=event.provider, live_mode=not event.test_mode,
+        external_order_id=event.external_resource_id,
+    ).populate_existing().with_for_update().one_or_none()
+    if order is not None:
+        session.execute(update(PaymentOrder).where(PaymentOrder.id == order.id).values(
+            amount=PaymentOrder.amount, updated_at=PaymentOrder.updated_at))
 
 
 def receive_order_event(session, event, *, quarantine_reason=None):
@@ -255,6 +265,7 @@ class PaymentOrderReconciliationProcessor:
                 now = self._now()
                 if not _owned(work, token, now):
                     return "LEASE_LOST"
+                lease_deadline = work.lease_until
                 # SQLite needs a write fence as well; PostgreSQL has the row lock.
                 fenced = session.execute(update(Work).where(
                     Work.id == work_id, Work.status == "PROCESSING",
@@ -298,6 +309,11 @@ class PaymentOrderReconciliationProcessor:
                     ), ["payment_order_id", "snapshot_hash"])
                     work.status, attempt.outcome = "DONE", "RECONCILED"
                     work.last_error = None
+                # A quarantine/order lock can wait beyond the lease. Roll back
+                # this entire completion; the abandoned attempt remains durable.
+                if self._now() >= lease_deadline:
+                    session.rollback()
+                    return "LEASE_LOST"
                 work.lease_token = work.lease_until = None
                 attempt.finished_at, attempt.error_code = now, error
                 return work.status

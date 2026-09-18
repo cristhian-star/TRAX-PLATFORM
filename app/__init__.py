@@ -89,6 +89,12 @@ def create_app(config_class=None, initialize_schema=False):
         PaymentOrderReconciliationWork, PaymentOrderReconciliationAttempt,
         PaymentOrderReconciliationEvidence, PaymentOrderReconciliationQuarantine,
     )
+    from app.models.payment_effect import (
+        TransactionalCreditPolicy, PaymentEffectDecision, TransactionalCommission,
+        TransactionalCreditLot, TransactionalCreditGrant, TransactionalCreditAllocation,
+        PaymentEffectAudit,
+        PaymentEffectPaymentClaim,
+    )
 
     if initialize_schema:
         if not app.config.get("ALLOW_SCHEMA_CREATE_ALL"):

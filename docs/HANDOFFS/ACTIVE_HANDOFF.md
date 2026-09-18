@@ -1,3 +1,333 @@
+# Handoff vigente: cierre técnico local 4F aprobado
+
+Estado: COMPLETED
+
+Timestamp de registro documental: 2026-09-18T09:50:28-03:00
+Estado técnico local: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/payment-effects-pro-commission`.
+Commit técnico: `83581b3`.
+Registro documental: Codex; dispositivo: laptop.
+Evidencia final de Testing suministrada para este cierre, sin repetir su ejecución.
+
+4F implementa el motor interno durable de créditos y comisión comercial separado
+de evidencia PSP, contabilidad y facturación. Solo evidencia 4E correlacionada,
+acreditada, completa en ARS y sin contradicciones permite evaluar efectos.
+La política económica inyectada es versionada, explícita y obligatoria: precio
+mensual/umbral y moneda sin valores predeterminados. Comisión neta efectiva
+acumulada equivalente al precio mensual PRO genera 1 crédito; su consumo concede
+30 días PRO. No se reintroduce la regla histórica de 60 días.
+
+Acumulación y remanente Decimal exactos, consumo FIFO y lotes que vencen
+individualmente a los 40 días, sin rejuvenecer saldos anteriores. Idempotencia
+por evidencia e identidad financiera, locks y auditoría atómica protegen la
+aplicación durable. El reloj efectivo se obtiene después de todos los locks:
+se revalidan vencimiento y elegibilidad de lotes; un lote vencido durante la
+espera no se consume ni concede PRO. Concesión y auditoría comparten ese instante.
+
+Sin política o evidencia confiable de comisión neta efectiva: `PENDING_POLICY`,
+sin crédito ni extensión; no se presume comisión cero ni se infiere comisión
+neta de `marketplace_fee`. Suscripción paga no genera comisión transaccional.
+Pagos tardíos, temporalidad incierta, reembolsos, reversos y contracargos quedan
+`PENDING_REVIEW`, sin compensación ni revocación automática de efectos anteriores.
+La temporalidad UNKNOWN de 4E no se convierte automáticamente en pago puntual.
+
+`PAYMENT_EFFECTS_ENABLED=False` y `TRANSACTIONAL_COMMISSION_ENABLED=False`.
+Migración `20260917_03`, descendiente de `20260917_02`.
+No habilita disponibilidad productiva, cobros reales, contabilidad ni facturación.
+
+### Evidencia final y cierre de hallazgos
+
+- Testing aprobado: focales **66/66** y regresiones **363/363**.
+- PostgreSQL **42/42** más **3/3** reproducciones adversariales.
+- Suite completa: **694 aprobadas** y **5 omisiones históricas**.
+- Ambos P2 corregidos y sin hallazgos pendientes: tiempo efectivo tras locks y
+  claves generadas compatibles con el validador vigente. Tokens internos iniciados
+  con `_` y `-` generan claves válidas; dos POST secuenciales conservan la misma
+  clave estable, sin debilitar validación ni duplicar efectos.
+- La historia de ambos hallazgos, sus correcciones y validaciones previas se conserva.
+
+Este cierre acredita únicamente implementación técnica local 4F y su retest.
+Supera la pendencia técnica de 4F en los registros anteriores, que se conservan
+como historia de su fecha. REQ-001 y REQ-003 permanecen APROBADO/PENDIENTE para
+la implementación productiva; el Sprint 2 productivo continúa abierto.
+
+### Gate futuro obligatorio de producción
+
+La activación productiva permanece bloqueada hasta acreditar y aprobar:
+
+- Constitución/CUIT y asesoramiento fiscal.
+- Cuenta bancaria empresarial.
+- Cuenta empresarial Mercado Pago, aplicación y OAuth completo, incluida
+  custodia y renovación de credenciales por profesional.
+- Precio mensual, moneda y política comercial explícita y versionada.
+- Fórmula/tasa real de comisión, evidencia confiable de comisión neta efectiva
+  y tratamiento fiscal; no existen tasas o importes predeterminados aprobados.
+- Dominios HTTPS, URLs públicas y secretos con custodia adecuada.
+- Pruebas staging/live, monitoreo, soporte y respuesta a incidentes.
+- Aprobación legal, privacidad y términos.
+
+También siguen pendientes la integración operativa autorizada, retornos,
+tratamiento productivo de pagos tardíos y reversos, resolución de revisiones,
+contabilidad y facturación. El cierre local no satisface estos gates ni autoriza
+activar flags o emplear credenciales reales.
+
+Los registros previos se conservan íntegramente a continuación.
+
+---
+
+# Registro anterior preservado íntegramente
+
+# Handoff vigente: implementación autorizada 4F
+
+Estado: READY_TO_RESUME
+## Decisión vigente 4F: créditos y política económica obligatoria
+
+Timestamp: 2026-09-17T21:41:40-03:00
+Estado: APROBADO
+Implementación: PENDIENTE
+Responsable: Cristian Sánchez; registro: Codex, laptop.
+Rama: `feature/payment-effects-pro-commission`; base: `d3998e15418f1029273fa8887e9199d23dc4e3fb`.
+
+- 1 crédito se obtiene al acumular comisión neta efectiva equivalente al precio
+  mensual PRO vigente; 1 crédito concede 30 días PRO. El excedente se conserva.
+- Consumo FIFO y vencimiento individual de lotes a 40 días; nuevos aportes no
+  rejuvenecen saldos anteriores. No se reintroduce la regla histórica de 60 días.
+- Precio/umbral y moneda pertenecen a una política versionada, explícita y
+  obligatoria. No existe valor predeterminado.
+- Sin política o sin evidencia confiable de comisión efectiva: PENDING_POLICY,
+  sin crédito ni extensión. Un pago aprobado no prueba por sí solo una comisión.
+- Suscripción paga no genera comisión transaccional. Pagos tardíos, temporalidad
+  incierta, reembolsos y contracargos quedan PENDING_REVIEW; no hay compensación
+  ni revocación automática de efectos previos.
+- Flags deshabilitados hasta definir valores comerciales y habilitar producción.
+- Esta decisión supera únicamente la fórmula pendiente de registros anteriores;
+  los valores comerciales, cambios de precio, reversas y activación real siguen
+  pendientes. Se preservan historia, trial/gracia y períodos de 30 días.
+
+## Corrección focal posterior 4F: dos hallazgos P2
+
+Timestamp: 2026-09-18T08:51:52-03:00
+Estado: READY_TO_RESUME
+Responsable: Codex, laptop.
+Rama: `feature/payment-effects-pro-commission`.
+HEAD: `d3998e15418f1029273fa8887e9199d23dc4e3fb`.
+Origen: hallazgos P2 comunicados por Testing y corrección autorizada por Cristian Sánchez.
+
+### Hallazgos preservados y corrección
+
+1. P2 — tiempo efectivo anterior a locks: el consumo podía seleccionar un lote
+   vigente y, tras esperar el lock de orden, consumirlo con un reloj anterior a
+   su vencimiento real. Se adquieren locks de política, todos los lotes candidatos,
+   órdenes financiadoras, fuentes PRO y elegibilidad antes de volver a obtener
+   el reloj. Se excluyen los lotes vencidos usando ese instante posterior a locks;
+   se revalidan política, fuente activa, elegibilidad y evidencia antes del consumo.
+   Concesión, suscripción, auditoría de consumo y decisión/auditoría de acumulación
+   usan el mismo tiempo posterior a locks. Un lote vencido no pierde saldo ni
+   genera asignaciones o PRO. No cambian fórmula, FIFO ni períodos aprobados.
+2. P2 — incompatibilidad preexistente de claves de formularios: token_urlsafe
+   podía comenzar con `_` o `-`, rechazados por el validador contractual vigente.
+   El generador común añade `op-` al token completo y verifica el resultado con
+   ese mismo validador. Se conserva entropía; no se debilita la validación.
+   Negociaciones, contratación, comandos y reviews usan el generador compatible.
+   POST conserva la clave recibida; no se regenera durante replay.
+
+### Regresiones y límites de evidencia
+
+Tres regresiones nuevas 4F coordinan worker y reloj mediante Events, sin sleeps:
+se pausa el write fence real de orden después de seleccionar lotes, se avanza
+el reloj y se libera el worker. Reproducen de forma determinista el orden de
+espera PostgreSQL en SQLite descartable; no sustituyen el retest PostgreSQL.
+Cubren consumo explícito al vencimiento exacto, consumo válido con timestamps
+posteriores y acumulación nueva con un lote previo que vence durante la espera.
+Dos regresiones HTTP fuerzan tokens iniciados con `_` y `-`: GET entrega una
+clave válida y dos POST secuenciales conservan esa clave, con una sola review,
+claim, evento y auditoría. Se impide explícitamente regenerarla durante POST.
+
+Validación final:
+- Focales 4F: 44/44; rutas de reviews: 13/13; corrida conjunta 57/57.
+- Regresiones relacionadas ampliadas: 368/368 en 31 módulos.
+- Compileall y AST de los cuatro Python afectados: aprobados.
+- UTF-8, enlaces, conservación del historial y git diff --check: aprobados.
+- Focales incluyen migración SQLite y DDL PostgreSQL offline, sin conexión.
+- Suite completa y PostgreSQL final no repetidos: corresponden al retest independiente.
+- Primer ensayo de fixtures detectó dos errores de preparación: una suscripción
+  paga excluía legítimamente la comisión. Se corrigió el fixture a una fuente
+  transaccional activa; la corrida final no tiene fallos ni errores.
+
+Archivos afectados por esta corrección:
+- app/services/payment_effect_service.py
+- app/routes/operation_routes.py
+- tests/test_payment_effect_credits.py
+- tests/test_sprint7_contract_review_routes_ui_moderation.py
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Se preservan los 13 cambios recuperados; los dos archivos de rutas/pruebas
+incorporados por la corrección de claves llevan el total a 15 cambios locales.
+Rama y HEAD preservados, staging vacío; sin commit, push, PR, merge ni deploy.
+No hubo merge: no autorizado y corresponde retest independiente de ambos P2.
+Flags PAYMENT_EFFECTS_ENABLED y TRANSACTIONAL_COMMISSION_ENABLED siguen False;
+no hay credenciales, llamadas reales ni activación productiva. Migración 03
+sin cambios. Los pendientes comerciales y productivos anteriores se mantienen.
+Próximo paso: retest independiente de Testing, incluida reproducción PostgreSQL
+sobre base descartable; no utilizar trax_db ni habilitar efectos en producción.
+Estado final: CORRECCION_P2_4F_PENDIENTE_DE_RETEST.
+
+## Reanudación y cierre de validación local 4F
+
+Timestamp: 2026-09-18T08:19:36-03:00
+Estado: READY_TO_RESUME
+Responsable: Codex, laptop.
+Rama: `feature/payment-effects-pro-commission`.
+HEAD: `d3998e15418f1029273fa8887e9199d23dc4e3fb`.
+
+Se recuperaron íntegramente los 13 cambios existentes: motor de créditos,
+modelos, migración, integración de locks, flags, documentación y pruebas.
+La implementación funcional ya estaba completa; no se reinició ni sobrescribió.
+Se completó la validación de cierre interrumpida: el historial del handoff es
+idéntico al de HEAD normalizando únicamente finales LF/CRLF. El fallo anterior
+era una comparación binaria entre finales de línea diferentes, sin pérdida
+de registros históricos. Esta entrada conserva íntegramente el cierre anterior.
+
+Validaciones repetidas sobre el estado local actual:
+- Focales 4F: 41/41, sin fallos ni errores.
+- Regresiones relacionadas: 324/324 en 27 módulos, sin fallos ni errores.
+- Compileall focal, AST, UTF-8, mojibake, enlaces relativos y whitespace: aprobados.
+- Alembic: head único `20260917_03`, descendiente de `20260917_02`.
+- Migración SQLite descartable y DDL PostgreSQL offline: aprobados por focales.
+- Git diff --check: aprobado.
+- Suite completa y PostgreSQL real no ejecutados; reservados para Testing final.
+
+La fórmula aprobada conserva Decimal exacto, remanente FIFO, vencimiento de
+lotes a 40 días y concesiones de 30 días por crédito. Política y constancia de
+comisión efectiva son obligatorias y confiables, sin valores predeterminados.
+Pagos tardíos, temporalidad incierta y reversos quedan a revisión, sin revocación
+ni compensación automática. Ambos flags permanecen False. No hay activación
+productiva ni llamadas reales. Continúan los pendientes comerciales y fuentes
+confiables detallados en el cierre anterior; UNKNOWN de 4E no se transforma.
+
+Único archivo editado durante esta reanudación: este handoff, para registrar
+validaciones y continuidad. Los otros doce cambios recuperados se preservaron.
+Estado Git: 13 archivos modificados/nuevos, staging vacío y HEAD preservado.
+Sin commit, push, PR, merge ni deploy; no hubo merge por falta de autorización
+y porque corresponde primero revisión y Testing independiente.
+Próximo paso: paquete de Testing final, con suite completa y PostgreSQL
+estrictamente descartable; no utilizar trax_db ni habilitar flags productivos.
+Estado final: IMPLEMENTACION_4F_PENDIENTE_DE_REVISION.
+
+## Cierre técnico local de implementación 4F
+
+Timestamp: 2026-09-17T22:06:54-03:00
+Estado: READY_TO_RESUME
+Implementación interna validada; pendiente de revisión y Testing independiente.
+HEAD: `d3998e15418f1029273fa8887e9199d23dc4e3fb`.
+Origin verificado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+### Motor y límites
+
+`PaymentEffectService` se compone explícitamente con `CreditPolicy` obligatoria,
+versionada, precio Decimal positivo y moneda ARS coherente con 4E; sin defaults,
+FX ni porcentaje de comisión inventado. `EffectiveCommission` es una constancia
+confiable inyectada, vinculada a evidencia/hash, orden, profesional, entorno,
+identidad de liquidación y fechas separadas de pago y comisión efectiva.
+No inferir comisión neta efectiva de marketplace_fee o de pago aprobado.
+Los proveedores se invocan fuera de transacción local y el contexto se revalida.
+Sin política/proveedor/constancia confiable: PENDING_POLICY sin crédito ni PRO.
+
+Ocho modelos separados: política, decisión por evidencia, comisión comercial,
+claim de identidad financiera, lotes, concesiones, asignaciones FIFO y auditoría.
+Idempotencia por evidencia, orden y liquidación; la identidad PSP del pago no
+puede financiar dos órdenes. Un snapshot distinto no reacredita una comisión.
+Acumulación y remanente Decimal exactos: cada lote guarda el numerador monetario
+contra un umbral inmutable; no se redondean fracciones de crédito. SQLite usa
+texto decimal exacto; PostgreSQL Numeric(64,2). Se conserva excedente y la fecha
+individual de acreditación/vencimiento a 40 días, incluso después de pasar a FREE.
+
+Conversión consume FIFO un umbral completo (1 crédito) y concede 30 días PRO
+TRANSACTIONAL con asignaciones trazables, una sola vez por período. Períodos
+activos, trial/gracia representados por la fuente existente, no se interrumpen.
+El excedente queda disponible para el siguiente vencimiento; no se consumen
+varios períodos futuros automáticamente. Suscripción paga al instante del pago
+no genera comisión transaccional. Una fuente futura financiada que se solaparía
+con la concesión bloquea conversión para revisión. Mezcla/redefinición de política
+no tiene conversión económica aprobada: queda pendiente de revisión.
+
+Locks de usuario, verificación, órdenes y lotes protegen efectos y consumo.
+La cuarentena 4E toma el lock común de orden, conservando Work → Order; no cambia
+HTTP, firma, backoff ni duración de lease. Se revalida el lease después de una
+espera y se revierte íntegramente una finalización que exceda su permiso.
+Concesión, remanente, decisión y auditoría se confirman en una transacción.
+Fallo/commit fallido revierte todo; excepciones públicas neutrales, sin secretos,
+__context__ ni __cause__. Review durable no se borra mediante replay.
+
+Temporalidad UNKNOWN o pago tardío, cuarentena, evidencia contradictoria,
+reembolso parcial/total o contracargo impiden efectos y/o generan revisión.
+No se cancelan suscripciones, compensan créditos ni modifican comisión efectiva
+histórica automáticamente. Contabilidad/facturación están separadas y ausentes.
+`PAYMENT_EFFECTS_ENABLED=False` y `TRANSACTIONAL_COMMISSION_ENABLED=False`.
+Sin endpoints, OAuth completo, credenciales o consultas reales, ni producción.
+
+### Migración y validación
+
+Migración/head único `20260917_03`, descendiente de `20260917_02`.
+Upgrade–downgrade–upgrade sobre SQLite descartable conserva datos anteriores.
+Downgrade de ledger poblado se rechaza: necesita plan separado de preservación
+para no dejar derechos PRO sin trazabilidad; no se revocan automáticamente.
+DDL PostgreSQL compilado offline solamente, sin conexión ni gate PostgreSQL real.
+
+- Focales finales 4F: **41/41** en dos módulos.
+- Regresiones relacionadas: **324/324** en 27 módulos PRO, 4A–4E, PSP,
+  persistencia, migraciones, seguridad y configuración.
+- Después de integrar el lock común y fencing, revalidación final conjunta:
+  **138/138** (41 focales 4F + 97 relacionadas 4E/head).
+- Compileall focal, AST/UTF-8, enlaces, Alembic heads y git diff --check: aprobados.
+- Suite completa y PostgreSQL real no ejecutados: reservados para Testing final.
+- No se usaron bases persistentes ni trax_db; transportes y precios ficticios.
+
+### Documentación, Git y continuidad
+
+Decisión registrada primero en REQ-001, decisiones arquitectónicas y este handoff.
+Reglas vigentes 9/12 y pendientes económicos realineados; textos sustituidos
+conservados explícitamente como historia. No se reintroducen los 60 días.
+REQ-001 sigue APROBADO/IMPLEMENTACION_PARCIAL; implementación productiva pendiente.
+Registros 4E y anteriores permanecen íntegros.
+
+Archivos modificados/nuevos:
+- app/models/payment_effect.py
+- app/services/payment_effect_service.py
+- migrations/versions/20260917_03_payment_effect_credits.py
+- tests/test_payment_effect_credits.py
+- tests/test_payment_effect_migration.py
+- app/__init__.py
+- app/config/config.py
+- app/services/payment_order_reconciliation_service.py
+- docs/DECISIONES_ARQUITECTURA.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/REQUISITOS/REQ-001-activacion-y-vigencia-pro.md
+- tests/test_payment_order_application_migration.py
+- tests/test_payment_order_reconciliation_migration.py
+
+Rama y HEAD preservados; 13 cambios sin staging ni commit. Sin push/PR/merge/deploy.
+No hubo merge: no autorizado y falta revisión y Testing independiente.
+Pendientes: revisión, suite completa/gate PostgreSQL descartable independiente,
+valores comerciales aprobados de política, fuente de comisión neta efectiva y
+certificación confiable de temporalidad. 4E actual conserva UNKNOWN normalmente;
+el motor no lo transforma en pago puntual. También quedan separados OAuth real,
+trial/onboarding, aplicación operativa del consumo al vencimiento, consentimiento,
+resolución manual de revisiones, reversas comerciales, contabilidad y facturación.
+Flags deben seguir False hasta decisiones comerciales y activación autorizada.
+
+Para retomar, verificar esta rama/HEAD y los 13 cambios; no usar trax_db ni
+credenciales reales. Focales:
+`.venv/Scripts/python.exe -B -m unittest tests.test_payment_effect_credits tests.test_payment_effect_migration`.
+Siguiente paso: revisión y paquete de Testing final con PostgreSQL descartable;
+no integrar ni habilitar cobros productivos a partir de esta validación local.
+Estado final: IMPLEMENTACION_4F_PENDIENTE_DE_REVISION.
+
+---
+
+# Registro anterior preservado íntegramente
+
 # Handoff vigente: cierre técnico local 4E aprobado
 
 Estado: COMPLETED

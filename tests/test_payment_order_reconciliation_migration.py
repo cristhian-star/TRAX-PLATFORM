@@ -26,7 +26,7 @@ class ReconciliationMigrationTest(unittest.TestCase):
             try:
                 with patch.dict(os.environ, {"DATABASE_URL": url}):
                     scripts = ScriptDirectory.from_config(config)
-                    self.assertEqual(scripts.get_heads(), ["20260917_02"])
+                    self.assertEqual(scripts.get_heads(), ["20260917_03"])
                     self.assertEqual(scripts.get_revision("20260917_02").down_revision, "20260917_01")
                     command.upgrade(config, "20260917_01")
                     with engine.begin() as connection:
