@@ -5,11 +5,130 @@ estado: APROBADO
 fecha_aprobacion: 2026-09-03T20:38:47-03:00
 responsable: Cristian Sánchez
 rama_documental: docs/spec-pro-facturacion-mvp
-implementacion: IMPLEMENTACION_PARCIAL
-ultima_revision: 2026-09-17T12:14:36-03:00
+implementacion: PENDIENTE
+ultima_revision: 2026-09-18T09:50:28-03:00
 ---
 
 # REQ-001 - Activacion y vigencia de MANDOBRA PRO
+
+## Cierre técnico local 4F aprobado por Testing
+
+Timestamp de registro documental: 2026-09-18T09:50:28-03:00
+Estado técnico local: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/payment-effects-pro-commission`.
+Commit técnico: `83581b3`.
+Registro documental: Codex; dispositivo: laptop.
+Evidencia final de Testing suministrada para este cierre, sin repetir su ejecución.
+
+4F implementa el motor interno durable de créditos y comisión comercial separado
+de evidencia PSP, contabilidad y facturación. Solo evidencia 4E correlacionada,
+acreditada, completa en ARS y sin contradicciones permite evaluar efectos.
+La política económica inyectada es versionada, explícita y obligatoria: precio
+mensual/umbral y moneda sin valores predeterminados. Comisión neta efectiva
+acumulada equivalente al precio mensual PRO genera 1 crédito; su consumo concede
+30 días PRO. No se reintroduce la regla histórica de 60 días.
+
+Acumulación y remanente Decimal exactos, consumo FIFO y lotes que vencen
+individualmente a los 40 días, sin rejuvenecer saldos anteriores. Idempotencia
+por evidencia e identidad financiera, locks y auditoría atómica protegen la
+aplicación durable. El reloj efectivo se obtiene después de todos los locks:
+se revalidan vencimiento y elegibilidad de lotes; un lote vencido durante la
+espera no se consume ni concede PRO. Concesión y auditoría comparten ese instante.
+
+Sin política o evidencia confiable de comisión neta efectiva: `PENDING_POLICY`,
+sin crédito ni extensión; no se presume comisión cero ni se infiere comisión
+neta de `marketplace_fee`. Suscripción paga no genera comisión transaccional.
+Pagos tardíos, temporalidad incierta, reembolsos, reversos y contracargos quedan
+`PENDING_REVIEW`, sin compensación ni revocación automática de efectos anteriores.
+La temporalidad UNKNOWN de 4E no se convierte automáticamente en pago puntual.
+
+`PAYMENT_EFFECTS_ENABLED=False` y `TRANSACTIONAL_COMMISSION_ENABLED=False`.
+Migración `20260917_03`, descendiente de `20260917_02`.
+No habilita disponibilidad productiva, cobros reales, contabilidad ni facturación.
+
+### Evidencia final y cierre de hallazgos
+
+- Testing aprobado: focales **66/66** y regresiones **363/363**.
+- PostgreSQL **42/42** más **3/3** reproducciones adversariales.
+- Suite completa: **694 aprobadas** y **5 omisiones históricas**.
+- Ambos P2 corregidos y sin hallazgos pendientes: tiempo efectivo tras locks y
+  claves generadas compatibles con el validador vigente. Tokens internos iniciados
+  con `_` y `-` generan claves válidas; dos POST secuenciales conservan la misma
+  clave estable, sin debilitar validación ni duplicar efectos.
+- La historia de ambos hallazgos, sus correcciones y validaciones previas se conserva.
+
+Este cierre acredita únicamente implementación técnica local 4F y su retest.
+Supera la pendencia técnica de 4F en los registros anteriores, que se conservan
+como historia de su fecha. REQ-001 y REQ-003 permanecen APROBADO/PENDIENTE para
+la implementación productiva; el Sprint 2 productivo continúa abierto.
+
+### Gate futuro obligatorio de producción
+
+La activación productiva permanece bloqueada hasta acreditar y aprobar:
+
+- Constitución/CUIT y asesoramiento fiscal.
+- Cuenta bancaria empresarial.
+- Cuenta empresarial Mercado Pago, aplicación y OAuth completo, incluida
+  custodia y renovación de credenciales por profesional.
+- Precio mensual, moneda y política comercial explícita y versionada.
+- Fórmula/tasa real de comisión, evidencia confiable de comisión neta efectiva
+  y tratamiento fiscal; no existen tasas o importes predeterminados aprobados.
+- Dominios HTTPS, URLs públicas y secretos con custodia adecuada.
+- Pruebas staging/live, monitoreo, soporte y respuesta a incidentes.
+- Aprobación legal, privacidad y términos.
+
+También siguen pendientes la integración operativa autorizada, retornos,
+tratamiento productivo de pagos tardíos y reversos, resolución de revisiones,
+contabilidad y facturación. El cierre local no satisface estos gates ni autoriza
+activar flags o emplear credenciales reales.
+
+Registro del frontmatter anterior: ultima_revision `2026-09-17T21:41:40-03:00`;
+implementacion `IMPLEMENTACION_PARCIAL`. El estado APROBADO se conserva.
+
+## Decisión vigente 4F: créditos y política económica obligatoria
+
+Timestamp: 2026-09-17T21:41:40-03:00
+Estado: APROBADO
+Implementación: PENDIENTE
+Responsable: Cristian Sánchez; registro: Codex, laptop.
+Rama: `feature/payment-effects-pro-commission`; base: `d3998e15418f1029273fa8887e9199d23dc4e3fb`.
+
+- 1 crédito se obtiene al acumular comisión neta efectiva equivalente al precio
+  mensual PRO vigente; 1 crédito concede 30 días PRO. El excedente se conserva.
+- Consumo FIFO y vencimiento individual de lotes a 40 días; nuevos aportes no
+  rejuvenecen saldos anteriores. No se reintroduce la regla histórica de 60 días.
+- Precio/umbral y moneda pertenecen a una política versionada, explícita y
+  obligatoria. No existe valor predeterminado.
+- Sin política o sin evidencia confiable de comisión efectiva: PENDING_POLICY,
+  sin crédito ni extensión. Un pago aprobado no prueba por sí solo una comisión.
+- Suscripción paga no genera comisión transaccional. Pagos tardíos, temporalidad
+  incierta, reembolsos y contracargos quedan PENDING_REVIEW; no hay compensación
+  ni revocación automática de efectos previos.
+- Flags deshabilitados hasta definir valores comerciales y habilitar producción.
+- Esta decisión supera únicamente la fórmula pendiente de registros anteriores;
+  los valores comerciales, cambios de precio, reversas y activación real siguen
+  pendientes. Se preservan historia, trial/gracia y períodos de 30 días.
+
+### Texto normativo anterior preservado como historia
+
+Las siguientes formulaciones fueron sustituidas prospectivamente por la
+decisión 4F anterior; no expresan la fórmula vigente:
+
+```text
+9. Cada comision efectiva de MANDOBRA genera creditos internos sujetos a una
+   conversion todavia pendiente; no extiende por si sola una cantidad fija de
+   dias.
+
+12. Al vencer la prueba o un periodo transaccional, un saldo suficiente puede
+    consumir un umbral equivalente al precio de 30 dias de suscripcion y
+    conceder 30 dias transaccionales. Sin fuente vigente ni saldo suficiente,
+
+- Precio, porcentaje, base de comision, conversion y moneda contable de los
+  creditos no estan definidos. La periodicidad aprobada es de 30 dias fijos.
+
+- Precio de la suscripcion y formula de conversion a creditos.
+```
 
 ## PROBLEMA
 
@@ -74,9 +193,10 @@ presente requisito.
    haya sido completada y validada.
 8. La activacion transaccional inicial debe conceder una prueba de 30 dias
    corridos.
-9. Cada comision efectiva de MANDOBRA genera creditos internos sujetos a una
-   conversion todavia pendiente; no extiende por si sola una cantidad fija de
-   dias.
+9. Cada comision neta efectiva de MANDOBRA aporta a creditos internos: al
+   acumular el precio mensual PRO de la politica vigente se obtiene 1 credito.
+   Ese credito concede 30 dias al consumirse; el excedente conserva su vencimiento.
+   Precio/umbral y moneda son explicitos, versionados y obligatorios, sin defaults.
 10. Cada lote de creditos vence individualmente a los 40 dias desde su
     acreditacion. Se consumen primero los mas antiguos; nuevos lotes no
     rejuvenecen los anteriores y el excedente conserva su vencimiento.
@@ -86,8 +206,8 @@ presente requisito.
     no los generan. Reembolsos y contracargos requieren una politica de reversa
     aun pendiente.
 12. Al vencer la prueba o un periodo transaccional, un saldo suficiente puede
-    consumir un umbral equivalente al precio de 30 dias de suscripcion y
-    conceder 30 dias transaccionales. Sin fuente vigente ni saldo suficiente,
+    consumir 1 credito mediante FIFO y conceder 30 dias transaccionales.
+    Sin fuente vigente ni saldo suficiente,
     el usuario vuelve a `FREE`; pasar a FREE no borra creditos aun vigentes.
 13. En la modalidad por suscripcion, PRO debe permanecer activo durante el
     periodo efectivamente pagado.
@@ -185,8 +305,9 @@ presente requisito.
 ## RESTRICCIONES
 
 - El porcentaje de comision no esta definido.
-- Precio, porcentaje, base de comision, conversion y moneda contable de los
-  creditos no estan definidos. La periodicidad aprobada es de 30 dias fijos.
+- Valores comerciales de precio/umbral, porcentaje, base de comision y moneda
+  no estan definidos. La formula de creditos esta aprobada en la decision 4F;
+  exige politica economica explicita y versionada. La periodicidad es de 30 dias.
 - Decisión documental de 2026-09-17T12:14:36-03:00, Cristian Sánchez: para REQ-003
   se aprueban Checkout Pro vía Orders API, OAuth del profesional receptor y
   comisión marketplace mediante `marketplace_fee`. Validación operativa y
@@ -309,7 +430,7 @@ resolverse antes de implementar; este requisito no inventa su solucion tecnica.
 ### PRO
 
 - Porcentaje de comision.
-- Precio de la suscripcion y formula de conversion a creditos.
+- Valores comerciales de precio/umbral y moneda de la politica versionada.
 - Catalogo completo de beneficios y limites.
 - Renovacion, cancelacion y mora.
 - Tratamiento de contracargos.

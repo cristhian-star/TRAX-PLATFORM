@@ -1,5 +1,27 @@
 # PRO - Refinamiento comercial, PSP y plan de tres sprints
 
+## Cierre técnico local 4F aprobado por Testing
+
+Timestamp de registro documental: 2026-09-18T09:50:28-03:00
+Rama: `feature/payment-effects-pro-commission`; commit técnico: `83581b3`.
+Política versionada obligatoria, sin defaults: comisión neta efectiva acumulada
+equivalente al precio mensual PRO genera 1 crédito; su consumo concede 30 días.
+Remanente Decimal exacto, FIFO, lotes de 40 días, idempotencia, locks y auditoría
+atómica. Reloj posterior a locks: un lote vencido durante la espera no concede PRO.
+Sin política/evidencia confiable: PENDING_POLICY. Suscripción paga no genera
+comisión transaccional. Pagos tardíos, temporalidad incierta y reversos quedan a
+revisión, sin compensación ni revocación automática. Ambos flags False.
+Migración `20260917_03`, descendiente de `20260917_02`.
+Evidencia final suministrada de Testing: focales 66/66, regresiones 363/363,
+PostgreSQL 42/42 + 3/3 adversariales; suite 694 aprobadas y 5 omisiones históricas.
+Ambos P2 corregidos, sin hallazgos pendientes. Historia preservada.
+REQ-001 y REQ-003 siguen APROBADO/PENDIENTE; Sprint 2 productivo continúa abierto.
+Este cierre supera únicamente la pendencia técnica local 4F de registros previos;
+no habilita disponibilidad productiva, cobros reales, contabilidad ni facturación.
+Gate futuro: [producción 4F](../DECISIONES_ARQUITECTURA.md#gate-futuro-obligatorio-de-producción).
+Detalle: [REQ-001](../REQUISITOS/REQ-001-activacion-y-vigencia-pro.md#cierre-técnico-local-4f-aprobado-por-testing)
+y [REQ-003](../REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#cierre-técnico-local-4f-aprobado-por-testing).
+
 Timestamp de actualizacion: 2026-09-07T21:31:53-03:00
 Timestamp de cierre documental: 2026-09-07T21:54:36-03:00
 Estado: CERRADO_DOCUMENTALMENTE_INTEGRACION_GIT_PENDIENTE
