@@ -1,8 +1,16 @@
 # Alembic en MANDOBRA
 
-## Head de identidad PSP contextual
+## Head vigente y diagnóstico Docker
 
-Desde 2026-09-11, `20260911_02` es el head único y desciende de
+El head vigente es `20260917_03`, descendiente de `20260917_02`.
+Para una base nueva de diagnóstico usar el servicio `migrate` del
+[Compose descartable](RUNBOOKS/DOCKER_STABILIZATION.md); web espera su éxito.
+No ejecutar estas validaciones sobre `trax_db` ni adoptar esquemas históricos
+marcando revisiones sin comprobar qué cambios están realmente aplicados.
+
+## Identidad PSP contextual (historia)
+
+Al 2026-09-11, `20260911_02` era el head único y desciende de
 `20260911_01`. Agrega contexto PSP nullable a `payment_attempts`; no realiza
 backfill y su downgrade conserva la bandeja creada por su revisión padre.
 
@@ -19,13 +27,10 @@ Alembic obtiene la URI desde `create_app().config["SQLALCHEMY_DATABASE_URI"]`; n
 
 ## Baseline inicial
 
-La revision `initial_schema_baseline` representa el schema ORM actual. Como la base DEV existente ya contiene tablas y datos, se registra con `stamp` en lugar de volver a crear tablas:
-
-```powershell
-alembic stamp head
-```
-
-`stamp` solamente marca la version aplicada en `alembic_version`; no borra ni transforma datos existentes. Para una base nueva vacia, usar `alembic upgrade head`.
+La revisión `20260527_01` es la baseline inicial, no el esquema ORM actual.
+Una base nueva vacía se crea mediante `alembic upgrade head`. La adopción de
+una base histórica exige auditoría previa del esquema y de las revisiones ya
+aplicadas: marcar el head sin ejecutar migraciones ocultaría cambios pendientes.
 
 ## Comandos habituales
 
