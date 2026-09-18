@@ -14,20 +14,24 @@ MANDOBRA es una plataforma Flask para conectar clientes con profesionales, gesti
 
 El entorno principal del proyecto es Docker. No se debe depender de `python run.py` para validar la aplicacion local completa.
 
-Desde la raiz del repositorio:
+Para diagnóstico reproducible usar el entorno descartable independiente. No
+comparte base, red ni volúmenes con `trax-postgres` o `trax_db`:
 
 ```bash
-docker compose down
-docker compose up --build -d
-docker compose ps
-docker compose logs trax-web --tail=100
+docker compose --env-file .env.example -p mandobra_stabilization -f docker-compose.stabilization.yml build web
+docker compose --env-file .env.example -p mandobra_stabilization -f docker-compose.stabilization.yml up -d --no-build --wait --wait-timeout 120
 ```
 
 Aplicacion local:
 
 ```text
-http://localhost:5000/
+http://127.0.0.1:5050/
 ```
+
+Procedimiento completo, seed explícito y teardown limitado al proyecto:
+[Docker descartable](docs/RUNBOOKS/DOCKER_STABILIZATION.md).
+El Compose histórico `docker-compose.yml` mantiene el entorno persistente en
+5000; no usarlo para estas pruebas ni detener sus servicios.
 
 ## Base de datos
 

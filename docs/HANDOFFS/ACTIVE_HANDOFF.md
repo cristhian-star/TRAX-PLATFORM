@@ -1,3 +1,122 @@
+# Corrección focal Docker P2: exclusión de Obsidian
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-18T11:04:43-03:00
+Responsable: Codex; dispositivo: laptop.
+Rama: `fix/platform-runtime-stabilization`.
+HEAD conservado: `a6989619c553a96713baa6f35572fe48f7181110`.
+Estado: corrección local validada, pendiente de retest independiente.
+
+Hallazgo P2: el contexto Docker incluía `docs/.obsidian/` y su configuración
+local (`app.json`, `appearance.json`, `core-plugins.json`, `graph.json`,
+`workspace.json`). La imagen no debe incorporar estos artefactos del editor.
+Corrección: `.dockerignore` excluye `.obsidian/` y `**/.obsidian/`, en la raíz y
+cualquier profundidad, sin excluir documentación Markdown.
+
+Regresiones en `tests/test_runtime_health.py`: reglas de exclusión y comprobación
+real del árbol `/app` dentro de la imagen, incluidos los cinco JSON y conservación
+de README/handoff Markdown. Activación explícita con `DOCKER_IMAGE_CHECK_ROOT=/app`.
+Comando de regresión independiente, sin red, mounts ni conexión DB:
+
+```powershell
+docker run --rm --network none --label com.docker.compose.project=mandobra_stabilization --env DOCKER_IMAGE_CHECK_ROOT=/app --env PYTHON_DOTENV_DISABLED=1 --entrypoint python mandobra_stabilization-app:local -B -m unittest -v tests.test_runtime_health.DockerContextTest
+```
+
+Validaciones: build `--no-cache web` aprobado; Compose config aprobado;
+focales/relacionadas 45 pruebas, 44 aprobadas y una omitida localmente porque exige
+la imagen. Esa regresión se ejecutó dentro de la imagen: DockerContextTest 2/2
+aprobadas. Ausencia completa de `.obsidian` y sus cinco JSON confirmada.
+Compileall focal y `git diff --check` aprobados. Sin suite completa.
+
+Solo tres archivos reciben esta corrección: `.dockerignore`,
+`tests/test_runtime_health.py` y este handoff. Se conservan los diez cambios
+existentes y todos los registros anteriores. Rama/HEAD sin cambios, staging
+vacío; sin commit, push, PR o merge. No se levantó Compose ni PostgreSQL;
+no se tocó `trax-postgres` ni se conectó a `trax_db`. Contenedor de regresión
+eliminado por `--rm`; inventarios posteriores del proyecto sin contenedores,
+volúmenes ni redes. Imagen/caché local conservadas para el retest.
+Próximo paso: retest independiente del hallazgo P2 y revisión del incremento.
+
+---
+
+# Handoff vigente: base Docker descartable validada
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-18T10:43:12-03:00
+Responsable: Codex; dispositivo: laptop.
+Rama: `fix/platform-runtime-stabilization`.
+HEAD/base conservada: `a6989619c553a96713baa6f35572fe48f7181110`.
+Origin verificado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: construir y validar un entorno Docker aislado para diagnóstico local.
+Estado final: implementación local validada, pendiente de revisión; no producción.
+
+## Implementación y decisiones
+
+Compose independiente `docker-compose.stabilization.yml`, proyecto exclusivo
+`mandobra_stabilization`: PostgreSQL 16 interno sin publicar 5432, migración
+one-shot `alembic upgrade head`, web condicionada a DB saludable y migración
+exit 0. Healthcheck HTTP `/healthz` verifica conexión y head actual con respuesta
+genérica. Web disponible en `http://127.0.0.1:5050/` durante el diagnóstico.
+Red DB interna, red HTTP propia y tres volúmenes propios; sin nombres globales,
+binds del repositorio ni carga del `.env` real. Configuración development
+sintética explícita, CSRF habilitado, sin `create_all`. Uploads/instance escribibles
+por `appuser` no root (UID 100). Mercado Pago, conciliación y efectos False;
+Maps/Cloudinary sin claves. Seed explícito bajo perfil `tools`, nunca automático.
+
+Docker Desktop no publicó el puerto con web solo en una red interna. Se añadió
+una red HTTP exclusiva para web; PostgreSQL/migrate/seed permanecen en la interna.
+Esta red permite salida de web: los flags y la ausencia de credenciales mantienen
+las integraciones externas deshabilitadas. No se hicieron llamadas a Mercado Pago.
+
+## Evidencia ejecutada
+
+- Build desde cero: `build --no-cache --pull web`, aprobado.
+- Compose config (también perfil tools), aislamiento y dependencias, aprobados.
+- Arranque final desde base vacía, DB/web saludables; migrate exit 0 hasta
+  `20260917_03`. Una segunda creación vacía confirmó ausencia de seed automático.
+- Pruebas focales y relacionadas: **43/43** (runtime health, configuración,
+  controles de seguridad y fundamento PRO entitlement).
+- Seed explícito dos veces: primera 4 usuarios, 3 profesionales, 1 suscripción
+  sintética y 4 verificaciones; segunda cero nuevos registros. IDs/cantidades y
+  vencimiento PRO se conservaron. El seed restablece las contraseñas demo.
+- Restart exclusivo de postgres/web: mismos datos y archivos de prueba en
+  instance/uploads; migrate conservó ID/FinishedAt, sin ejecutar nuevamente.
+- Smoke HTTP host 5050: 200 en `/healthz`, `/`, `/login`, `/register`, `/explorar`,
+  `/planes`, `/dev/qa` y `/profesional/1`, `/profesional/2`, `/profesional/3`.
+- `pip check`: sin dependencias rotas; compileall focal y diff check aprobados.
+- Teardown exclusivo `down --volumes` del proyecto: ausencia posterior de sus
+  contenedores, tres volúmenes y dos redes confirmada.
+- `trax-postgres` conservó ID
+  `8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154`
+  y estado `running healthy`. Solo se inspeccionó metadata; no conexión a `trax_db`.
+
+## Alcance, Git y pendientes
+
+Archivos afectados: `.dockerignore`, `Dockerfile`, `README.md`,
+`app/__init__.py`, `app/routes/health_routes.py`, `docker-compose.stabilization.yml`,
+`tests/test_runtime_health.py`, `docs/alembic.md`,
+`docs/RUNBOOKS/DOCKER_STABILIZATION.md` y este handoff.
+Sin migraciones nuevas; head vigente `20260917_03`. Compose persistente original,
+requirements y migraciones no modificados. Staging vacío; cambios sin commit.
+Sin commit, push, PR, merge o deploy: no autorizados en este encargo.
+La imagen local y caché de build quedan disponibles; no hay servicios descartables.
+
+No se ejecutó suite completa: reservada para Testing final. Esta validación no
+acredita flujos autenticados completos, contratos, fixtures admin, QA visual,
+accesibilidad ni servicios externos. Flask es servidor de desarrollo; imágenes
+con tags y transitivas sin lock no garantizan reconstrucción binaria idéntica.
+Próximo paso: revisión/Testing independiente y diagnóstico de páginas/flujo con
+fixtures explícitos. No inferir disponibilidad de cobros ni producción.
+
+Para retomar seguir [el runbook](../RUNBOOKS/DOCKER_STABILIZATION.md), siempre con
+`--env-file .env.example -p mandobra_stabilization -f docker-compose.stabilization.yml`.
+No administrar `trax-postgres`, conectar a `trax_db`, usar stamp, prune o down
+genérico, borrar volúmenes ajenos, ni hacer Git mutable sin autorización.
+
+---
+
+# Registro anterior conservado íntegramente
+
 # Handoff vigente: cierre técnico local 4F aprobado
 
 Estado: COMPLETED
