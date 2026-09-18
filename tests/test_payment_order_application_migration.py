@@ -30,8 +30,8 @@ class PaymentOrderApplicationMigrationTest(unittest.TestCase):
             try:
                 scripts = ScriptDirectory.from_config(config)
                 heads = scripts.get_heads()
-                self.assertEqual(heads, ["20260917_02"])
-                self.assertEqual(scripts.get_revision(heads[0]).down_revision, "20260917_01")
+                self.assertEqual(heads, ["20260917_03"])
+                self.assertEqual(scripts.get_revision(heads[0]).down_revision, "20260917_02")
                 command.upgrade(config, "20260916_01")
                 with engine.begin() as connection:
                     connection.execute(sa.text(

@@ -1,4 +1,5 @@
 import unittest
+import re
 from unittest.mock import patch
 
 from app import create_app, db
@@ -139,6 +140,40 @@ class ContractReviewRoutesUiModerationTest(unittest.TestCase):
         self.assertNotIn('name="cliente_id"', body)
         self.assertNotIn('name="professional_id"', body)
         self.assertNotIn('name="contract_id"', body)
+
+    def _generated_key_replay(self, leading):
+        from app.routes.operation_routes import _new_idempotency_key
+        from app.services.contract_service import require_idempotency_key
+        raw = leading + "a" * 31
+        self._login(self.owner_id)
+        path = f"/contratacion/{self.contract_id}/review"
+        with patch("app.routes.operation_routes.secrets.token_urlsafe", return_value=raw):
+            self.assertEqual(require_idempotency_key(_new_idempotency_key()), "op-" + raw)
+            page = self.client.get(path)
+        self.assertEqual(page.status_code, 200)
+        key = re.search(r'name="idempotency_key" value="([^"]+)"', page.get_data(as_text=True)).group(1)
+        self.assertEqual(key, "op-" + raw)
+        self.assertEqual(require_idempotency_key(key), key)
+        payload = dict(rating="5", comment="Same stable request", idempotency_key=key)
+        # POST must keep the submitted key, not generate a replacement.
+        with patch("app.routes.operation_routes._new_idempotency_key", side_effect=AssertionError("key regenerated")):
+            first = self.client.post(path, data=payload)
+            second = self.client.post(path, data=payload)
+        self.assertEqual(first.status_code, 302)
+        self.assertEqual(second.status_code, 302)
+        self.assertEqual(first.headers["Location"], second.headers["Location"])
+        with self.app.app_context():
+            self.assertEqual(Review.query.count(), 1)
+            self.assertEqual(OperationCommand.query.count(), 1)
+            self.assertEqual(OperationCommand.query.one().idempotency_key, key)
+            self.assertEqual(ReputationEvent.query.count(), 1)
+            self.assertEqual(AuditLog.query.count(), 1)
+
+    def test_generated_underscore_key_is_valid_and_stable_across_two_posts(self):
+        self._generated_key_replay("_")
+
+    def test_generated_hyphen_key_is_valid_and_stable_across_two_posts(self):
+        self._generated_key_replay("-")
 
     def test_create_replay_payload_conflict_and_exact_effects(self):
         self._login(self.owner_id)

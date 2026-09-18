@@ -102,6 +102,12 @@ from app.utils.security import (
     user_rate_limit_key,
 )
 
+def _new_idempotency_key():
+    # URL-safe randomness can start with '_' or '-'; the existing contract
+    # validator requires an alphanumeric first character. Preserve all entropy.
+    return require_idempotency_key("op-" + secrets.token_urlsafe(24))
+
+
 operations = Blueprint("operations", __name__)
 
 
@@ -224,7 +230,7 @@ def nueva_negociacion_directa():
 
     return render_template(
         "negotiation_start.html",
-        idempotency_key=secrets.token_urlsafe(24),
+        idempotency_key=_new_idempotency_key(),
         professional=professional,
     )
 
@@ -245,11 +251,11 @@ def negotiation_detail(id):
         "negotiation_detail.html",
         **context,
         command_keys={
-            "propose": secrets.token_urlsafe(24),
-            "accept": secrets.token_urlsafe(24),
-            "cancel": secrets.token_urlsafe(24),
-            "reject": secrets.token_urlsafe(24),
-            "finalize": secrets.token_urlsafe(24),
+            "propose": _new_idempotency_key(),
+            "accept": _new_idempotency_key(),
+            "cancel": _new_idempotency_key(),
+            "reject": _new_idempotency_key(),
+            "finalize": _new_idempotency_key(),
         },
     )
 
@@ -396,7 +402,7 @@ def nueva_contratacion():
 
     return render_template(
         "nueva_contratacion.html",
-        idempotency_key=secrets.token_urlsafe(24),
+        idempotency_key=_new_idempotency_key(),
     )
 
 
@@ -413,12 +419,12 @@ def contract_detail(id):
         "contract_detail.html",
         **context,
         command_keys={
-            "accept": secrets.token_urlsafe(24),
-            "reject": secrets.token_urlsafe(24),
-            "start": secrets.token_urlsafe(24),
-            "complete": secrets.token_urlsafe(24),
-            "confirm": secrets.token_urlsafe(24),
-            "cancel": secrets.token_urlsafe(24),
+            "accept": _new_idempotency_key(),
+            "reject": _new_idempotency_key(),
+            "start": _new_idempotency_key(),
+            "complete": _new_idempotency_key(),
+            "confirm": _new_idempotency_key(),
+            "cancel": _new_idempotency_key(),
         },
     )
 
@@ -443,7 +449,7 @@ def create_contractual_review(id):
     idempotency_key = (
         request.form.get("idempotency_key")
         if request.method == "POST"
-        else secrets.token_urlsafe(24)
+        else _new_idempotency_key()
     )
     error_message = None
     status_code = 200
