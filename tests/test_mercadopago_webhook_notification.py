@@ -20,13 +20,13 @@ from app.services.psp_event_contract import PSPEvent
 class MercadoPagoWebhookNotificationTest(unittest.TestCase):
     SECRET = "fictional-notification-secret"
     REQUEST_ID = "request-123"
-    TIMESTAMP = "1742505638683"
+    TIMESTAMP = str(int(datetime(2026, 9, 12, 21, tzinfo=timezone.utc).timestamp() * 1000))
     RECEIVED_AT = datetime(2026, 9, 12, 21, tzinfo=timezone.utc)
 
     @classmethod
     def _signature(cls, data_id, **overrides):
         manifest = (
-            f"id:{data_id.lower()};"
+            f"id:{data_id};"
             f"request-id:{overrides.get('request_id', cls.REQUEST_ID)};"
             f"ts:{overrides.get('timestamp', cls.TIMESTAMP)};"
         )
@@ -94,7 +94,7 @@ class MercadoPagoWebhookNotificationTest(unittest.TestCase):
         self.assertEqual(event.action, "payment.approved")
         self.assertFalse(hasattr(event, "financial_status"))
 
-    def test_order_identifier_is_lowercased_only_for_signature_manifest(self):
+    def test_order_identifier_preserves_case_in_signature_manifest(self):
         data_id = "ORD01JQ4S4KY8HWQ6NA5PXB65B3D3"
         event = self._parse(
             data_id,
@@ -191,7 +191,7 @@ class MercadoPagoWebhookNotificationTest(unittest.TestCase):
 
     def test_payload_hash_is_deterministic_and_excludes_delivery_time(self):
         first = self._parse()
-        redelivery = self._parse(received_at=self.RECEIVED_AT + timedelta(hours=1))
+        redelivery = self._parse(received_at=self.RECEIVED_AT + timedelta(minutes=1))
         changed = self._parse(body=self._body(action="payment.created"))
         changed_identity_metadata = self._parse(body=self._body(user_id=124))
         self.assertEqual(first.payload_hash, redelivery.payload_hash)

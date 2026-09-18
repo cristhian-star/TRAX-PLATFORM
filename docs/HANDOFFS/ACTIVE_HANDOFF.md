@@ -1,3 +1,319 @@
+# Handoff vigente: cierre técnico local 4E aprobado
+
+Estado: COMPLETED
+Timestamp de registro documental: 2026-09-17T21:24:48-03:00
+Estado técnico local: APROBADO
+Implementación productiva: PENDIENTE
+Rama: `feature/mercadopago-payment-reconciliation`.
+Commit técnico: `8dc0e12`.
+Registro documental: Codex; dispositivo: laptop.
+Evidencia final de Testing suministrada para este cierre.
+
+4E implementa recepción y conciliación verificada de evidencia durable de
+Orders, sin efectos PRO, contables o comerciales. POST
+`/api/webhooks/mercadopago` acepta únicamente el tópico `order`; HMAC-SHA256
+con comparación constante conserva `data.id` case-sensitive. Inbox y trabajo
+durables, deduplicación, cuarentena e intentos son independientes de los
+estados informados por el webhook. La confirmación HTTP 200 ocurre únicamente
+después del commit durable; firma inválida responde 401 sin persistencia.
+
+La validación criptográfica está separada de la temporal: firma válida con
+timestamp en milisegundos fuera de la ventana inclusiva ±10 minutos queda en
+cuarentena durable `TIMESTAMP_OUTSIDE_WINDOW`, sin trabajo ejecutable ni consulta
+PSP. Colisiones preservan la primera recepción y quedan en cuarentena.
+`LEASE_DURATION_SECONDS = 60` y `STALE_LEASE_RECOVERY_SECONDS = 120` separan
+vencimiento del permiso de despacho/finalización y recuperación del trabajo
+abandonado. Entre 60 y 119 segundos no hay consulta; desde 120 segundos puede
+recuperarse con otro token. Fencing impide finalizar con lease vencido;
+ocho intentos programados como máximo, sin retries del transporte HTTP.
+
+Consulta `GET /v1/orders/{id}` fuera de una transacción local abierta, con
+credencial OAuth por profesional suministrada por un proveedor confiable
+inyectado, vinculada a profesional, cuenta PSP y entorno; sin fallback global.
+El onboarding, la custodia y la renovación OAuth permanecen pendientes.
+Se correlacionan orden externa, PaymentOrder, obligación, contrato y reserva;
+solo una respuesta autoritativa validada permite registrar evidencia normalizada
+de pagos, reembolsos y reversos, incluidos contracargos y pagos tardíos.
+El vencimiento contractual local sigue siendo la autoridad de entrega del
+checkout; registrar un pago tardío no habilita automáticamente efecto alguno.
+
+Suma Decimal exacta de reembolsos por pago asociado y por orden, deduplicada por
+identidad externa. El snapshot remoto y la evidencia acumulada durable deben
+respetar ambos límites. La validación acumulada se serializa bajo lock de
+PaymentOrder y fence SQLite: contradicciones quedan en cuarentena sin insertar
+nueva evidencia financiera válida; se conserva la evidencia histórica válida.
+
+Migración `20260917_02`, descendiente de `20260917_01`, incorpora trabajo,
+intentos, evidencia y cuarentena durables. Feature flags
+`MERCADOPAGO_ORDER_WEBHOOK_ENABLED=False` y
+`MERCADOPAGO_ORDER_RECONCILIATION_ENABLED=False` permanecen deshabilitados por
+defecto. No se declaran credenciales reales, cobros productivos ni conciliación
+financiera con efectos habilitados.
+
+Evidencia final acreditada de Testing:
+
+- Focales 4E: **96/96**.
+- Regresiones relacionadas: **197/197**.
+- PostgreSQL: **37/37**.
+- Suite completa: **653 ejecutadas, 648 aprobadas y 5 omisiones históricas**.
+- Migraciones SQLite/PostgreSQL, `compileall`, Alembic y `git diff --check`:
+  aprobados; head `20260917_02`.
+- Sin hallazgos P0–P3 pendientes.
+
+Los hallazgos P1/P2 y su corrección de `2026-09-17T21:04:23-03:00`, junto con
+la implementación de `2026-09-17T20:42:27-03:00`, se conservan en el
+[historial del handoff](#registro-anterior-preservado-íntegramente). Los resultados de aquella corrección
+(207/207 regresiones) son históricos; este cierre acredita los **197/197**
+del paquete final suministrado, sin reemplazar la evidencia anterior.
+
+Se cierra únicamente 4E técnico local y su retest: supera esos pendientes en
+registros anteriores, conservados íntegramente. REQ-003 continúa
+`estado: APROBADO` e `implementacion: PENDIENTE`; no se cierra Sprint 2 productivo.
+Pendientes reales: OAuth completo y custodia/renovación, fórmula de comisión,
+retornos, credenciales y prueba real, validación/activación productiva de la
+recepción y consulta PSP. Los efectos PRO, comerciales y contables de evidencia
+conciliada, pagos tardíos y reversos corresponden a 4F; producción permanece
+pendiente. La recepción y evidencia local de webhook/Orders ya están
+implementadas en 4E; no confundirlas con su activación productiva.
+
+Próximo paso: diseñar y autorizar 4F por separado; no habilitar efectos o flags
+productivos basándose únicamente en este cierre técnico local.
+Commit técnico acreditado: `8dc0e12`; la implementación terminó en su rama.
+
+---
+
+# Registro anterior preservado íntegramente
+
+# Handoff vigente: corrección focal 4E P1/P2
+
+Timestamp: 2026-09-17T21:04:23-03:00
+Estado: READY_TO_RESUME
+Agente: Codex; dispositivo: laptop.
+Rama: `feature/mercadopago-payment-reconciliation`.
+HEAD preservado: `8b975b2472a594a8ca07f7e9cc1ef01f31376446`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: corregir exclusivamente los tres hallazgos P1/P2 de Testing comunicados
+por el usuario; el registro de implementación anterior se conserva íntegro abajo.
+
+## Hallazgos y corrección posterior
+
+1. El rechazo temporal anterior impedía la cuarentena durable. Ahora HMAC y
+ventana temporal se validan por separado. Firma inválida: 401 sin persistencia.
+Firma válida fuera de ±10 minutos inclusivos: inbox y cuarentena durable
+`TIMESTAMP_OUTSIDE_WINDOW`, trabajo QUARANTINED sin intentos ejecutables ni PSP.
+200 exclusivamente después del commit. Rollback devuelve 500 genérico.
+Se preservan data.id case-sensitive, deduplicación y colisiones.
+
+2. El lease anterior confundía duración y recuperación. Constantes explícitas:
+`LEASE_DURATION_SECONDS = 60`; `STALE_LEASE_RECOVERY_SECONDS = 120`.
+El propietario pierde permiso de despacho y finalización al vencer 60 segundos;
+la recuperación comienza a los 120 segundos desde el claim. Entre ambos límites
+no se consulta. El trabajo conserva el estado PROCESSING no ejecutable durante
+la espera; luego otro token recupera el trabajo o termina EXHAUSTED al octavo
+intento. Se revalida el reloj después de adquirir locks antes de finalizar.
+Regresiones de 59, 61, 119 y 120 segundos y respuesta recibida con lease vencido.
+
+3. Faltaba el límite de reembolso por pago. Se suma Decimal exacto por identidad
+externa deduplicada y por pago asociado; nunca puede superar el importe de ese
+pago ni el límite global de la orden. Identidades contradictorias se rechazan.
+El snapshot remoto valida el invariante; la finalización vuelve a validar todos
+los snapshots durables y el candidato bajo lock de PaymentOrder y fence SQLite.
+Una contradicción remota queda INVALID_RESPONSE; una contradicción acumulada
+queda REFUND_CONTRADICTION. No se inserta evidencia del evento contradictorio;
+la evidencia válida histórica permanece intacta. Pruebas concurrentes y rollback
+acreditan atomicidad local, sin mensajes o excepciones públicas con secretos.
+
+## Validación ejecutada y alcance
+
+Focales 4E: 96/96 aprobadas en cinco módulos.
+Regresiones relacionadas: 207/207 aprobadas en veinte módulos.
+La primera corrida focal encontró un error de montaje en la nueva prueba de
+concurrencia; se corrigió el fixture y la corrida final pasó sin errores.
+Compileall, AST/UTF-8 y git diff --check: verificación de cierre de esta sesión.
+No se ejecutaron suite completa ni PostgreSQL: corresponden a retest independiente.
+Pruebas con transporte y credenciales ficticios, sin llamadas reales ni trax_db.
+Ambos flags permanecen False; sin efectos PRO, comerciales, contables o producción.
+No se altera migración, backoff, máximo de ocho intentos o alcance funcional.
+
+Archivos afectados por esta corrección:
+- app/services/mercadopago_webhook_signature.py
+- app/services/mercadopago_webhook_notification.py
+- app/routes/mercadopago_webhook_routes.py
+- app/services/payment_order_reconciliation_service.py
+- app/services/mercadopago_order_query_adapter.py
+- tests/test_mercadopago_webhook_routes.py
+- tests/test_mercadopago_order_reconciliation.py
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Git: se preservan los 19 cambios existentes, rama y HEAD; staging vacío.
+Sin commit, push, PR, merge o deploy por alcance autorizado. No hubo merge.
+Pendiente: retest independiente de los hallazgos P1/P2 y gates finales.
+Retomar en esta rama/base sin alterar cambios; ejecutar gates solo con autorización.
+Estado final: CORRECCION_4E_PENDIENTE_DE_RETEST.
+
+---
+
+# Registro anterior preservado íntegramente
+
+# Handoff vigente: implementación técnica local 4E
+
+Timestamp: 2026-09-17T20:42:27-03:00
+Estado: READY_TO_RESUME
+Agente: Codex; dispositivo: laptop.
+Objetivo: recepción durable y evidencia verificada de Orders, sin efectos comerciales.
+Rama: `feature/mercadopago-payment-reconciliation`.
+Base/último commit: `8b975b2472a594a8ca07f7e9cc1ef01f31376446`.
+Origin verificado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck: rama/base correctas; árbol y staging inicialmente limpios.
+Estado final: implementación focal validada, pendiente de revisión y Testing independiente.
+Git: 19 archivos nuevos/modificados sin staging ni commit; HEAD preservado.
+Sin push, PR, merge o deploy: no autorizados y falta el gate independiente de Testing.
+El merge PR #19 de 4D permanece acreditado por el commit base; no hubo merge de 4E.
+
+## Implementación y decisiones aplicadas
+
+POST `/api/webhooks/mercadopago`, exento de CSRF y sin autenticación por sesión:
+requiere flag explícito y secreto de firma. Solo tópico exacto `order`, versión `v1`
+e identificador Orders seguro. HMAC-SHA256 con comparación constante, `data.id`
+case-sensitive, timestamp en milisegundos y ventana inclusiva ±10 minutos.
+Request ID único/acotado; headers ambiguos, JSON duplicado, UTF-8 inválido,
+constantes no estándar y recursos incoherentes se rechazan. Lectura limitada a
+64 KiB, incluso sin Content-Length. No confiar en action/estado del webhook.
+La confirmación 200 se entrega exclusivamente después de commit de inbox/trabajo
+o cuarentena. Duplicados no recrean trabajo ni resetean intentos. Colisiones
+conservan el primer evento, deduplican la cuarentena e invalidan trabajo/lease;
+no se responde 409 a una colisión que ya quedó durablemente registrada.
+Errores públicos genéricos: 400 entrada, 401 firma/ventana, 413 tamaño,
+503 deshabilitado/secreto ausente y 500 fallo de persistencia con rollback.
+
+Inbox existente reutilizado; UPSERT SQLite dirigido únicamente a la identidad
+esperada conserva rollback exterior y valores neutrales UTC conscientes.
+PostgreSQL conserva recuperación de la constraint de identidad esperada mediante
+savepoint. La creación de trabajo/cuarentena/evidencia usa UPSERT con targets
+explícitos, sin ocultar violaciones ajenas. Nuevos modelos separados de trabajo,
+intentos, evidencia y cuarentena; no reutilizar PaymentAttempt para Orders.
+
+Procesador interno de composición explícita con proveedor confiable inyectado.
+Claim y registro de despacho se confirman antes de resolver OAuth/consultar.
+Lease de 120 segundos, token único y fencing en despacho/finalización; despacho
+atómico único por intento. Crashes quedan durables; leases vencidos permiten
+recuperación con otro intento y contabilizan el anterior como LEASE_LOST.
+Un crash en el octavo intento termina EXHAUSTED al vencer el lease.
+`process_due(limit=100)` ejecuta un pase acotado sin bucle de retry; su invocador
+programa pases posteriores, sin scheduler externo ni proceso automático nuevo.
+Máximo ocho intentos por trabajo. Para fallos recuperables, demoras entre intentos:
+15 min, 15 min, 5 h 30 min, 42 h, 48 h, 96 h, 96 h, desde la finalización anterior.
+Cada intento hace como máximo una consulta, con cero retries del transporte.
+Recursos aún no correlacionables o credenciales indisponibles quedan programados;
+respuestas inválidas y cambios del contexto local quedan en cuarentena.
+
+GET `https://api.mercadopago.com/v1/orders/{id}` con Bearer del profesional
+vinculado por `ProfessionalOrderQueryCredential`: profesional, cuenta PSP,
+entorno y ARS. Sin token global ni fallback. El receptor de la respuesta debe
+coincidir con account_id confiable; identidad/referencia, importe Decimal exacto,
+moneda, tipo/modo y contexto PaymentOrder → obligación → contrato/reserva también
+se verifican. La respuesta Orders no exige un live_mode inexistente: el entorno
+proviene del contexto y credencial confiables; si la respuesta lo incluye, se
+valida estrictamente. Se conservan TLS verificado, no redirects, límite de 1 MiB,
+JSON estricto y timeout de 10 s, configurable hasta 30 s. La sesión ORM se cierra
+por completo antes de resolver la credencial y consultar. Nueva transacción
+local corta revalida el contexto y el lease antes de guardar evidencia.
+
+Evidencia deduplicada por orden/hash de snapshot normalizado, inmutable en el
+flujo: IDs/estados de pagos, reembolsos parciales/totales y contracargos vinculados,
+importes y fechas remotas. Payer, tokens, medios de pago y metadata no se guardan.
+Observaciones antiguas se conservan como hechos y no sobreescriben aprobaciones
+ni reversos: no hay proyección financiera mutable ni terminalidad que omita
+consultas posteriores. Estados/detalles desconocidos se ponen en cuarentena.
+El estado de vigencia de PaymentOrder, reserva, obligación, contrato y PRO no
+se modifica por reconciliación. No aplicar comisión contable, facturación ni
+ningún efecto de 4F.
+
+Vencimiento local de 72 h continúa como autoridad contractual. Evidencia de
+órdenes vencidas se admite sin entregar/reabrir checkout ni suponer pago a tiempo.
+observed_at, remote_updated_at y vencimiento se conservan por separado. Si la
+creación remota misma es posterior al vencimiento local, timing registra
+AFTER_LOCAL_EXPIRY; en los demás casos registra UNKNOWN: last_updated_date no
+se interpreta como fecha de aprobación/pago. Esto permite representar evidencia
+posterior e incertidumbre temporal sin inventar la fecha efectiva de pago.
+Los efectos y clasificación funcional final de pagos tardíos pertenecen a 4F.
+
+Excepciones de OAuth, validación, transporte, JSON/parser y persistencia pública
+se neutralizan capturando solamente sentinels/clasificaciones. La excepción
+pública se lanza fuera del except, sin __context__, __cause__, argumentos
+originales, tokens en repr ni logs de contenido sensible.
+
+Flags `MERCADOPAGO_ORDER_WEBHOOK_ENABLED=False` y
+`MERCADOPAGO_ORDER_RECONCILIATION_ENABLED=False` por defecto. 4C/4D conservan
+sus flags deshabilitados. Habilitar flags no suministra OAuth ni compone un
+procesador; requiere `build_order_reconciliation_processor(...)` explícito.
+Sin credenciales reales, llamadas reales o disponibilidad productiva.
+
+## Archivos y validación ejecutada
+
+- Modelos: `app/models/payment_order_reconciliation.py`.
+- Adaptador/procesador: `app/services/mercadopago_order_query_adapter.py`,
+  `app/services/payment_order_reconciliation_service.py`.
+- Cableado/configuración: `app/__init__.py`, `app/config/config.py`.
+- Recepción: `app/routes/mercadopago_webhook_routes.py`,
+  `app/services/mercadopago_webhook_signature.py`,
+  `app/services/mercadopago_webhook_notification.py`, `app/services/psp_event_inbox.py`.
+- Migración: `migrations/versions/20260917_02_payment_order_reconciliation.py`,
+  descendiente de `20260917_01`, head único comprobado por test de migración.
+- Focales nuevas: `tests/test_mercadopago_order_reconciliation.py`,
+  `tests/test_payment_order_reconciliation_migration.py`.
+- Focales actualizadas: `tests/test_mercadopago_webhook_signature.py`,
+  `tests/test_mercadopago_webhook_notification.py`,
+  `tests/test_mercadopago_webhook_routes.py`.
+- Regresión del head: `tests/test_payment_order_application_migration.py`.
+- Gates PostgreSQL preparados, no ejecutados:
+  `tests/postgresql_payment_order_reconciliation_e2e.py`,
+  `tests/postgresql_mercadopago_webhook_ingress_e2e.py`.
+- Única documentación actualizada: este handoff; registros anteriores preservados.
+
+Focales finales: **86/86**, en cinco módulos Orders/reconciliación, firma,
+notificación, rutas y migración. Último endurecimiento del tópico exacto:
+**19/19** rutas; protección pública de dispatch **2/2**. Regresiones relacionadas finales: **207/207**, en veinte módulos
+4A–4D, inbox/conciliación anterior, consulta legacy, persistencia/orquestación,
+migraciones relacionadas, seguridad y configuración. SQLite exclusivamente
+descartable; pruebas de upgrade/downgrade/upgrade y preservación histórica.
+compileall focal, UTF-8 y git diff --check aprobados; revisión de código/diff.
+Advertencias históricas datetime.utcnow/Query.get, sin fallos finales.
+Primeros focales detectaron fixtures de ventana antigua y aserciones globales
+sobre sesiones de otros workers; corregidos manteniendo la comprobación de que
+el caller HTTP no tiene sesión abierta. Primera regresión detectó pérdida de
+tzinfo al recuperar UPSERT SQLite; corregida y revalidada sin modificar primera
+recepción ni romper rollback.
+
+## Pendientes, riesgos y continuidad
+
+Testing independiente: suite completa y PostgreSQL final, incluidos concurrencia,
+commit HTTP, rollback, leases y fencing bajo PostgreSQL real descartable.
+No se ejecutaron Docker, PostgreSQL, suite completa, migraciones en bases
+persistentes, credenciales reales ni consultas PSP reales. `trax_db` intacta.
+El gate nuevo solo admite `trax_order_reconciliation_test` con sufijo seguro y
+`TRAX_POSTGRES_TEST_ALLOW_RESET=1`; rechaza trax_db antes de conectar.
+OAuth real/onboarding/custodia/renovación, fórmula comercial, credenciales/prueba
+real y activación siguen pendientes. Programación operativa del invocador de
+process_due y tratamiento comercial/contable de tardíos/reversos no se habilitan.
+Sin efectos PRO/contables ni producción; REQ-003 continúa APROBADO/PENDIENTE.
+
+Para retomar, verificar rama/base y estos 19 cambios, sin staging. Focales:
+`.venv/Scripts/python.exe -B -m unittest tests.test_mercadopago_order_reconciliation tests.test_mercadopago_webhook_signature tests.test_mercadopago_webhook_notification tests.test_mercadopago_webhook_routes tests.test_payment_order_reconciliation_migration`.
+PostgreSQL se reserva a Testing con autorización/base descartable explícita;
+no usar trax_db, credenciales reales ni activar flags productivos. No integrar
+hasta revisión y gate independiente. No hubo commit/push/merge de este incremento.
+
+Fuentes oficiales consultadas:
+- [GET Orders](https://www.mercadopago.com.ar/developers/es/reference/online-payments/checkout-pro/get-order/get).
+- [Estados Orders](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-orders/payment-management/status/order-status?scope=prod).
+- [Contracargos Orders](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro-orders/chargebacks/notifications?scope=prod).
+- [Firma case-sensitive, corrección oficial](https://github.com/mercadopago/sdk-python/pull/118).
+
+---
+
+# Registro anterior preservado íntegramente
+
 # Handoff vigente: cierre técnico local 4D
 
 Timestamp: 2026-09-17T16:14:10-03:00

@@ -1,5 +1,29 @@
 # CHANGELOG MANDOBRA
 
+## 2026-09-17 - Cierre técnico local 4E
+
+Timestamp de registro documental: 2026-09-17T21:24:48-03:00
+Rama: `feature/mercadopago-payment-reconciliation`; commit técnico: `8dc0e12`.
+4E técnico local aprobado: webhook `order` firmado con data.id case-sensitive,
+inbox/trabajo durable, cuarentena y leases; consulta Orders con OAuth confiable
+inyectado por profesional, sin fallback global. Evidencia verificada de pagos,
+reembolsos y reversos, incluidos contracargos y pagos tardíos, sin efectos PRO,
+contables o comerciales. Firma válida fuera de ±10 minutos: cuarentena durable
+TIMESTAMP_OUTSIDE_WINDOW y 200 después del commit; firma inválida: 401 sin persistir.
+Lease 60 s, recuperación desde 120 s y límites Decimal de reembolso por pago y
+orden, deduplicados y verificados sobre evidencia acumulada bajo lock.
+Migración/head `20260917_02`, descendiente de `20260917_01`; ambos flags False.
+Evidencia final suministrada de Testing: focales 96/96, regresiones 197/197,
+PostgreSQL 37/37; suite 653 ejecutadas, 648 aprobadas y 5 omisiones históricas.
+Migraciones SQLite/PostgreSQL, compileall, Alembic y diff check aprobados;
+sin hallazgos P0–P3 pendientes. Hallazgos y correcciones históricos preservados.
+Este cierre supera únicamente 4E local y su retest pendientes en registros
+anteriores; REQ-003 sigue APROBADO/PENDIENTE y Sprint 2 productivo permanece abierto.
+Pendientes: OAuth completo/custodia/renovación, fórmula de comisión, retornos,
+credenciales/prueba real, activación productiva y efectos 4F sobre pagos tardíos,
+reversos, PRO y contabilidad. No habilita cobros productivos.
+Detalle y límites: [cierre 4E](REQUISITOS/REQ-003-creacion-de-ordenes-de-cobro-checkout-pro.md#cierre-técnico-local-4e-aprobado-por-testing).
+
 ## 2026-09-17 - Cierre técnico local 4D
 
 Timestamp: 2026-09-17T16:14:10-03:00

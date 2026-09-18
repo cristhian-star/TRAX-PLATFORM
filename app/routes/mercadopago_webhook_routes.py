@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime, timezone
 
 from flask import Blueprint, current_app, jsonify, request
@@ -10,9 +11,9 @@ from app.services.mercadopago_webhook_notification import (
 )
 from app.services.mercadopago_webhook_signature import (
     MercadoPagoWebhookSignatureError,
-    verify_mercadopago_webhook_signature,
+    verify_mercadopago_webhook_signature, webhook_timestamp_in_window,
 )
-from app.services.psp_event_inbox import PSPEventConflictError, register_or_get_event
+from app.services.payment_order_reconciliation_service import receive_order_event
 
 
 mercadopago_webhooks = Blueprint("mercadopago_webhooks", __name__)
@@ -90,14 +91,19 @@ def _utc_now():
 @mercadopago_webhooks.post("/api/webhooks/mercadopago")
 @csrf.exempt
 def receive_mercadopago_webhook():
+    if current_app.config.get("MERCADOPAGO_ORDER_WEBHOOK_ENABLED") is not True:
+        return jsonify({"error": "service unavailable"}), 503
     secret = current_app.config.get("MERCADOPAGO_WEBHOOK_SECRET")
     if not isinstance(secret, str) or not secret.strip():
         return jsonify({"error": "service unavailable"}), 503
 
     query_pairs = _pairs(request.args, multiple=True)
     header_pairs = _pairs(request.headers)
+    received_at = _utc_now()
     try:
         signed_data_id = _unique_value(query_pairs, "data.id")
+        if _unique_value(query_pairs, "type") != "order":
+            raise MercadoPagoWebhookNotificationError("unsupported order notification")
     except MercadoPagoWebhookNotificationError:
         return jsonify({"error": "bad request"}), 400
     try:
@@ -105,10 +111,12 @@ def receive_mercadopago_webhook():
             header_pairs, "x-signature", case_insensitive=True
         )
         x_request_id = _unique_request_id(header_pairs)
+        if len(x_request_id) > 256 or any(char in x_request_id for char in "\r\n;"):
+            raise MercadoPagoWebhookNotificationError("malformed webhook metadata")
     except MercadoPagoWebhookNotificationError:
         return jsonify({"error": "bad request"}), 400
     try:
-        verify_mercadopago_webhook_signature(
+        verification = verify_mercadopago_webhook_signature(
             x_signature=x_signature,
             x_request_id=x_request_id,
             data_id=signed_data_id,
@@ -119,8 +127,15 @@ def receive_mercadopago_webhook():
 
     if not request.is_json:
         return jsonify({"error": "bad request"}), 400
-    body = _decode_json_body(request.get_data(cache=False))
+    if request.content_length is not None and request.content_length > 65536:
+        return jsonify({"error": "payload too large"}), 413
+    raw_body = request.stream.read(65537)
+    if len(raw_body) > 65536:
+        return jsonify({"error": "payload too large"}), 413
+    body = _decode_json_body(raw_body)
     if body is _INVALID_JSON:
+        return jsonify({"error": "bad request"}), 400
+    if type(body) is not dict or body.get("type") != "order" or body.get("api_version") != "v1":
         return jsonify({"error": "bad request"}), 400
 
     try:
@@ -129,19 +144,23 @@ def receive_mercadopago_webhook():
             headers=header_pairs,
             body=body,
             secret=secret,
-            received_at=_utc_now(),
+            received_at=received_at,
         )
+        if (event.topic != "order" or re.fullmatch(r"ORD[A-Za-z0-9_-]{1,157}", event.external_resource_id, re.ASCII) is None
+                or len(event.external_event_id) > 160
+                or not event.action.startswith("order.")):
+            raise MercadoPagoWebhookNotificationError("unsupported order notification")
     except MercadoPagoWebhookSignatureError:
         return jsonify({"error": "unauthorized"}), 401
     except MercadoPagoWebhookNotificationError:
         return jsonify({"error": "bad request"}), 400
 
     try:
-        register_or_get_event(db.session, event)
+        receive_order_event(db.session, event, quarantine_reason=(
+            None if webhook_timestamp_in_window(verification, received_at)
+            else "TIMESTAMP_OUTSIDE_WINDOW"
+        ))
         db.session.commit()
-    except PSPEventConflictError:
-        db.session.rollback()
-        return jsonify({"error": "conflict"}), 409
     except Exception:
         db.session.rollback()
         return jsonify({"error": "internal error"}), 500

@@ -1,6 +1,8 @@
 from datetime import timezone
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.orm.attributes import set_committed_value
 
 from app.models.psp_event import PSPEventRecord
 from app.services.psp_event_contract import PSPEvent, normalize_psp_provider
@@ -30,9 +32,20 @@ def register_or_get_event(session, event):
         **{name: getattr(event, name) for name in event.__slots__}
     )
     if session.get_bind().dialect.name == "sqlite":
-        session.add(record)
-        session.flush()
-        return record
+        values = {name: getattr(record, name) for name in (
+            "provider", "external_event_id", "topic", "action", "external_resource_id",
+            "test_mode", "occurred_at", "received_at", "payload_hash",
+        )}
+        for name in ("occurred_at", "received_at"):
+            values[name] = _instant(values[name])
+        session.execute(sqlite_insert(PSPEventRecord.__table__).values(**values)
+                        .on_conflict_do_nothing(index_elements=["provider", "test_mode", "external_event_id"]))
+        existing = get_event_by_identity(session, event.provider, event.test_mode, event.external_event_id)
+        # SQLite strips timezone information on read. Restore the neutral port's
+        # aware UTC values without marking the persisted first receipt dirty.
+        for name in ("occurred_at", "received_at"):
+            set_committed_value(existing, name, _instant(getattr(existing, name)))
+        return _matching(existing, event)
     try:
         with session.begin_nested():
             session.add(record)

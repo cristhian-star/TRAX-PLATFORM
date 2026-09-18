@@ -4,6 +4,8 @@ import os
 import re
 import sys
 import unittest
+from datetime import datetime, timezone
+from unittest.mock import patch
 from pathlib import Path
 
 import sqlalchemy as sa
@@ -18,6 +20,7 @@ if str(ROOT) not in sys.path:
 from app import create_app, db
 from app.config.config import TestingConfig
 from app.models.psp_event import PSPEventRecord
+from app.models.payment_order_reconciliation import PaymentOrderReconciliationWork as Work, PaymentOrderReconciliationAttempt as Attempt, PaymentOrderReconciliationEvidence as Evidence, PaymentOrderReconciliationQuarantine as Quarantine
 from tests.alembic_head_validation import assert_database_at_repository_head
 
 
@@ -45,7 +48,8 @@ def _guarded_engine(url, allow_reset):
 class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
     SECRET = "fictional-postgresql-ingress-secret"
     REQUEST_ID = "request-postgresql-123"
-    TIMESTAMP = "1742505638683"
+    NOW = datetime(2026, 9, 17, 20, tzinfo=timezone.utc)
+    TIMESTAMP = str(int(NOW.timestamp() * 1000))
 
     @classmethod
     def setUpClass(cls):
@@ -64,6 +68,7 @@ class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
         assert_database_at_repository_head(cls.config, revisions)
         cls.app = create_app(config_class=TestingConfig)
         cls.app.config["MERCADOPAGO_WEBHOOK_SECRET"] = cls.SECRET
+        cls.app.config["MERCADOPAGO_ORDER_WEBHOOK_ENABLED"] = True
         cls.context = cls.app.app_context()
         cls.context.push()
         cls.client = cls.app.test_client()
@@ -87,13 +92,17 @@ class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
 
     def setUp(self):
         db.session.rollback()
-        db.session.query(PSPEventRecord).delete()
+        for model in (Evidence, Attempt, Quarantine, Work, PSPEventRecord):
+            db.session.query(model).delete()
         db.session.commit()
+        self.clock_patch = patch("app.routes.mercadopago_webhook_routes._utc_now", return_value=self.NOW)
+        self.clock_patch.start()
+        self.addCleanup(self.clock_patch.stop)
 
     @classmethod
-    def _signature(cls, data_id="123456"):
+    def _signature(cls, data_id="ORD123456"):
         manifest = (
-            f"id:{data_id.lower()};request-id:{cls.REQUEST_ID};"
+            f"id:{data_id};request-id:{cls.REQUEST_ID};"
             f"ts:{cls.TIMESTAMP};"
         )
         return hmac.new(
@@ -104,9 +113,9 @@ class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
     def _body(cls, **changes):
         body = {
             "id": 9001,
-            "type": "payment",
-            "action": "payment.updated",
-            "data": {"id": "123456"},
+            "type": "order",
+            "action": "order.updated",
+            "data": {"id": "ORD123456"},
             "live_mode": False,
             "date_created": "2026-09-12T20:59:00Z",
             "api_version": "v1",
@@ -116,7 +125,7 @@ class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
 
     def _post(self, **changes):
         return self.client.post(
-            "/api/webhooks/mercadopago?data.id=123456&type=payment",
+            "/api/webhooks/mercadopago?data.id=ORD123456&type=order",
             headers={
                 "X-Signature": (
                     f"ts={self.TIMESTAMP},v1={self._signature()}"
@@ -129,24 +138,25 @@ class PostgreSQLMercadoPagoWebhookIngressGate(unittest.TestCase):
     def test_new_replay_and_conflict_are_atomic_on_postgresql(self):
         first = self._post()
         replay = self._post()
-        conflict = self._post(action="payment.created")
+        conflict = self._post(action="order.created")
 
         self.assertEqual(first.status_code, 200)
         self.assertEqual(replay.status_code, 200)
         self.assertEqual(first.get_json(), replay.get_json())
-        self.assertEqual(conflict.status_code, 409)
+        self.assertEqual(conflict.status_code, 200)
+        self.assertEqual(db.session.query(Quarantine).count(), 1)
         db.session.expire_all()
         rows = db.session.query(PSPEventRecord).all()
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0].action, "payment.updated")
+        self.assertEqual(rows[0].action, "order.updated")
 
     def test_failed_persistence_rolls_back_and_session_recovers(self):
         invalid = PSPEventRecord(
             provider="mercadopago",
             external_event_id="invalid",
-            topic="payment",
-            action="payment.updated",
-            external_resource_id="123456",
+            topic="order",
+            action="order.updated",
+            external_resource_id="ORD123456",
             test_mode=True,
             received_at=sa.func.now(),
             payload_hash="short",
