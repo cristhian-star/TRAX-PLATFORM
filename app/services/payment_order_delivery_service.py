@@ -39,10 +39,11 @@ class PaymentOrderDeliveryService:
     """Owner-only read boundary; never creates on read or QR generation."""
 
     def __init__(self, *, session_factory, application_service,
-                 clock=lambda: datetime.now(timezone.utc)):
+                 clock=lambda: datetime.now(timezone.utc), checkout_validator=None):
         self._sessions = session_factory
         self._application = application_service
         self._clock = clock
+        self._checkout_validator = checkout_validator
 
     def create_order(self, *, actor_user_id, contract_request_id):
         # Authorize before invoking 4B; also refuse cancelled/expired replays.
@@ -93,11 +94,15 @@ class PaymentOrderDeliveryService:
                 raise PaymentOrderUnavailableError
             invalid_result = False
             try:
-                result = validate_payment_order_creation_result(_command(reservation), _stored_result(order))
+                result = validate_payment_order_creation_result(
+                    _command(reservation), _stored_result(order, self._checkout_validator)
+                )
                 parsed = urlsplit(result.checkout_url)
                 allowed = (result.provider == "mercadopago"
                            and parsed.hostname == "www.mercadopago.com.ar"
                            and parsed.port in (None, 443))
+                if self._checkout_validator is not None:
+                    allowed = self._checkout_validator(result)
             except Exception:
                 invalid_result = True
             if invalid_result or not allowed:

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/e2e-demo.css') }}">{% endblock %}
+{% block content %}
+<main class="trax-container e2e-demo" aria-labelledby="payment-title">
+  <p class="e2e-demo__badge">SIMULACIÓN LOCAL · sin dinero real</p>
+  <h1 id="payment-title">Checkout simulado</h1>
+  <p>Contrato #{{ contract.id }} · importe ARS {{ order.amount }}. Esta pantalla no usa Mercado Pago.</p>
+  <form method="post" action="{{ url_for('e2e_demo.approve', external_id=order.external_order_id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="trax-button trax-button--primary" type="submit">Simular pago aprobado y conciliar</button>
+  </form>
+  <a href="{{ url_for('e2e_demo.dashboard') }}">Volver al progreso</a>
+</main>
+{% endblock %}

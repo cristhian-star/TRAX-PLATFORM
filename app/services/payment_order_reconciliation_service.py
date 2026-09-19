@@ -133,14 +133,17 @@ def _query(adapter, context):
 
 
 class PaymentOrderReconciliationProcessor:
-    def __init__(self, *, session_factory, adapter, enabled=False, clock=utcnow):
+    def __init__(self, *, session_factory, adapter, enabled=False, clock=utcnow,
+                 simulated_timing=None):
         if (not callable(session_factory) or not callable(clock)
-                or not callable(getattr(adapter, "query_order", None)) or type(enabled) is not bool):
+                or not callable(getattr(adapter, "query_order", None)) or type(enabled) is not bool
+                or (simulated_timing is not None and not callable(simulated_timing))):
             raise ValueError("invalid reconciliation configuration")
         self._sessions = session_factory
         self._adapter = adapter
         self._enabled = enabled
         self._clock = clock
+        self._simulated_timing = simulated_timing
 
     def __repr__(self):
         return "PaymentOrderReconciliationProcessor(enabled=<configured>)"
@@ -301,6 +304,12 @@ class PaymentOrderReconciliationProcessor:
                     # Append facts, including older snapshots and reversals. No financial
                     # projection or contractual mutation can be regressed by event order.
                     timing = "AFTER_LOCAL_EXPIRY" if result.remote_created_at >= context.expires_at else "UNKNOWN"
+                    if self._simulated_timing is not None and context.external_order_id.startswith("sim-"):
+                        candidate = self._simulated_timing(result, context)
+                        if candidate not in ("BEFORE_LOCAL_EXPIRY", "AFTER_LOCAL_EXPIRY", "UNKNOWN"):
+                            raise ValueError("invalid simulated timing")
+                        if timing != "AFTER_LOCAL_EXPIRY":
+                            timing = candidate
                     insert_once(session, Evidence, dict(
                         payment_order_id=context.payment_order_id, event_id=event.id,
                         attempt_id=attempt.id, snapshot_hash=result.digest,

@@ -1,0 +1,29 @@
+# Opt-in only alongside docker-compose.stabilization.yml and project mandobra_stabilization.
+services:
+  web:
+    environment:
+      E2E_DEMO_ENABLED: "true"
+      ENABLE_DEV_QA_PANEL: "true"
+      E2E_DEMO_PROJECT: mandobra_stabilization
+      E2E_DEMO_ORIGIN: http://127.0.0.1:5050
+  e2e_seed:
+    profiles: [tools]
+    image: mandobra_stabilization-app:local
+    command: [python, scripts/dev_seed_e2e.py]
+    environment:
+      APP_ENV: development
+      FLASK_ENV: development
+      PYTHON_DOTENV_DISABLED: "1"
+      E2E_DEMO_ENABLED: "true"
+      ENABLE_DEV_QA_PANEL: "true"
+      E2E_DEMO_PROJECT: mandobra_stabilization
+      E2E_DEMO_ORIGIN: http://127.0.0.1:5050
+      SECRET_KEY: stabilization-disposable-only-not-production
+      DATABASE_URL: postgresql+psycopg2://stabilization_user:stabilization_disposable@postgres:5432/mandobra_stabilization_db?connect_timeout=3
+      TRAX_DEMO_PASSWORD: stabilization-demo-only
+    networks: [runtime]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully

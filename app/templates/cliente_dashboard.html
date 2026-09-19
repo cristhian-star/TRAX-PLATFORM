@@ -19,6 +19,7 @@
                     presupuestos recibidos, emergencias, propuestas y contrataciones.
                 </p>
                 <div class="client-dashboard__hero-actions" aria-label="Accesos principales">
+                    {% if e2e_demo_available %}<a class="client-dashboard__button client-dashboard__button--secondary" href="{{ url_for('e2e_demo.dashboard') }}">SIMULACIÓN: recorrido de cobro</a>{% endif %}
                     <a class="client-dashboard__button client-dashboard__button--primary" href="/presupuestos/nuevo">Nuevo presupuesto</a>
                     <a class="client-dashboard__button client-dashboard__button--secondary" href="/explorar">Buscar profesionales</a>
                 </div>

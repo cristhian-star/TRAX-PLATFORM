@@ -55,6 +55,13 @@ def create_app(config_class=None, initialize_schema=False):
     if app.config.get("REGISTER_DEV_ROUTES"):
         from app.routes.dev_routes import dev
         app.register_blueprint(dev)
+        from app.services.simulated_mercadopago_demo import enabled
+        if enabled(app.config):
+            from app.routes.e2e_demo_routes import e2e_demo
+            app.register_blueprint(e2e_demo)
+            @app.context_processor
+            def demo_context():
+                return {"e2e_demo_available": enabled(app.config)}
     
     from app.models.user import User
     from app.models.professional import Professional
