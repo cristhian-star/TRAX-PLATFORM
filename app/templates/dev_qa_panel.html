@@ -47,6 +47,10 @@
         </div>
 
         <div class="dev-qa-alert" role="alert">
+            {% if e2e_demo_available %}
+            <p><strong>SIMULACIÓN END-TO-END:</strong> cliente <code>cliente.demo@trax.local</code> y profesional Punto Agua <code>plomeria.work@demo.trax.local</code>. Contraseña local ficticia: <code>stabilization-demo-only</code>.</p>
+            <p>Después de iniciar sesión, abrí el <a href="{{ url_for('e2e_demo.dashboard') }}">panel de progreso simulado</a>. Cambiá de usuario aquí para completar las acciones normales.</p>
+            {% endif %}
             <strong>Advertencia:</strong>
             este panel no pide contraseña y solo debe habilitarse con
             <code>ENABLE_DEV_QA_PANEL=true</code> en entornos de desarrollo.

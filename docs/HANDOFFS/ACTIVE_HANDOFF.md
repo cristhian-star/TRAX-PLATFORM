@@ -1,3 +1,113 @@
+# Handoff vigente: demo E2E local aprobada por Testing
+
+Estado: COMPLETED
+Fecha de aprobación final: 2026-09-19T11:22:22-03:00.
+Rama: `feature/end-to-end-demo-scenarios`.
+Commit técnico: `6ce047a`.
+Alcance: implementación técnica local exclusiva de QA en el Compose descartable
+`mandobra_stabilization`; producción, cobros y efectos financieros reales siguen
+deshabilitados.
+
+Testing acreditó el recorrido completo cliente → contrato confirmado → Punto
+Agua → una orden simulada → checkout y QR locales → pago aprobado simulado →
+conciliación 4E → una comisión ficticia → un crédito PRO 4F. Se verificó una
+única orden, evidencia, comisión ficticia y concesión, incluso ante replay, y
+ausencia de llamadas externas. No quedaron hallazgos P0–P3 pendientes.
+
+Evidencia final de Testing: focales **7/7** locales y **7/7** en imagen;
+regresiones **174/174**; PostgreSQL **12/12** y **35/35**; suite completa
+**715 ejecutadas, 709 aprobadas, 6 omitidas, 0 fallos y 0 errores**.
+Los seis casos omitidos corresponden al resultado reportado por Testing; no se
+reinterpreta su causa en este cierre. Esta aprobación no habilita producción.
+
+El registro siguiente conserva íntegramente la implementación y las
+validaciones previas, con sus timestamps originales.
+
+---
+
+# Handoff vigente: simulación end-to-end local 4A–4F
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-19T11:00:18-03:00
+Origen: laptop; agente: Codex.
+Rama: `feature/end-to-end-demo-scenarios`.
+HEAD/base conservado: `34dcb6c1821aded1f7836ab0d6fdf655095ef98b`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: recorrido visible cliente → contrato CONFIRMADA → Punto Agua → orden,
+checkout y QR locales → pago simulado → conciliación 4E → crédito 4F.
+Estado técnico: implementado y validado localmente; pendiente de revisión y
+Testing independiente. No producción ni cobro real.
+
+## Implementación y decisiones
+
+`docker-compose.e2e.yml` es un opt-in para el proyecto descartable
+`mandobra_stabilization`. Web registra `/dev/e2e` exclusivamente en contenedor,
+entorno development/testing, QA habilitado, E2E_DEMO_ENABLED=True, proyecto,
+base y origen local exactos. El Compose base mantiene todos los flags financieros
+y Mercado Pago False. El seed E2E se ejecuta explícitamente con perfil tools,
+crea/reproduce un solo contrato sintético y no se ejecuta en startup.
+
+Se usa un adaptador SimulatedMercadoPago sin HTTP, OAuth ni secretos, con
+`provider=mercadopago`, `live_mode=False` e IDs `sim-`. La política de URL local
+se inyecta solo en el servicio QA; la allowlist productiva 4D queda intacta.
+Enlace y QR codifican exactamente la misma URL local. Client/professional
+mantienen sesión, CSRF, roles y ownership. Pago simulado entra por inbox y
+trabajo durable 4E, no por webhook HTTP. Un evaluador temporal simulado e
+inyectado permite `BEFORE_LOCAL_EXPIRY` solo para IDs `sim-`; el comportamiento
+4E ordinario sigue `UNKNOWN` sin prueba temporal. 4F recibe política y prueba
+de comisión explícitamente ficticias (`simulated-pro-100-v1`, umbral ARS 100,
+comisión neta ARS 100); replay no duplica órdenes ni créditos. Nada representa
+comisión comercial real ni pago productivo.
+
+Enlaces visibles desde panel cliente, profesional y `/dev/qa`; contrato usa sus
+transiciones normales. CSS usa Design System V2, diseño móvil, etiquetas de
+simulación y foco visible. Reinicio únicamente mediante recreación acotada de
+volúmenes del proyecto, documentada en el runbook; sin borrado selectivo.
+
+## Validación y Git
+
+- Focales nuevas: 7/7 locales y 7/7 dentro de imagen Docker aislada sin red.
+- Focales + regresiones relacionadas: 193 casos cargados, comando final exit 0.
+  Incluye contratos, PSP neutral, 4B–4F, rutas, seguridad y configuración.
+- `docker compose config` combinado con perfil tools: aprobado; DB sin puerto,
+  seed opt-in y flags base False.
+- Build de imagen desde cero; migración interna hasta `20260917_03`;
+  PostgreSQL y web saludables; seed explícito dos veces reprodujo contrato #1.
+- Smoke HTTP host 5050: `/healthz` y `/dev/qa` 200; cambio de sesión, contrato
+  CREADA → ACEPTADA → EN_PROGRESO → COMPLETADA → CONFIRMADA; orden, enlace y QR
+  PNG, checkout local, pago simulado, 4E DONE y 4F ACCRUED.
+- En la base exclusiva se verificaron exactamente un contrato, una orden, un
+  evento, un trabajo DONE, una evidencia, una comisión efectiva ficticia y un
+  crédito concedido. No se ejecutó suite completa ni gate PostgreSQL de Testing.
+- Compileall y `git diff --check` aprobados. Staging vacío, sin commit/push/PR,
+  merge o deploy. Cambios sin commit; no migraciones nuevas.
+- Teardown con `down --volumes` únicamente del proyecto descartable; inventarios
+  posteriores de sus contenedores, redes y volúmenes vacíos.
+
+`trax-postgres` mantuvo ID `8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154`,
+pero estaba `exited starting` al inspeccionarlo antes y después del smoke. No se
+lo detuvo, inició, modificó ni se conectó a `trax_db`. Su condición requiere
+diagnóstico independiente; no atribuirla a esta simulación.
+
+Archivos de código: `app/__init__.py`, `app/config/config.py`,
+`app/routes/e2e_demo_routes.py`, `app/services/simulated_mercadopago_demo.py`,
+`app/services/psp_payment_order_contract.py`,
+`app/services/payment_order_application_service.py`,
+`app/services/payment_order_delivery_service.py`,
+`app/services/payment_order_reconciliation_service.py`,
+`app/templates/cliente_dashboard.html`, `app/templates/profesional_dashboard.html`,
+`app/templates/dev_qa_panel.html`, tres templates E2E, CSS E2E,
+`docker-compose.e2e.yml`, `scripts/dev_seed_e2e.py`, `tests/test_e2e_demo.py`.
+Documentación: este handoff y `docs/RUNBOOKS/E2E_DEMO_LOCAL.md`.
+
+Próximo paso: revisión independiente del alcance/aislamiento y Testing final,
+incluido PostgreSQL adversarial y suite completa. No incorporar endpoints QA ni
+valores ficticios a producción. Para retomar seguir el runbook con `-p` y ambos
+Compose, verificar identidad de recursos antes de borrar los volúmenes del
+proyecto y nunca tocar `trax_db`.
+
+---
+
 # Corrección focal Docker P2: exclusión de Obsidian
 
 Estado: READY_TO_RESUME

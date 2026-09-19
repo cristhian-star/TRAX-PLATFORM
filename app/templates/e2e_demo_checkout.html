@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/e2e-demo.css') }}">{% endblock %}
+{% block content %}
+<main class="trax-container e2e-demo" aria-labelledby="checkout-title">
+  <p class="e2e-demo__badge">SIMULACIÓN LOCAL · sin cobro real</p>
+  <h1 id="checkout-title">Orden simulada</h1>
+  <p>Importe ARS {{ checkout.amount_text }}. Vence localmente {{ checkout.expires_at.strftime('%d/%m/%Y %H:%M') }} UTC.</p>
+  <p id="qr-note">El enlace y el QR contienen exactamente la misma URL local. Abrirlos no confirma un pago.</p>
+  <a class="trax-button trax-button--primary" href="{{ checkout.checkout_url }}" aria-describedby="qr-note" rel="noreferrer noopener">Abrir checkout simulado</a>
+  <img class="e2e-demo__qr" src="{{ url_for('e2e_demo.qr') }}" alt="QR del mismo checkout local simulado" aria-describedby="qr-note">
+  <a href="{{ url_for('e2e_demo.dashboard') }}">Volver al progreso</a>
+</main>
+{% endblock %}

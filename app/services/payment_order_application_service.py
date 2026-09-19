@@ -42,6 +42,7 @@ class PaymentOrderApplicationService:
             raise TypeError("invalid payment order creation adapter")
         self._sessions = session_factory
         self._adapter = adapter
+        self._checkout_url_policy = getattr(adapter, "checkout_url_policy", None)
         self._clock = clock
         self._ids = id_factory
 
@@ -91,7 +92,7 @@ class PaymentOrderApplicationService:
                         if order is None:
                             raise PaymentOrderIdempotencyConflictError("payment order reservation conflict")
                         _require_unexpired(command.expires_at, self._clock)
-                        return reservation.id, command, _stored_result(order), None
+                        return reservation.id, command, _stored_result(order, self._checkout_url_policy), None
                     if reservation.status != "PREPARED":
                         raise PaymentOrderCreationUncertainError("payment order creation requires recovery")
                     invocation = _prepare_adapter(self._adapter, command)
@@ -169,7 +170,7 @@ class PaymentOrderApplicationService:
                     reservation.payment_order_id = order.id
                     reservation.finished_at = _read_clock(self._clock).replace(tzinfo=None)
                     session.flush()
-                    stored = _stored_result(order)
+                    stored = _stored_result(order, self._checkout_url_policy)
             return stored
         except (PermissionError, PaymentOrderIdempotencyConflictError):
             raise
@@ -282,7 +283,7 @@ def _external_result(adapter, command):
         return None
 
 
-def _stored_result(order):
+def _stored_result(order, checkout_url_policy=None):
     values = {name: getattr(order, name) for name in (
         "local_order_id", "external_reference", "amount", "currency", "concept",
         "idempotency_key", "external_order_id", "checkout_url", "provider", "live_mode",
@@ -293,4 +294,5 @@ def _stored_result(order):
         obligation_reference=order.obligation.internal_reference,
         created_at=order.created_at.replace(tzinfo=timezone.utc),
         expires_at=order.expires_at.replace(tzinfo=timezone.utc),
+        checkout_url_policy=checkout_url_policy,
     )

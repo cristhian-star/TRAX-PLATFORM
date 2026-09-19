@@ -119,6 +119,9 @@ class DevelopmentConfig(Config):
             "ENABLE_DEV_QA_PANEL",
             False,
         )
+        app_config["E2E_DEMO_ENABLED"] = _env_bool("E2E_DEMO_ENABLED", False)
+        app_config["E2E_DEMO_PROJECT"] = _env("E2E_DEMO_PROJECT")
+        app_config["E2E_DEMO_ORIGIN"] = _env("E2E_DEMO_ORIGIN")
 
 
 class TestingConfig(Config):
@@ -139,6 +142,9 @@ class TestingConfig(Config):
             "ENABLE_DEV_QA_PANEL",
             False,
         )
+        app_config["E2E_DEMO_ENABLED"] = _env_bool("E2E_DEMO_ENABLED", False)
+        app_config["E2E_DEMO_PROJECT"] = _env("E2E_DEMO_PROJECT")
+        app_config["E2E_DEMO_ORIGIN"] = _env("E2E_DEMO_ORIGIN")
 
 
 class ProductionConfig(Config):

@@ -1,0 +1,8 @@
+.e2e-demo { padding-block: 2rem 4rem; max-width: 70rem; }
+.e2e-demo__badge { display: inline-block; padding: .5rem .8rem; border: 2px solid currentColor; font-weight: 800; }
+.e2e-demo__steps { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap: 1rem; padding: 0; list-style-position: inside; }
+.e2e-demo__steps li { border: 1px solid currentColor; border-radius: .6rem; padding: 1rem; overflow-wrap: anywhere; }
+.e2e-demo__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-block: 2rem; }
+.e2e-demo__qr { display: block; width: min(100%, 18rem); height: auto; margin-block: 1rem; }
+.e2e-demo :is(a,button):focus-visible { outline: 3px solid #005fcc; outline-offset: 3px; }
+@media (max-width: 40rem) { .e2e-demo__actions, .e2e-demo__actions form, .e2e-demo__actions .trax-button { width: 100%; } }

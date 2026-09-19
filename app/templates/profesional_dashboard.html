@@ -71,6 +71,7 @@
         {% endif %}
 
         <section class="pro-dashboard__quick-links" aria-label="Accesos rapidos">
+            {% if e2e_demo_available %}<a href="{{ url_for('e2e_demo.dashboard') }}">SIMULACIÓN: recorrido de cobro</a>{% endif %}
             <a href="{{ public_profile_url }}">Ver perfil publico</a>
             <a href="/profesional/perfil/completar">Editar perfil</a>
             <a href="/presupuestos/mis-enviados">Mis presupuestos enviados</a>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/e2e-demo.css') }}">{% endblock %}
+{% block content %}
+<main class="trax-container e2e-demo" aria-labelledby="demo-title">
+  <p class="e2e-demo__badge">SIMULACIÓN LOCAL · sin Mercado Pago ni dinero real</p>
+  <h1 id="demo-title">Recorrido de contratación y cobro</h1>
+  <p>Cliente y Punto Agua completan el contrato mediante sus acciones normales. Abrir el checkout o QR no significa que el pago se haya aprobado.</p>
+  <ol class="e2e-demo__steps" aria-label="Progreso del escenario">
+    <li><strong>Contrato:</strong> {{ state.contract }}</li>
+    <li><strong>Orden:</strong> {{ state.order or 'Pendiente' }}</li>
+    <li><strong>Pago:</strong> {{ state.payment }}</li>
+    <li><strong>Conciliación:</strong> {{ state.reconciliation }}</li>
+    <li><strong>Comisión:</strong> {{ state.commission }}</li>
+    <li><strong>Crédito:</strong> {{ state.credit }} · {{ state.grants }} período(s) PRO concedidos</li>
+  </ol>
+  <div class="e2e-demo__actions">
+    <a class="trax-button trax-button--primary" href="{{ url_for('operations.contract_detail', id=contract.id) }}">Abrir contrato #{{ contract.id }}</a>
+    {% if not is_client and contract.estado == 'CONFIRMADA' %}
+      <form method="post" action="{{ url_for('e2e_demo.create_order') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="trax-button" type="submit">Crear o reproducir orden simulada</button></form>
+      {% if state.order %}<a class="trax-button" href="{{ url_for('e2e_demo.order') }}">Ver enlace y QR</a>{% endif %}
+      {% if state.reconciliation != 'PENDIENTE' %}<form method="post" action="{{ url_for('e2e_demo.apply') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="trax-button" type="submit">Aplicar crédito ficticio</button></form>{% endif %}
+    {% endif %}
+    {% if is_client and state.order %}<a class="trax-button" href="{{ 'http://127.0.0.1:5050/dev/e2e/checkout/' ~ state.order }}">Abrir checkout local simulado</a>{% endif %}
+    <a href="/dev/qa">Cambiar usuario demo</a>
+  </div>
+  <p>Política ficticia {{ policy.version }}: precio mensual PRO ARS {{ policy.monthly_price }}; comisión neta simulada ARS {{ commission }}. Un crédito concede 30 días PRO. No es una tasa comercial aprobada.</p>
+</main>
+{% endblock %}

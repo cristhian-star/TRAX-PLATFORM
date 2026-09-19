@@ -103,6 +103,7 @@ class PaymentOrderCreationResult:
     checkout_url: str = field(repr=False)
     provider: str
     live_mode: bool
+    checkout_url_policy: object = field(default=None, repr=False, compare=False)
 
     def __post_init__(self):
         try:
@@ -201,7 +202,9 @@ def _validate_result_fields(result):
     object.__setattr__(result, "provider", provider)
     if type(result.live_mode) is not bool:
         _invalid_result()
-    if not _is_structurally_safe_checkout_url(result.checkout_url):
+    if not (_is_structurally_safe_checkout_url(result.checkout_url)
+            or (callable(result.checkout_url_policy)
+                and result.checkout_url_policy(result) is True)):
         _invalid_result()
 
 
