@@ -1,3 +1,117 @@
+# Refinamiento footer corporativo UX-01: estructura demostrativa
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T16:31:28-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar el footer azul compartido, distinguiendo destinos funcionales de contenido futuro, sin modificar secciones anteriores del home ni lógica de negocio.
+
+`base.html` conserva un único footer global con identidad MANDOBRA, cobertura Capital Federal y AMBA, columnas Explorar/Para profesionales/Ayuda/Legal, tres SVG inline decorativos de Instagram, Facebook y LinkedIn sin enlaces ni red, y barra inferior 2026. Enlaces reales: `/buscar`, `/presupuestos/nuevo`, `/emergencias/nueva`, `/register`, `/propuestas`, `/planes` y anclas del home visitante `#featured-title`, `#faq-title`, `#trust-title`. Las anclas no se enlazan con sesión iniciada porque `/` muestra otro template; aparecen como texto inactivo. Herramientas, Cómo funciona, Contacto y todos los documentos legales son texto no interactivo con leyendas de preparación. No se afirman términos vigentes ni perfiles oficiales. Backlog registra titularidad/seguridad de cuentas, documentos, políticas, revisión legal/fiscal y habilitación gradual de rutas.
+
+Validación local: 38/38 pruebas focales/footer/home y regresiones frontend; pruebas JS de FAQ y carrusel aprobadas. Sintaxis JS, `compileall`, UTF-8, enlaces válidos/fragmentos y `git diff --check` aprobados. Inspección preliminar del Compose descartable a 1440, 768, 390 y 320 px: cinco columnas (marca + cuatro) en escritorio, dos en tablet, una en móvil, sin overflow horizontal; contraste, iconos, foco y contenido pendiente distinguible, barra inferior. Footer también renderizado en login, registro y planes. Suite completa, PostgreSQL y retest independiente no ejecutados por alcance. Aprobación visual del usuario pendiente.
+
+Archivos intervenidos en esta sesión: `app/templates/base.html`, `app/static/css/styles.css`, nuevo `tests/test_corporate_footer.py`, ajuste de expectativa en `tests/test_home_hero_carousel.py`, `docs/BACKLOG.md` y este handoff. Los refinamientos UX-01 previos permanecen íntegros. Web del proyecto exclusivo `mandobra_stabilization` disponible en `http://127.0.0.1:5050/`; no se tocó `trax_db`, base ni migraciones. Staging vacío; no hubo commit, push, PR, merge ni deploy porque está pendiente la revisión visual. Próximo paso: aprobación visual del usuario y luego retest final independiente. Conservar el entorno encendido hasta su inspección.
+
+---
+
+# Cuarto refinamiento visual UX-01: confianza, ayuda y cierre del home
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T16:08:46-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar el home tras los seis oficios, con confianza compacta, FAQ local y llamado para ambos actores, conservando hero, carrusel, MIME, búsqueda y footer global.
+
+Se sustituyó la confianza anterior por los tres mensajes aprobados y se añadió un FAQ de seis `details`/`summary`, con filtro independiente que normaliza acentos y mayúsculas, estado vacío y anuncio accesible. Sin JavaScript permanecen las seis respuestas; el filtro no envía ni conserva consultas. El llamado final reutiliza `main.buscar` (`/buscar`) y `auth.register` (`/register`), ambos GET 200. Registro permite elegir rol profesional, pero no preselecciona el rol mediante un enlace aprobado; no se alteró autenticación. Footer global único sin cambios. Backlog registra el futuro asistente documentado y soporte humano, sin implementarlos. Persiste el desajuste previo del selector de Pintura descrito en el registro anterior.
+
+Validación local: 33/33 focales/regresiones frontend, pruebas JS de FAQ y carrusel, sintaxis JS, `compileall`, UTF-8, enlaces, y `git diff --check` aprobados. Inspección preliminar en `mandobra_stabilization` a 1440, 768, 390 y 320 px: tres elementos de confianza en escritorio/tablet y apilados en móvil, llamado doble en escritorio/tablet y apilado en móvil, FAQ expansible, filtro y estado vacío, footer único, sin overflow horizontal. Enlaces navegados hasta búsqueda y registro. Aprobación visual del usuario y retest final independiente pendientes; suite completa y PostgreSQL no ejecutados por alcance.
+
+Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, nuevo `app/static/js/home-faq.js`, `tests/test_home_hero_carousel.py`, nuevo `tests/js/home_faq.test.js`, `docs/BACKLOG.md` y este handoff. Se conservaron los cambios UX-01 anteriores, ocho WebP, carrusel, MIME y demás lógica. Web del Compose descartable reconstruida y recreada, disponible en `http://127.0.0.1:5050/`, sin tocar `trax_db` ni migraciones. Git: staging vacío, sin commit, push, PR, merge ni deploy porque continúa la revisión visual; próximo paso: aprobación visual del usuario, decisión posterior sobre catálogo Pintura y retest final independiente. No integrar antes de esa revisión.
+
+---
+
+# Tercer refinamiento visual UX-01: oficios destacados
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T15:46:12-03:00
+Origen: laptop; agente: Codex.
+Rama: `feature/ux-ui-foundation`; HEAD base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reemplazar exclusivamente la sección de tres tarjetas numeradas por seis oficios editoriales, preservando hero, carrusel, mensajes, MIME y buscador.
+
+Nueva sección "Oficios destacados" con seis enlaces semánticos e imágenes WebP existentes, lazy, 16:9 y alt vacío; cuadrícula de 3 columnas en escritorio, 2 en tablet y 1 en móvil. Mapeo visible → `servicio` GET: Electricidad → Electricidad; Plomería → Plomeria; Refrigeración y climatización → Refrigeracion A/C; Cableado estructurado → Electricidad; Instalación de calderas → Gas domiciliario; Pintura → Pintura. Las tres primeras equivalencias y las dos familias amplias reutilizan opciones existentes. `Pintura` es un valor real de `Professional.servicio` aceptado por `/buscar` y mostrado en el encabezado de resultados, pero no está en el selector cerrado de resultados: éste muestra "Todos los servicios" aunque el filtro Pintura esté activo. No se alteró el buscador ni se inventó una equivalencia. Si se requiere selección visible en ese control, hace falta autorizar un incremento de catálogo fuera del alcance actual.
+
+Las tarjetas son selección editorial, no ranking respaldado por métricas. `docs/BACKLOG.md` registra diseño futuro de eventos anónimos, territorio CABA/AMBA, oferta/demanda, resultados vacíos, conversión, ventana y muestra, protección de manipulación, fallback editorial y privacidad/retención. No se implementó analítica ni persistencia.
+
+Validación local: 30/30 pruebas focales y frontend relacionadas; temporizadores JS, `compileall`, sintaxis JS, UTF-8, enlaces y `git diff --check` aprobados. Vista preliminar Docker a 1440, 768, 390 y 320 px: imágenes encuadradas, tres/dos/una columnas, foco/enlaces accesibles y sin overflow horizontal. El enlace Pintura respondió 200 y evidenció el desajuste del selector descrito. Suite completa, PostgreSQL y retest independiente no ejecutados por alcance. Aprobación visual definitiva pendiente del usuario.
+
+El Compose descartable `mandobra_stabilization` se reconstruyó solo para web y permanece disponible en `http://127.0.0.1:5050/`; no se tocó `trax_db`, volúmenes ni migraciones. Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `tests/test_home_hero_carousel.py`, `docs/BACKLOG.md` y este handoff. Los ocho WebP, el JS del carrusel y la corrección MIME no se modificaron. Git: 16 archivos con cambios locales, staging vacío, sin commit, push, PR, merge ni deploy. Próximo paso: inspección visual del usuario y decisión sobre Pintura en el selector; luego retest final independiente. No integrar ni desmontar el entorno antes de esa revisión.
+
+---
+
+# Segundo refinamiento visual UX-01: altura y mensajes dinámicos
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T15:17:41-03:00
+Origen: laptop; agente: Codex.
+Objetivo: ampliar el hero aprobado y rotar tres pares de título/subtítulo sin mover buscador, flechas ni otros contenidos.
+Rama: `feature/ux-ui-foundation`; HEAD base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+Se preservaron íntegros los 14 cambios UX-01/MIME/refinamiento previo. El hero crece 80 px efectivos en escritorio (496,24 → 576,24 px a 1440) y 48 px en móvil (1087,20 → 1135,20 px a 390), con padding repartido arriba y abajo, sin altura rígida. Tres mensajes exactos rotan cada 10.000 ms con fundido de 180 ms; el primero queda en HTML sin JavaScript. Tres copias invisibles y excluidas de accesibilidad reservan el alto máximo del bloque, por lo que el buscador no salta. Las ocho imágenes continúan cada 5.000 ms; navegación manual cambia solo la imagen. Temporizadores separados se cancelan/reprograman ante hover, tacto, foco, pestaña oculta o movimiento reducido. En reduced motion no hay autoplay ni transiciones. No se recuperaron los elementos visibles retirados en el refinamiento anterior.
+
+Validación: focales/regresiones frontend `tests.test_home_hero_carousel`, `tests.test_design_system_v2` y `tests.test_auth_ux_redesign_v1`: 28/28; nueva prueba de temporizadores con Node: aprobada. `compileall`, sintaxis JS, UTF-8 y `git diff --check`: aprobados. Inspección preliminar en Docker a 1440, 390 y 320 px: composición legible, flechas centradas, buscador completo, sin overflow horizontal ni errores de consola; la rotación hasta el tercer mensaje mantuvo altura y posición. GET/HEAD WebP y MIME de CSS/JS/PNG siguen cubiertos por la regresión focal. Suite completa, PostgreSQL y retest final no ejecutados por alcance.
+
+Entorno descartable `mandobra_stabilization`: se reconstruyó y recreó solo web, disponible en `http://127.0.0.1:5050/` para revisión del usuario. Se deja encendido; no se accedió a `trax_db`, no se hicieron migraciones ni seed. Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`; nuevo `tests/js/home_hero_carousel.test.js`. Los ocho WebP y la corrección MIME de `app/__init__.py` permanecen sin cambios de esta sesión. Git: 15 archivos con cambios locales, staging vacío, sin commit, push, PR o merge porque falta aprobación visual. Sin bloqueantes técnicos conocidos; riesgo pendiente: valoración visual final del usuario. Próximo paso: el usuario revisa `5050` en escritorio y móvil; solo después corresponde retest independiente. No integrar ni desmontar el entorno antes de esa revisión.
+
+---
+
+# Refinamiento visual UX-01 pendiente de aprobación del usuario
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T14:33:37-03:00
+Origen: laptop; agente: Codex.
+Objetivo: simplificar el hero visitante y mejorar la visibilidad de las ocho escenas sin iniciar todavía el retest final independiente.
+Rama: `feature/ux-ui-foundation`; HEAD/base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`; staging vacío; 14 cambios locales UX-01/MIME/refinamiento, sin cambios adicionales.
+
+Se retiraron del hero la ceja, los tres beneficios, la nota de imágenes, el botón de pausa y el contador visible. Permanecen el título, párrafo y buscador. El overlay azul oscuro se redujo moderadamente; los ocho WebP originales y la corrección MIME se conservaron intactos. Las flechas laterales son cheurones sin caja, con área de 44×44 px y nombres accesibles. El carrusel conserva fundido, avance automático de 5000 ms y navegación manual; reinicia un único temporizador después de cada cambio, pausa durante hover, tacto, foco o pestaña oculta y desactiva autoplay/transiciones con movimiento reducido. La primera imagen permanece como fallback sin JavaScript; el anuncio de cambios manuales no es visible.
+
+Validación ejecutada: focal `tests.test_home_hero_carousel` y regresiones frontend `tests.test_design_system_v2`, `tests.test_auth_ux_redesign_v1`: **27/27**; `compileall`, `node --check`, UTF-8 y `git diff --check`: código 0. GET y HEAD reales desde el contenedor: ocho WebP `image/webp`, CSS `text/css`, JS `text/javascript` y PNG `image/png`, todos 200. Inspección de navegador: hero de escritorio, flechas funcionales, vista móvil sin overflow horizontal ni solapamiento horizontal con el buscador, consola sin errores. La suite completa y el retest final independiente **no se ejecutaron**, conforme al alcance solicitado. No se conocen bloqueantes técnicos; contraste y composición definitivos requieren aprobación visual del usuario.
+
+Entorno de revisión: `docker compose -p mandobra_stabilization -f docker-compose.stabilization.yml build web`, seguido de `up -d --no-deps --force-recreate web`. Web y PostgreSQL descartable del proyecto permanecen saludables; web disponible solo en `http://127.0.0.1:5050/`. No se inició ni conectó `trax_db`; `trax-postgres` conservó ID `8d989fb2a948` y estado `Exited (0)`. No se ejecutó seed ni se eliminó el entorno, para permitir inspección del usuario.
+
+Archivos editados en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py` y este handoff. `app/__init__.py` y los ocho WebP preexistentes quedaron sin alteraciones de esta sesión. No hubo staging, commit, push, PR, merge ni deploy porque falta la aprobación visual. Próximo paso: usuario revisa en escritorio y móvil las ocho escenas, la legibilidad, las flechas, el buscador y el ritmo del carrusel; tras su aprobación, realizar retest independiente final. Para retomar: verificar rama, HEAD, staging y 14 cambios; consultar este registro; no integrar ni desmontar el Compose antes de la inspección del usuario.
+
+---
+
+# Corrección focal P2 UX-01: MIME WebP portable
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T13:34:59-03:00
+Origen: laptop; agente: Codex.
+Rama: `feature/ux-ui-foundation`; HEAD base conservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Hallazgo P2: la respuesta estática de los ocho `.webp` podía depender de la tabla MIME del host Windows y no anunciar `image/webp` de forma portable.
+Corrección: `create_app` registra explícitamente `.webp` como `image/webp` antes de construir Flask. La regresión HTTP consulta GET y HEAD de los ocho assets y comprueba `Content-Type`; también protege los tipos CSS, JavaScript y PNG. No se alteraron imágenes, carrusel, buscador, caché, rutas ni backend financiero.
+Validación focal y regresiones frontend relacionadas: 27/27; `compileall`, UTF-8 y `git diff --check` aprobados. Suite completa y PostgreSQL no ejecutados por alcance. No se conocen nuevos errores. Testing independiente debe revalidar el P2.
+Git: solo los 13 cambios UX-01 anteriores más `app/__init__.py` modificado; staging vacío, sin commit ni push. No hubo PR ni merge porque la corrección está pendiente de retest. Próximo paso: retest HTTP independiente y revisión de UX-01; no integrar ni desplegar antes de aprobación.
+
+---
+
+# Handoff vigente: UX-01 carrusel visual del home
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-19T13:22:54-03:00
+Origen: laptop; agente: Codex.
+Objetivo: incorporar ocho escenas aprobadas como fondo del hero visitante, sin alterar textos, buscador, rutas ni lógica de negocio.
+Rama: `feature/ux-ui-foundation`; HEAD base conservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+Se convirtieron los ocho PNG aprobados de Downloads a WebP locales 1600×900, entre 53 y 98 KB cada uno; los originales no ingresaron al repositorio. El template muestra la primera imagen aun sin JavaScript. El carrusel carga las siguientes progresivamente, mantiene un overlay oscuro, ofrece controles anterior/siguiente y pausa, se detiene durante interacción y con movimiento reducido, y usa encuadre móvil. Las escenas se identifican como ilustrativas. No hay servicios externos, migraciones ni cambios financieros.
+
+Validación local: 26/26 pruebas focales y regresiones frontend relacionadas; `compileall`, sintaxis JS y `git diff --check` aprobados. Revisión visual en contenedor descartable separado, servido en `127.0.0.1:5051`: escritorio y móvil legibles, buscador intacto, control manual funcional. El contenedor temporal se detuvo; no se modificó `mandobra_stabilization` ni `trax_db`. Suite completa y migraciones no ejecutadas por alcance. No hay errores conocidos; Testing independiente queda pendiente.
+
+Archivos modificados: `app/templates/home.html`, `app/static/css/home-v1.css`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`. Nuevos: `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py` y ocho WebP en `app/static/images/home/hero/`.
+Git: cambios locales sin staging, commit ni push; no hubo PR ni merge porque UX-01 está pendiente de revisión. Riesgo restante: confirmar calidad y contraste en la matriz final de navegadores/dispositivos. Próximo paso: Testing visual/accesibilidad independiente, luego revisión para commit técnico. No hacer merge ni despliegue antes de esa revisión.
+
+---
+
 # Handoff vigente: demo E2E local aprobada por Testing
 
 Estado: COMPLETED

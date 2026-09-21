@@ -1,5 +1,29 @@
 # BACKLOG MANDOBRA
 
+## Futuro: identidad legal y perfiles sociales del footer
+
+Timestamp: 2026-09-20T16:31:28-03:00. Rama: `feature/ux-ui-foundation`.
+El footer UX-01 es una **presentación demostrativa**. Los documentos legales y perfiles externos todavía no están disponibles ni se anuncian como vigentes. Pendientes: crear y verificar perfiles oficiales de Instagram, Facebook y LinkedIn; conectar únicamente URLs oficiales verificadas; definir propiedad, recuperación, autenticación reforzada y responsables internos de las cuentas. Redactar Términos y condiciones, Política de privacidad, Política de cookies, reglas de pagos, cancelaciones y reembolsos, Normas de la comunidad, y política de contenido, imágenes y autorizaciones. Someterlas a revisión legal y fiscal antes de producción; crear rutas reales y retirar cada indicación «Próximamente» cuando el recurso correspondiente esté aprobado y habilitado. No se incorporan redes, rastreadores, cookies ni enlaces legales ficticios en este incremento.
+
+## Futuro: asistencia documentada y soporte humano
+
+Timestamp: 2026-09-20T16:08:46-03:00. Rama: `feature/ux-ui-foundation`.
+El FAQ del home UX-01 filtra seis preguntas y respuestas **exclusivamente en el navegador**; no transmite ni conserva consultas. Incremento posterior: asistente RAG restringido a documentación aprobada, respuestas con fuentes, derivación a soporte humano, tickets de consulta con estados y responsables, consentimiento y privacidad, retención de mensajes, límites de frecuencia y protección contra abuso, notificaciones de respuesta, vinculación opcional con WhatsApp y métricas anonimizadas de preguntas no resueltas. Definir políticas y autorización antes de incorporar persistencia, servicios externos o IA.
+
+## Futuro: búsqueda territorial y ranking de oficios con evidencia
+
+Timestamp: 2026-09-20T15:39:04-03:00. Rama: `feature/ux-ui-foundation`.
+Las seis tarjetas de "Oficios destacados" del home UX-01 son una **selección editorial inicial**, no un ranking basado en métricas. No afirmar popularidad, demanda o volumen hasta diseñar y validar:
+
+- eventos anonimizados de búsquedas por oficio y zona, con criterios de privacidad y retención;
+- normalización territorial de Capital Federal y AMBA;
+- cantidad de profesionales activos y verificados por especialidad y relación entre oferta y demanda;
+- búsquedas sin resultados y conversión de búsqueda a contacto, presupuesto y contratación;
+- ranking dinámico con ventana temporal, tamaño mínimo de muestra y protección contra manipulación;
+- fallback editorial explícito cuando la muestra sea insuficiente.
+
+La captura de eventos, el ranking y la evolución del catálogo/filtros quedan para un incremento posterior. En UX-01 no se implementa analítica ni persistencia de búsquedas.
+
 ## Cierre técnico local 4F aprobado por Testing
 
 Timestamp de registro documental: 2026-09-18T09:50:28-03:00
