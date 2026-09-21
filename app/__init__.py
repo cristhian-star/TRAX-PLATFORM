@@ -1,3 +1,5 @@
+import mimetypes
+
 from flask import Flask, jsonify, request, session
 from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
@@ -15,6 +17,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(config_class=None, initialize_schema=False):
+    # Keep static WebP responses portable across host MIME registries.
+    mimetypes.add_type("image/webp", ".webp", strict=True)
     app = Flask(__name__)
 
     config_class = config_class or get_config_class()

@@ -7,82 +7,154 @@
 {% block content %}
 <main class="trax-home">
     <section class="trax-home__hero" aria-labelledby="home-title">
+        <div class="trax-home__slides" data-hero-carousel aria-hidden="true">
+            <img class="trax-home__slide is-active" src="{{ url_for('static', filename='images/home/hero/electricidad.webp') }}" width="1600" height="900" alt="" fetchpriority="high" decoding="async">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/plomeria.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/refrigeracion-interior.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/pintura.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/climatizacion-exterior.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/cableado-estructurado.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/instalacion-caldera.webp') }}" width="1600" height="900" alt="">
+            <img class="trax-home__slide" data-src="{{ url_for('static', filename='images/home/hero/mesada-porcelanato.webp') }}" width="1600" height="900" alt="">
+        </div>
         <div class="trax-home__grid"></div>
         <div class="shell trax-home__hero-layout">
             <div class="trax-home__intro">
-                <span class="trax-home__eyebrow">Servicios tecnicos y oficios</span>
-                <h1 id="home-title">El trabajo correcto empieza con una conexion confiable.</h1>
-                <p class="trax-home__lead">
-                    Encontra profesionales, compara presupuestos, resolve una urgencia
-                    o accede a nuevas oportunidades desde un solo lugar.
-                </p>
-
-                <div class="trax-home__proof" aria-label="Beneficios de MANDOBRA">
-                    <span>Perfiles con reputacion visible</span>
-                    <span>Busqueda por servicio y zona</span>
-                    <span>Seguimiento dentro de MANDOBRA</span>
+                <div class="trax-home__message">
+                    <div class="trax-home__message-content" data-hero-message-content aria-live="off">
+                        <h1 id="home-title" class="trax-home__message-title">El trabajo correcto empieza con una conexión confiable.</h1>
+                        <p class="trax-home__lead">Encontrá profesionales, compará presupuestos, resolvé una urgencia o accedé a nuevas oportunidades desde un solo lugar.</p>
+                    </div>
+                    <div class="trax-home__message-measure" aria-hidden="true">
+                        <span class="trax-home__message-title">El trabajo correcto empieza con una conexión confiable.</span>
+                        <p class="trax-home__lead">Encontrá profesionales, compará presupuestos, resolvé una urgencia o accedé a nuevas oportunidades desde un solo lugar.</p>
+                    </div>
+                    <div class="trax-home__message-measure" data-hero-message aria-hidden="true">
+                        <span class="trax-home__message-title">Tu oficio merece más oportunidades.</span>
+                        <p class="trax-home__lead">Mostrá tu experiencia, recibí nuevas solicitudes y organizá cada trabajo desde MANDOBRA.</p>
+                    </div>
+                    <div class="trax-home__message-measure" data-hero-message aria-hidden="true">
+                        <span class="trax-home__message-title">Formá parte de nuestra comunidad técnica.</span>
+                        <p class="trax-home__lead">Clientes, profesionales y empresas conectados para resolver necesidades, crear oportunidades y hacer crecer cada oficio.</p>
+                    </div>
                 </div>
             </div>
 
             {% include "home/_operation_search.html" %}
         </div>
+        <div class="trax-home__carousel-controls" data-hero-controls role="group" aria-label="Navegación de imágenes" hidden>
+            <button type="button" data-hero-previous aria-label="Imagen anterior">‹</button>
+            <button type="button" data-hero-next aria-label="Imagen siguiente">›</button>
+            <span class="trax-home__carousel-status" data-hero-status aria-live="polite" aria-atomic="true"></span>
+        </div>
     </section>
 
-    <section class="trax-home__pathways" aria-labelledby="pathways-title">
+    <section class="trax-home__featured" aria-labelledby="featured-title">
         <div class="shell">
-            <div class="trax-home__section-heading">
-                <div>
-                    <span class="trax-home__eyebrow trax-home__eyebrow--dark">Una red para cada tarea</span>
-                    <h2 id="pathways-title">Elegi como queres avanzar.</h2>
-                </div>
-                <p>
-                    MANDOBRA conecta necesidades concretas con profesionales preparados,
-                    sin mezclar contrataciones, cotizaciones y oportunidades.
-                </p>
-            </div>
-
-            <div class="trax-home__pathway-grid">
-                <article class="trax-home__pathway">
-                    <span class="trax-home__pathway-index">01</span>
-                    <h3>Busca con criterio</h3>
-                    <p>Filtra por especialidad y zona antes de revisar cada perfil.</p>
-                    <a href="/resultados">Explorar profesionales</a>
-                </article>
-                <article class="trax-home__pathway">
-                    <span class="trax-home__pathway-index">02</span>
-                    <h3>Compara propuestas</h3>
-                    <p>Publica el trabajo y evalua alcance, plazo y condiciones.</p>
-                    <a href="/presupuestos/nuevo">Pedir presupuestos</a>
-                </article>
-                <article class="trax-home__pathway trax-home__pathway--dark">
-                    <span class="trax-home__pathway-index">03</span>
-                    <h3>Hace crecer tu oficio</h3>
-                    <p>Presenta tu experiencia y accede a trabajos relevantes.</p>
-                    <a href="/propuestas/nueva">Ver propuestas</a>
-                </article>
+            <h2 id="featured-title">Oficios destacados</h2>
+            <p class="trax-home__featured-lead">Explorá servicios y encontrá profesionales para resolver tu necesidad.</p>
+            <div class="trax-home__featured-grid">
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Electricidad') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/electricidad.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Electricidad</h3>
+                </a>
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Plomeria') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/plomeria.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Plomería</h3>
+                </a>
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Refrigeracion A/C') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/refrigeracion-interior.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Refrigeración y climatización</h3>
+                </a>
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Electricidad') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/cableado-estructurado.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Cableado estructurado</h3>
+                </a>
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Gas domiciliario') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/instalacion-caldera.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Instalación de calderas</h3>
+                </a>
+                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Pintura') }}">
+                    <img src="{{ url_for('static', filename='images/home/hero/pintura.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
+                    <h3>Pintura</h3>
+                </a>
             </div>
         </div>
     </section>
 
     <section class="trax-home__trust" aria-labelledby="trust-title">
-        <div class="shell trax-home__trust-layout">
-            <div>
-                <span class="trax-home__eyebrow trax-home__eyebrow--dark">Confianza operativa</span>
-                <h2 id="trust-title">Decisiones claras antes del primer contacto.</h2>
-            </div>
+        <div class="shell">
+            <h2 id="trust-title">Más claridad en cada etapa.</h2>
             <div class="trax-home__trust-list">
                 <article>
-                    <strong>Identidad profesional</strong>
-                    <p>Especialidad, zona, reputacion y badges visibles.</p>
+                    <h3>Perfiles con información verificable</h3>
+                    <p>Revisá la información disponible antes de elegir.</p>
                 </article>
                 <article>
-                    <strong>Contexto de trabajo</strong>
-                    <p>Cada operacion solicita solo la informacion necesaria.</p>
+                    <h3>Presupuestos para comparar</h3>
+                    <p>Evaluá alcance, condiciones y propuestas antes de decidir.</p>
                 </article>
                 <article>
-                    <strong>Estados comprensibles</strong>
-                    <p>Sabes que accion realizaste y cual es el proximo paso.</p>
+                    <h3>Seguimiento del trabajo</h3>
+                    <p>Consultá el estado de la contratación desde MANDOBRA.</p>
                 </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="trax-home__faq" aria-labelledby="faq-title" data-home-faq>
+        <div class="shell trax-home__faq-layout">
+            <div class="trax-home__faq-intro">
+                <h2 id="faq-title">¿Cómo podemos ayudarte?</h2>
+                <p>Encontrá respuestas rápidas sobre el uso de MANDOBRA.</p>
+                <label for="home-faq-search">Buscar en las preguntas frecuentes</label>
+                <input id="home-faq-search" type="search" placeholder="Escribí tu duda sobre MANDOBRA" autocomplete="off" data-home-faq-search aria-describedby="home-faq-status">
+                <p id="home-faq-status" class="trax-home__faq-status" role="status" aria-live="polite" aria-atomic="true" data-home-faq-status></p>
+            </div>
+            <div class="trax-home__faq-list">
+                <details data-home-faq-item>
+                    <summary>¿Cómo encuentro y contacto a un profesional?</summary>
+                    <p>Buscá por servicio y zona, revisá los perfiles disponibles y elegí la opción de contacto o contratación correspondiente.</p>
+                </details>
+                <details data-home-faq-item>
+                    <summary>¿Puedo pedir y comparar presupuestos?</summary>
+                    <p>Podés describir tu necesidad y revisar las propuestas recibidas antes de decidir cómo continuar.</p>
+                </details>
+                <details data-home-faq-item>
+                    <summary>¿Cómo verifica MANDOBRA a los profesionales?</summary>
+                    <p>Los perfiles muestran la información y el estado de verificación disponible. Revisá también su experiencia, especialidad y reputación antes de elegir.</p>
+                </details>
+                <details data-home-faq-item>
+                    <summary>¿Cómo funcionan los pagos dentro de la plataforma?</summary>
+                    <p>Cuando el cobro esté disponible para una contratación, MANDOBRA mostrará la orden, el importe y el medio habilitado. Abrir un enlace o QR no confirma por sí solo el pago.</p>
+                </details>
+                <details data-home-faq-item>
+                    <summary>¿Qué hago si surge un problema con el trabajo?</summary>
+                    <p>Consultá el seguimiento de la contratación y utilizá los canales de ayuda disponibles para registrar la situación y conocer los próximos pasos.</p>
+                </details>
+                <details data-home-faq-item>
+                    <summary>¿Cómo puedo registrarme como profesional?</summary>
+                    <p>Creá una cuenta profesional, completá tu perfil y presentá la información necesaria para su revisión antes de comenzar a recibir oportunidades.</p>
+                </details>
+                <p class="trax-home__faq-empty" data-home-faq-empty hidden>No encontramos una respuesta. Probá con otras palabras.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="trax-home__closing" aria-labelledby="closing-title">
+        <div class="shell">
+            <h2 id="closing-title">Empezá a usar MANDOBRA.</h2>
+            <div class="trax-home__closing-grid">
+                <div>
+                    <h3>¿Necesitás resolver un trabajo?</h3>
+                    <p>Encontrá profesionales y elegí cómo avanzar según tu necesidad.</p>
+                    <a class="trax-button trax-button--primary" href="{{ url_for('main.buscar') }}">Buscar profesionales</a>
+                </div>
+                <div>
+                    <h3>¿Querés ofrecer tus servicios?</h3>
+                    <p>Creá tu perfil, mostrale tu experiencia a la comunidad y accedé a nuevas oportunidades.</p>
+                    <a class="trax-button trax-button--secondary" href="{{ url_for('auth.register') }}">Crear perfil profesional</a>
+                </div>
             </div>
         </div>
     </section>
@@ -91,4 +163,6 @@
 
 {% block extra_scripts %}
     <script src="{{ url_for('static', filename='js/home-tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/home-hero-carousel.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/home-faq.js') }}" defer></script>
 {% endblock %}
