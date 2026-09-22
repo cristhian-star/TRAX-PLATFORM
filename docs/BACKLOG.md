@@ -1,5 +1,23 @@
 # BACKLOG MANDOBRA
 
+## Futuro: evolución de búsqueda y catálogo de rubros
+
+Timestamp: 2026-09-21T20:18:54-03:00. Rama: `feature/ux-ui-foundation`.
+UX-02 presenta veinte rubros editoriales y mantiene correspondencias de búsqueda
+explícitas, sin ampliar la taxonomía canónica ni afirmar oferta, demanda o
+popularidad. Quedan para incrementos posteriores:
+
+- sinónimos y aliases revisados para cada rubro;
+- catálogo canónico administrable y su gobierno editorial;
+- búsqueda por especialidades;
+- normalización territorial de CABA y AMBA;
+- métricas de búsquedas con criterios de privacidad y retención;
+- registro y análisis de búsquedas sin resultados;
+- medición de oferta real por región;
+- conversión desde búsqueda a perfil y contratación;
+- ranking basado en evidencia y resistente a manipulación;
+- revisión del tratamiento global de errores.
+
 ## Futuro: identidad legal y perfiles sociales del footer
 
 Timestamp: 2026-09-20T16:31:28-03:00. Rama: `feature/ux-ui-foundation`.

@@ -1,3 +1,207 @@
+# Corrección UX-02: contrato de tarjetas y aislamiento de logging
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T02:54:54-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: resolver los hallazgos P2/P3 de Testing sin alterar el diseño visual
+UX-02 aprobado ni debilitar la prueba de protección de secretos.
+
+P2 resuelto. El usuario aprobó visualmente la tarjeta compacta formada por
+imagen, título, etiquetas y acción `Explorar profesionales`; no lleva párrafo
+descriptivo. La prueba focal ahora expresa ese contrato mediante la estructura
+de las veinte tarjetas y los campos de `ExploreTrade`, en vez de depender solo
+de que una frase concreta no aparezca. `description` no tenía consumidores ni
+una utilidad documentada, por lo que se retiró del objeto de presentación y de
+las veinte entradas. HTML, CSS, alineación, imágenes, títulos, etiquetas,
+acciones, enlaces, términos de búsqueda y taxonomía permanecen intactos.
+
+P3 resuelto localmente. La reproducción determinista demostró que
+`logging.config.fileConfig("alembic.ini")`, usado por el entorno Alembic,
+deshabilita por defecto el logger existente `app`; antes estaba
+`disabled=False` y después `disabled=True`. Por eso el nodo aislado pasaba y
+podía fallar tras pruebas de migración. La captura de seguridad ahora conserva
+el nivel, handlers, filtros, `propagate`, `disabled` y el umbral global de
+logging; habilita y limpia filtros solo durante `assertLogs`, y restaura todo en
+`finally`. Una regresión contamina deliberadamente cada estado y acredita su
+restauración. La prueba sigue exigiendo el mensaje público, presencia real del
+log y ausencia de token, clave, teléfono y payload sensible. No se modificó
+producción ni `migrations/env.py`.
+
+Validación ejecutada: focales UX-02 15/15; nodo de seguridad aislado 1/1;
+módulo `test_security_compliance_phase3` 9/9; reproducción mínima
+`fileConfig -> seguridad` 2/2 y `seguridad -> fileConfig -> seguridad` 3/3;
+selección con parche de `logging.Logger._log` y estados contaminados 3/3;
+regresiones frontend relacionadas 38/38. `compileall`, UTF-8, enlaces relativos
+y `git diff --check`: aprobados. La
+suite completa no se ejecutó porque queda reservada para retest independiente.
+
+Archivos ajustados por esta corrección:
+`app/services/explore_catalog_service.py`,
+`tests/test_explore_rubros_ux02.py`,
+`tests/test_security_compliance_phase3.py` y este handoff. Los ocho cambios
+locales UX-02 preexistentes fueron preservados; `tests/test_security_compliance_phase3.py`
+es el único path adicional. Sin migraciones ni cambios de datos. Staging vacío;
+sin commit, push, PR, merge ni deploy porque P2/P3 quedan pendientes de retest
+independiente. Próximo paso: ejecutar el paquete de Testing sin incorporar
+descripciones ni modificar la presentación aprobada.
+
+---
+
+# Refinamiento visual UX-02: alineación interna de tarjetas
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T21:37:07-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: alinear títulos, etiquetas, acciones y bordes de las tarjetas de
+`/explorar` sin alterar contenido, imágenes, enlaces ni búsquedas de UX-02.
+
+La grilla exterior estira las tarjetas de cada fila. Cada tarjeta usa dos filas
+internas, imagen y cuerpo, con `height: 100%`; el cuerpo usa áreas CSS Grid
+compartidas para título, etiquetas y acción. El título conserva espacio mínimo
+para dos líneas, las etiquetas ocupan una zona flexible sin recorte y la acción
+queda al fondo. No se agregaron alturas rígidas de tarjeta, posiciones
+absolutas, selectores individuales, rellenos invisibles, estilos inline ni
+JavaScript. El template solo añadió la clase común `rubro-card__title`.
+
+Medición con `getBoundingClientRect()` en 1440, 1280, 1024, 768, 390 y 320 px:
+cuatro/dos/una columnas según breakpoint y diferencia máxima de `0 px` dentro
+de cada fila para altura y borde inferior de tarjetas, inicio de títulos, inicio
+de etiquetas y extremos superior/inferior de botones. No hubo overflow
+horizontal, superposición ni recorte de títulos, etiquetas o acciones. Se
+revisaron los temas claro y oscuro y el foco por teclado sobre `Explorar
+profesionales`; el contorno y anillo de foco permanecen visibles. El reflow
+equivalente a 200% se cubrió a 768 CSS px sobre el ancho de escritorio de 1536;
+el bridge automatizado no expuso un control nativo del zoom cromado, por lo que
+esa comprobación exacta queda incluida en la aprobación visual manual.
+
+Validación local: 15/15 focales UX-02 y 38/38 regresiones de home, footer,
+Design System y autenticación. `compileall`, UTF-8 y `git diff --check`
+aprobados. Suite completa no ejecutada por alcance. Compose exclusivo
+`mandobra_stabilization`: web reconstruida y saludable en
+`http://127.0.0.1:5050/explorar`; localhost queda disponible para revisión.
+`trax-postgres`, `trax_db`, imágenes, rutas, servicios, modelos y migraciones no
+fueron tocados.
+
+Archivos ajustados en este refinamiento:
+`app/static/css/explore-rubros-v1.css`,
+`app/templates/explorar_rubros.html`,
+`tests/test_explore_rubros_ux02.py` y este handoff. Se preservaron los ocho
+cambios locales UX-02 existentes. Staging vacío; sin commit, push, PR, merge ni
+deploy porque el refinamiento espera aprobación visual del usuario y Testing
+final. Próximo paso: revisar localhost, incluido zoom manual al 200%; si se
+aprueba, entregar el paquete UX-02 completo a Testing sin integrar todavía.
+
+---
+
+# Refinamiento visual UX-02: tarjetas compactas y acciones destacadas
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T21:15:23-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: simplificar las tarjetas de `/explorar` tras la revisión visual del
+usuario, conservando títulos, etiquetas, imágenes, búsqueda y estructura UX-02.
+
+Se retiraron de la vista los párrafos descriptivos de los veinte rubros. Las
+descripciones permanecen en el catálogo de presentación como datos internos,
+pero el template muestra únicamente título, etiquetas y acción. Las etiquetas
+ahora usan los tokens semánticos `primary`, `primary-soft` y `primary-border`
+del Design System, con contraste diferenciado en temas claro y oscuro. En
+Calderas y calefacción se ajustó la etiqueta a `Pisos radiantes`, junto con
+`Calderas` y `Controles de presión`. La acción por tarjeta pasó al estilo
+primario naranja y al texto `Explorar profesionales`; su destino GET y los
+términos de búsqueda no cambiaron.
+
+Validación local: 14/14 focales UX-02 y 38/38 regresiones de home, footer,
+Design System y autenticación; `compileall` aprobado. Inspección en el Compose
+exclusivo `mandobra_stabilization`: 1536 px y 390 px, temas claro/oscuro, una
+columna móvil, cero descripciones y cero overflow horizontal. Colores
+computados: etiquetas claras `rgb(185, 56, 10)` sobre `rgb(255, 244, 237)` y
+oscuras `rgb(255, 138, 76)` sobre fondo semitransparente del token; CTA claro
+`rgb(211, 68, 14)` con texto blanco y CTA oscuro `rgb(255, 138, 76)` con texto
+oscuro. Web reconstruida y saludable en `http://127.0.0.1:5050/explorar` para
+revisión. `trax-postgres` y `trax_db` no fueron tocados.
+
+Archivos ajustados en este refinamiento:
+`app/templates/explorar_rubros.html`,
+`app/static/css/explore-rubros-v1.css`,
+`app/services/explore_catalog_service.py`,
+`tests/test_explore_rubros_ux02.py` y este handoff. Se preservó el resto del
+trabajo UX-02 local. Staging vacío; sin commit, push, PR, merge ni deploy porque
+el conjunto continúa pendiente de revisión visual y Testing final. Próximo
+paso: revisar el catálogo abierto en localhost y, si se aprueba, entregar el
+paquete completo UX-02 a Testing sin modificar taxonomía ni lógica de búsqueda.
+
+---
+
+# UX-02: catálogo visual de Explorar rubros
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T20:35:06-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: rediseñar `/explorar` como catálogo visual accesible de veinte rubros,
+sin modificar la taxonomía canónica, los WebP versionados ni lógica de negocio.
+
+Se incorporó un catálogo de presentación centralizado e inmutable con cinco
+categorías editoriales y veinte tarjetas. Cada entrada declara identificador,
+título, descripción, hasta tres ejemplos, WebP, alt ilustrativo y término de
+búsqueda. La pantalla usa un único `h1`, `h2` por categoría, `h3` por tarjeta,
+anclas nativas, buscador GET por servicio/zona, acción por rubro y acción general.
+No se agregó JavaScript. Las imágenes mantienen 1200 x 900, lazy loading,
+decodificación asíncrona y `object-fit: cover`.
+
+Correspondencias aprobadas: Electricidad domiciliaria -> `Electricista`,
+Plomería -> `Plomero` y Aire acondicionado ->
+`Técnico en Aire Acondicionado`. Los otros diecisiete rubros no tienen una
+equivalencia canónica exacta aprobada y envían su título editorial completo;
+pueden producir una búsqueda vacía antes que una coincidencia incorrecta.
+`resultados.html` conserva y muestra de forma escapada cualquier servicio que no
+pertenezca al selector cerrado. El catálogo vacío muestra un estado propio y un
+error inesperado conserva la respuesta genérica 500; ninguno se presenta como
+falta de profesionales.
+
+Responsive verificado en Docker a 1440, 1280, 768, 390 y 320 px: cuadrículas de
+4/4/2/1/1 columnas, buscador apilado bajo 48rem, categorías con wrap, targets de
+44 px y cero overflow horizontal. Se revisaron los veinte encuadres, navegación,
+foco por teclado, estado de búsqueda vacío y temas claro/oscuro. Durante la
+revisión se corrigió el contraste del título del hero en tema oscuro usando el
+blanco estable del Design System. El navbar compartido conserva una atenuación
+visual preexistente en el menú móvil oscuro; no fue modificado por estar fuera de
+alcance.
+
+Validación local: 13/13 focales UX-02; 38/38 regresiones de home, navbar, footer,
+Design System y autenticación; 17/17 regresiones relacionadas de búsqueda y
+seguridad. `compileall` focal, 31 enlaces internos/fragmentos, assets locales,
+UTF-8 estricto y ausencia de mojibake nuevo, y `git diff --check`: aprobados.
+Permanece una secuencia histórica de mojibake en una recomendación de reseñas de
+`main_routes.py`, fuera del diff y del alcance; no se amplió. Suite completa y
+Testing final no ejecutados por instrucción.
+
+Compose exclusivo `mandobra_stabilization`: web reconstruida y saludable en
+`http://127.0.0.1:5050/explorar`, con la pestaña abierta en tema claro para
+aprobación visual. PostgreSQL descartable permaneció saludable; `trax-postgres`
+conservó ID `8d989fb2a948`, detenido, y no se accedió a `trax_db`. No hubo
+migraciones ni cambios de datos.
+
+Archivos modificados: `app/routes/main_routes.py`,
+`app/templates/explorar_rubros.html`, `app/templates/resultados.html`,
+`app/static/css/explore-rubros-v1.css`, `docs/BACKLOG.md` y este handoff.
+Archivos nuevos: `app/services/explore_catalog_service.py` y
+`tests/test_explore_rubros_ux02.py`. Los veinte WebP y UX-01 permanecen intactos.
+Staging vacío; sin commit, push, PR, merge ni deploy porque falta aprobación
+visual del usuario y Testing final. Próximo paso: revisar `/explorar` en
+localhost; si la presentación se aprueba, entregar el paquete a Testing sin
+integrar ni modificar taxonomía, modelos o imágenes.
+
+---
+
 # Refinamiento footer corporativo UX-01: estructura demostrativa
 
 Estado: READY_TO_RESUME
