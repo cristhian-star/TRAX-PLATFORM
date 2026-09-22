@@ -11,8 +11,8 @@ from app.services.category_service import (
     request_category,
     get_category_requests_summary,
     approve_category,
-    get_explorable_categories,
 )
+from app.services.explore_catalog_service import get_explore_catalog
 from app.services.professional_service import (
     create_professional,
     complete_professional_profile,
@@ -355,31 +355,9 @@ def listado_profesionales():
 @main.route("/explorar")
 @limiter.limit("60 per minute", key_func=ip_rate_limit_key)
 def explorar_rubros():
-    industria = normalize_limited_text(request.args.get("industria", ""))
-    rubro_seleccionado = normalize_limited_text(request.args.get("rubro", ""))
-    rubros_disponibles = get_explorable_categories()
-    rubros = rubros_disponibles
-
-    if industria:
-        rubros = [
-            rubro
-            for rubro in rubros
-            if rubro["industria"].casefold() == industria.casefold()
-        ]
-
-    if rubro_seleccionado:
-        rubros = [
-            rubro
-            for rubro in rubros
-            if rubro["nombre"].casefold() == rubro_seleccionado.casefold()
-        ]
-
     return render_template(
         "explorar_rubros.html",
-        rubros=paginate_items(rubros),
-        rubros_disponibles=rubros_disponibles,
-        industria=industria,
-        rubro_seleccionado=rubro_seleccionado,
+        catalog=get_explore_catalog(),
     )
 
 

@@ -6,84 +6,108 @@
 
 {% block content %}
 <main class="explore-rubros">
-    <section class="explore-rubros__hero">
-        <div class="shell explore-rubros__hero-layout">
-            <div>
-                <span class="explore-rubros__eyebrow">Directorio MANDOBRA</span>
-                <h1>Explora rubros y encontra al profesional indicado</h1>
-                <p>
-                    Recorre los servicios disponibles en la plataforma y accede al
-                    listado de profesionales de cada especialidad.
-                </p>
-            </div>
-            <div class="explore-rubros__metric" aria-label="Cantidad de rubros visibles">
-                <strong>{{ rubros|length }}</strong>
-                <span>rubros disponibles</span>
-            </div>
+    <header class="explore-rubros__hero" id="explore-top">
+        <div class="shell explore-rubros__hero-content">
+            <h1>Explorá rubros</h1>
+            <p>Encontrá el servicio que necesitás y buscá profesionales en tu zona.</p>
+
+            <form action="{{ url_for('main.buscar') }}" method="GET" class="explore-search" aria-label="Buscar profesionales">
+                <div class="trax-field explore-search__field">
+                    <label class="trax-field__label" for="explore-service">Servicio</label>
+                    <input
+                        class="trax-input"
+                        id="explore-service"
+                        name="servicio"
+                        type="search"
+                        maxlength="120"
+                        autocomplete="off"
+                        placeholder="Ejemplo: Plomería">
+                </div>
+                <div class="trax-field explore-search__field">
+                    <label class="trax-field__label" for="explore-zone">Zona</label>
+                    <input
+                        class="trax-input"
+                        id="explore-zone"
+                        name="zona"
+                        type="search"
+                        maxlength="120"
+                        autocomplete="address-level2"
+                        placeholder="Barrio, ciudad o zona">
+                </div>
+                <button class="trax-button trax-button--primary explore-search__submit" type="submit">
+                    Buscar profesionales
+                </button>
+            </form>
         </div>
-    </section>
+    </header>
 
-    <section class="shell explore-rubros__content">
-        <form action="/explorar" method="GET" class="explore-filters" aria-label="Filtrar rubros">
-            <label>
-                <span>Industria</span>
-                <select name="industria">
-                    <option value="">Todas las industrias</option>
-                    <option value="Servicios tecnicos" {% if industria == "Servicios tecnicos" %}selected{% endif %}>
-                        Servicios tecnicos
-                    </option>
-                </select>
-            </label>
-
-            <label>
-                <span>Rubro / categoria</span>
-                <select name="rubro">
-                    <option value="">Todos los rubros</option>
-                    {% for rubro in rubros_disponibles %}
-                        <option value="{{ rubro.nombre }}" {% if rubro_seleccionado == rubro.nombre %}selected{% endif %}>
-                            {{ rubro.nombre }}
-                        </option>
+    <div class="shell explore-rubros__content">
+        {% if catalog %}
+            <nav class="explore-categories" aria-label="Categorías de rubros">
+                <p>Ir a una categoría</p>
+                <ul>
+                    {% for category in catalog %}
+                        <li><a href="#{{ category.id }}">{{ category.title }}</a></li>
                     {% endfor %}
-                </select>
-            </label>
+                </ul>
+            </nav>
 
-            <button type="submit">Aplicar filtros</button>
-            {% if industria or rubro_seleccionado %}
-                <a href="/explorar">Limpiar</a>
-            {% endif %}
-        </form>
+            <div class="explore-catalog">
+                {% for category in catalog %}
+                    <section
+                        class="explore-category"
+                        id="{{ category.id }}"
+                        aria-labelledby="{{ category.id }}-title">
+                        <div class="explore-category__heading">
+                            <h2 id="{{ category.id }}-title">{{ category.title }}</h2>
+                            <a href="#explore-top">Volver arriba</a>
+                        </div>
 
-        {% if rubros %}
-            <div class="rubro-grid" aria-label="Rubros disponibles">
-                {% for rubro in rubros %}
-                    <article class="rubro-card">
-                        <div class="rubro-card__visual" aria-hidden="true">
-                            <span>{{ "%02d"|format(loop.index) }}</span>
-                            <i></i>
-                            <i></i>
-                            <i></i>
+                        <div class="rubro-grid">
+                            {% for trade in category.trades %}
+                                <article class="rubro-card" id="rubro-{{ trade.id }}">
+                                    <img
+                                        class="rubro-card__image"
+                                        src="{{ url_for('static', filename='images/explorar/rubros/' ~ trade.image_filename) }}"
+                                        width="1200"
+                                        height="900"
+                                        loading="lazy"
+                                        decoding="async"
+                                        alt="{{ trade.alt_text }}">
+                                    <div class="rubro-card__body">
+                                        <h3 class="rubro-card__title">{{ trade.title }}</h3>
+                                        {% if trade.examples %}
+                                            <ul class="rubro-card__examples" aria-label="Ejemplos de {{ trade.title }}">
+                                                {% for example in trade.examples %}
+                                                    <li>{{ example }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        <a
+                                            class="trax-button trax-button--primary rubro-card__action"
+                                            href="{{ url_for('main.buscar', servicio=trade.search_term) }}">
+                                            Explorar profesionales
+                                        </a>
+                                    </div>
+                                </article>
+                            {% endfor %}
                         </div>
-                        <div class="rubro-card__body">
-                            <span class="rubro-card__industry">{{ rubro.industria }}</span>
-                            <h2>{{ rubro.nombre }}</h2>
-                            <p>
-                                {{ rubro.descripcion or "Profesionales disponibles para trabajos, mantenimiento y asistencia tecnica." }}
-                            </p>
-                            <a href="/resultados?servicio={{ rubro.nombre|urlencode }}">
-                                Ver profesionales
-                            </a>
-                        </div>
-                    </article>
+                    </section>
                 {% endfor %}
             </div>
         {% else %}
-            <section class="explore-empty" aria-labelledby="explore-empty-title">
-                <span aria-hidden="true">0</span>
-                <h2 id="explore-empty-title">No encontramos rubros con esos filtros.</h2>
-                <p>Proba otra categoria o limpia los filtros para ver todo el directorio.</p>
-                <a href="/explorar">Ver todos los rubros</a>
+            <section class="trax-empty-state explore-empty" aria-labelledby="explore-empty-title">
+                <span class="explore-empty__icon" aria-hidden="true">0</span>
+                <h2 class="trax-empty-state__title" id="explore-empty-title">El catálogo no está disponible.</h2>
+                <p class="trax-empty-state__description">Podés buscar profesionales directamente por servicio y zona.</p>
             </section>
         {% endif %}
-    </section>
+
+        <div class="explore-rubros__general-action">
+            <a class="trax-button trax-button--primary" href="{{ url_for('main.buscar') }}">
+                Ver todos los profesionales
+            </a>
+        </div>
+    </div>
 </main>
 {% endblock %}
