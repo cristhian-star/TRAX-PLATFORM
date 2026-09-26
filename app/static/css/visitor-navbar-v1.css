@@ -6,6 +6,35 @@
     column-gap: clamp(var(--trax-space-4), 2vw, var(--trax-space-7));
 }
 
+/* Account controls need the existing collapsible menu earlier than visitor controls. */
+@media (min-width: 821px) and (max-width: 1180px) {
+    .site-header--visitor.site-header--authenticated {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .site-header--authenticated .menu-toggle {
+        display: block;
+        justify-self: end;
+        margin-left: 0;
+    }
+
+    .site-header--authenticated .main-nav--visitor,
+    .site-header--authenticated .header-utilities {
+        display: none;
+        grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        padding-top: var(--trax-space-3);
+    }
+
+    body.menu-open .site-header--authenticated .main-nav--visitor,
+    body.menu-open .site-header--authenticated .header-utilities {
+        display: flex;
+    }
+}
+
 .site-header--visitor .main-nav--visitor {
     min-width: 0;
     justify-content: center;
@@ -20,41 +49,31 @@
     width: 200px;
     height: 56px;
     justify-content: center;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .site-header--visitor .brand-logo {
-    height: 56px;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     object-position: center;
 }
 
-.site-header--visitor .brand-logo--light {
-    width: 200px;
-    object-fit: cover;
+.site-header--visitor .menu-toggle {
+    background: var(--trax-color-surface);
+    border-color: var(--trax-color-border);
 }
 
-.site-header--visitor .brand-logo--dark {
-    width: 200px;
-    object-fit: cover;
+.site-header--visitor .menu-toggle span {
+    background: var(--trax-color-text);
 }
 
 .site-header--visitor .brand-logo--dark,
-.site-header--visitor .brand-symbol {
-    display: none;
-}
-
-.theme-light .site-header--visitor .brand-logo--light {
-    display: block;
-}
-
-.theme-light .site-header--visitor .brand-logo--dark {
-    display: none;
-}
-
 .theme-dark .site-header--visitor .brand-logo--light {
     display: none;
 }
 
+.site-header--visitor .brand-logo--light,
 .theme-dark .site-header--visitor .brand-logo--dark {
     display: block;
 }
@@ -293,6 +312,10 @@
 }
 
 @media (min-width: 821px) and (max-width: 1080px) {
+    .site-header--visitor .brand {
+        width: 160px;
+    }
+
     .theme-switch__label {
         display: none;
     }
@@ -305,24 +328,9 @@
     }
 
     .site-header--visitor .brand {
-        width: 44px;
+        width: clamp(144px, 46vw, 180px);
         height: 44px;
         min-width: 0;
-        overflow: hidden;
-    }
-
-    .site-header--visitor .brand-logo,
-    .theme-dark .site-header--visitor .brand-logo {
-        display: none;
-    }
-
-    .site-header--visitor .brand-symbol,
-    .theme-dark .site-header--visitor .brand-symbol {
-        display: block;
-        width: 44px;
-        height: 44px;
-        object-fit: contain;
-        transform: scale(1.65);
     }
 
     .site-header--visitor .menu-toggle {

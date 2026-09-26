@@ -25,11 +25,10 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="site-header site-header--visitor">
+    <header class="site-header site-header--visitor{% if session.get('user_id') %} site-header--authenticated{% endif %}">
         <a class="brand" href="/" aria-label="MANDOBRA inicio">
-            <img class="brand-logo brand-logo--light" src="{{ url_for('static', filename='img/branding/mandobra/ahora_si2.png') }}" alt="" aria-hidden="true">
-            <img class="brand-logo brand-logo--dark" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-on-dark.png') }}" alt="" aria-hidden="true">
-            <img class="brand-symbol" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-symbol-compact.png') }}" alt="" aria-hidden="true">
+            <img class="brand-logo brand-logo--light" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-light.png') }}" width="1696" height="720" alt="" aria-hidden="true">
+            <img class="brand-logo brand-logo--dark" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-dark.png') }}" width="1696" height="720" alt="" aria-hidden="true">
         </a>
 
         <button
