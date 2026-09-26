@@ -1,170 +1,236 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block extra_css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/markets-v2.css') }}">
+{% endblock %}
 
-<main class="markets-screen">
-    <section class="markets-hero">
-        <div class="shell markets-hero-grid">
-            <div>
-                <span class="signal">Market intelligence publico</span>
-                <h1>Mercados y precios</h1>
+{% macro market_icon(name) -%}
+<svg class="market-guide__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    {% if name == "wallet" %}
+        <path d="M4 6.5h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2h12"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4Z"/>
+    {% elif name == "range" %}
+        <path d="M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/>
+    {% elif name == "demand" %}
+        <path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/>
+    {% elif name == "urgency" %}
+        <path d="M13 2 5 14h6l-1 8 9-13h-6Z"/>
+    {% elif name == "electricity" %}
+        <path d="m13 2-7 11h6l-1 9 7-12h-6Z"/>
+    {% elif name == "cooling" %}
+        <path d="M12 2v20M4.2 6.5l15.6 11M19.8 6.5l-15.6 11M8.5 4 12 6l3.5-2M8.5 20l3.5-2 3.5 2M3.5 10 7 12l-3.5 2M20.5 10 17 12l3.5 2"/>
+    {% elif name == "plumbing" %}
+        <path d="M12 2S6 9 6 14a6 6 0 0 0 12 0c0-5-6-12-6-12Z"/>
+    {% elif name == "gas" %}
+        <path d="M13 2c1 5-3 5-3 9 0 2 1 3 2 4-3 0-5-2-5-5-2 3-3 6-2 8a8 8 0 0 0 14-1c2-6-3-11-6-15Z"/>
+    {% elif name == "construction" %}
+        <path d="M4 20h16M6 20V9l6-5 6 5v11M9 12h6M9 16h6"/>
+    {% elif name == "finishes" %}
+        <path d="m4 15 8-8 5 5-8 8H4v-5Z"/><path d="m14 5 2-2 5 5-2 2M4 20h16"/>
+    {% elif name == "metalwork" %}
+        <path d="M5 20V9h14v11M5 13h14M9 9V5h6v4M3 20h18"/><path d="m8 16 2-2 2 2 2-2 2 2"/>
+    {% elif name == "calendar" %}
+        <path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2ZM3 9h18M8 2v4M16 2v4"/>
+    {% elif name == "location" %}
+        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>
+    {% elif name == "complexity" %}
+        <path d="M4 19h16M6 16l4-4 3 2 5-7"/><path d="m14 7 4-1 1 4"/>
+    {% elif name == "materials" %}
+        <path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>
+    {% elif name == "urgency-factor" %}
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>
+    {% endif %}
+</svg>
+{%- endmacro %}
+
+{% block content %}
+<main class="market-guide">
+    <section class="market-guide__hero" aria-labelledby="market-guide-title">
+        <div class="market-guide__visuals" data-market-carousel aria-hidden="true">
+            <div class="market-guide__visual-slide is-active">
+                <img src="{{ url_for('static', filename='images/home/hero/electricidad.webp') }}" width="1600" height="900" alt="" fetchpriority="high" decoding="async">
+                <img src="{{ url_for('static', filename='images/home/hero/plomeria.webp') }}" width="1600" height="900" alt="" fetchpriority="high" decoding="async">
+            </div>
+            <div class="market-guide__visual-slide">
+                <img data-src="{{ url_for('static', filename='images/home/hero/refrigeracion-interior.webp') }}" width="1600" height="900" alt="">
+                <img data-src="{{ url_for('static', filename='images/home/hero/pintura.webp') }}" width="1600" height="900" alt="">
+            </div>
+            <div class="market-guide__visual-slide">
+                <img data-src="{{ url_for('static', filename='images/home/hero/climatizacion-exterior.webp') }}" width="1600" height="900" alt="">
+                <img data-src="{{ url_for('static', filename='images/home/hero/cableado-estructurado.webp') }}" width="1600" height="900" alt="">
+            </div>
+            <div class="market-guide__visual-slide">
+                <img data-src="{{ url_for('static', filename='images/home/hero/instalacion-caldera.webp') }}" width="1600" height="900" alt="">
+                <img data-src="{{ url_for('static', filename='images/home/hero/mesada-porcelanato.webp') }}" width="1600" height="900" alt="">
+            </div>
+        </div>
+        <div class="shell market-guide__hero-grid">
+            <div class="market-guide__hero-copy">
+                <h1 id="market-guide-title">Precios de mercado para decidir mejor</h1>
                 <p>
-                    Una vista estimada del movimiento de servicios tecnicos en MANDOBRA:
-                    precios de referencia, demanda por categoria y tendencias de urgencia.
+                    Consultá rangos orientativos y señales de demanda antes de buscar profesionales
+                    o preparar un presupuesto.
                 </p>
             </div>
-            <aside class="markets-note">
-                <strong>Datos mock por ahora</strong>
-                <span>Estos indicadores son placeholders estimados para validar la experiencia. No usan APIs externas ni datos reales todavia.</span>
-            </aside>
+            <section class="market-guide__hero-indicators" aria-labelledby="market-indicators-title">
+                <div class="market-guide__hero-indicators-heading">
+                    <h2 id="market-indicators-title">Indicadores de referencia</h2>
+                    <span>Valores simulados</span>
+                </div>
+                <div class="market-guide__indicators">
+                    {% for indicator in market_indicators %}
+                    <article class="market-guide__indicator">
+                        <span class="market-guide__icon-wrap">{{ market_icon(indicator.icon) }}</span>
+                        <div>
+                            <p class="market-guide__card-label">{{ indicator.label }}</p>
+                            <strong>{{ indicator.value }}</strong>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
         </div>
+        <button class="market-guide__carousel-toggle" type="button" data-market-carousel-toggle aria-pressed="false" hidden>
+            Pausar imágenes
+        </button>
     </section>
 
-    <section class="shell markets-content">
-        <div class="market-indicators">
-            <article>
-                <span>Ticket promedio</span>
-                <strong>$32.400</strong>
-                <small>servicios tecnicos generales</small>
-            </article>
-            <article>
-                <span>Rango habitual</span>
-                <strong>$18k-$65k</strong>
-                <small>segun categoria y urgencia</small>
-            </article>
-            <article>
-                <span>Demanda activa</span>
-                <strong>1.284</strong>
-                <small>consultas estimadas este mes</small>
-            </article>
-            <article>
-                <span>Urgencias</span>
-                <strong>+23%</strong>
-                <small>variacion mock semanal</small>
-            </article>
-        </div>
-
-        <div class="markets-grid">
-            <section class="market-panel wide">
-                <div class="panel-title">
-                    <span class="kicker">Price summary</span>
-                    <h2>Resumen de precios por servicio</h2>
-                    <p>Rangos estimados para orientar decisiones iniciales antes de pedir cotizacion.</p>
+    <div class="shell market-guide__content">
+        <section class="market-guide__section" aria-labelledby="market-prices-title">
+            <div class="market-guide__heading market-guide__heading--split">
+                <div>
+                    <span class="market-guide__kicker">Rubros frecuentes</span>
+                    <h2 id="market-prices-title">Rangos orientativos por servicio</h2>
                 </div>
-                <div class="price-range-table">
-                    <div class="range-row">
-                        <strong>Electricidad</strong>
-                        <span>Visita / tablero / instalacion</span>
-                        <em>$18.000 - $82.000</em>
+                <p>Los valores en $0 son marcadores temporales hasta contar con datos suficientes. No constituyen cotizaciones.</p>
+            </div>
+            <div class="market-guide__prices">
+                {% for reference in market_price_references %}
+                <details class="market-guide__price-card">
+                    <summary>
+                        <span class="market-guide__icon-wrap">{{ market_icon(reference.icon) }}</span>
+                        <span class="market-guide__price-copy">
+                            <strong>{{ reference.service }}</strong>
+                            <small>{{ reference.works|length }} trabajos frecuentes</small>
+                        </span>
+                        <span class="market-guide__price-summary-action">Ver rangos</span>
+                    </summary>
+                    <div class="market-guide__work-list">
+                        {% for work in reference.works %}
+                        <div class="market-guide__work-row">
+                            <div>
+                                <strong>{{ work.name }}</strong>
+                                <span>{{ work.unit }}</span>
+                            </div>
+                            <div class="market-guide__work-value">
+                                <small>Rango estimativo pendiente</small>
+                                <strong>{{ work.price_range }}</strong>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
-                    <div class="range-row">
-                        <strong>Refrigeracion A/C</strong>
-                        <span>Service / instalacion / carga</span>
-                        <em>$22.000 - $95.000</em>
+                    <a class="market-guide__price-action" href="{{ url_for('main.buscar', servicio=reference.search_term) }}">
+                        Explorar profesionales de {{ reference.service }}
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </details>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="market-guide__section market-guide__section--tinted" aria-labelledby="market-trends-title">
+            <div class="market-guide__heading">
+                <span class="market-guide__kicker">Tendencias demostrativas</span>
+                <h2 id="market-trends-title">Demanda relativa por rubro</h2>
+                <p>Series estáticas de seis períodos, creadas únicamente para mostrar la interfaz. No representan operaciones ni mediciones reales.</p>
+            </div>
+            <div class="market-guide__trends">
+                {% for trend in market_demand_references %}
+                <article class="market-guide__trend">
+                    <div class="market-guide__trend-heading">
+                        <span class="market-guide__icon-wrap">{{ market_icon(trend.icon) }}</span>
+                        <div class="market-guide__trend-title">
+                            <span>Tendencia demostrativa</span>
+                            <h3>{{ trend.service }}</h3>
+                        </div>
                     </div>
-                    <div class="range-row">
-                        <strong>Plomeria</strong>
-                        <span>Perdidas / sanitarios / urgencias</span>
-                        <em>$16.000 - $70.000</em>
+                    <svg class="market-guide__trend-chart" viewBox="0 0 236 100" role="img" aria-labelledby="trend-chart-title-{{ loop.index }} trend-chart-description-{{ loop.index }}">
+                        <title id="trend-chart-title-{{ loop.index }}">Evolución demostrativa de {{ trend.service }}</title>
+                        <desc id="trend-chart-description-{{ loop.index }}">{{ trend.summary }}</desc>
+                        <defs>
+                            <linearGradient id="trend-area-{{ loop.index }}" x1="0" y1="0" x2="0" y2="1">
+                                <stop class="market-guide__trend-area-start" offset="0%"/>
+                                <stop class="market-guide__trend-area-end" offset="100%"/>
+                            </linearGradient>
+                        </defs>
+                        <path class="market-guide__trend-grid" d="M8 20H228 M8 48H228 M8 76H228"/>
+                        <polygon class="market-guide__trend-area" points="{{ trend.area_points }}" fill="url(#trend-area-{{ loop.index }})"/>
+                        <polyline class="market-guide__trend-line" points="{{ trend.line_points }}"/>
+                        {% for x, y in trend.chart_points %}
+                        <circle class="market-guide__trend-point" cx="{{ x }}" cy="{{ y }}" r="3.5"/>
+                        {% endfor %}
+                    </svg>
+                    <ol class="market-guide__trend-values">
+                        {% for value in trend.values %}
+                        <li>Período demostrativo {{ loop.index }}: índice simulado {{ value }}</li>
+                        {% endfor %}
+                    </ol>
+                    <div class="market-guide__trend-summary">
+                        <strong><span aria-hidden="true">{{ trend.trend_symbol }}</span> {{ trend.closing_trend }}</strong>
+                        <p>{{ trend.summary }}</p>
                     </div>
-                    <div class="range-row">
-                        <strong>Gas domiciliario</strong>
-                        <span>Revision / conexion / reparacion</span>
-                        <em>$24.000 - $110.000</em>
-                    </div>
-                </div>
-            </section>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
 
-            <section class="market-panel wide">
-                <div class="panel-title">
-                    <span class="kicker">Price fluctuation</span>
-                    <h2>Fluctuacion estimada de precios</h2>
-                    <p>Placeholder visual para una futura serie temporal de precios por semana.</p>
-                </div>
-                <div class="chart-placeholder trend-chart" aria-label="Grafico placeholder de fluctuacion de precios">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </section>
+        <section class="market-guide__section" aria-labelledby="market-interpretation-title">
+            <div class="market-guide__heading">
+                <span class="market-guide__kicker">Lectura responsable</span>
+                <h2 id="market-interpretation-title">Cómo interpretar estos rangos</h2>
+                <p>El precio final puede variar. Considerá estos factores antes de comparar propuestas.</p>
+            </div>
+            <div class="market-guide__factors">
+                <article>{{ market_icon("location") }}<h3>Ubicación</h3><p>Traslado, cobertura y disponibilidad en la zona.</p></article>
+                <article>{{ market_icon("complexity") }}<h3>Complejidad</h3><p>Diagnóstico, alcance y condiciones del trabajo.</p></article>
+                <article>{{ market_icon("materials") }}<h3>Materiales</h3><p>Calidad, cantidad y provisión de insumos.</p></article>
+                <article>{{ market_icon("urgency-factor") }}<h3>Urgencia</h3><p>Prioridad, horario y tiempo de respuesta.</p></article>
+                <article>{{ market_icon("calendar") }}<h3>Temporada</h3><p>Demanda y disponibilidad según el momento del año.</p></article>
+            </div>
+        </section>
 
-            <section class="market-panel">
-                <div class="panel-title">
-                    <span class="kicker">Demand indicators</span>
-                    <h2>Demanda por categoria</h2>
+        <section class="market-guide__methodology" aria-labelledby="market-methodology-title">
+            <details>
+                <summary id="market-methodology-title">Metodología y transparencia</summary>
+                <div>
+                    <p>
+                        Esta versión usa datos ficticios y estables para validar la interfaz. Los rangos no
+                        sustituyen un presupuesto, no garantizan disponibilidad y no constituyen una oferta.
+                    </p>
+                    <p>
+                        Una versión futura deberá publicar fecha de actualización, tamaño mínimo de muestra,
+                        tratamiento de valores atípicos, segmentación y versión de la metodología.
+                    </p>
                 </div>
-                <div class="category-demand">
-                    <div><strong>Electricidad</strong><span style="--value: 86%"></span><small>Alta intencion</small></div>
-                    <div><strong>Refrigeracion</strong><span style="--value: 74%"></span><small>Estacional</small></div>
-                    <div><strong>Plomeria</strong><span style="--value: 66%"></span><small>Urgencias frecuentes</small></div>
-                    <div><strong>Herreria</strong><span style="--value: 48%"></span><small>Proyectos planificados</small></div>
-                </div>
-            </section>
+            </details>
+        </section>
 
-            <section class="market-panel">
-                <div class="panel-title">
-                    <span class="kicker">Most requested</span>
-                    <h2>Categorias mas pedidas</h2>
-                </div>
-                <ol class="requested-list">
-                    <li><strong>Electricidad domiciliaria</strong><span>31% de consultas mock</span></li>
-                    <li><strong>Refrigeracion A/C</strong><span>24% de consultas mock</span></li>
-                    <li><strong>Plomeria urgente</strong><span>19% de consultas mock</span></li>
-                    <li><strong>Gas matriculado</strong><span>14% de consultas mock</span></li>
-                </ol>
-            </section>
-
-            <section class="market-panel">
-                <div class="panel-title">
-                    <span class="kicker">Emergency services</span>
-                    <h2>Tendencias de urgencia</h2>
-                </div>
-                <div class="emergency-grid">
-                    <article>
-                        <strong>24h</strong>
-                        <span>Mayor conversion mobile</span>
-                    </article>
-                    <article>
-                        <strong>18 min</strong>
-                        <span>Respuesta esperada</span>
-                    </article>
-                    <article>
-                        <strong>+34%</strong>
-                        <span>Busqueda fuera de horario</span>
-                    </article>
-                </div>
-            </section>
-
-            <section class="market-panel">
-                <div class="panel-title">
-                    <span class="kicker">Service trends</span>
-                    <h2>Tendencias de servicios</h2>
-                </div>
-                <div class="trend-list">
-                    <p><strong>A/C preventivo</strong><span>Sube antes de temporada alta</span></p>
-                    <p><strong>Urgencias 24h</strong><span>Alta conversion en mobile</span></p>
-                    <p><strong>Instalaciones completas</strong><span>Ticket promedio creciente</span></p>
-                </div>
-            </section>
-
-            <section class="market-panel wide">
-                <div class="panel-title">
-                    <span class="kicker">Future module</span>
-                    <h2>Mapa de calor de demanda</h2>
-                    <p>Bloque reservado para cruzar zona, categoria, disponibilidad y precio estimado.</p>
-                </div>
-                <div class="heatmap-placeholder" aria-label="Placeholder de mapa de calor">
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                </div>
-            </section>
-        </div>
-    </section>
+        <section class="market-guide__cta" aria-labelledby="market-actions-title">
+            <div>
+                <span class="market-guide__kicker">Siguiente paso</span>
+                <h2 id="market-actions-title">Convertí la referencia en una propuesta concreta</h2>
+                <p>Explorá rubros o publicá tu necesidad para recibir presupuestos de profesionales.</p>
+            </div>
+            <div class="market-guide__cta-actions">
+                <a class="btn btn-primary" href="{{ url_for('main.explorar_rubros') }}">Explorar rubros</a>
+                <a class="btn btn-secondary" href="{{ url_for('operations.nuevo_presupuesto') }}">Solicitar presupuesto</a>
+            </div>
+        </section>
+    </div>
 </main>
+{% endblock %}
 
+{% block extra_scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/markets-carousel.js') }}" defer></script>
 {% endblock %}

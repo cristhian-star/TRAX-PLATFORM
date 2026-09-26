@@ -43,8 +43,9 @@
         </button>
 
         <nav id="primary-navigation" class="main-nav main-nav--visitor" aria-label="Navegacion principal">
-            <a href="/">Inicio</a>
-            <a href="/explorar">Explorar rubros</a>
+            <a href="/"{% if request.path == "/" %} aria-current="page"{% endif %}>Inicio</a>
+            <a href="/explorar"{% if request.path == "/explorar" %} aria-current="page"{% endif %}>Explorar rubros</a>
+            <a href="/mercados"{% if request.path == "/mercados" %} aria-current="page"{% endif %}>Precios de mercado</a>
 
             <details class="nav-dropdown">
                 <summary>
@@ -67,8 +68,6 @@
                 </div>
             </details>
 
-            <a href="/mercados">Mercados</a>
-
             <details class="nav-dropdown">
                 <summary>
                     Ecosistema
@@ -86,7 +85,7 @@
                 </div>
             </details>
 
-            <a href="/planes">Planes</a>
+            <a href="/planes"{% if request.path == "/planes" %} aria-current="page"{% endif %}>Planes</a>
         </nav>
 
         <div class="header-utilities">

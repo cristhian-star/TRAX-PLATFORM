@@ -87,6 +87,11 @@
     color: var(--trax-orange-700);
 }
 
+.site-header--visitor .main-nav--visitor > a[aria-current="page"] {
+    color: var(--trax-color-action-primary);
+    box-shadow: inset 0 -2px 0 currentColor;
+}
+
 .nav-dropdown {
     position: relative;
 }

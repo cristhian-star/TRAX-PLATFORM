@@ -13,6 +13,7 @@ from app.services.category_service import (
     approve_category,
 )
 from app.services.explore_catalog_service import get_explore_catalog
+from app.services.market_view_service import build_markets_page_context
 from app.services.professional_service import (
     create_professional,
     complete_professional_profile,
@@ -363,7 +364,7 @@ def explorar_rubros():
 
 @main.route("/mercados")
 def mercados():
-    return render_template("mercados.html")
+    return render_template("mercados.html", **build_markets_page_context())
 
 
 @main.route("/planes")
