@@ -1,5 +1,24 @@
 # BACKLOG MANDOBRA
 
+## Futuro: datos reales y metodología de Precios de mercado
+
+Timestamp: 2026-09-22T22:33:48-03:00. Rama: `feature/ux-ui-foundation`.
+UX-03 presenta una guía pública con datos ficticios y estables para validar la
+experiencia. No implementa analítica, persistencia nueva ni mediciones reales.
+Antes de reemplazar la demostración se deberá definir y aprobar:
+
+- búsquedas anonimizadas por oficio y zona, con privacidad y retención explícitas;
+- presupuestos emitidos y aceptados, y precios finalmente acordados;
+- distribución por oficio y zona, separando mano de obra y materiales;
+- detección y tratamiento de valores atípicos;
+- tamaño mínimo de muestra antes de publicar una referencia;
+- fecha de actualización visible;
+- metodología versionada y trazable;
+- revisión administrativa de métricas y calidad de datos.
+
+Las referencias futuras deberán distinguir estimaciones de cotizaciones y no
+afirmar representatividad cuando la muestra sea insuficiente.
+
 ## Futuro: evolución de búsqueda y catálogo de rubros
 
 Timestamp: 2026-09-21T20:18:54-03:00. Rama: `feature/ux-ui-foundation`.

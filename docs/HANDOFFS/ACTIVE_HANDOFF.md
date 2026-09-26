@@ -1,3 +1,262 @@
+# Refinamiento UX-03: grilla 2×2 para demanda por rubro
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-25T23:43:16-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reorganizar exclusivamente las cuatro tarjetas de gráficos de
+`Demanda relativa por rubro` en dos filas de dos, con mayor presencia visual.
+
+La grilla presenta dos columnas desde 48 rem, por lo que escritorio y tablet
+muestran exactamente dos tarjetas por fila. Cada tarjeta aumenta su separación,
+padding y altura mínima para aprovechar el ancho disponible sin alterar los
+gráficos, rubros, textos, datos demostrativos ni accesibilidad. Por debajo de
+48 rem conserva una columna para evitar compresión en móvil.
+
+Inspección visual comprobada en 1440, 1024 y 768 CSS px: cuatro tarjetas en dos
+filas de dos, anchos y alturas alineados y sin overflow horizontal. En 390 y
+320 CSS px: cuatro filas de una tarjeta, sin recortes ni superposiciones. Tema
+claro y oscuro conservan contraste; la consola del navegador no presenta
+errores ni advertencias. La página queda abierta en
+`http://127.0.0.1:5050/mercados` y el Compose exclusivo
+`mandobra_stabilization` permanece encendido y saludable para revisión visual.
+
+Validación ejecutada: focales mercados/navbar 19/19; `compileall` y
+`git diff --check`, aprobados. La suite completa y PostgreSQL no se ejecutaron
+por alcance. Archivos afectados por este ajuste:
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+No hubo migraciones, cambios de backend, rutas, permisos, autenticación ni
+base de datos.
+
+Git conserva los once paths locales autorizados de UX-03, staging vacío y HEAD
+sin cambios. No hubo commit, push, PR, merge ni deploy porque resta la
+aprobación visual y el retest independiente. Próximo paso: revisar la nueva
+distribución 2×2 en la página abierta y, con aprobación expresa, preparar el
+paquete de Testing sin modificar el contenido de los gráficos.
+
+---
+
+# Refinamiento UX-03: gráficos de demanda por rubro
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-25T23:35:49-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reemplazar exclusivamente las barras de `Demanda relativa por rubro`
+por gráficos de línea demostrativos, preservando el resto de UX-03.
+
+Electricidad, Refrigeración, Plomería y Herrería conservan su identidad y ahora
+se presentan en cuatro tarjetas. Cada una contiene icono decorativo local, SVG
+semántico fluido, línea y puntos con el naranja corporativo, área tenue, seis
+períodos estáticos, etiqueta visible `Tendencia demostrativa`, cierre con flecha
+y texto explicativo. La sección declara que las series existen para mostrar la
+interfaz y no representan operaciones ni mediciones reales. No se atribuyeron
+fechas, fuentes o actividad real.
+
+Cada SVG tiene título y descripción accesibles específicos del rubro. Los seis
+valores también se exponen en una lista HTML visualmente oculta y el cierre se
+explica en texto, por lo que la lectura no depende del color o de interpretar la
+línea. Se eliminaron los cuatro elementos `progress`. No se incorporaron canvas,
+Chart.js, dependencias, CDN, APIs, rastreadores, animaciones ni JavaScript nuevo.
+
+La grilla usa cuatro columnas a partir de 64 rem, dos desde 48 rem y una en
+móvil. Las tarjetas mantienen ancho y altura alineados. Inspección visual en
+1440, 1024, 768, 390 y 320 CSS px: sin overflow, recortes o superposiciones;
+tema claro y oscuro aprobados localmente. En oscuro la línea conserva 3 px y el
+naranja corporativo `rgb(255, 138, 76)`. La estructura accesible expone cuatro
+gráficos, cuatro resúmenes y veinticuatro valores. Consola sin errores.
+
+Validación ejecutada: focales mercados/navbar 19/19; selección relacionada de
+autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 81/81. `compileall` y la sintaxis del
+JavaScript preexistente del carrusel: aprobados. La suite completa no se ejecutó
+por alcance y queda para Testing independiente.
+
+Archivos afectados por este refinamiento:
+`app/services/market_view_service.py`, `app/templates/mercados.html`,
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+`docs/BACKLOG.md` no requirió una nueva modificación. Sin migraciones, cambios
+de backend, base de datos, rutas, permisos o autenticación. El Compose exclusivo
+`mandobra_stabilization` queda encendido y saludable, con la página disponible
+en `http://127.0.0.1:5050/mercados` para aprobación visual.
+
+Git conserva los once paths locales autorizados de UX-03, staging vacío y HEAD
+sin cambios. No hubo commit, push, PR, merge ni deploy porque falta aprobación
+visual y retest independiente. Próximo paso: revisar la claridad de los cuatro
+gráficos en la página abierta; no sustituir las series demostrativas por datos
+reales sin la metodología y fuentes futuras ya registradas.
+
+---
+
+# Refinamiento visual UX-03: hero e importes desplegables
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T23:02:36-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: aplicar la revisión visual del usuario al hero y los rangos de
+`/mercados`, preservando navbar, tendencias y secciones inferiores de UX-03.
+
+Se retiraron el rótulo `Referencia pública de precios` y el cuadro `Datos
+demostrativos`. El hero conserva el tono verde con una capa más translúcida
+sobre cuatro pares de imágenes locales ya aprobadas. Cada escena muestra dos
+oficios en mitades iguales y cambia de derecha a izquierda cada 3 segundos. La
+primera pareja funciona sin JavaScript; las restantes cargan progresivamente.
+El control `Pausar imágenes`/`Reanudar imágenes`, la pausa durante interacción,
+la visibilidad de la página y `prefers-reduced-motion` evitan movimiento no
+controlado. No se agregaron assets, servicios externos ni dependencias.
+
+Los cuatro indicadores existentes ocupan ahora el panel derecho del hero en
+una grilla 2×2 y mantienen la indicación `Valores simulados`. Debajo comienza
+directamente `Rangos orientativos por servicio`. Los rubros Electricidad,
+Refrigeración y climatización, Plomería, Gas domiciliario, Construcción en seco,
+y Revestimientos y terminaciones usan desplegables semánticos. Cada uno contiene
+cinco trabajos frecuentes con unidad de referencia. Los treinta importes son
+marcadores explícitos `$0 – $0`, rotulados `Rango estimativo pendiente`; la
+introducción aclara que no son cotizaciones ni datos reales. No se inventaron
+precios, demanda adicional ni estadísticas.
+
+Validación ejecutada: focales UX-03/UX-03A 18/18; selección relacionada de
+autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 80/80. Sintaxis de
+`markets-carousel.js` aprobada. En Docker se verificó el avance automático,
+pausa manual y `aria-pressed`, los seis desplegables, treinta filas y enlaces de
+búsqueda; consola sin errores. Revisión visual en 1440, 1024, 768, 390 y 320 CSS
+px, temas claro/oscuro, dos imágenes visibles, indicadores, controles de 44 px
+y ausencia de overflow horizontal: aprobada localmente. La suite completa no se
+ejecutó porque queda reservada para el retest independiente.
+
+Archivo adicional de este refinamiento: nuevo
+`app/static/js/markets-carousel.js`; se ajustaron
+`app/services/market_view_service.py`, `app/templates/mercados.html`,
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+Sin migraciones, cambios de datos o backend productivo. El Compose descartable
+permanece saludable en `http://127.0.0.1:5050/mercados` y la pestaña queda
+abierta para aprobación visual. Git conserva todos los cambios UX-03 sin commit
+y staging vacío. No hubo push, PR, merge ni deploy porque el refinamiento aún
+requiere aprobación visual y retest independiente. Próximo paso: revisar hero,
+cambio de imágenes y desplegables; no completar los importes hasta definir una
+fuente y metodología de precios aprobadas.
+
+---
+
+# UX-03: navbar y rediseño público de Precios de mercado
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T22:38:56-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar UX-03 sobre la base local UX-03A, preservando el navbar
+público aprobado y rediseñando únicamente la página pública `/mercados`.
+
+El navbar mantiene una sola estructura para escritorio y móvil, en el orden
+`Inicio`, `Explorar rubros`, `Precios de mercado`, `Operaciones`, `Ecosistema`,
+`Planes`, igual para visitantes, clientes y profesionales. `/mercados` continúa
+siendo público, conserva `aria-current="page"` y no incorpora `Mi panel` ni
+modifica dashboards privados, autenticación, permisos o rutas de negocio.
+
+La página nueva presenta un hero de referencia pública, aviso visible de datos
+demostrativos, cuatro indicadores y cuatro rangos preexistentes, tendencias
+simuladas con `progress`, factores de interpretación, metodología desplegable y
+acciones hacia `/explorar`, `/buscar` y `/presupuestos/nuevo`. Los datos de
+presentación quedaron centralizados en `market_view_service.py`; son ficticios,
+estables y escapados por Jinja. No se agregaron estadísticas, controles falsos,
+CDN, dependencias, JavaScript, analítica ni persistencia. Los iconos son SVG
+inline decorativos y accesibles. `markets-v2.css` usa tokens del Design System
+V2, objetivos táctiles de 44 px y reflow sin estructura duplicada.
+
+Validación local ejecutada: focales UX-03/UX-03A 16/16; selección relacionada
+de autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 78/78. `compileall`, UTF-8 estricto
+de diez archivos, enlaces de búsqueda y acciones, smoke HTTP 200 para `/` y
+`/mercados`, consola sin errores y `git diff --check`: aprobados. No se modificó
+JavaScript y no correspondió una validación nueva de sintaxis. La suite completa
+no se ejecutó porque queda reservada para el retest independiente.
+
+Inspección visual en `mandobra_stabilization`: imagen web reconstruida, servicio
+saludable y disponible en `http://127.0.0.1:5050/` y
+`http://127.0.0.1:5050/mercados`. Se verificaron 1440, 1024, 768, 390 y 320 CSS
+px, temas claro y oscuro, navegación móvil, foco visible por teclado, lectura de
+metodología, acciones de 44 px y ausencia de overflow horizontal o recorte. Las
+dos páginas quedan abiertas para aprobación visual. El PostgreSQL descartable
+permanece saludable. `trax-postgres` conservó el ID
+`8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154` y su
+estado previo `exited/unhealthy`; no fue iniciado, conectado ni modificado.
+
+Archivos del trabajo local: `app/templates/base.html`,
+`app/static/css/visitor-navbar-v1.css`, `tests/test_navbar_markets_ux03a.py`,
+`app/routes/main_routes.py`, nuevo `app/services/market_view_service.py`,
+`app/templates/mercados.html`, nuevo `app/static/css/markets-v2.css`, nuevo
+`tests/test_markets_ux03.py`, `docs/BACKLOG.md` y este handoff. Sin migraciones,
+cambios de esquema, datos o servicios externos. El backlog registra como futuro
+la fuente real, metodología versionada, umbrales de muestra, privacidad,
+retención y revisión administrativa; nada de eso se implementó aquí.
+
+Git queda con estos diez paths sin commit y staging vacío. No hubo push, PR,
+merge ni deploy porque falta la aprobación visual expresa y el retest
+independiente. Riesgo pendiente: los valores siguen siendo demostrativos y no
+deben presentarse como mediciones reales. Próximo paso: revisar visualmente las
+dos pestañas abiertas; con aprobación, entregar el paquete al agente de Testing.
+No incorporar dashboards privados, datos reales, migraciones ni analítica en
+este incremento.
+
+---
+
+# UX-03A: reordenamiento del navbar público
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T22:00:52-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reubicar el acceso público existente de mercados y presentarlo como
+`Precios de mercado`, sin rediseñar su página ni modificar los portales privados.
+
+El navbar compartido conserva una sola estructura para escritorio y móvil. Su
+orden público queda `Inicio`, `Explorar rubros`, `Precios de mercado`,
+`Operaciones`, `Ecosistema`, `Planes`, tanto para visitantes como para sesiones
+cliente o profesional. `Precios de mercado` reutiliza `/mercados`, permanece
+público y es el único enlace con esa etiqueta. Los enlaces directos principales
+incorporan `aria-current="page"`; el activo usa tokens del tema y mantiene el
+foco visible existente. No se agregó `Mi panel` ni se cambiaron menú de cuenta,
+sesión, roles, autenticación, rutas, lógica o JavaScript.
+
+`Precios de mercado` es el tablero público y demostrativo de precios: conserva
+íntegramente sus datos mock. Los dashboards privados de cliente y profesional
+son conceptos distintos y no fueron modificados. `Mi panel` se incorporará en
+un incremento posterior dentro de la navegación lateral izquierda de cada
+portal autenticado, no en el navbar superior.
+
+Validación local ejecutada: focales UX-03A 7/7; regresiones relacionadas de
+autenticación, Design System V2, footer, Home UX-01 y Explorar UX-02 53/53.
+`compileall`, UTF-8 estricto de los archivos técnicos, enlace `/mercados` y
+`git diff --check`: aprobados. No se modificó JavaScript, por lo que no aplicó
+una nueva validación de sintaxis JS. Suite completa no ejecutada por alcance.
+
+Inspección visual en el Compose exclusivo `mandobra_stabilization`: web
+reconstruida y saludable en `http://127.0.0.1:5050/`. A 1440 px y 390 px se
+confirmaron orden, un solo enlace, activo correcto en `/mercados`, temas claro
+y oscuro, menú móvil expandible y ausencia de overflow horizontal. La página
+queda disponible para aprobación visual. PostgreSQL descartable sigue saludable;
+`trax-postgres` conservó el ID `8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154`
+y su estado previo `exited/unhealthy`; no fue iniciado, conectado ni modificado.
+
+Archivos del incremento: `app/templates/base.html`,
+`app/static/css/visitor-navbar-v1.css`, nuevo
+`tests/test_navbar_markets_ux03a.py` y este handoff. Sin migraciones, cambios de
+datos, servicios externos ni bases reales. Git queda con estos cuatro cambios
+sin commit y staging vacío. Push, PR, merge y deploy no realizados por alcance
+y porque falta la aprobación visual expresa del usuario. Próximo paso: revisar
+Home y `/mercados` en escritorio y móvil; después de la aprobación corresponde
+el retest independiente, sin iniciar todavía el rediseño de mercados o de los
+dashboards privados.
+
+---
+
 # Corrección UX-02: contrato de tarjetas y aislamiento de logging
 
 Estado: READY_TO_RESUME
