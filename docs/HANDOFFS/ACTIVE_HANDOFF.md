@@ -1,3 +1,93 @@
+# Identidad MANDOBRA aprobada: navbar compartido de toda la plataforma
+
+Estado: COMPLETED
+Timestamp: 2026-09-26T14:13:29-03:00
+Origen: laptop DESKTOP-5K3IE76, Codex Desktop.
+Rama: `feature/ux-ui-foundation`; HEAD: `ffbb967275bc80460f88df0594f8f5e710f8b526`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Autorizacion: el usuario aprobo la colocacion del logo para toda la plataforma tras revisar el canario. Este registro sustituye su restriccion al home y su aprobacion pendiente; el registro anterior se conserva como historia.
+
+## Resultado y alcance
+Los dos PNG normalizados aprobados son ahora la identidad por defecto del navbar compartido en `base.html`, tanto para visitantes como para usuarios autenticados. Sin duplicar navbar, nuevas dependencias, JS, rutas, cambios de permisos ni autenticacion. Footer, favicon, manifest, assets legacy y originales del workbench preservados. Sin migraciones.
+Se retiro el opt-in canario y su CSS del home; ambos archivos vuelven al contenido de HEAD. El CSS compartido mantiene contain, dimensiones reservadas 1696x720, enlace accesible MANDOBRA inicio e imagenes decorativas. Claro/oscuro seleccionados por las clases de tema existentes. Hashes de ambos PNG iguales a los registrados en el canario.
+Cajas: 200x56 escritorio, 160x56 entre 821 y 1080 px, 144-180x44 movil. En cuentas autenticadas se usa el menu colapsable existente hasta 1180 px para evitar superposicion con controles de cuenta. Corregido el contraste del boton de menu oscuro con tokens existentes; sus dos trazos quedan visibles.
+
+## Archivos y estado Git
+Cambios efectivos respecto de HEAD: `app/templates/base.html`, `app/static/css/visitor-navbar-v1.css`, este handoff y tres nuevos archivos: ambos wordmarks y [tests/test_platform_brand.py](../../tests/test_platform_brand.py). El test canario sin commit fue sustituido por el test global.
+`git status --short` tambien enumera `app/templates/home.html` y `app/static/css/home-v1.css`, pero `git diff` confirma cero diferencias de contenido en ambos (working copy CRLF / index LF). Total observado: ocho paths, seis con cambios efectivos. Staging vacio. Trabajo previo del canario incorporado, sin cambios ajenos detectados.
+Sin commit, push, PR, merge ni despliegue de produccion. HEAD no cambio. No hubo merge porque la aprobacion de colocacion no autoriza operaciones de integracion Git. Los cambios solo estan locales; el push de esta implementacion esta PENDIENTE.
+
+## Validacion ejecutada
+- 83/83 unittest PASS en la ejecucion final (7,843 s), incluidos 11 tests de identidad global. Modulos: tests.test_platform_brand, tests.test_home_hero_carousel, tests.test_navbar_markets_ux03a, tests.test_design_system_v2, tests.test_corporate_footer, tests.test_auth_ux_redesign_v1, tests.test_markets_ux03 y tests.test_explore_rubros_ux02.
+- Contenedor descartable `docker run --rm --network none`, DATABASE_URL=sqlite:///:memory:, sin volumenes ni acceso a trax_db. Verificados GET/HEAD PNG, hashes, RGBA, alfa identico, seis paginas publicas, home y dashboards CLIENTE/PROFESIONAL/SUPER_ADMIN y notificaciones, accesibilidad del enlace y contrato de temas.
+- `compileall -q app tests/test_platform_brand.py`: PASS. `git diff --check`: PASS. Advertencias heredadas SQLAlchemy Query.get y datetime.utcnow; log ERROR esperado del escenario negativo de Explorar, sin fallos de pruebas.
+- Chrome: dashboard de cliente demo a 1440, 1024, 768, 390 y 320 CSS px en ambos temas. Diez casos sin overflow horizontal, recorte ni halos visibles; PNG correcto cargado y contain. Altura 84,8 px escritorio / 76 px movil. Menu de cuenta abierto a 1024 sin superposicion; dos trazos visibles, contraste oscuro corregido.
+- Pagina publica /mercados revisada a 1024 claro y 1440 oscuro con logo nuevo y navegacion sin superposicion. Sesion demo cerrada y viewport temporal restablecido al terminar. Captura local fuera del repositorio: `C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/mandobra-identidad-global.png`.
+- No ejecutados: suite completa, gates PostgreSQL, nueva ejecucion de tests JS (sin cambios JS), migraciones ni seed. Revision visual autenticada acotada a CLIENTE; PROFESIONAL/SUPER_ADMIN cubiertos por pruebas HTTP, no por navegador. No equivale a QA exhaustivo de toda ruta.
+
+## Entorno, riesgos y continuidad
+Reconstruido y recreado solo web con docker-compose.stabilization.yml. Web y PostgreSQL descartable existentes healthy al cierre, disponibles en http://127.0.0.1:5050/ y /mercados. Sin tocar volumenes ni trax_db. No hubo errores tecnicos bloqueantes; persiste la limitacion raster de detalle fino del maletin en tamanos pequenos. No se vectorizo ni transformo el master aprobado.
+Documentacion actualizada: este handoff. Sin nuevo troubleshooting: ajustes CSS localizados, sin incidente de plataforma.
+Proximo paso recomendado: revision del diff y autorizacion explicita para commit/push y posterior integracion a develop. Para retomar: ejecutar git status, git branch --show-current y git log -1 --oneline; verificar HEAD ffbb967, staging vacio y alcance aqui registrado; revisar el navbar en ambos temas. No reset/clean, no borrar originales o assets legacy, no migrar ni operar sobre trax_db. No hay implementacion parcial pendiente; quedan integracion Git y eventual QA independiente.
+
+---
+
+# Canario de identidad MANDOBRA: solo navbar del home publico (historico, sustituido)
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T14:01:21-03:00
+Origen: laptop DESKTOP-5K3IE76 (chassis 10), Codex Desktop.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `ffbb967275bc80460f88df0594f8f5e710f8b526`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck: working tree limpio, staging vacio; `git ls-remote` confirmo la rama remota en el mismo SHA.
+Los registros anteriores describen sesiones previas: sus cambios UX-03 ya estan guardados en HEAD; no representan cambios pendientes de esta sesion.
+
+## Objetivo y resultado
+Integrar los dos wordmarks normalizados exclusivamente en el navbar del home publico para aprobacion visual. Implementacion y verificacion focal COMPLETADAS; aprobacion visual del usuario y ampliacion global PENDIENTES.
+`home.html` activa `home_brand_canary = true`; `base.html` usa ese contexto con default false. No se compara URL para seleccionar la marca, no se duplico navbar ni se cambiaron rutas, permisos o autenticacion. Home autenticado, dashboards y demas templates conservan el default legacy. Footer, favicon, manifest y assets anteriores intactos.
+
+## Archivos y hashes
+Copiados sin transformar desde `C:/Users/Cristhian/Downloads/MANDOBRA_BRAND_WORKBENCH/`:
+- [Wordmark claro](../../app/static/img/branding/mandobra/mandobra-wordmark-light.png): SHA-256 `4d5e5b8738979d373ab5021f0ba89f15bd98d2ccd831fff47097025a6dfacb9e`.
+- [Wordmark oscuro](../../app/static/img/branding/mandobra/mandobra-wordmark-dark.png): SHA-256 `ca6933542a281720f24d5fc3e9c1be2a4c6f9ce21458a14da81f601694cf2f0f`.
+Ambos PNG RGBA 1696x720; origen y copia identicos; cero diferencias de alfa, IoU 100%. Texto MANDOBRA y maletin presentes; sin eslogan ni Casa. Masters del workbench intactos.
+Codigo modificado: `app/templates/base.html`, `app/templates/home.html`, `app/static/css/home-v1.css`.
+Nuevo en ese momento: `tests/test_home_brand_canary.py` (sustituido posteriormente por [tests/test_platform_brand.py](../../tests/test_platform_brand.py)).
+Documentacion actualizada: exclusivamente este handoff.
+Total: siete paths locales (cuatro modificados y tres nuevos), sin staging.
+
+## Comportamiento y revision visual
+CSS acotado a `.brand--home-canary` en home-v1.css; contain, dimensiones intrinsecas, sin recorte, fondo ni transformacion. Dos imagenes decorativas alt vacio/aria-hidden y enlace MANDOBRA inicio. El bootstrap de tema existente se ejecuta en head, antes del body; las clases theme-light/theme-dark seleccionan por CSS. No se incorporaron JS ni recursos externos.
+Caja 200x56 en escritorio; 160x56 entre 821 y 1080 px; 144-180x44 en movil. A 1024 px se redujo solo el espacio horizontal reservado: el dibujo sigue limitado por altura, sin reducirse. Esto evita el solapamiento heredado Planes/selector de tema en home; /mercados conserva el comportamiento anterior.
+Chrome: matriz de 1440, 1024, 768, 390 y 320 CSS px en ambos temas, diez casos revisados. Un solo navbar, PNG correcto y cargado, contain, sin overflow horizontal ni superposicion del wordmark con menu. Altura conservada: aproximadamente 84,8 px escritorio y 76 px movil. Cambiar tema conserva la caja, sin salto visible; persistencia al recargar verificada. Sin recorte ni halo visible. Wordmark viable hasta 320 px; no fue necesario fallback al simbolo compacto. Los detalles finos del maletin pierden nitidez al reducirse; aprobacion visual humana pendiente.
+Comparacion /mercados: conserva ambos wordmarks anteriores y simbolo compacto movil. /login tambien observado con marca anterior.
+Limitacion preexistente: menu hamburguesa movil en tema oscuro tiene lineas blancas sobre boton blanco; confirmado en /mercados a 320 px. No alterado por alcance. Solapamiento legacy a 1024 en /mercados tampoco modificado.
+El visor integrado tuvo inconsistencias de escala/captura; la matriz final se verifico en Chrome con innerWidth exacto. Consola Chrome: errores de una extension ajena a la aplicacion; sin errores de aplicacion observados. Recursos de marca locales; no confundir scripts inyectados por extensiones con recursos introducidos por este cambio.
+
+## Validaciones ejecutadas
+- Python unittest: 54/54 PASS (9 focales de identidad + 45 regresiones): tests.test_home_brand_canary, tests.test_home_hero_carousel, tests.test_navbar_markets_ux03a, tests.test_design_system_v2, tests.test_corporate_footer, tests.test_auth_ux_redesign_v1.
+- Ejecutadas en `docker run --rm --network none`, imagen mandobra_stabilization-app:local, DATABASE_URL=sqlite:///:memory:, sin volumenes. Sin acceso a trax_db ni a PostgreSQL para los tests.
+- Focales cubren recursos GET/HEAD 200 image/png, hashes, RGBA, dimensiones, alfa, accesibilidad, contain, contrato CSS de temas, opt-in unico, ausencia de texto/eslogan en marca, default base incluso en ruta / y aislamiento de seis paginas publicas mas home autenticado. Unico template opt-in confirma aislamiento de dashboards/operativas; no se navegaron exhaustivamente todas las rutas autenticadas.
+- Node: 2/2 archivos de regresion PASS, tests/js/home_hero_carousel.test.js y tests/js/home_faq.test.js.
+- compileall app y test focal: PASS en contenedor descartable. UTF-8, enlaces locales afectados, hashes de copias y git diff --check: verificados al cierre.
+- Advertencias historicas SQLAlchemy Query.get y datetime.utcnow; sin fallos. ResourceWarnings introducidos por respuestas de test se resolvieron cerrandolas; ejecucion final limpia de esas advertencias.
+- No ejecutados: suite completa, gates PostgreSQL, migraciones, seed, retest independiente. No se declara aprobacion global.
+
+## Docker y Git
+Solo `docker compose -f docker-compose.stabilization.yml build web` y `up -d --no-deps web`. PostgreSQL y volumenes descartables existentes preservados; no se ejecuto migrate ni seed. Web y PostgreSQL se dejan encendidos para aprobacion; salud comprobada al cierre.
+URLs: http://127.0.0.1:5050/ (canario) y http://127.0.0.1:5050/mercados (comparacion legacy).
+Sin commit, push, PR, merge ni deploy. Remoto sigue en ffbb967; los siete paths del canario solo existen localmente. NO hubo merge porque falta aprobacion visual y autorizacion de integracion.
+
+## Retomar y rollback
+1. Ejecutar git status, git branch --show-current y git log -1 --oneline; confirmar HEAD ffbb967 y exactamente los siete paths del canario.
+2. Abrir ambas URLs y revisar temas/escritorio/movil. Mantener el Compose encendido hasta aprobacion.
+3. Con aprobacion, preparar retest/integracion o ampliacion en un alcance nuevo; no hacer staging/commit/push/merge sin autorizacion explicita.
+Rollback funcional sencillo: retirar el opt-in de home.html devuelve ese navbar al bloque legacy. No eliminar assets anteriores ni masters. No tocar footer, favicon, autenticacion, DB o paginas fuera de alcance.
+Riesgos pendientes: decision visual sobre tamano/detalles raster y contraste del menu global preexistente. Ningun bloqueante tecnico del canario observado.
+
+---
+
 # Refinamiento UX-03: grilla 2×2 para demanda por rubro
 
 Estado: READY_TO_RESUME
