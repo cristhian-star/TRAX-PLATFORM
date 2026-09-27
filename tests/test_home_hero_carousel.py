@@ -114,47 +114,27 @@ class HomeHeroCarouselTest(unittest.TestCase):
         ):
             self.assertNotIn(removed, section)
 
-        cards = re.findall(
-            r'<a class="trax-home__featured-card" href="([^"]+)">\s*'
-            r'<img src="([^"]+)"([^>]+)>\s*<h3>([^<]+)</h3>\s*</a>',
-            section,
-        )
-        # Search filters Professional.servicio as free text. The dropdown supplies
-        # the first five canonical values; Pintura is an existing service value
-        # but is absent from that dropdown and must not map to an unrelated trade.
-        expected = (
-            ("Electricidad", "Electricidad", "electricidad.webp"),
-            ("Plomería", "Plomeria", "plomeria.webp"),
-            ("Refrigeración y climatización", "Refrigeracion A/C", "refrigeracion-interior.webp"),
-            ("Cableado estructurado", "Electricidad", "cableado-estructurado.webp"),
-            ("Instalación de calderas", "Gas domiciliario", "instalacion-caldera.webp"),
-            ("Pintura", "Pintura", "pintura.webp"),
-        )
-        self.assertEqual(len(cards), 6)
-        for card, (title, value, image) in zip(cards, expected):
-            href, src, attributes, label = card
-            with self.subTest(title=title):
-                self.assertEqual(label, title)
-                self.assertEqual(urlsplit(href).path, "/buscar")
-                self.assertEqual(parse_qs(urlsplit(href).query), {"servicio": [value]})
-                self.assertEqual(src, f"/static/images/home/hero/{image}")
-                self.assertIn('width="1600" height="900" loading="lazy"', attributes)
-                self.assertIn('alt=""', attributes)
-                response = self.client.get(href)
-                self.assertEqual(response.status_code, 200)
-                self.assertIn(value, response.get_data(as_text=True))
+        self.assertNotIn('trax-home__featured-card',section)
+        cards=re.findall(r'<a class="featured-bands__card" href="([^"]+)"(?! tabindex)[^>]*>\s*<img src="([^"]+)"[^>]*>\s*<span class="featured-bands__title">([^<]+)',section)
+        self.assertEqual(len(cards),12)
+        expected=('Pintura','PVC','industrial','pérgolas','Pisos de madera','soldadura','soldadura','estuco','tanques','ventanas','solar','Electricidad')
+        for (href,src,label),value in zip(cards,expected):
+            with self.subTest(label=label):
+                self.assertEqual(urlsplit(href).path,'/buscar')
+                self.assertEqual(parse_qs(urlsplit(href).query),{'servicio':[value]})
+                self.assertTrue(src.startswith('/static/images/explorar/carrusel/'))
+                self.assertTrue(label.strip())
+                self.assertEqual(self.client.get(href).status_code,200)
+        # The historical 06 filename now depicts an electrical panel, not an appliance.
+        self.assertEqual(cards[-1][2].strip(),'Tableros eléctricos')
 
-    def test_featured_grid_breakpoints_and_accessibility(self):
-        css = (ROOT / "app/static/css/home-v1.css").read_text(encoding="utf-8")
-        self.assertIn('.trax-home__featured-grid {\n    display: grid;', css)
-        self.assertIn('grid-template-columns: repeat(2, minmax(0, 1fr))', css)
-        self.assertIn('grid-template-columns: repeat(3, minmax(0, 1fr))', css)
-        self.assertIn('aspect-ratio: 16 / 9', css)
-        self.assertIn('object-fit: cover', css)
-        self.assertIn('.trax-home__featured-card:focus-visible', css)
-        self.assertIn('.trax-home__featured-card {\n        transition: none;', css)
-        self.assertNotIn('trax-home__pathway', css)
-        self.assertNotIn('trax-home__section-heading', css)
+    def test_featured_bands_responsive_and_keyboard_fallback(self):
+        css=(ROOT/'app/static/css/featured-bands.css').read_text(encoding='utf-8')
+        for contract in ('376px','248px','132s','116s','aspect-ratio: 16 / 9',
+                         '.featured-bands .featured-bands__card:focus-visible','data-bands-browse',
+                         'data-bands-static','overflow-x: auto','[data-copy="1"]'):
+            self.assertIn(contract,css)
+        self.assertNotIn('trax-home__featured-card',(ROOT/'app/static/css/home-v1.css').read_text(encoding='utf-8'))
 
     def test_lower_home_order_trust_faq_closing_and_footer(self):
         markers = ('class="trax-home__hero"', 'class="trax-home__featured"',

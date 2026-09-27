@@ -1,0 +1,108 @@
+/* UX-05A: linked bands belong only to Oficios destacados. */
+.featured-bands {
+    --featured-photo-width: 376px;
+    --featured-duration: 132s;
+    position: relative;
+    overflow: hidden;
+    margin-block: 20px 24px;
+    border-radius: var(--trax-radius-lg);
+    background: var(--trax-color-surface);
+}
+.featured-bands__photos { display: grid; gap: 16px; }
+.featured-bands__photos::after {
+    content: '';
+    pointer-events: none;
+    z-index: 1;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--trax-color-surface), transparent 2%, transparent 98%, var(--trax-color-surface));
+}
+.featured-bands__track { display: flex; width: max-content; }
+.featured-bands__group {
+    display: flex;
+    flex: none;
+    gap: 16px;
+    padding-right: 16px;
+    /* Identical groups make the -50% seam exact, including the last gap. */
+    width: calc(6 * (var(--featured-photo-width) + 16px));
+    box-sizing: border-box;
+}
+.featured-bands__row { overflow-x: auto; padding: 4px 0 12px; }
+.featured-bands__card {
+    display: block;
+    flex: 0 0 var(--featured-photo-width);
+    width: var(--featured-photo-width);
+    overflow: hidden;
+    border: 1px solid var(--trax-color-border-subtle);
+    border-radius: var(--trax-radius-lg);
+    box-sizing: border-box;
+    background: var(--trax-color-surface);
+    color: var(--trax-color-text);
+    text-decoration: none;
+}
+.featured-bands__card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.featured-bands__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 60px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: var(--trax-font-weight-bold);
+}
+.featured-bands__title > span { flex: none; }
+.featured-bands__card:hover .featured-bands__title { text-decoration: underline; }
+.featured-bands .featured-bands__card:focus-visible { outline: 3px solid var(--trax-color-focus); outline-offset: -3px; }
+.featured-bands[data-bands-browse] .featured-bands__photos::after { display: none; }
+/* Without animation every original remains reachable by touch or keyboard. */
+.featured-bands:not([data-bands-ready]) [data-copy="1"],
+.featured-bands[data-bands-static] [data-copy="1"],
+.featured-bands[data-bands-browse] [data-copy="1"] { display: none; }
+.featured-bands[data-bands-ready]:not([data-bands-static]):not([data-bands-browse]) .featured-bands__row { overflow-x: hidden; }
+.featured-bands[data-bands-ready] .featured-bands__track { animation: featured-photo-drift var(--featured-duration) linear infinite; }
+.featured-bands[data-bands-ready] .featured-bands__row:nth-child(2) .featured-bands__track { animation-direction: reverse; }
+.featured-bands[data-bands-paused] .featured-bands__track { animation-play-state: paused; }
+.featured-bands[data-bands-static] .featured-bands__track,
+.featured-bands[data-bands-browse] .featured-bands__track { animation: none; }
+@keyframes featured-photo-drift { to { transform: translateX(-50%); } }
+.featured-bands__toggle {
+    position: absolute;
+    z-index: 2;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid var(--trax-color-border);
+    border-radius: var(--trax-radius-pill);
+    background: var(--trax-color-surface);
+    color: var(--trax-color-text);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+.featured-bands__toggle[hidden] { display: none; }
+.featured-bands__toggle:focus-visible { outline: 3px solid var(--trax-color-focus); outline-offset: 3px; }
+@media (max-width: 47.99rem) {
+    .featured-bands { --featured-photo-width: 248px; --featured-duration: 116s; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .featured-bands[data-bands-ready] .featured-bands__track { animation: none; }
+    .featured-bands__toggle { display: none; }
+    .featured-bands [data-copy="1"] { display: none; }
+    .featured-bands .featured-bands__row { overflow-x: auto; }
+}
+@media print {
+    .featured-bands[data-bands-ready] .featured-bands__track { animation: none; }
+    .featured-bands__toggle { display: none; }
+    .featured-bands [data-copy="1"] { display: none; }
+    .featured-bands .featured-bands__row { overflow-x: auto; }
+}

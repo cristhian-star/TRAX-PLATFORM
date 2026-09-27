@@ -103,13 +103,14 @@ class MarketsUX03Test(unittest.TestCase):
         self.assertNotIn("data-src", first_slide)
         self.assertNotRegex(template, r"https?://|//cdn")
 
-    def test_carousel_advances_every_three_seconds_and_can_pause_for_accessibility(self):
+    def test_carousel_advances_without_visible_controls_and_keeps_automatic_pauses(self):
         script = CAROUSEL_JS.read_text(encoding="utf-8")
         self.assertIn("window.setTimeout(advance, 3000)", script)
         self.assertIn('prefers-reduced-motion: reduce', script)
-        self.assertIn('aria-pressed', script)
-        self.assertIn('Pausar imágenes', script)
-        self.assertIn('Reanudar imágenes', script)
+        self.assertNotIn('data-market-carousel-toggle', self.html)
+        self.assertNotIn('Pausar imágenes', self.html)
+        self.assertNotIn('toggle', script)
+        self.assertIn('if (!carousel) return;', script)
         self.assertIn('document.hidden', script)
         self.assertIn('pointerenter', script)
         self.assertIn('focusin', script)

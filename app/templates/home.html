@@ -2,6 +2,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home-v1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/featured-bands.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -53,31 +54,36 @@
         <div class="shell">
             <h2 id="featured-title">Oficios destacados</h2>
             <p class="trax-home__featured-lead">Explorá servicios y encontrá profesionales para resolver tu necesidad.</p>
-            <div class="trax-home__featured-grid">
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Electricidad') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/electricidad.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Electricidad</h3>
-                </a>
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Plomeria') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/plomeria.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Plomería</h3>
-                </a>
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Refrigeracion A/C') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/refrigeracion-interior.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Refrigeración y climatización</h3>
-                </a>
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Electricidad') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/cableado-estructurado.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Cableado estructurado</h3>
-                </a>
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Gas domiciliario') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/instalacion-caldera.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Instalación de calderas</h3>
-                </a>
-                <a class="trax-home__featured-card" href="{{ url_for('main.buscar', servicio='Pintura') }}">
-                    <img src="{{ url_for('static', filename='images/home/hero/pintura.webp') }}" width="1600" height="900" loading="lazy" decoding="async" alt="">
-                    <h3>Pintura</h3>
-                </a>
+            {# Editorial labels and free-text servicio filters, not new taxonomy entries. #}
+            {% set photo_rows = [
+                [('pintura-altura', 'Pintura en altura', 'Pintura'), ('decoracion-pvc', 'Revestimientos de PVC', 'PVC'), ('automatizacion-industrial', 'Automatización industrial', 'industrial'), ('construccion-pergolas', 'Construcción de pérgolas', 'pérgolas'), ('acabado-parquet', 'Pisos de madera', 'Pisos de madera'), ('soldadura-estructuras', 'Soldadura de estructuras', 'soldadura')],
+                [('soldadura-galpones', 'Soldadura de galpones', 'soldadura'), ('estuco-veneciano', 'Estuco veneciano', 'estuco'), ('limpieza-tanques', 'Limpieza de tanques', 'tanques'), ('instalacion-ventanas', 'Instalación de ventanas', 'ventanas'), ('instalacion-solar', 'Instalaciones solares', 'solar'), ('reparacion-electrodomesticos', 'Tableros eléctricos', 'Electricidad')]
+            ] %}
+            <div class="featured-bands">
+                <div class="featured-bands__photos">
+                    {% for photos in photo_rows %}
+                        <div class="featured-bands__row">
+                            <div class="featured-bands__track">
+                                {% for copy in range(2) %}
+                                    <div class="featured-bands__group" data-copy="{{ copy }}"{% if copy %} aria-hidden="true"{% endif %}>
+                                        {% for photo, title, service in photos %}
+                                            <a class="featured-bands__card" href="{{ url_for('main.buscar', servicio=service) }}"{% if copy %} tabindex="-1"{% endif %}>
+                                                <img src="{{ url_for('static', filename='images/explorar/carrusel/' ~ photo ~ '.webp') }}"
+                                                     width="960" height="540" alt="" draggable="false"
+                                                     decoding="async" loading="lazy" fetchpriority="low">
+                                                <span class="featured-bands__title">{{ title }} <span aria-hidden="true">↗</span></span>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="featured-bands__toggle" type="button" hidden
+                        aria-label="Pausar fotografías de Oficios destacados" aria-pressed="false">
+                    <span aria-hidden="true">Ⅱ</span>
+                </button>
             </div>
         </div>
     </section>
@@ -165,4 +171,5 @@
     <script src="{{ url_for('static', filename='js/home-tabs.js') }}"></script>
     <script src="{{ url_for('static', filename='js/home-hero-carousel.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/home-faq.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/featured-bands.js') }}" defer></script>
 {% endblock %}

@@ -2,11 +2,21 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/explore-rubros-v1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/explore-motion.css') }}">
 {% endblock %}
 
 {% block content %}
 <main class="explore-rubros">
     <header class="explore-rubros__hero" id="explore-top">
+        {% set scenes = ['pintura-altura', 'acabado-parquet', 'instalacion-solar', 'construccion-pergolas', 'automatizacion-industrial', 'estuco-veneciano', 'soldadura-estructuras'] %}
+        <div class="explore-scenes" aria-hidden="true">
+            {% for photo in scenes %}
+                <img class="explore-scenes__image{{ ' is-active' if loop.first else '' }}"
+                     src="{{ url_for('static', filename='images/explorar/carrusel/' ~ photo ~ '.webp') }}"
+                     width="960" height="540" alt="" draggable="false" decoding="async"
+                     loading="{{ 'eager' if loop.first else 'lazy' }}" fetchpriority="{{ 'high' if loop.first else 'low' }}">
+            {% endfor %}
+        </div>
         <div class="shell explore-rubros__hero-content">
             <h1>Explorá rubros</h1>
             <p>Encontrá el servicio que necesitás y buscá profesionales en tu zona.</p>
@@ -110,4 +120,8 @@
         </div>
     </div>
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/explore-motion.js') }}" defer></script>
 {% endblock %}

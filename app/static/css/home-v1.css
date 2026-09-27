@@ -452,50 +452,11 @@
     line-height: var(--trax-line-height-body);
 }
 
-.trax-home__featured-grid {
-    display: grid;
-    gap: var(--trax-space-6);
-}
 
-.trax-home__featured-card {
-    display: block;
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--trax-color-border-subtle);
-    border-radius: var(--trax-radius-lg);
-    color: var(--trax-color-brand-strong);
-    background: var(--trax-color-surface);
-    box-shadow: var(--trax-shadow-sm);
-    text-decoration: none;
-    transition: border-color var(--trax-duration-base) var(--trax-ease-standard),
-        box-shadow var(--trax-duration-base) var(--trax-ease-standard);
-}
 
-.trax-home__featured-card img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-}
 
-.trax-home__featured-card h3 {
-    margin: 0;
-    padding: var(--trax-space-5);
-    color: var(--trax-color-brand-strong);
-    font-size: var(--trax-font-size-24);
-    line-height: var(--trax-line-height-heading);
-}
 
-.trax-home__featured-card:hover {
-    border-color: var(--trax-color-action-primary);
-    box-shadow: var(--trax-shadow-md);
-}
 
-.trax-home__featured-card:focus-visible {
-    outline: 3px solid var(--trax-color-action-primary);
-    outline-offset: 3px;
-}
 
 .trax-home__trust {
     background: var(--trax-color-surface-subtle);
@@ -629,9 +590,6 @@
         grid-column: 1 / -1;
     }
 
-    .trax-home__featured-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 
     .trax-home__trust-list {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -693,9 +651,6 @@
         padding: var(--trax-space-20) 0;
     }
 
-    .trax-home__featured-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
 
     .trax-home__faq-layout {
         grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -706,9 +661,6 @@
 
 @media (prefers-reduced-motion: reduce) {
     .trax-home__slide {
-        transition: none;
-    }
-    .trax-home__featured-card {
         transition: none;
     }
     .trax-home__message-content {

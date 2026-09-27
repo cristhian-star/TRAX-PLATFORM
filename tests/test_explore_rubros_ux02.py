@@ -171,7 +171,11 @@ class ExploreRubrosUX02Test(unittest.TestCase):
         self.assertIn('name="zona"', form)
         self.assertIn("Buscar profesionales", form)
         template = TEMPLATE.read_text(encoding="utf-8")
-        self.assertNotIn("<script", template)
+        # UX-05A enhances only decorative motion; GET search remains native.
+        search_form = template.split('<form ', 1)[1].split('</form>', 1)[0]
+        self.assertNotIn("<script", search_form)
+        self.assertNotIn("onsubmit", search_form)
+        self.assertNotIn("fetch(", (ROOT / 'app/static/js/explore-motion.js').read_text(encoding='utf-8'))
         self.assertNotIn("javascript:", template.lower())
         main = self.html.split('<main class="explore-rubros">', 1)[1].split("</main>", 1)[0]
         for unsupported_claim in ("más buscados", "más contratados", "más populares"):

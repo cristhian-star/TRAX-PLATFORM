@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const hero = document.querySelector(".market-guide__hero");
     const carousel = hero?.querySelector("[data-market-carousel]");
-    const toggle = hero?.querySelector("[data-market-carousel-toggle]");
-    if (!carousel || !toggle) return;
+    if (!carousel) return;
 
     const slides = Array.from(carousel.querySelectorAll(".market-guide__visual-slide"));
     if (slides.length < 2) return;
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let current = 0;
     let timer = null;
-    let pausedByUser = false;
     let pausedByInteraction = false;
 
     const loadImages = (slide) => Promise.all(
@@ -29,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const canAdvance = () => (
         !reducedMotion.matches
-        && !pausedByUser
         && !pausedByInteraction
         && !document.hidden
     );
@@ -62,16 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
         schedule();
     };
 
-    const updateToggle = () => {
-        toggle.setAttribute("aria-pressed", String(pausedByUser));
-        toggle.textContent = pausedByUser ? "Reanudar imágenes" : "Pausar imágenes";
-    };
-
-    toggle.addEventListener("click", () => {
-        pausedByUser = !pausedByUser;
-        updateToggle();
-        schedule();
-    });
     hero.addEventListener("pointerenter", (event) => {
         if (event.pointerType === "mouse") {
             pausedByInteraction = true;
@@ -95,8 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("visibilitychange", schedule);
     reducedMotion.addEventListener("change", schedule);
 
-    toggle.hidden = false;
-    updateToggle();
     preloadNext();
     schedule();
 });
