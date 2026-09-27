@@ -135,12 +135,12 @@ class NavbarMarketsUX03ATest(unittest.TestCase):
 
     def test_mobile_uses_the_same_navigation_without_a_duplicate_copy(self):
         html = self.client.get("/").get_data(as_text=True)
-        css = (ROOT / "app/static/css/visitor-navbar-v1.css").read_text(encoding="utf-8")
+        css = (ROOT / "app/static/css/navbar-drawer.css").read_text(encoding="utf-8")
 
         self.assertEqual(html.count('id="primary-navigation"'), 1)
-        self.assertIn('aria-controls="primary-navigation"', html)
-        self.assertIn("@media (max-width: 820px)", css)
-        self.assertIn("body.menu-open .site-header--visitor .main-nav--visitor", css)
+        self.assertIn('aria-controls="navigation-drawer"', html)
+        self.assertIn('[data-nav-mode="drawer"]', css)
+        self.assertIn(".nav-drawer .main-nav--visitor", css)
         self._assert_public_navigation_contract(html)
 
     def test_active_link_keeps_visible_focus_and_theme_compatible_tokens(self):

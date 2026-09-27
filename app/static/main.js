@@ -1,15 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const menuToggle = document.querySelector(".menu-toggle");
-
-    if (menuToggle) {
-        menuToggle.addEventListener("click", () => {
-            const isOpen = document.body.classList.toggle("menu-open");
-            menuToggle.setAttribute("aria-expanded", String(isOpen));
-            menuToggle.setAttribute("aria-label", isOpen ? "Cerrar menu" : "Abrir menu");
-        });
-    }
-
-    const navDropdowns = document.querySelectorAll(".nav-dropdown");
+    // The shared header owns its listeners in navbar-drawer.js.
+    const navDropdowns = document.querySelectorAll(".nav-dropdown:not(.site-header .nav-dropdown)");
 
     navDropdowns.forEach((dropdown) => {
         const summary = dropdown.querySelector("summary");

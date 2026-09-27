@@ -162,7 +162,8 @@ class PlatformBrandTest(unittest.TestCase):
         self.assertNotIn("cover", image_rule)
         self.assertIn("width: 100%", image_rule)
         self.assertIn("height: 100%", image_rule)
-        self.assertIn("width: clamp(144px, 46vw, 180px)", css)
+        drawer_css = (ROOT / "app/static/css/navbar-drawer.css").read_text(encoding="utf-8")
+        self.assertIn("width: clamp(144px, 46vw, 180px)", drawer_css)
 
     def test_theme_contract_is_css_only_and_initialized_before_body(self):
         css = (ROOT / "app/static/css/visitor-navbar-v1.css").read_text(encoding="utf-8")
@@ -176,8 +177,9 @@ class PlatformBrandTest(unittest.TestCase):
 
     def test_authenticated_layout_and_menu_use_shared_responsive_controls(self):
         css = (ROOT / "app/static/css/visitor-navbar-v1.css").read_text(encoding="utf-8")
-        self.assertIn("@media (min-width: 821px) and (max-width: 1180px)", css)
-        self.assertIn("body.menu-open .site-header--authenticated .main-nav--visitor", css)
+        drawer_css = (ROOT / "app/static/css/navbar-drawer.css").read_text(encoding="utf-8")
+        self.assertIn('[data-nav-mode="drawer"]', drawer_css)
+        self.assertIn(".nav-drawer .header-utilities", drawer_css)
         self.assertIn("background: var(--trax-color-surface)", css.split(".site-header--visitor .menu-toggle {", 1)[1].split("}", 1)[0])
         self.assertIn("background: var(--trax-color-text)", css.split(".site-header--visitor .menu-toggle span {", 1)[1].split("}", 1)[0])
 

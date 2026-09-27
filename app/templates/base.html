@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/visitor-navbar-v1.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-switch-v1.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notification-navbar-v1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-drawer.css') }}">
     <script>
         (function () {
             try {
@@ -34,13 +35,14 @@
         <button
             class="menu-toggle"
             type="button"
-            aria-label="Abrir menu"
+            aria-label="Abrir menú"
             aria-expanded="false"
-            aria-controls="primary-navigation">
+            aria-controls="navigation-drawer" hidden>
             <span></span>
             <span></span>
         </button>
 
+        <div class="navigation-content" data-navigation-content>
         <nav id="primary-navigation" class="main-nav main-nav--visitor" aria-label="Navegacion principal">
             <a href="/"{% if request.path == "/" %} aria-current="page"{% endif %}>Inicio</a>
             <a href="/explorar"{% if request.path == "/explorar" %} aria-current="page"{% endif %}>Explorar rubros</a>
@@ -180,6 +182,16 @@
             </div>
         {% endif %}
         </div>
+        </div>
+        <dialog id="navigation-drawer" class="nav-drawer" aria-labelledby="navigation-drawer-title">
+            <div class="nav-drawer__head">
+                <h2 id="navigation-drawer-title">Menú</h2>
+                <button class="nav-drawer__close" type="button" aria-label="Cerrar menú" autofocus>
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="nav-drawer__body"></div>
+        </dialog>
     </header>
 
     {% set flash_messages = get_flashed_messages(with_categories=true) %}
@@ -288,6 +300,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navbar-drawer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/design-system-v2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme-switch-v1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/whatsapp-consent-v1.js') }}"></script>
