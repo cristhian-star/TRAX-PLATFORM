@@ -1,5 +1,32 @@
 # BACKLOG MANDOBRA
 
+## UX-04B/04C — Estados de carga y errores amigables
+
+Timestamp: 2026-09-27T16:12:05-03:00. Rama feature/ux-ui-foundation; base 18c422e.
+Estado: implementado localmente; aprobación visual y Testing independiente pendientes.
+
+Skeleton global: enlaces internos elegibles y submits válidos, espera 300 ms,
+mensaje a 8 s, cleanup pageshow/bfcache/Escape/Navigation API y fail-safe 30 s.
+Excluye externos, protocolos especiales, descargas, targets nuevos, anclas locales,
+modificadores, eventos cancelados, data-no-loading y formularios inválidos.
+Sin SPA/intercepción/reenvío; no opera antes de la primera respuesta HTML absoluta.
+Sin Navigation API, cancelaciones no observables dependen de Escape/pageshow/límite.
+
+403/404/500/503 comparten template seguro, marca, temas, acciones reales y SVG
+local original animado suavemente; movimiento reducido desactiva animaciones.
+TESTING/JSON, health, webhooks, CSRF, headers y logs genéricos preservados;
+render de errores no consulta notificaciones. QA aislado en /dev/qa/estados.
+
+Evidencia: 143 Python PASS tras corregir orden de CSS, última tanda focal/seguridad/
+webhook 65 PASS (solapada, no sumar), Node final40 PASS; compileall, sintaxis,
+UTF-8, enlaces y diff-check. Chrome48 casos errores +12 skeleton en seis anchos y
+ambos temas; mínimos44px, sin overflow estable. Alcances exactos en ACTIVE_HANDOFF.
+
+Pendientes: aprobación visual; suite completa/retest independiente; AT, JS apagado,
+bfcache real y navegadores legacy; reduced motion del SO y zoom real (720px equiv.
+200% ya revisado). No confundir estas reservas con un PASS de Testing.
+No migraciones ni nuevas dependencias. Sin staging/commit/push/merge.
+
 ## UX-05A: ajuste visual exclusivo de Explorar
 
 Timestamp: 2026-09-27T14:30:36-03:00. Implementado localmente, revision visual pendiente.

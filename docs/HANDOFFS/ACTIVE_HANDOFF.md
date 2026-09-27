@@ -1,3 +1,157 @@
+# UX-04B/04C — Skeleton y errores amigables
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T16:12:05-03:00
+Origen: laptop, Codex Desktop Windows; agente técnico MANDOBRA.
+Rama: feature/ux-ui-foundation.
+HEAD conservado: 18c422e35ed20f109e2567ffbf8a51fa440cfe8f.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: working tree limpio, staging vacío. La entrada anterior conserva una
+base histórica 85a7f22 y cambios de UX-05A; el pedido vigente y Git confirman que
+ese trabajo ya está guardado en la nueva base 18c422e. No se reescribe el historial.
+
+## Alcance implementado
+
+- Skeleton global desde base.html y páginas de error: enlace interno elegible o
+  submit nativo válido; demora 300 ms, mensaje a los 8 s, liberación a los 30 s.
+  No intercepta respuestas, no cambia métodos, no reenvía, no llama preventDefault.
+- Excluye externos, protocolos no HTTP, WhatsApp externo, downloads, otros targets,
+  modificadores, anclas locales, eventos cancelados, data-no-loading, controles
+  locales y formularios inválidos. Respeta overrides del submitter y novalidate.
+- Limpia timers en pageshow/pagehide (incluido bfcache), Escape, invalid y eventos
+  Navigation API de cancelación/resultado. Un aborto antiguo no cancela una carga
+  nueva. Sin beforeunload ni variables globales. Inicialización idempotente.
+- Overlay fijo, sin captar eventos ni mover foco; aria-busy restaurado al valor
+  anterior, mensaje polite, formas decorativas. CSS/JS con liberación de seguridad.
+  Movimiento reducido desactiva shimmer; la liberación CSS diferida no anima formas.
+- HTML compartido para 403/404/500/503, navegación segura a / y /explorar, logo y
+  tema, ilustración SVG original local de vivienda/maletín/señal, animación lenta
+  de transform/opacity desactivada con prefers-reduced-motion. Sin fuentes externas,
+  scripts, texto ni recursos externos dentro del SVG. MIME SVG explícito.
+- Contexto de errores evita consultas de notificaciones incluso con sesión activa
+  y fallo de DB. No depende del navbar completo. No expone argumentos de excepción.
+- TESTING, Accept JSON y request JSON conservan negociación existente. Respuestas
+  JSON directas de health/webhooks intactas. /healthz y /api/ no usan plantilla
+  corporativa; los errores genéricos mantienen texto anterior sin Accept JSON.
+  400/CSRF, 413, 429 siguen genéricos. HTTPException no seleccionadas siguen
+  passthrough, 405 conserva Allow; 503 conserva Retry-After. Seguridad global intacta.
+  500 registra el mensaje genérico existente una vez, sin payload ni excepción.
+- QA usa el guard existente development/testing + ENABLE_DEV_QA_PANEL; blueprint
+  ausente en producción. Previews 200 rotuladas sin errores artificiales ni logs.
+  Esperas GET/POST acotadas a 3/10 s, HEAD sin demora, CSRF conservado, no-store.
+  Simulación visual de 12 s con el mismo controlador sólo mediante marcador QA.
+- Sin cambios de negocio, modelos, migraciones, dependencias, assets previos,
+  home, carruseles o navbar, salvo inclusión global del skeleton en base.html.
+
+## Revisión local
+
+Compose descartable: docker-compose.stabilization.yml, proyecto mandobra_stabilization.
+Sólo se reconstruyó imagen y recreó web con --no-deps. Disponible en 127.0.0.1:5050.
+No se accedió a trax_db ni se alteró trax-postgres; tests en contenedores --rm,
+--network none, sin volúmenes y DATABASE_URL=sqlite:///:memory:.
+
+1. Abrir http://127.0.0.1:5050/dev/qa/estados.
+2. Pulsar “Simular skeleton durante 12 segundos” para inspección visual sin navegar.
+   Aparece tras 300 ms, mensaje prolongado a los 8 s, finaliza a los 12 s; Escape limpia.
+3. Los enlaces “Navegar con espera de 3/10 segundos” producen esperas reales QA.
+   No abrir directamente la URL con demora para evaluar el skeleton: necesita partir
+   de una página ya cargada. Formulario QA permite validar envío y campo requerido.
+4. Errores: /dev/qa/estados/403, /404, /500 y /503 (todos bajo el mismo prefijo).
+   Son previews 200, no sustituyen pruebas de status HTTP real en Flask.
+
+## Evidencia ejecutada y límites
+
+- Primera focal: 18 Python PASS (errores + RuntimeHealthTest).
+- Primera regresión: 125 Python, 3 subcasos fallidos del mismo guard de orden CSS
+  del drawer. Causa: nueva hoja después de navbar-drawer.css. Solución: cargar
+  page-loading.css antes, conservando la última hoja del navbar. No se debilitó test.
+- Después: 143 Python PASS en 9.098 s, sin skips. Incluye focales, health, home,
+  Explorar, mercados, drawer/nav, identidad, DS, auth, footer, seguridad/config y
+  servicios de dashboard. Es una selección de módulos, NO la suite completa.
+- Última revisión de controlador/API y nueva comprobación de enlaces: 65 Python
+  PASS en 4.755 s (loading_error_states, RuntimeHealthTest, security_controls,
+  security_compliance_phase3, app_configuration, mercadopago_webhook_routes).
+  Las tandas se solapan: NO sumar como pruebas únicas.
+- Última tanda Node: 40 PASS, 0 skips, 119.4393 ms. Incluye 11 focales de carga,
+  drawer, home hero/FAQ, bandas y Explorar. Relojes simulados prueban lógica de
+  temporizadores, NO son mediciones simuladas de layout.
+- compileall app + test focal, sintaxis JS, UTF-8 estricto y git diff --check PASS.
+  Enlaces/recursos nuevos relativos y resolubles comprobados con Flask/HTMLParser.
+- Chrome real: 48 casos de error (4 códigos × 1440/1024/768/720/390/320 × 2 temas),
+  getBoundingClientRect: todos los objetivos >=44×44; mínimo 66.46×44 en claro y
+  79.84×44 en oscuro; acciones principales >=48 px alto. SVG cargado y dentro del
+  ancho; sin overflow horizontal. 720 CSS px representa reflow de 1440 al 200 %.
+- Skeleton: 12 combinaciones ancho/tema; sin overflow propio, foco conservado,
+  aria-busy y texto prolongado observados. Durante resize acelerado dos lecturas
+  iniciales de overflow del navbar fueron transitorias; remedir a 320 y 390 una vez
+  asentado el modo drawer dio cero overflow (evidencia guarda ambas lecturas).
+- Teclado real: cinco controles de preview 403, contorno sólido computado 2.4 px;
+  Escape limpia overlay/busy. Formulario vacío no navega y enfoca requerido;
+  válido realiza POST normal y vuelve con overlay oculto/busy retirado.
+- La herramienta espera el fin de la navegación y no captura el HTML saliente
+  mientras espera servidor; por eso las capturas del skeleton usan simulación QA.
+  Los enlaces lentos reales y el POST sí fueron recorridos en Chrome.
+- Consola consultada: sólo mensajes de extensión chrome-extension://mopn...;
+  no se atribuyen a la aplicación. Warnings Python heredados: Query.get y utcnow.
+- ResourceWarning de respuesta estática en prueba inicial corregido con close();
+  no aparece en la última tanda. No nuevo troubleshooting reutilizable pendiente.
+
+Evidencia fuera del repositorio:
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/
+- ux04bc-browser-measurements.json
+- ux04c-error-404-light-1440.png
+- ux04c-error-503-dark-320.png
+- ux04c-error-403-light-390-focus.png
+- ux04b-skeleton-light-1440.png
+- ux04b-skeleton-dark-320.png
+
+Limitación explícita: el skeleton funciona durante navegaciones iniciadas desde
+una página de MANDOBRA ya cargada. No puede mostrarse durante la primera descarga
+absoluta del HTML antes de que el servidor responda, salvo que en el futuro se
+incorpore un shell persistente, SPA o service worker. No se implementó ninguno.
+En navegadores sin Navigation API, cancelaciones no notificadas por el navegador
+usan Escape/pageshow o el límite de 30 s; no hay evento universal de cancelación.
+Reduced motion verificado en reglas CSS/tests, sin emulación real disponible en la
+herramienta. Pendientes de Testing: lectura con AT real, JS desactivado en navegador,
+bfcache efectivo/otros navegadores, preferencia de movimiento del SO y zoom real.
+No se afirma que tests unitarios certifiquen esos escenarios reales ni accesibilidad
+integral. La navegación sin JS queda nativa; skeleton oculto por HTML.
+
+## Cierre y continuidad
+
+16 paths locales (6 modificados, 10 nuevos), sin staging, commit, push, PR o merge.
+No merge por instrucción expresa; HEAD y rama conservados. Push a GitHub no ejecutado,
+sin sincronización remota ni afirmación de nuevos cambios publicados.
+Completado: implementación, focales/regresiones seleccionadas, revisión visual de
+agente, BACKLOG y handoff. Pendiente: aprobación visual de Producto y retest/suite
+completa por Testing independiente. No hay bloqueo técnico identificado.
+Riesgos restantes: limitaciones de cancelación legacy/primera carga y validación AT.
+Próximo paso: revisar URLs anteriores; sólo después autorizar Testing y eventual
+integración a develop. No ejecutar full suite ni integrar sin autorización.
+Para retomar: git status; git branch --show-current; git log -1 --oneline;
+leer esta entrada; comprobar los paths siguientes y staging vacío; conservar
+Compose descartable y no tocar recursos persistentes. No reset/clean/staging/commit.
+
+Archivos modificados y nuevos de esta sesión:
+- app/__init__.py
+- app/routes/dev_routes.py
+- app/templates/base.html
+- app/templates/dev_qa_panel.html
+- app/static/css/error-pages.css
+- app/static/css/page-loading.css
+- app/static/images/states/mandobra-repair.svg
+- app/static/js/page-loading.js
+- app/templates/dev_qa_states.html
+- app/templates/errors/base_error.html
+- app/templates/partials/page_loading.html
+- app/utils/error_pages.py
+- tests/js/page_loading.test.js
+- tests/test_loading_error_states.py
+- docs/BACKLOG.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+---
+
 # Correccion focal: retirar pausa visible de Precios de mercado
 
 Estado: READY_TO_RESUME
