@@ -1,6 +1,6 @@
 import mimetypes
 
-from flask import Flask, jsonify, request, session
+from flask import Flask, g, jsonify, make_response, request, session
 from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
@@ -19,6 +19,7 @@ limiter = Limiter(key_func=get_remote_address)
 def create_app(config_class=None, initialize_schema=False):
     # Keep static WebP responses portable across host MIME registries.
     mimetypes.add_type("image/webp", ".webp", strict=True)
+    mimetypes.add_type("image/svg+xml", ".svg", strict=True)
     app = Flask(__name__)
 
     config_class = config_class or get_config_class()
@@ -121,7 +122,7 @@ def create_app(config_class=None, initialize_schema=False):
 
     @app.context_processor
     def inject_notification_navbar():
-        if not session.get("user_id"):
+        if getattr(g, "rendering_error_page", False) or not session.get("user_id"):
             return {
                 "navbar_notifications": [],
                 "navbar_unread_notifications": 0,
@@ -142,6 +143,11 @@ def create_app(config_class=None, initialize_schema=False):
         if app.config.get("TESTING") or request.accept_mimetypes.best == "application/json" or request.is_json:
             return jsonify({"error": message}), status_code
 
+        # Technical responses retain their existing generic contract.
+        technical = request.path == "/healthz" or request.path.startswith("/api/")
+        if status_code in (403, 404, 500, 503) and not technical:
+            from app.utils.error_pages import render_error_page
+            return render_error_page(status_code), status_code
         return f"{status_code} - {message}", status_code
 
     @app.errorhandler(400)
@@ -166,14 +172,23 @@ def create_app(config_class=None, initialize_schema=False):
 
     @app.errorhandler(500)
     def handle_internal_error(error):
+        app.logger.error("Error inesperado procesando la solicitud")
         return _safe_error_response(500, "Error interno")
+
+    @app.errorhandler(503)
+    def handle_unavailable(error):
+        response = make_response(_safe_error_response(503, "Servicio no disponible"))
+        if isinstance(error, HTTPException):
+            retry_after = error.get_response().headers.get("Retry-After")
+            if retry_after:
+                response.headers["Retry-After"] = retry_after
+        return response
 
     @app.errorhandler(Exception)
     def handle_unexpected_error(error):
         if isinstance(error, HTTPException):
             return error
 
-        app.logger.error("Error inesperado procesando la solicitud")
         return handle_internal_error(error)
 
     @app.after_request

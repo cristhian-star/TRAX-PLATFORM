@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>{{ title }} · MANDOBRA</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/branding/mandobra/mandobra-symbol-compact.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system-v2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/error-pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-loading.css') }}">
+</head>
+<body class="error-page">
+    <header class="error-header">
+        <a class="error-brand" href="{{ url_for('main.home') }}" aria-label="MANDOBRA inicio">
+            <img class="error-brand__light" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-light.png') }}" width="1696" height="720" alt="" aria-hidden="true">
+            <img class="error-brand__dark" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-dark.png') }}" width="1696" height="720" alt="" aria-hidden="true">
+        </a>
+        <button class="error-theme" type="button" data-theme-switch aria-label="Cambiar a tema oscuro" aria-pressed="false"><span class="theme-switch__label">Tema</span></button>
+    </header>
+    {% if preview %}<aside class="error-preview">Vista previa QA · Error {{ code }} · <a href="{{ url_for('dev.qa_states') }}">Volver a las vistas previas</a></aside>{% endif %}
+    <main class="error-main">
+        <div class="error-copy">
+            <p class="error-code">MANDOBRA <span aria-hidden="true">/</span> Error {{ code }}</p>
+            <h1>{{ title }}</h1>
+            <p class="error-message">{{ message }}</p>
+            <nav class="error-actions" aria-label="Continuar navegando">
+                <a class="error-action error-action--primary" href="{{ url_for('main.home') }}">Volver al inicio</a>
+                <a class="error-action" href="{{ url_for('main.explorar_rubros') }}">Explorar rubros</a>
+            </nav>
+        </div>
+        <img class="error-illustration" src="{{ url_for('static', filename='images/states/mandobra-repair.svg') }}" width="560" height="440" alt="" aria-hidden="true">
+    </main>
+    <footer class="error-footer">MANDOBRA · Profesionales para tu hogar y tu proyecto.</footer>
+    {% include 'partials/page_loading.html' %}
+    <script src="{{ url_for('static', filename='js/theme-switch-v1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page-loading.js') }}"></script>
+</body>
+</html>

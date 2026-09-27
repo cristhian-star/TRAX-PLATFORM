@@ -1,0 +1,37 @@
+/* Fixed, non-interactive presentation. Drawer/dialog focus remains untouched. */
+.page-loading[hidden] { display: none; }
+.page-loading { position: fixed; inset: 0; z-index: 900; pointer-events: none; overflow: hidden;
+    background: var(--trax-ds-bg); color: var(--trax-ds-text); animation: loading-release 0s 30s forwards; }
+.page-loading *, .page-loading *::before { box-sizing: border-box; }
+.page-loading__shell { max-width: 1160px; margin: auto; padding: clamp(20px, 4vw, 56px); }
+.page-loading__header { display: flex; justify-content: space-between; margin-bottom: 64px; }
+.page-loading__header span { width: 150px; height: 34px; }
+.page-loading__header span:last-child { width: 44px; }
+.page-loading__title { height: 46px; width: 65%; margin-bottom: 24px; }
+.page-loading__line { height: 16px; width: 80%; margin: 12px 0; }
+.page-loading__line--short { width: 55%; }
+.page-loading__panel { height: 70px; margin: 36px 0; }
+.page-loading__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.page-loading__grid > div { height: 130px; }
+.page-loading__shapes > div:not(.page-loading__header):not(.page-loading__grid),
+.page-loading__header span, .page-loading__grid > div { position: relative; overflow: hidden; border-radius: 12px; background: var(--trax-ds-bg-muted); }
+.page-loading__shapes > div:not(.page-loading__header):not(.page-loading__grid)::before,
+.page-loading__header span::before, .page-loading__grid > div::before { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 20%, var(--trax-ds-bg-elevated) 50%, transparent 80%);
+    opacity: .45; transform: translateX(-100%); animation: loading-shimmer 2.8s ease-in-out infinite; }
+.page-loading__status { position: absolute; top: 100px; left: 20px; right: 20px; text-align: center;
+    margin: 0; font: 600 15px/1.5 system-ui, sans-serif; color: var(--trax-ds-text-secondary); }
+.page-loading__status::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 9px; border-radius: 50%; background: var(--trax-ds-primary); }
+@keyframes loading-shimmer { to { transform: translateX(100%); } }
+/* Independent CSS fail-safe if a later script fails before JS cleanup. */
+@keyframes loading-release { to { visibility: hidden; } }
+@media (max-width: 600px) {
+    .page-loading__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .page-loading__grid > div { height: 112px; }
+    .page-loading__header { margin-bottom: 86px; }
+    .page-loading__title { width: 90%; height: 36px; }
+    .page-loading__status { top: 78px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .page-loading__shapes *::before { animation: none !important; display: none; }
+}

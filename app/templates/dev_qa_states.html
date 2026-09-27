@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dev-qa-panel.css') }}">{% endblock %}
+{% block content %}
+<main class="dev-qa-page dev-qa-shell">
+    <h1>Vista previa QA · Estados de MANDOBRA</h1>
+    <p>Exclusivo de desarrollo/testing. Estas vistas no provocan errores reales.</p>
+    <nav class="dev-qa-toolbar" aria-label="Errores de ejemplo">
+        {% for code in (403, 404, 500, 503) %}<a class="btn" href="{{ url_for('dev.qa_error_preview', code=code) }}">Vista previa {{ code }}</a>{% endfor %}
+    </nav>
+    <h2>Skeleton con demora controlada</h2>
+    <p><button type="button" data-loading-preview>Simular skeleton durante 12 segundos</button></p>
+    <p>La simulación visual usa el mismo controlador, sin abandonar esta página ni enviar solicitudes.</p>
+    <p>El estado aparece después de 300 ms. A los ocho segundos cambia el mensaje. Escape lo oculta; la navegación sigue su curso normal.</p>
+    <p><a class="btn" href="{{ url_for('dev.qa_states', demora=3) }}">Navegar con espera de 3 segundos</a></p>
+    <p><a class="btn" href="{{ url_for('dev.qa_states', demora=10) }}">Navegar con espera de 10 segundos</a></p>
+    <form method="post" action="{{ url_for('dev.qa_states') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="demora" value="3">
+        <label for="qa-loading-name">Texto de prueba obligatorio (no se guarda)</label>
+        <input id="qa-loading-name" name="ejemplo" required maxlength="30" autocomplete="off">
+        <button type="submit">Enviar formulario de prueba</button>
+    </form>
+    <p>Probar con el campo vacío mantiene la validación HTML nativa. Recargar directamente esta URL no muestra el skeleton de primera descarga.</p>
+</main>
+{% endblock %}
