@@ -1,4 +1,235 @@
-# Identidad MANDOBRA aprobada: navbar compartido de toda la plataforma
+# UX-04A P2: correccion focal de objetivos tactiles
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T23:22:32-03:00
+Dispositivo/origen: Codex Desktop, checkout local Windows.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `263a158dfec83d280e3686edd5ca34271992b3fc`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck y cierre: exactamente los mismos once paths UX-04A locales (siete
+modificados y cuatro nuevos), staging vacio. Trabajo anterior preservado.
+
+## Hallazgo, causa y correccion
+P2 confirmado: Inicio, Explorar rubros, Precios de mercado y Planes quedaban
+debajo de 44 px. La regla `.site-header--visitor .main-nav--visitor > a` de
+visitor-navbar-v1.css imponia min-height 36 px (token control-height-sm), por
+encima del selector generico con :is de navbar-drawer.css. El test textual
+anterior no verificaba esa competencia de especificidad.
+
+Se agrega exclusivamente `#navigation-drawer :is(a[href], button, summary)`:
+min-width/min-height 44px, border-box y flex-shrink 0. Su ID supera los selectores
+de clases existentes; sin !important, sin cambiar tokens, padding, line-height,
+tipografia, temas ni JS. No alcanza la fila horizontal ni el clon de medicion.
+Incluye enlaces directos, acordeones, opciones, cierre, tema, notificaciones,
+autenticacion y cuenta. No se modificaron rutas ni comportamiento aprobado.
+
+Archivos modificados en ESTA correccion (solo tres de los once preexistentes):
+- [navbar-drawer.css](../../app/static/css/navbar-drawer.css).
+- [test_navbar_drawer_ux04a.py](../../tests/test_navbar_drawer_ux04a.py).
+- [ACTIVE_HANDOFF.md](ACTIVE_HANDOFF.md), esta entrada; historial preservado debajo.
+
+## Evidencia ejecutada
+Antes, Chrome real a 320 px: los cuatro enlaces medidos en esta sesion dieron
+263,2 x 42,4 px con min-height computado 36px, sin acordeones abiertos. El hallazgo
+de Testing reportaba aproximadamente 248 x 42,4; el ancho varia con el scrollbar
+interno. Despues, con TODOS los acordeones abiertos: cuatro enlaces 248 x 44 px
+a 320; min-height computado 44px. Son getBoundingClientRect reales, no valores
+simulados en el DOM double.
+
+Matriz real: 320, 390 y 768 px x claro/oscuro x visitante/CLIENTE/PROFESIONAL,
+18 combinaciones, 312 controles medidos (13/21/18 por rol y combinacion).
+Todos >=44 x 44 px; minimo observado 44 x 44. Cero overflow horizontal de pagina
+y cuerpo del drawer, cero intersecciones entre controles del mismo contenedor.
+Scroll interno overflow-y:auto comprobado con contenido mayor que clientHeight;
+se midieron tambien opciones fuera del area visible del scroll. CLIENTE incluye
+notificaciones existentes; PROFESIONAL incluye estado vacio y Panel profesional.
+Se inspeccionaron capturas, alineacion y foco visible; apertura, cierre, Escape
+y retorno al disparador, reapertura y plegado/desplegado siguen operativos.
+Los cuatro enlaces horizontales a 1440, tema oscuro visitante, conservaron
+exactamente x/y/ancho/alto antes y despues (altura horizontal 36px).
+El tema efectivo se verifico por clase theme-dark y control visible, no por el
+atributo data-theme heredado que no refleja el estado efectivo de esta pagina.
+
+Regresion estructural reforzada: verifica ID del dialog, selector aplicable,
+minimos, border-box, no encogimiento, orden real de CSS en HTML renderizado,
+ausencia de sizing !important/IDs competidores e inline sizing para tres roles,
+y presencia de los cuatro destinos. Cubre las hojas de ambos temas; el layout
+a 320 en ambos temas se complementa con la matriz de navegador anterior.
+No se agrego infraestructura ni dependencias: el runner Node existente usa DOM
+double y no tiene motor de layout. Control negativo en contenedor, sustituyendo
+solo la lectura del CSS en memoria: retirar la regla nueva produce exactamente
+tres fallos esperados (uno por rol), cero errores; ningun archivo fue alterado.
+
+- Python: 63 tests PASS, cero errores/fallos, 7,366 s. Modulos:
+  tests.test_navbar_drawer_ux04a, tests.test_navbar_markets_ux03a,
+  tests.test_platform_brand, tests.test_home_hero_carousel,
+  tests.test_auth_ux_redesign_v1, tests.test_design_system_v2,
+  tests.test_corporate_footer. Contenedor --rm --network none, SQLite en memoria,
+  sin volumenes. Warnings existentes Query.get/datetime.utcnow, no errores.
+- Node --test: 18 PASS (16 drawer y archivos FAQ/hero), cero fallos/skips.
+- Node --check main.js y navbar-drawer.js; compileall app y tres tests Python
+  UX-04A/navbar/identidad; UTF-8 de once paths, enlaces relativos de esta entrada
+  y git diff --check: PASS. Avisos Git LF/CRLF sin errores de whitespace.
+- No ejecutados: suite completa por restriccion, gates PostgreSQL, migraciones,
+  seed ni retest independiente. NO constituye aprobacion de Testing.
+
+Evidencia fuera del repo: carpeta
+`C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/`:
+`ux04a-p2-matrix.json`, `ux04a-p2-320-light.png`, `ux04a-p2-320-dark.png`.
+
+## Continuidad y pendientes
+Solo build y up -d --no-deps web de docker-compose.stabilization.yml; Compose
+descartable disponible en http://127.0.0.1:5050/ para revision. Sin acceso a
+trax_db ni alteracion de trax-postgres. Sin migraciones ni cambios de backend.
+Sesion demo cerrada y viewport temporal restaurado al finalizar.
+Sin staging, commit, push, PR ni merge: expresamente prohibidos en esta tarea.
+HEAD y rama conservados; cambios locales sin publicar. Los otros ocho paths
+UX-04A no fueron editados en esta correccion.
+
+Pendiente: retest independiente P2 por Testing, incluyendo matriz de roles/temas
+y controles expandidos. No cerrar el hallazgo como aprobado. Riesgo restante:
+el guard estructural no reemplaza un motor CSS; futuros selectores con ID o
+!important necesitan revision y medicion real. Limitaciones historicas de QA
+de UX-04A siguen registradas debajo, sin atribuirles aprobacion nueva.
+Retomar: git status --short; git branch --show-current; git log -1 --oneline;
+git diff --cached --name-only. Confirmar SHA y once paths; abrir 5050 y repetir
+getBoundingClientRect con acordeones/cuenta abiertos. No ejecutar suite completa
+salvo decision explicita de Testing; no reset/clean ni integrar cambios sin
+autorizacion. Estado final: correccion implementada, validada focalmente,
+PENDIENTE DE RETEST independiente.
+
+---
+
+# UX-04A: navbar responsive con sidebar vertical (historico)
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T21:03:18-03:00
+Dispositivo/origen: laptop DESKTOP-5K3IE76, chassis 10 confirmado por CIM; Codex Desktop.
+Rama: `feature/ux-ui-foundation`.
+HEAD/base: `263a158dfec83d280e3686edd5ca34271992b3fc` (`docs: record global Mandobra identity`).
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck: working tree limpio, staging vacio; `git ls-remote` confirmo exactamente
+el mismo SHA remoto. Las restricciones iniciales de red/CIM se resolvieron con
+lectura autorizada. La identidad anterior esta guardada en HEAD; los registros
+historicos de ffbb967 ya no describen el estado pendiente de esta sesion.
+
+## Objetivo, implementacion y decisiones
+Conservar toda la fila horizontal mientras quepa y reubicar el mismo contenido
+en un drawer vertical derecho al reducirse el espacio. Implementacion local
+completa; aprobacion visual y ciertas verificaciones manuales PENDIENTES.
+
+Inventario preservado: Inicio, Explorar rubros, Precios de mercado, Operaciones
+(Contratacion, Presupuestos, Emergencias, Propuestas), Ecosistema (Academy/Tools
+como proximamente) y Planes. Tema e Iniciar para visitante; tema, notificaciones,
+Mi cuenta y logout POST con CSRF para cuentas. Panel profesional solo en las
+acciones existentes de PROFESIONAL; Admin existente preservado. Sin agregar
+Mi panel al navbar, rutas, permisos o cambios a dashboards.
+
+Antes: cortes 820/1080/1180 px, reduccion de tipografia a 13 px y ocultamiento de
+etiqueta de tema; cuentas pasaban al menu bajo 1180. A 1280 la suma de etiquetas
+principales medida fue aproximadamente 493 px, con controles de visitante de
+214 px y cuenta de 342 px. UX-04A usa la fila sin compresion a 14 px, gaps DS,
+logo aprobado 200x56 y resumen de cuenta con su limite de texto existente.
+Se retiraron los cortes de layout anteriores de visitor-navbar-v1.css.
+
+Breakpoint resultante medido, no hardcodeado: minimo util 1141 px claro / 1146 px
+oscuro para visitante; 1301 / 1306 px para ambos roles demo autenticados. Incluye
+padding horizontal, ambos gaps, wordmark y todos los controles. Se compara
+contra el ancho real del header; un scrollbar puede requerir mayor viewport.
+Los bordes inmediatamente inferiores/superiores quedaron verificados con anchos
+reales fraccionarios por la escala de Windows (por ejemplo 1305,6 / 1307,2).
+Medicion sincrona con clon temporal inert/aria-hidden, sin IDs/names, retirado
+antes de pintar; solo existe un nav accesible. ResizeObserver, resize agrupado
+con requestAnimationFrame y eventos de fuentes/texto recalculan el minimo.
+
+Dialog nativo en top layer: backdrop, fondo inert, Escape/cierre/enlace/backdrop,
+foco inicial y circular, retorno al disparador. Al volver a horizontal cierra,
+libera scroll y devuelve foco a un elemento visible. Compensacion del scrollbar
+sin desplazar el contenido (logo x=20 antes/despues comprobado). Drawer maximo
+24rem, margen lateral de 1rem a 320 px, 100dvh, scroll interno, cierre fijo en su
+fila y cuenta al final. Acordeones con botones reales, aria-expanded/controls y
+paneles hidden; escritorio conserva details/summary. Tokens DS V2, targets 44 px,
+foco visible, movimiento breve y desactivado por prefers-reduced-motion.
+Sin JS o sin showModal, se conserva el HTML inicial con links que envuelven y
+details nativos; no se oculta la navegacion esperando una inicializacion.
+
+## Archivos afectados
+- [app/templates/base.html](../../app/templates/base.html): contenedor unico, dialog y recursos locales.
+- [app/static/main.js](../../app/static/main.js): retirar toggle legacy; handlers ajenos al header preservados.
+- [app/static/css/visitor-navbar-v1.css](../../app/static/css/visitor-navbar-v1.css): retirar cortes legacy sustituidos.
+- [app/static/css/navbar-drawer.css](../../app/static/css/navbar-drawer.css): nuevo layout, fallback y drawer aislado.
+- [app/static/js/navbar-drawer.js](../../app/static/js/navbar-drawer.js): nuevo controlador idempotente.
+- [tests/test_navbar_drawer_ux04a.py](../../tests/test_navbar_drawer_ux04a.py): seis focales de render/contratos.
+- [tests/js/navbar_drawer.test.js](../../tests/js/navbar_drawer.test.js): 16 pruebas del controlador con DOM double, sin dependencias.
+- [tests/test_navbar_markets_ux03a.py](../../tests/test_navbar_markets_ux03a.py) y [tests/test_platform_brand.py](../../tests/test_platform_brand.py): adaptar contratos responsive, conservando identidad/orden/rutas.
+- [docs/BACKLOG.md](../BACKLOG.md) y este handoff: estado, evidencia y pendientes, sin borrar historia.
+
+## Validaciones ejecutadas
+- 62 unittest PASS, 0 fallos/errores, ejecucion final 6,698 s: tests.test_navbar_drawer_ux04a,
+  tests.test_navbar_markets_ux03a, tests.test_platform_brand, tests.test_home_hero_carousel,
+  tests.test_auth_ux_redesign_v1, tests.test_design_system_v2 y tests.test_corporate_footer.
+- `docker run --rm --network none`, DATABASE_URL=sqlite:///:memory:, sin volumenes.
+  La primera ejecucion encontro dos errores del nuevo fixture porque el context
+  processor de notificaciones requiere tablas; corregido creando/desechando el
+  esquema solo en SQLite en memoria. Reejecucion completa focal en verde. No se
+  tocaron bases existentes. Advertencias historicas Query.get/datetime.utcnow.
+- Node --test: 18/18 PASS (16 casos drawer + archivos FAQ y hero). Apertura/cierre,
+  Escape/backdrop/enlace, foco circular/retorno, scroll restaurado, resize abierto,
+  umbral exacto y re-medicion, idempotencia, acordeones, ruta activa, desktop y
+  fallback sin showModal. DOM double no sustituye layout/inert nativo del navegador.
+- Node --check de main.js y navbar-drawer.js PASS; compileall app y tres tests
+  Python afectados PASS en contenedor descartable. UTF-8, enlaces relativos de
+  esta entrada/Backlog y git diff --check comprobados al cierre.
+- Chrome: matriz base de 54 combinaciones (tres perfiles, dos temas, nueve anchos)
+  mas observaciones adicionales de limites. 1440, 1280, encima/debajo de minimo,
+  1024, 768, 390, 320, 720 CSS px. Sin overflow ni superposiciones observadas.
+  720 representa reflow de una ventana de 1440 al 200 %, no zoom nativo medido.
+  Wordmarks y temas preservados. Drawer oscuro abierto a 320x640: 304 px de ancho,
+  16 px de margen y scroll interno. Home con drawer claro capturado a 1024x900.
+- Interacciones reales de teclado: abrir, acordeon Operaciones, Shift+Tab desde
+  cierre al ultimo control y Tab de vuelta, Escape, retorno de foco; backdrop y
+  enlace cierran. PROFESIONAL conserva Panel profesional dentro de cuenta.
+  Redimensionar abierto a 1440 restauro horizontal, scroll/padding y foco visible.
+- Consola: sin errores de aplicacion observados. Se registraron errores de una
+  extension Chrome ajena (chrome-extension://.../content.js). No confundirlos
+  con recursos externos incorporados por este cambio.
+
+## Limitaciones, troubleshooting y riesgos
+No ejecutados: suite completa (prohibida por alcance), gates PostgreSQL, migraciones,
+seed, retest independiente, otros motores y prueba con lector de pantalla.
+Fallback sin JS y reduced-motion verificados mediante contratos/test, no mediante
+emulacion visual real. La politica de URL de la herramienta bloqueo file:// del
+fixture HTML real sin scripts; no se uso otro servidor/protocolo para eludirla.
+Completar ambos chequeos manuales antes de declarar QA exhaustivo aprobado.
+La herramienta de navegador tuvo capturas/viewport obsoletos y timeout de una
+matriz larga; se recupero con pestanas nuevas y tandas cortas, contrastando cada
+ancho real con el modo. No se atribuye ese fallo a la app sin evidencia.
+Dialog modal requiere navegador moderno; sin soporte queda fallback nativo.
+El detalle fino del logo raster conserva la limitacion ya aprobada en identidad.
+No hubo incidente de backend ni nueva causa raiz que requiriera runbook tecnico.
+
+## Docker, Git y continuidad
+Solo build web y up -d --no-deps web en docker-compose.stabilization.yml. Web y
+PostgreSQL descartable existentes se dejan encendidos para revision en
+http://127.0.0.1:5050/. Sin seed/migraciones, sin tocar trax_db o volumenes.
+Once paths locales (siete modificados y cuatro nuevos), sin staging. HEAD sin
+cambios. Sin commit, push, PR, merge ni deploy; remoto verificado en la base al
+inicio. No hubo merge porque esta tarea lo prohibe y requiere aprobacion visual.
+Estado final: implementacion y focales completadas; QA visual limitado segun lo
+anterior y aprobacion humana pendientes. No afirmar aprobacion global.
+
+Retomar: ejecutar git status, git branch --show-current, git log -1 --oneline;
+confirmar HEAD 263a158 y estos once paths; abrir home en ambos temas y mover el
+ancho sobre el minimo medido. Revisar sin JS/reduced-motion manualmente. Revisar
+diff y autorizar separadamente staging/commit/push o integracion posterior a develop.
+No reset/clean, no perder cambios locales, no modificar dashboards, rutas,
+permisos, logos originales, bases o migraciones. Mantener Compose encendido.
+Evidencia fuera del repo: `C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux04a-matrix.json`
+y `ux04a-sidebar-home.png`. Sesiones demo cerradas; viewport restaurado.
+
+---
+
+# Identidad MANDOBRA aprobada: navbar compartido de toda la plataforma (historico)
 
 Estado: COMPLETED
 Timestamp: 2026-09-26T14:13:29-03:00

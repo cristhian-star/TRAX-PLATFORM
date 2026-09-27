@@ -1,5 +1,33 @@
 # BACKLOG MANDOBRA
 
+## UX-04A: navbar adaptable con drawer vertical
+
+Timestamp: 2026-09-26T21:03:18-03:00. Rama: `feature/ux-ui-foundation`.
+Base: `263a158dfec83d280e3686edd5ca34271992b3fc`. Estado: implementado localmente,
+pendiente de aprobacion visual e integracion Git. No hubo commit, push ni merge.
+
+- Una sola navegacion, reubicada en dialog modal a la derecha cuando la fila no
+  cabe completa. El ancho se mide nuevamente ante resize, fuentes o cambios de
+  texto; no se comprimen etiquetas ni se elige un breakpoint fijo por dispositivo.
+- Con los usuarios demo actuales: minimo util 1141 px (claro) / 1146 px (oscuro)
+  visitante; 1301 / 1306 px CLIENTE y PROFESIONAL. Incluye logo, opciones, controles,
+  separaciones y padding. Comparacion contra el ancho real del header, descontando
+  el espacio ocupado por scrollbar. Los numeros son evidencia, no constantes JS.
+- Dialog nativo con backdrop, Escape, foco contenido/restaurado, bloqueo de scroll,
+  botones de acordeon, acciones de cuenta al final y fallback HTML/CSS sin JS.
+- Verificacion focal: 62 unittest PASS y 18 casos/archivos Node PASS; matriz visual
+  de tres perfiles y dos temas entre 320 y 1440 px, extremos del umbral y reflow
+  equivalente a 200 % (720 CSS px desde una base de 1440).
+- Pendiente: aprobacion humana, revision visual real sin JS y emulacion visual de
+  movimiento reducido. La apertura del fixture local sin scripts fue rechazada por
+  la politica de URL del navegador; no se eludio. Esos contratos tienen pruebas
+  estructurales/controlador, no evidencia visual equivalente a un navegador sin JS.
+- Pendiente posterior: retest independiente y compatibilidad en otros motores.
+  Suite completa no ejecutada por alcance. Panel privado, skeletons, paginas de
+  error, backend y migraciones permanecen fuera de UX-04A.
+
+Detalle y continuidad: [ACTIVE_HANDOFF.md](HANDOFFS/ACTIVE_HANDOFF.md).
+
 ## Futuro: datos reales y metodología de Precios de mercado
 
 Timestamp: 2026-09-22T22:33:48-03:00. Rama: `feature/ux-ui-foundation`.
