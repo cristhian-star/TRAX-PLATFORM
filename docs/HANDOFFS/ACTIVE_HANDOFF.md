@@ -1,3 +1,505 @@
+# Correccion focal: retirar pausa visible de Precios de mercado
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:38:25-03:00
+Origen: Codex Desktop Windows; agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation; HEAD:85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Origin:https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Objetivo solicitado: eliminar Pausar imagenes de /mercados. Completado localmente.
+
+Retirados boton HTML, tres reglas CSS y estado/listeners JS exclusivos del boton.
+El inicializador ya no depende de encontrarlo. Conservados autoplay3000ms,
+pausas automaticas por interaccion/visibilidad y prefers-reduced-motion.
+Home y Explorar intactos,7 hashes antes/despues iguales. Sin cambios a assets.
+
+Archivos de esta sesion:
+- app/templates/mercados.html
+- app/static/css/markets-v2.css
+- app/static/js/markets-carousel.js
+- tests/test_markets_ux03.py
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+12 pruebas tests.test_markets_ux03 PASS,0.368s; SQLite en memoria, contenedor
+efimero sin red ni volumenes. Sintaxis JavaScript, UTF-8 y diff-check PASS.
+Chrome:/mercados sin boton, carrusel avanzando, sin overflow en escritorio.
+Captura externa: markets-without-pause.png en directorio de evidencia habitual.
+No suite completa ni matriz responsive completa repetida para este ajuste focal.
+Sin migraciones, nuevos errores conocidos ni bloqueo tecnico. Revision visual y
+Testing independiente pendientes; no implica aprobacion integral de UX05A.
+
+Git: trabajo previo preservado,30 paths locales acumulados,staging vacio.
+Sin commit/push/PR/merge: cambios pendientes de revision. Rama/HEAD conservados.
+Solo rebuild/recreate web del Compose descartable --no-deps,5050 disponible.
+No acceso a trax_db ni cambios a trax-postgres/recursos ajenos. No migraciones.
+Documentacion actualizada: esta posta, historial preservado.
+Retomar verificando identidad/staging, abrir /mercados en5050 y revisar ausencia
+del boton. No tocar Home ni Explorar, ni staging/commit/push/merge sin autorizacion.
+
+---
+
+# UX-05A: portada de Explorar azul, sin controles visibles
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:30:36-03:00
+Origen: Codex Desktop Windows, agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation; HEAD:85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Objetivo: reforzar la capa azul de Explorar, retirar flechas/pausa visible,
+no tocar Home mientras Producto lo revisa.
+
+Completado: overlay superior62%->72%, manteniendo94% detras del texto/buscador.
+Retirados HTML/CSS/listeners de anterior/siguiente. Ya no habia boton visible de
+pausa en Explorar. Unico boton de la portada: Buscar profesionales.
+Se mantienen siete escenas,8s,fade750ms, pausas automaticas hover/foco/visibilidad,
+reduced-motion y fallback sin JS. Titulo, buscador,20 rubros y rutas sin cambios.
+No se modificaron Home, bandas, Precios de mercado ni assets. Siete hashes de
+archivos home/template/CSS/JS/tests comparados antes/despues, iguales.
+
+Archivos cambiados en esta sesion:
+- app/templates/explorar_rubros.html
+- app/static/css/explore-motion.css
+- app/static/js/explore-motion.js
+- tests/js/explore_motion.test.js
+- tests/test_explore_motion_ux05a.py
+- docs/BACKLOG.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Validacion:19 Python PASS (UX05A/UX02,1.024s),6 Node PASS; sintaxis JS,
+UTF-8 y git diff --check. Python en contenedor efimero sin red/volumenes y SQLite
+en memoria. ERROR del caso deliberado de UX02, sin fallos. Sin suite completa,
+gates PostgreSQL ni migraciones. Revision Chrome en pestaña nueva solo Explorar,
+portada azul y ausencia de controles verificadas. Captura ux05a-explore-blue-desktop.png
+en el directorio externo habitual. No se navego ni recargo Home en navegador.
+
+Se reconstruyo/recreo solo web del Compose descartable --no-deps;5050 disponible.
+No trax_db/trax-postgres ni recursos ajenos. Sin nuevos archivos de producto.
+26 paths locales acumulados (7 modificados/19 nuevos contra HEAD),staging vacio.
+No commit/push/PR/merge; se conserva rama y HEAD. No hubo merge porque quedan
+revision visual y Testing independiente. Cambios solo locales.
+
+Pendientes: aprobacion visual, Testing independiente y suite completa posterior;
+CLS instrumental/emulacion real sin JS/reduced-motion siguen pendientes como
+se indico antes. No declarar aprobacion por pruebas focales. Sin errores nuevos.
+Retomar verificando identidad/staging/26 paths, revisar /explorar en5050.
+No modificar Home mientras Producto lo revisa, ni realizar staging/commit/push/
+merge o reset/clean sin autorizacion. Historial preservado abajo.
+
+---
+
+# UX-05A: Oficios destacados solo con bandas grandes y enlaces
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:18:48-03:00
+Origen: Codex Desktop Windows, agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation.
+HEAD: 85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+
+## Decision vigente
+Producto solicita retirar las seis tarjetas fijas, ampliar las dos bandas,
+reducir ligeramente su velocidad y agregar titulos para buscar profesionales.
+Esta instruccion reemplaza la preservacion de las seis tarjetas del pedido
+anterior. No modifica la aprobacion de los doce assets ni el carrusel de Explorar.
+Implementado localmente; nueva revision visual y Testing independiente pendientes.
+
+## Cambios completados
+- Retiradas las seis tarjetas y sus reglas CSS sin consumidores.
+- Bandas con tarjetas enlazadas de 376px escritorio / 248px movil, imagen 16:9
+  y titulo de 16px con flecha de enlace. Alto total medido: 592.4 / 448.4px.
+- Duracion132s escritorio /116s movil. Como el recorrido tambien crece, la
+  velocidad lineal baja aproximadamente12% respecto del componente pequeno
+  (17.82 frente20.20 px/s escritorio;13.66 frente15.40 px/s movil).
+- Doce originales accesibles; clones aria-hidden y tabindex=-1, sin duplicar
+  posiciones de Tab. Pausa por hover/foco, control manual, visibilidad y bfcache.
+- Al recorrer con teclado, filas estaticas desplazables y cada enlace se lleva
+  a la vista. Al salir se recupera el movimiento. Sin JS/movimiento reducido,
+  originales desplazables sin clones: los doce enlaces siguen disponibles.
+- Foco de color DS con especificidad local suficiente para superar el foco blanco
+  legacy .trax-home a:focus-visible; corregido tras medirlo en Chrome.
+- Los titulos son editoriales y servicio es el filtro libre real de /buscar:
+  Pintura en altura->Pintura; Revestimientos de PVC->PVC;
+  Automatizacion industrial->industrial; Construccion de pergolas->pergolas
+  (con acento en el parametro real); Pisos de madera->Pisos de madera;
+  ambas soldaduras->soldadura; Estuco veneciano->estuco; Limpieza de tanques->tanques;
+  Instalacion de ventanas->ventanas; Instalaciones solares->solar;
+  Tableros electricos->Electricidad. El filename historico 06 se conserva pero
+  su titulo describe correctamente el tablero, no electrodomesticos.
+  No nueva taxonomia, rutas ni filtros backend. Busqueda actual solo filtra
+  Professional.servicio por subcadena; puede no haber coincidencias. No se
+  afirma disponibilidad ni validacion de especialidades de los profesionales.
+
+## Validaciones de esta sesion
+64 unittest PASS en SQLite en memoria, contenedor --network none sin volumenes:
+UX05A/home/UX02/drawer/identidad/DSv2/footer. Tras correccion de foco, repetidos
+solo los16 focales UX05A+home: PASS. Node13 PASS: bandas5, Explorar6, hero y FAQ.
+Sintaxis JS, compileall app y tests afectados, UTF-8 y diff-check verificados.
+Warnings Query.get/datetime legacy y ERROR deliberado de UX02, sin fallos.
+No suite completa ni gates PostgreSQL/migraciones.
+
+Chrome: home en siete anchos1440/1280/1024/768/720/390/320, ambos temas.
+Sin overflow de documento, cero tarjetas antiguas, dos bandas.
+Claro medido en modo teclado desplazable (alto622.8/478.8 incluye scrollbars);
+oscuro en modo animacion (592.4/448.4). Doce enlaces alcanzados visibles por Tab,
+sin clones, tanto escritorio como320. Foco final computado rgb(11,135,153) solid.
+Enlace Tableros electricos abre /buscar?servicio=Electricidad con resultado real.
+Reanudacion confirmada con animationPlayState=running. Capturas inspeccionadas
+escritorio y movil. Assets originales y doce WebP no modificados.
+Evidencia externa en C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/:
+ux05a-bands-large-light.png, ux05a-bands-large-mobile-light.png,
+ux05a-bands-large-mobile-dark.png, ux05a-bands-large-evidence.json.
+
+## Git, alcance y continuidad
+Precheck:24 paths previos, staging vacio, rama/HEAD/origin correctos.
+Esta sesion modifica nueve archivos (respecto del estado local previo):
+- `app/templates/home.html`
+- `app/static/css/home-v1.css`
+- `app/static/css/featured-bands.css`
+- `app/static/js/featured-bands.js`
+- `tests/test_home_hero_carousel.py`
+- `tests/test_explore_motion_ux05a.py`
+- `tests/js/featured_bands.test.js`
+- `docs/BACKLOG.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+Estado acumulado:26 paths locales,7 modificados contra HEAD y19 nuevos heredados.
+Staging vacio. Sin commit, push, PR ni merge; aprobacion visual y Testing pendientes.
+No se accedio a trax_db ni se modifico trax-postgres. Solo build/recreate web del
+Compose descartable con --no-deps, queda encendido en http://127.0.0.1:5050/.
+Sin migraciones ni nuevos assets, dependencias o archivos de producto.
+
+Pendientes: revision visual del responsable y retest independiente; suite completa
+posterior, CLS instrumental y emulacion visual sin JS/reduced-motion siguen
+pendientes (contratos y Node cubiertos). Sin nuevo bloqueo tecnico conocido.
+Retomar verificando rama85a7f22/staging/26 paths, revisar home y esta decision.
+No restore/reset/clean ni staging/commit/push/merge sin autorizacion. El historial
+siguiente describe disenos anteriores; la seccion superior es la decision vigente.
+
+---
+
+# UX-05A refinado: carrusel sereno en Explorar y bandas en Oficios destacados
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:00:27-03:00
+Dispositivo/origen: laptop, Codex Desktop Windows; agente tecnico MANDOBRA.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `85a7f22c50e07fcc37e2f6bacce866d920736c12`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+## Decision vigente y continuidad
+La aprobacion visual anterior queda retirada por decision expresa de Producto:
+las bandas continuas producen demasiado movimiento en Explorar. El registro
+anterior se conserva abajo como historia; no representa aprobacion del diseno
+vigente. Los doce assets y sus excepciones visuales siguen autorizados.
+NUEVA APROBACION VISUAL PENDIENTE; UX-05A no esta aprobada ni integrada.
+
+Precheck: identidad Git coincidente, staging vacio, exactamente veinte paths
+locales de UX-05A. Se refactorizo ese trabajo sin restore/reset/clean ni descartar
+cambios. Hashes iniciales de los veinte paths guardados fuera del repositorio en
+`C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux05a-refine-before.json`.
+
+## Trabajo completado
+- Explorar: siete escenas decorativas, una activa; fundido opacity 750ms,
+  intervalo 8000ms, anterior/siguiente laterales 44x44, sin contador ni pausa
+  visible. Pausa por hover/foco/documento oculto; controles manuales reinician
+  un unico temporizador. Sin autoplay/fundido con movimiento reducido.
+- Primera escena visible sin JavaScript, controles ocultos hasta inicializacion.
+  Degradado azul localizado: al comenzar el contenido la opacidad minima es 94%.
+  Titulo, texto, formulario GET servicio/zona, veinte tarjetas y enlaces originales
+  conservados exactamente contra HEAD al retirar las inserciones del componente.
+- Home: bandas entre texto de apoyo y seis tarjetas de Oficios destacados.
+  Doce WebP compartidos, seis por fila con copias decorativas, soldaduras en filas
+  distintas, 60s y sentidos opuestos, grupos identicos con gap incluido en el bucle.
+  Alto medido 226px escritorio / 172px movil. Fondo DS claro/oscuro, bordes
+  redondeados, degradados laterales, control iconico pausa/reanudacion 44x44.
+  Lazy loading, width/height y decoding async; no nuevas dependencias/CDN.
+- Root y listeners separados, init idempotente con WeakMap; dispose elimina
+  listeners/temporizador; pagehide/pageshow manejan salida y restauracion bfcache.
+  Documento oculto pausa bandas. Reducido/sin JS: bandas estaticas, sin boton inutil.
+- Hero principal, seis tarjetas (imagenes, textos, enlaces), FAQ y resto del home
+  identicos a HEAD al remover exclusivamente las tres inserciones del refinamiento.
+- 12/12 SHA-256 iguales al snapshot inicial; 1021870 bytes en total.
+  No conversion/reprocesamiento/copia/duplicacion de assets ni cambios a PNG origen.
+
+## Validacion ejecutada en esta sesion
+- 94 pruebas Python PASS, 6.095s, en contenedor efimero `--network none`, sin
+  volumenes, `DATABASE_URL=sqlite:///:memory:`. Modulos:
+  `tests.test_explore_motion_ux05a`, `tests.test_explore_rubros_ux02`,
+  `tests.test_home_hero_carousel`, `tests.test_navbar_drawer_ux04a`,
+  `tests.test_navbar_markets_ux03a`, `tests.test_platform_brand`,
+  `tests.test_design_system_v2`, `tests.test_auth_ux_redesign_v1`,
+  `tests.test_markets_ux03`, `tests.test_corporate_footer`.
+  Incluye GET/HEAD de los doce WebP: 200 y MIME image/webp; decodificacion y presupuesto.
+- Node: 28 PASS / 0 FAIL (10 focales nuevos/refinados, 16 drawer y dos archivos
+  de regresion hero/FAQ); temporizadores, bucle, foco/hover, visibilidad, reduccion,
+  manual, cleanup, idempotencia, bfcache y ausencia de root.
+- `node --check` de ambos componentes PASS; `compileall -q app` y los dos tests
+  Python focales PASS en contenedor efimero; UTF-8 estricto y assets relativos PASS;
+  `git diff --check` PASS. No suite completa ni gates PostgreSQL/migraciones.
+- Log ERROR durante test UX-02 corresponde al error deliberado del catalogo;
+  warnings legacy Query.get/datetime.utcnow preexistentes; ninguno fallo la suite.
+
+## Navegador real y evidencia
+Chrome, visitante. Matriz 28 combinaciones: / y /explorar; temas claro/oscuro;
+1440, 1280, 1024, 768, 390, 320 y 720px (reflow equivalente a 1440/200%).
+42 mediciones getBoundingClientRect >=44x44; cero overflow horizontal de documento
+una vez estabilizado el resize; una escena activa, veinte tarjetas en Explorar;
+dos bandas y seis tarjetas en home. Tema verificado por clase theme-light/dark y
+colores computados (el atributo data-theme legacy no refleja el tema efectivo).
+Se observo una medicion transitoria durante un resize adicional del home mientras
+el navbar recalculaba su modo; lectura siguiente scrollWidth=clientWidth=375 a
+viewport390, sin desbordamiento persistente. No se modifico el navbar aprobado.
+
+Capturas inspeccionadas escritorio/movil, ambos temas. Sin recortes de texto,
+controles ni formulario; bandas contenidas antes de las tarjetas. Foco visible
+por teclado; anterior/siguiente funcionales. Escena se mantiene con foco durante
+mas de ocho segundos. Altura de Explorar movil 630.237px estable entre cambios de
+escena observados. Bandas detenidas con transformaciones estables tras pausa;
+24/24 img (incluidos clones) cargadas, doce URLs compartidas. Sin descargas de
+assets duplicados a otra carpeta; no se hizo traza de red de bytes transferidos.
+Navbar movil abre/acordeon/cierra y devuelve foco. Busqueda real Plomeria/Palermo
+navega a /buscar con ambos parametros y muestra el estado vacio. Retorno funcional.
+Hero home responde a su control propio sin alterar bandas; FAQ filtra pagos y se
+restauro filtro vacio; un unico footer. Console: solo error de extension Chrome
+mopnmbcafieddcagagdcbnhejhlodfdd/content.js, sin errores de aplicacion observados.
+
+Contraste conservador calculado sobre fotografia blanca bajo overlay al inicio
+del contenido: titulo blanco 13.42:1; texto #e8edf3 11.40:1. Boton oscuro con
+colores computados rgb(53,59,71)/rgb(255,138,76): 4.81:1.
+
+Evidencia externa, mismo directorio del snapshot:
+- `ux05a-refine-matrix.json`: las 28 lecturas reales.
+- `ux05a-refine-explore-desktop-light.png`, `ux05a-refine-explore-desktop-dark.png`.
+- `ux05a-refine-explore-mobile-light.png`, `ux05a-refine-explore-mobile-dark.png`.
+- `ux05a-refine-home-desktop-light.png`, `ux05a-refine-home-dark.png`.
+- `ux05a-refine-home-mobile-light.png`, `ux05a-refine-home-mobile-dark.png`.
+
+## Pendientes, limites y riesgos
+- Nueva aprobacion visual del responsable. Testing independiente y suite completa
+  quedan pendientes para despues de esa aprobacion; no declarar retest aprobado.
+- Sin saltos visuales observados y dimensiones reservadas, pero CLS instrumental
+  no medido: la interfaz de navegador disponible no expone PerformanceObserver.
+  No afirmar CLS=0. Completar medicion formal en Testing.
+- Sin JS y prefers-reduced-motion comprobados con contratos HTML/CSS y Node;
+  sin emulacion visual real de esos modos ni print en esta sesion. Hover y
+  visibilitychange cubiertos en Node; no confundir con medicion fisica de pestaña
+  oculta (las lecturas del navegador activan la pestaña). No nueva matriz visual
+  autenticada; regresiones de roles/autenticacion incluidas en Python.
+- No se cambiaron rutas/backend/taxonomia ni base persistente. Sin migraciones.
+
+## Estado Git y archivos finales
+Cinco archivos modificados contra HEAD y diecinueve nuevos sin seguimiento.
+El test UX-02 conserva el cambio local previo, sin modificacion adicional en este
+refinamiento. Los doce WebP son nuevos para Git desde la implementacion anterior,
+pero no se alteraron en esta sesion. Nuevos en esta sesion: featured-bands.css,
+featured-bands.js y featured_bands.test.js; home.html se incorporo al alcance.
+
+```text
+ M app/templates/explorar_rubros.html
+ M app/templates/home.html
+ M docs/BACKLOG.md
+ M docs/HANDOFFS/ACTIVE_HANDOFF.md
+ M tests/test_explore_rubros_ux02.py
+?? app/static/css/explore-motion.css
+?? app/static/css/featured-bands.css
+?? app/static/images/explorar/carrusel/acabado-parquet.webp
+?? app/static/images/explorar/carrusel/automatizacion-industrial.webp
+?? app/static/images/explorar/carrusel/construccion-pergolas.webp
+?? app/static/images/explorar/carrusel/decoracion-pvc.webp
+?? app/static/images/explorar/carrusel/estuco-veneciano.webp
+?? app/static/images/explorar/carrusel/instalacion-solar.webp
+?? app/static/images/explorar/carrusel/instalacion-ventanas.webp
+?? app/static/images/explorar/carrusel/limpieza-tanques.webp
+?? app/static/images/explorar/carrusel/pintura-altura.webp
+?? app/static/images/explorar/carrusel/reparacion-electrodomesticos.webp
+?? app/static/images/explorar/carrusel/soldadura-estructuras.webp
+?? app/static/images/explorar/carrusel/soldadura-galpones.webp
+?? app/static/js/explore-motion.js
+?? app/static/js/featured-bands.js
+?? tests/js/explore_motion.test.js
+?? tests/js/featured_bands.test.js
+?? tests/test_explore_motion_ux05a.py
+```
+
+Documentacion actualizada: BACKLOG y esta posta, preservando historial.
+Sin staging, commit, push, PR ni merge. HEAD/rama conservados. No hubo merge porque
+el producto debe revisar el nuevo diseno y luego Testing debe validar el paquete.
+Estado remoto no actualizado ni nuevo push; esta version existe solo localmente.
+
+## Entorno y siguiente paso exacto
+Se reconstruyo y recreo SOLO web del Compose descartable:
+`docker compose -f docker-compose.stabilization.yml build web`
+`docker compose -f docker-compose.stabilization.yml up -d --no-deps web`
+Compose permanece encendido en http://127.0.0.1:5050/ y /explorar para revision.
+No se accedio a trax_db ni se altero trax-postgres ni recursos ajenos.
+No seed, migracion ni reinicio de postgres.
+
+Retomar: comprobar rama/SHA/origin/staging y estos 24 paths; revisar capturas y
+ambas paginas en 5050. Obtener nueva aprobacion visual, luego paquete de Testing
+independiente con suite completa y las limitaciones arriba. No integrar ni hacer
+staging/commit/push/merge, ni reabrir la seleccion de imagenes aprobada, sin nueva
+instruccion. No restore/reset/clean ni tocar recursos persistentes.
+
+---
+
+## Historial anterior preservado (diseno de bandas en Explorar supersedido)
+
+# UX-05A: doble carrusel decorativo en Explorar rubros
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T12:48:26-03:00
+Dispositivo/origen: laptop, Codex Desktop Windows.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `85a7f22c50e07fcc37e2f6bacce866d920736c12`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck limpio, staging vacio. git ls-remote confirmo la rama remota en el mismo
+SHA. El registro anterior de 263a158 queda preservado como historia.
+
+## Decision de producto y alcance
+El responsable autorizo expresamente las doce imagenes actuales, las actividades
+repetidas, el diptico, el cambio de actividad de 06 y textos incidentales de 07/11.
+No regenerar/reemplazar originales. Esta decision revoca el bloqueo de la auditoria
+anterior; no es aprobacion visual de la implementacion terminada.
+05 actual es una escena solar unica. 06 representa tablero industrial y conserva
+el filename solicitado reparacion-electrodomesticos.webp por el mapeo aprobado;
+no se usa ese nombre como texto, alt, taxonomia o informacion funcional.
+
+Solo cabecera de /explorar: dos filas decorativas de seis originales y una copia
+por fila. Sin cambios de rutas, permisos, backend, catalogo, busqueda o veinte
+cards. JS diferido y local solamente habilita movimiento y pausa. CSS nuevo
+separado para no afectar los contratos/layout de UX-02.
+
+## Assets y procesamiento reproducible
+Originales exclusivos: Downloads/MANDOBRA_EXPLORAR_CARRUSEL_ORIGINALES, exactamente
+01.png-12.png; PNG RGB 1448x1086 decodificados, sin duplicados SHA. pHash minimo
+20/64, sin duplicados perceptuales evidentes. Textos/composiciones aceptados por
+producto; ningun archivo corrupto ni marca de agua dominante observada.
+Herramienta: Pillow 12.3.0, libwebp 1.6.0.
+Para cada PNG: crop((4, y, 1444, y+810)), rectangulo exacto 1440x810 (16:9);
+resize((960,540), LANCZOS); pegar en Image.new('RGB',(960,540)); guardar WEBP
+quality=88, method=6. No deformacion, no alfa ni animacion. Imagen RGB nueva evita
+propagar EXIF/XMP/ICC/C2PA. Los doce recortes fueron inspeccionados individualmente.
+Peso total 1021870 bytes, menor que 1,3 MB; todos menores que 130000 bytes.
+No se fuerza peso minimo: PVC/estuco comprimen por debajo del objetivo orientativo.
+
+| Original | Derivado en app/static/images/explorar/carrusel/ | y del recorte | Bytes |
+| --- | --- | ---: | ---: |
+| 01.png | pintura-altura.webp | 40 | 87890 |
+| 02.png | limpieza-tanques.webp | 35 | 95752 |
+| 03.png | acabado-parquet.webp | 0 | 93328 |
+| 04.png | instalacion-ventanas.webp | 90 | 102210 |
+| 05.png | instalacion-solar.webp | 0 | 78428 |
+| 06.png | reparacion-electrodomesticos.webp | 90 | 75582 |
+| 07.png | automatizacion-industrial.webp | 45 | 99508 |
+| 08.png | soldadura-estructuras.webp | 90 | 82180 |
+| 09.png | soldadura-galpones.webp | 160 | 97918 |
+| 10.png | construccion-pergolas.webp | 100 | 82398 |
+| 11.png | decoracion-pvc.webp | 55 | 58996 |
+| 12.png | estuco-veneciano.webp | 80 | 67680 |
+
+SHA-256 de originales comprobados nuevamente al cierre, todos intactos:
+```
+01.png 5b56b8be345493013c13ec635467c5b698ae66f7760a26bfd63736a60111a6dc
+02.png c39000f1c80bed1947cbd24065b699c1b52dc3df7abc36bca3fa93f5e9a75a72
+03.png fff4beae4300b52e02d2d11a2271127238c6530eeca6729ff0d98975d88ab929
+04.png 6adf8c27a15667b3a68d26585f4b057968b85fb272777fb87a3701f4ef559ebb
+05.png c7be439af16cc02f6c586fe4f6ffaa8fce6c6f7d36f79fa6265e0dbe9106be67
+06.png fa9ac473941737cb5f1de3512db72a010c9fc2d7243553e664b50295239a1f3f
+07.png 203a5fe96d15d09a89b6f1bb06077ddea03e6c183a97bf46f2bc67d3a06a09b8
+08.png 97b7d3128c9a8b5d893589ae5bdaf69bb2f0e1396eede467ff9570c9bf7d528c
+09.png ac9ffc4a29063d7571447f740894ca1ae61b6c3596b7f5566bb78a4db000269b
+10.png 409cccee5a8ef40a61a881e6a2b55ee2d0670ef2d2986be3094a6fe321f48117
+11.png df46af7387ec4ef420fffdd8e5cacc52d10f7557be2b8f634034760e73453220
+12.png 2f42882f584b0d18c8c4860f7194379e796483590b09c1af74824396e8ed156d
+```
+
+## Distribucion y decisiones de UX
+Superior, izquierda: 01 pintura-altura, 11 decoracion-pvc, 07 automatizacion-industrial,
+10 construccion-pergolas, 03 acabado-parquet, 08 soldadura-estructuras.
+Inferior, derecha: 09 soldadura-galpones, 12 estuco-veneciano, 02 limpieza-tanques,
+04 instalacion-ventanas, 05 instalacion-solar, 06 reparacion-electrodomesticos.
+Soldaduras separadas; alternancia de interiores, exteriores y acabados calidos.
+
+60 s lineales, transform translateX(-50%), fila inferior reverse. Dos grupos
+iguales (1512px escritorio, 1032px movil), con padding final igual al gap de 12px:
+la copia ocupa exactamente la posicion del original al cerrar el periodo.
+Cada grupo mide al menos 100vw, sin huecos incluso en escritorios mas anchos.
+Ancho de foto 240/160px, alto 135/90px; object-fit cover. Los encuadres individuales
+estan incorporados en cada derivado. Resize conserva la animacion y la preferencia
+de pausa; cambia geometria responsive sin reinicializar el controlador.
+
+Franja visual dentro de la cabecera, por encima del texto, capa azul .18 y
+fundidos laterales/inferior. Zona de titulo y buscador sobre acero-950 opaco,
+para no depender del brillo de cada foto. Capas aisladas y contenido recortado.
+Control iconico unico 44x44, foco visible, aria-pressed y nombre accesible dinamico,
+fuera de aria-hidden. Fotos alt vacio, draggable false, sin links ni foco.
+Sin JS: ninguna animacion habilitada y boton hidden. Reduced motion: estatico,
+control oculto y preferencia de pausa del usuario conservada al cambiar el sistema.
+Print: animation none. Sin timers, librerias, CDN ni dependencias nuevas.
+Eager + fetchpriority low porque ambas filas aparecen arriba del fold y las
+fotos siguientes entran en movimiento; decoding async y dimensiones reservadas.
+Duplicados DOM usan las mismas URLs; no hay duplicados fisicos de archivos.
+
+## Validacion ejecutada
+- 77 unittest PASS, cero fallos/skips, 5,798 s: UX-05A (4), UX-02,
+  navbar drawer/markets, identidad, DS V2, hero home y autenticacion.
+  docker run --rm --network none, SQLite en memoria, sin volumenes.
+- 24 Node PASS: seis UX-05A, dieciseis drawer y archivos FAQ/hero.
+- Primera corrida Python: dos contratos antiguos fallaron por prohibir scripts
+  y absolute/nth-child en toda la pagina. CSS decorativo separado, prueba de
+  busqueda acotada a su formulario GET y ausencia de fetch; reejecucion verde.
+  El log ERROR de UX-02 es el RuntimeError deliberado del test de error de catalogo.
+  Warnings Query.get/datetime.utcnow preexistentes, sin errores de ejecucion final.
+- Assets: doce WebP unicos decodificables 960x540 RGB, presupuesto y ausencia de
+  metadatos verificados; 24 respuestas GET/HEAD 200 con image/webp.
+- Chrome real: 14 combinaciones (1440,1280,1024,768,720,390,320 x claro/oscuro).
+  720 es reflow equivalente de 1440 al 200%, no zoom nativo. Cero overflow
+  horizontal; titulo/formulario/control dentro de cabecera; boton 44x44;
+  veinte cards preservadas y 24 instancias decorativas cargadas correctamente.
+- Pausa/reanudacion por teclado real, nombre/estado actualizado, pausa estable
+  entre observaciones; preferencia preservada durante resize. Direcciones
+  opuestas, duracion computada 60s y grupos de identico ancho comprobados.
+- Contraste calculado con colores computados: titulo 18,72:1; descripcion
+  15,90:1 sobre rgb(11,18,32). Labels blancos sobre superficie aun mas oscura.
+- Logs web en carga 2026-09-27 15:33:53 UTC: doce solicitudes de carrusel,
+  una por asset, todas 304 (cache); no 404/500 de fotografias.
+- Consola inspeccionada: sin errores de app; dos errores de una extension
+  chrome-extension://.../content.js, ajenos a recursos de la plataforma.
+- Node --check, compileall, UTF-8, enlaces relativos y diff --check al cierre.
+
+## Limites y pendientes de revision independiente
+PENDIENTE: aprobacion visual del usuario, suite completa (no ejecutada por alcance),
+retest independiente, lector de pantalla y otros motores. Fallback sin JS,
+reduced-motion y print cubiertos por contratos/CSS y Node; no emulados visualmente
+con esta herramienta. No afirmar aprobacion integral de accesibilidad.
+CLS numerico PENDIENTE: el evaluador del navegador no expone Performance API.
+No se observaron desplazamientos por carga y las fotos tienen dimensiones/altura
+reservadas en una capa absoluta; esto no equivale a una medicion CLS=0.
+El cierre exacto del ciclo esta sustentado por geometria repetida, no por una
+captura instrumental frame a frame. Testing debe revisar continuidad prolongada.
+No hubo fallos de producto que exigieran un runbook nuevo.
+
+## Archivos y continuidad
+Modificados: app/templates/explorar_rubros.html, tests/test_explore_rubros_ux02.py,
+docs/BACKLOG.md y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/static/css/explore-motion.css, app/static/js/explore-motion.js,
+tests/test_explore_motion_ux05a.py, tests/js/explore_motion.test.js y los doce
+WebP enumerados arriba. explore-rubros-v1.css queda sin diferencias contra HEAD.
+Sin migraciones, seed ni cambios a bases. Solo build web y up -d --no-deps web
+con docker-compose.stabilization.yml; web y postgres descartable disponibles.
+No se accedio a trax_db ni se modifico trax-postgres o volumenes ajenos.
+Revision: http://127.0.0.1:5050/explorar.
+Evidencia externa: carpeta .codex/visualizations/2026/09/21/
+01a0c628-6518-73a3-b7ca-d4ba209ac043, archivos ux05a-matrix.json,
+ux05a-desktop-dark.png y ux05a-mobile-dark.png.
+
+Estado final: implementacion local sin staging/commit/push/merge/PR. No hubo merge
+porque esta expresamente prohibido y falta aprobacion visual. Rama y HEAD intactos;
+20 paths locales pendientes. Retomar con git status --short -uall, git branch
+--show-current, git rev-parse HEAD y git diff --cached --name-only; confirmar
+85a7f22 y revisar 5050/explorar en ambos temas antes de autorizar integracion.
+No reset/clean ni modificar originales; no ejecutar suite completa hasta Testing.
+
+---
+
 # UX-04A P2: correccion focal de objetivos tactiles
 
 Estado: READY_TO_RESUME

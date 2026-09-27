@@ -1,5 +1,66 @@
 # BACKLOG MANDOBRA
 
+## UX-05A: ajuste visual exclusivo de Explorar
+
+Timestamp: 2026-09-27T14:30:36-03:00. Implementado localmente, revision visual pendiente.
+Capa azul superior reforzada; sin controles visibles de pausa/anterior/siguiente.
+Autoplay8s y fade750ms conservados; pausas de accesibilidad automaticas.
+Home congelado por instruccion de Producto, hashes verificados sin cambios.
+19 Python y6 Node PASS. Sin staging/commit/push/merge. Evidencia y limites en handoff.
+
+## UX-05A: bandas grandes enlazadas, sin las seis tarjetas fijas
+
+Timestamp: 2026-09-27T14:18:48-03:00. Estado: implementado localmente, revision visual pendiente.
+Decision nueva de Producto: las bandas reemplazan las seis tarjetas fijas del home.
+376/248px por tarjeta, titulos enlazados a /buscar?servicio=..., velocidad lineal
+aproximadamente12% menor; hover/foco pausa y teclado expone originales desplazables.
+Doce assets intactos. Sin cambios al hero principal, Explorar ni backend.
+64 Python y13 Node PASS;16 focales repetidos tras corregir especificidad del foco,
+PASS. Chrome siete anchos x dos temas,12 enlaces visibles por Tab a320/escritorio.
+Sin staging/commit/push/merge. Handoff conserva resultados, mapeo y limitaciones.
+Aprobacion visual, Testing/suite completa y CLS instrumental pendientes.
+
+## UX-05A refinado: Explorar sereno y bandas dentro del home
+
+Timestamp: 2026-09-27T14:00:27-03:00. Rama `feature/ux-ui-foundation`; base `85a7f22`.
+Estado: implementado localmente; NUEVA APROBACION VISUAL PENDIENTE.
+La aprobacion visual anterior queda retirada por exceso de movimiento en Explorar.
+La autorizacion de los doce assets y sus excepciones se conserva.
+
+Explorar: siete escenas, fundido750ms/intervalo8s, controles laterales, pausas por
+interaccion/visibilidad y modo reducido; sin bandas, pausa visible ni contador.
+Home: dos bandas opuestas60s dentro de Oficios destacados, despues del texto y
+antes de las seis tarjetas intactas. Hero principal, buscador y veinte rubros sin
+cambios funcionales. Doce WebP reutilizados con SHA-256 identicos, sin duplicacion.
+
+94 Python +28 Node PASS; compileall/sintaxis/UTF-8/relativos/diff-check PASS.
+Chrome:28 combinaciones (dos paginas x dos temas x siete anchos),42 controles
+>=44x44, sin overflow persistente; capturas y trazabilidad en
+[handoff activo](HANDOFFS/ACTIVE_HANDOFF.md). Compose descartable5050 disponible.
+Pendientes: revision visual del responsable, Testing independiente y suite
+completa posterior; CLS instrumental y emulacion visual sin JS/reduced-motion.
+No declarar aprobado ni integrado. Sin staging/commit/push/merge/migraciones.
+
+### Registro historico: primera composicion supersedida
+
+## UX-05A: doble carrusel decorativo de Explorar rubros
+
+Timestamp: 2026-09-27T12:48:26-03:00. Estado: implementado localmente, aprobacion visual PENDIENTE.
+Rama feature/ux-ui-foundation; base 85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Producto autorizo las doce imagenes actuales y sus excepciones visuales; PNG
+externos intactos. Doce WebP 960x540, RGB, sin metadatos, total 1021870 bytes.
+Dos filas con seis escenas y copias decorativas, sentidos opuestos, 60s; pausa
+accesible, fallback estatico sin JS, reduced-motion y print. Sin cambios al
+catalogo, busqueda ni backend. Orden y procesamiento completos en el
+[handoff activo](HANDOFFS/ACTIVE_HANDOFF.md).
+
+77 Python y 24 Node PASS; matriz Chrome 14 combinaciones sin overflow, control
+44x44 y contraste de texto >=15,9:1. Suite completa y retest independiente
+pendientes. Completar CLS instrumental y emulacion visual sin JS/reduced-motion/
+print; no confundir cobertura estructural con medicion real. Entorno descartable
+5050/explorar disponible. Sin staging/commit/push/merge.
+
+
 ## UX-04A: navbar adaptable con drawer vertical
 
 Timestamp: 2026-09-26T21:03:18-03:00. Rama: `feature/ux-ui-foundation`.
