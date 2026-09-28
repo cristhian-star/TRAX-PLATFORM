@@ -1,5 +1,19 @@
 # UX-06A P1/P2 — creación atómica y recuperación temporal
 
+## Cierre de revisión documental UX-07A — 2026-09-28
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+
 Registro: 2026-09-27T22:04:02-03:00. Estado: implementado, pendiente de retest independiente.
 Responsable: Codex, laptop MANDOBRA. Rama `feature/ux-ui-foundation`,
 HEAD `7af47a25a59efcb64f70c2596d9f6818ace298bc`, sin commit.
@@ -1042,3 +1056,28 @@ Alcance:
 Criterio:
 
 Las nuevas pantallas deberan consumir variables semanticas del Design System v2 para heredar automaticamente Light/Dark.
+
+## UX-07A — Propuesta de guardia vigente y orden neutral
+
+Registro: `2026-09-27T23:14:25-03:00`. Responsable de Producto: Cristian Sánchez; redacción: Codex, laptop MANDOBRA.
+Rama: `feature/ux-ui-foundation`. HEAD: `4489c5c208245368a2a9bfd1672a261cf3004c93`.
+Motivo: formalizar el preflight UX-07A aprobado y la decisión de Producto de
+`2026-09-27T23:03:15-03:00`, `APROBADO PARA ESPECIFICACIÓN`.
+Estado: especificación para revisión; implementación PENDIENTE. El preflight es el
+antecedente de inspección del chat, no evidencia de guardias implementadas.
+Orden neutral: PRO no habilita ni prioriza Emergencias; verificación es filtro obligatorio,
+no privilegio adicional de orden. Próximo paso: revisar REQ-004/ADR-002 y autorizar
+UX-07A.1; UX-07A.2 depende de su verificación.
+
+
+Nueva propuesta: [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md), estado PROPUESTO;
+contrato funcional: [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md).
+Se propone una disponibilidad actual única por profesional, timestamps aware, versión y
+locks, invalidación sin reactivación implícita y vencimiento por consulta. Reutilizar
+OperationCommand/AuditLog y transacción única para solicitud/notificación/comando/auditoría.
+
+Orden objetivo de Emergencias: elegibilidad completa primero, asistencia/cobertura,
+distancia aproximada válida, rating verificable como desempate y nombre/ID estable.
+Antecedentes de prioridad PRO quedan históricos para este alcance futuro; el código
+actual no se declara modificado. Contacto revalida guardia y ownership; geodatos privados
+no viajan en URLs. Alembic y PostgreSQL serán obligatorios en .1, sin infraestructura nueva.

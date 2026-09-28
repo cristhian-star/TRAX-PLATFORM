@@ -1,3 +1,142 @@
+# UX-07A — Cierre aprobado de revisión documental
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+
+Estado del handoff: READY_TO_RESUME.
+Origen: laptop MANDOBRA; agente documental local.
+Rama: feature/ux-ui-foundation. Commit base: 4489c5c208245368a2a9bfd1672a261cf3004c93.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: nueve documentos modificados, dos nuevos, staging vacío; ningún archivo técnico.
+Objetivo de esta sesión: registrar el cierre, validar once documentos, crear un único
+commit documental y publicarlo en la rama actual, por autorización explícita de Producto.
+Validación previa aprobada: lectura completa, UTF-8, enlaces/anclas, 27 criterios y diff sin errores.
+El cierre de versionado exige repetir las validaciones documentales, staging exacto de once
+documentos, commit correcto, working tree limpio y HEAD local igual al remoto tras el push.
+Publicación: autorizada para esta sesión; el registro se redacta antes del commit y push.
+El hash final y el resultado de publicación deben verificarse en Git y en el informe de cierre;
+este registro no anticipa como ejecutadas las operaciones posteriores a su escritura.
+Archivos del paquete: los once del inventario histórico inmediato, sin ampliación de alcance.
+No ejecutadas: pruebas técnicas/funcionales, Docker, migraciones ni despliegue.
+No se modifican código, assets, infraestructura ni datos. Ninguna migración creada.
+Pendientes y riesgos: decisión de ADR-002, reglas técnicas propuestas, privacidad y gates PostgreSQL.
+No hay hallazgos documentales abiertos. Las capacidades futuras siguen sin implementar.
+No hubo merge: no está autorizado y este cierre solo publica documentación en su rama.
+Para retomar: comprobar rama, HEAD y limpieza; leer REQ-004 y ADR-002; decidir la arquitectura
+y preparar UX-07A.1 con autorización explícita antes de ejecutar cambios técnicos.
+No implementar UX-07A.2 ni afirmar disponibilidad antes de verificar UX-07A.1.
+
+---
+
+# UX-07A — Especificación de Emergencias y guardia vigente
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T23:20:19-03:00
+Origen: laptop MANDOBRA, Codex Desktop Windows. Redacción: Codex.
+Responsable de Producto: Cristian Sánchez.
+Objetivo: formalización documental del preflight UX-07A y decisiones de Producto.
+Aprobación recibida: 2026-09-27T23:03:15-03:00, APROBADO PARA ESPECIFICACIÓN.
+Rama: feature/ux-ui-foundation.
+HEAD local y remoto verificados: 4489c5c208245368a2a9bfd1672a261cf3004c93.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Motivo: registrar contrato revisable y separar .1 guardia/matching/seguridad de .2 visual.
+Relación con preflight: informe aprobado del chat local; diagnóstico incorporado en REQ-004,
+sin inventar una ruta documental anterior ni atribuir implementación al antecedente.
+Orden neutral: PRO no concede elegibilidad ni prioridad; verificación obligatoria es filtro.
+Siguiente paso: revisión de REQ-004/ADR-002 y autorización explícita de UX-07A.1.
+
+## Git y continuidad
+
+Precheck: ubicación/raíz, origin, rama y SHA coincidentes; árbol limpio y staging vacío.
+La rama remota se verificó con consulta de lectura. No se mutaron referencias Git.
+Estado final previsto/verificado en cierre: dos archivos nuevos y nueve modificados,
+todos documentación sin commit; staging vacío, rama y HEAD conservados.
+El remoto conserva la base verificada; estos cambios documentales NO fueron publicados.
+No hubo commit, push, PR, merge ni despliegue: esta sesión no los autoriza.
+La entrada anterior conserva su estado histórico de UX-06A; no representa el HEAD actual.
+No se alteró ni se repitió su evidencia de pruebas ni se emitió aprobación de Testing.
+
+## Trabajo completado y decisiones
+
+- REQ-004 disponible según convención; especificación creada con catálogo de seis
+  asistencias, actores, guardia temporal 2/4/8 h, ownership, reloj, idempotencia,
+  transacción única, elegibilidad neutral, privacidad y revalidación de contacto.
+- ADR-002 propuesto: fila única por profesional, locks/versiones, auditoría existente,
+  reutilización de OperationCommand, PostgreSQL obligatorio y downgrade con pérdida potencial.
+- UX-07A.2 documenta imágenes, posiciones focales, hero/carrusel con controles y táctil,
+  formulario nativo, skeleton, seguridad, vacío, temas, responsive y accesibilidad.
+- Veintisiete criterios verificables y matriz de pruebas. .2 no afirma guardia hasta .1.
+- Master Spec, decisiones, taxonomía, backlog, roadmap e índices relacionados.
+- Se preservaron íntegros registros y fechas históricas mediante entradas aditivas.
+
+## Pendientes, riesgos y bloqueantes
+
+Implementación completa PENDIENTE. No bloqueante técnico para esta entrega documental.
+Revisión pendiente de reglas propuestas: renovación desde ahora (puede acortar ventana),
+invalidación sin resurrección, perfil habilitado, fallback textual, cancelación ABIERTA,
+retención/contexto privado y contratos concretos de endpoints. Aprobación para especificar
+no aprueba automáticamente esos detalles ni autoriza implementarlos.
+Riesgos: carrera contacto/desactivación, reloj antiguo tras esperar lock, ownership,
+exposición geográfica y dependencias compartidas de autenticación/WhatsApp/taxonomía.
+No capturar coordenadas exactas hasta definir política de retención y almacenamiento.
+Migración Alembic será necesaria en .1; ninguna creada ni ejecutada. No fijar revisión
+antes de inspeccionar head vigente. Downgrade puede destruir ventanas/contexto nuevo.
+No se diagnosticó error técnico nuevo ni se requirió troubleshooting en esta sesión.
+
+## Validaciones y límites de evidencia
+
+Ejecutadas: precheck de lectura, revisión de convención/IDs, UTF-8 estricto y newline final,
+enlaces relativos incorporados, preservación de contenido histórico, inventario documental,
+`git diff --check` y comprobación final de staging/branch/HEAD.
+Resultado documental: sin enlaces incorporados rotos, sin borrados de registros históricos,
+sin cambios fuera de los once documentos indicados. Sin errores de whitespace.
+No ejecutadas: pruebas unitarias/integración/Node/PostgreSQL, navegador, compilación,
+migraciones ni suite completa; esta autorización es solo documentación.
+No se usó Docker ni base de datos. No código, assets ni infraestructura modificados.
+Las verificaciones del preflight son antecedentes, no pruebas nuevas de este requisito.
+
+## Inventario exacto
+
+Creados:
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- docs/ADR/ADR-002-emergencias-guardia-vigente.md
+
+Modificados:
+- docs/REQUISITOS/MASTER_SPEC.md
+- docs/DECISIONES_ARQUITECTURA.md
+- docs/trax-taxonomy-v1.md
+- docs/BACKLOG.md
+- docs/ROADMAP.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/INDEX.md
+- docs/REQUISITOS/README.md
+- docs/ADR/README.md
+
+## Instrucciones para retomar
+
+1. Verificar origin/rama/HEAD/staging e inventario anterior; conservar estos cambios.
+2. Leer REQ-004, ADR-002 y esta entrada antes de cualquier implementación.
+3. Revisar propuestas con Producto; preparar paquete .1 con alcance/criterios/entorno
+   descartable y autorización explícita. Implementar/verificar .1 antes de disponibilidad .2.
+4. No tocar trax_db ni trax-postgres, no desplegar, no convertir imágenes ni escribir
+   migraciones durante revisión documental. No staging/commit/push/merge sin autorización.
+5. Tras revisión, solicitar autorización de versionado/publicación de esta rama para
+   continuidad entre dispositivos; no proponer merge a develop como si ya estuviera aprobado.
+
+Estado final: documentación lista para revisión, producto aprobado para especificación;
+implementación y retest independientes PENDIENTES. No hubo merge por alcance autorizado.
+
+---
+
 # Corrección UX-06A P1/P2 — atomicidad, idempotencia y borrador
 
 Estado: READY_TO_RESUME
