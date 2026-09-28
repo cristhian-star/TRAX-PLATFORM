@@ -108,7 +108,7 @@
                         <small>Caballito, CABA</small>
                         <b>$ 120.000</b>
                     </a>
-                    <a href="/presupuestos/nuevo" class="logged-work-card">
+                    <a href="{{ url_for('operations.marketplace_presupuestos' if user_role == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}" class="logged-work-card">
                         <strong>Mantenimiento de tableros trifasicos</strong>
                         <small>Villa Crespo, CABA</small>
                         <b>$ 85.000</b>
@@ -166,7 +166,7 @@
                 <h2>Herramientas rapidas</h2>
                 <div>
                     <a href="/mercados">Calculadora</a>
-                    <a href="/presupuestos/nuevo">Presupuesto</a>
+                    <a href="{{ url_for('operations.marketplace_presupuestos' if user_role == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">Presupuesto</a>
                     <a href="/propuestas/nueva">Plantillas</a>
                     <a href="/explorar">Guias</a>
                 </div>

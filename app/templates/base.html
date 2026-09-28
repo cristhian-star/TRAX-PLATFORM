@@ -58,7 +58,7 @@
                     <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=contratacion">
                         <strong>Contratacion</strong>
                     </a>
-                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/presupuestos/nuevo">
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="{{ url_for('operations.marketplace_presupuestos' if session.get('user_role') == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">
                         <strong>Presupuestos</strong>
                     </a>
                     <a class="nav-dropdown__item nav-dropdown__item--link" href="/emergencias/nueva">
@@ -247,7 +247,7 @@
                     <h2 id="footer-explore">Explorar</h2>
                     <ul>
                         <li><a href="{{ url_for('main.buscar') }}">Buscar profesionales</a></li>
-                        <li><a href="{{ url_for('operations.nuevo_presupuesto') }}">Pedir presupuestos</a></li>
+                        <li><a href="{{ url_for('operations.marketplace_presupuestos' if session.get('user_role') == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">{{ 'Ver solicitudes de presupuesto' if session.get('user_role') == 'PROFESIONAL' else 'Pedir presupuestos' }}</a></li>
                         <li><a href="{{ url_for('operations.nueva_emergencia') }}">Emergencias</a></li>
                         {% if not session.get('user_id') %}
                             <li><a href="{{ url_for('main.home') }}#featured-title">Oficios destacados</a></li>

@@ -30,6 +30,7 @@ def user_display_name(user_id, fallback="Usuario MANDOBRA"):
 
 def notify_budget_created(budget_request):
     registrar_evento(
+        commit=False,
         user_id=budget_request.cliente_id,
         actor_user_id=budget_request.cliente_id,
         tipo=TIPO_PRESUPUESTO_PUBLICADO,

@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
+import hashlib
+import json
+import uuid
 
 from sqlalchemy.exc import IntegrityError
 
@@ -8,8 +11,12 @@ from app import db
 from app.models.budget_offer import BudgetOffer
 from app.models.budget_request import BudgetRequest
 from app.models.professional import Professional
+from app.models.operation_command import OperationCommand
+from app.services.budget_creation_key_service import OPERATION, validate_budget_key
+from app.services.operation_notification_service import notify_budget_created
 from app.services.contracting_core_service import create_contract_from_budget_offer
 from app.services.subscription_service import has_pro_access
+from app.services.actor_policy_service import require_active_actor
 
 
 MAX_OFFERS_PER_REQUEST = 6
@@ -24,6 +31,21 @@ class BudgetAwardResult:
     state_changed: bool
 
 
+class BudgetCreationConflict(ValueError):
+    """A valid command key cannot be reused for a different operation payload."""
+
+
+def _budget_replay(command, payload_hash, actor_id):
+    if command.payload_hash != payload_hash:
+        raise BudgetCreationConflict("Esta solicitud ya fue enviada con otros datos. Abrí una nueva solicitud.")
+    if command.status != "SUCCEEDED" or command.result_entity_type != "BudgetRequest":
+        raise BudgetCreationConflict("La solicitud está en proceso. Volvé a intentarlo con este formulario.")
+    result = db.session.get(BudgetRequest, command.result_entity_id)
+    if result is None or result.cliente_id != actor_id:
+        raise BudgetCreationConflict("No se pudo recuperar el resultado de la solicitud.")
+    return result
+
+
 def create_budget_request(
     cliente_id,
     categoria,
@@ -32,21 +54,46 @@ def create_budget_request(
     zona,
     fecha_estimada=None,
     urgencia="NORMAL",
+    idempotency_key=None,
 ):
-    budget_request = BudgetRequest(
-        cliente_id=cliente_id,
-        categoria=categoria,
-        titulo=titulo,
-        descripcion=descripcion,
-        zona=zona,
-        fecha_estimada=fecha_estimada,
-        urgencia=urgencia,
-    )
-
-    db.session.add(budget_request)
-    db.session.commit()
-
-    return budget_request
+    # This application operation owns the transaction, including INTERNAL delivery.
+    identity = None
+    try:
+        require_active_actor(cliente_id, ("CLIENTE",))
+        validate_budget_key(idempotency_key, cliente_id)
+        payload = dict(categoria=categoria, titulo=titulo, descripcion=descripcion,
+                       zona=zona, fecha_estimada=fecha_estimada.isoformat() if fecha_estimada else None,
+                       urgencia=urgencia)
+        payload_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        identity = dict(actor_user_id=cliente_id, operation=OPERATION, idempotency_key=idempotency_key)
+        command = OperationCommand.query.filter_by(**identity).with_for_update().first()
+        if command:
+            return _budget_replay(command, payload_hash, cliente_id)
+        command = OperationCommand(**identity, payload_hash=payload_hash, status="PROCESSING", correlation_id=str(uuid.uuid4()))
+        db.session.add(command)
+        db.session.flush()  # Unique constraint serializes competing creators.
+        budget_request = BudgetRequest(cliente_id=cliente_id, **{**payload, "fecha_estimada": fecha_estimada})
+        db.session.add(budget_request)
+        db.session.flush()
+        notify_budget_created(budget_request)
+        command.status = "SUCCEEDED"
+        command.result_entity_type = "BudgetRequest"
+        command.result_entity_id = budget_request.id
+        command.completed_at = datetime.utcnow()
+        db.session.commit()
+        return budget_request
+    except IntegrityError:
+        db.session.rollback()
+        if identity is None:
+            raise
+        require_active_actor(cliente_id, ("CLIENTE",))
+        command = OperationCommand.query.filter_by(**identity).first()
+        if command:
+            return _budget_replay(command, payload_hash, cliente_id)
+        raise
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def get_budget_request_by_id(budget_request_id):
@@ -76,6 +123,7 @@ def get_budget_offers(budget_request_id):
 
 
 def get_client_budget_requests_with_counts(cliente_id, estados=None):
+    require_active_actor(cliente_id, ("CLIENTE",))
     query = (
         db.session.query(
             BudgetRequest,
@@ -245,6 +293,7 @@ def create_budget_offer(
 
 
 def award_budget_offer(budget_request_id, offer_id, cliente_id):
+    require_active_actor(cliente_id, ("CLIENTE",))
     try:
         budget_request = (
             BudgetRequest.query
@@ -298,6 +347,7 @@ def award_budget_offer(budget_request_id, offer_id, cliente_id):
 
 
 def cancel_budget_request(budget_request_id, cliente_id):
+    require_active_actor(cliente_id, ("CLIENTE",))
     budget_request = (
         BudgetRequest.query
         .filter_by(id=budget_request_id)
@@ -321,6 +371,7 @@ def cancel_budget_request(budget_request_id, cliente_id):
 
 
 def get_client_budget_requests(cliente_id):
+    require_active_actor(cliente_id, ("CLIENTE",))
     return (
         BudgetRequest.query
         .filter_by(cliente_id=cliente_id)

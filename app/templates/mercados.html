@@ -220,7 +220,7 @@
             </div>
             <div class="market-guide__cta-actions">
                 <a class="btn btn-primary" href="{{ url_for('main.explorar_rubros') }}">Explorar rubros</a>
-                <a class="btn btn-secondary" href="{{ url_for('operations.nuevo_presupuesto') }}">Solicitar presupuesto</a>
+                <a class="btn btn-secondary" href="{{ url_for('operations.marketplace_presupuestos' if session.get('user_role') == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">{{ 'Ver solicitudes de presupuesto' if session.get('user_role') == 'PROFESIONAL' else 'Solicitar presupuesto' }}</a>
             </div>
         </section>
     </div>

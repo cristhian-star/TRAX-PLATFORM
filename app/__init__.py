@@ -152,6 +152,12 @@ def create_app(config_class=None, initialize_schema=False):
 
     @app.errorhandler(400)
     def handle_bad_request(error):
+        from flask_wtf.csrf import CSRFError
+        if isinstance(error, CSRFError):
+            from app.routes.operation_routes import recover_budget_expired_post
+            recovered = recover_budget_expired_post()
+            if recovered is not None:
+                return recovered
         return _safe_error_response(400, "Solicitud invalida")
 
     @app.errorhandler(403)
