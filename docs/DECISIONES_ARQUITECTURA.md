@@ -1,4 +1,147 @@
+# UX-06A P1/P2 — creación atómica y recuperación temporal
+
+Registro: 2026-09-27T22:04:02-03:00. Estado: implementado, pendiente de retest independiente.
+Responsable: Codex, laptop MANDOBRA. Rama `feature/ux-ui-foundation`,
+HEAD `7af47a25a59efcb64f70c2596d9f6818ace298bc`, sin commit.
+
+Se conserva la decisión previa de facultades exclusivamente CLIENTE. Esta entrada
+supera solamente los pendientes históricos de atomicidad y recuperación de borrador.
+
+- Causa P1: `create_budget_request` confirmaba BudgetRequest antes de que la ruta
+  invocara una notificación con commit propio; el reenvío no tenía ledger durable.
+- OperationCommand ya permite `result_entity_type=BudgetRequest` y un id genérico.
+  No requiere modelos ni migraciones nuevas. Se reutiliza su restricción única
+  `(actor_user_id, operation, idempotency_key)` para `BUDGET_REQUEST_CREATE`.
+- La aplicación autoriza CLIENTE activo antes de cualquier replay. La clave
+  `b1.actor.nonce.firma` lleva 128 bits aleatorios y HMAC-SHA256 ligado al actor y
+  operación; límite 160 caracteres, formato estricto. Un formulario nuevo recibe
+  una clave nueva, los errores de validación y la recuperación conservan la misma.
+- Hash SHA-256 de JSON ordenado de los seis valores normalizados; misma clave y
+  mismo payload recuperan el mismo id; payload distinto devuelve 409; clave ajena,
+  malformada o ausente devuelve 400; PROFESIONAL conserva 403. No se deduplica por
+  semejanza de datos: claves distintas permiten dos solicitudes deliberadas.
+- Límite transaccional: autorización, comando PROCESSING, solicitud, notificación
+  INTERNAL, resultado SUCCEEDED y un commit final en budget_service. El helper usa
+  `commit=False`; la ruta no confirma ni notifica. Esta creación no tenía un
+  AuditLog/ContractEvent obligatorio previo; no se inventan hechos contractuales.
+  Un fallo revierte todos los hechos creados y deja la sesión utilizable. La carrera
+  se resuelve mediante unicidad PostgreSQL y lectura del comando ganador después
+  de rollback; se vuelve a autorizar antes de recuperar ese resultado.
+- Causa P2: el POST anónimo redirigía al login descartando los campos; si vencía la
+  cookie completa, CSRF lo rechazaba antes de entrar a la ruta.
+- Recuperación: archivos privados temporales en `instance/budget_drafts` (directorio
+  configurable con `BUDGET_DRAFT_DIRECTORY`), únicamente seis campos saneados y
+  acotados más metadatos actor/nonce/vencimiento. Sin contraseñas, tokens CSRF,
+  claves idempotentes completas, archivos adjuntos ni secretos en el registro.
+  No se usan query strings ni logs para datos del borrador; no se usan sessionStorage,
+  Redis, colas, outbox ni nuevas dependencias.
+- Cookie independiente HttpOnly, SameSite=Strict y Secure según configuración,
+  aleatoria de 256 bits, vincula navegador; no contiene campos del formulario.
+  Prueba firmada en el formulario vincula actor, nonce, hash de navegador y hash
+  del CSRF original. Solo un POST a nuevo_presupuesto sin autenticación activa
+  puede recuperar usando firma y CSRF original válidos, ambos de hasta 15 minutos.
+  El manejador 400 no exime CSRF ni crea entidades: valida esa prueba para guardar
+  el borrador y redirigir al login interno fijo. Otro CSRF inválido conserva 400.
+- Reautenticación obligatoria: solo el mismo CLIENTE activo/navegador recupera.
+  Los valores se revalidan al publicar; propietario/rol/estado/ids enviados se
+  descartan. Hasta cinco borradores por actor/navegador, separados por nonce;
+  con varios se elige mediante POST protegido y nunca se fusionan pestañas.
+- TTL de datos: 15 minutos desde recuperación; limpieza al éxito, descarte explícito
+  y acceso posterior tras vencimiento. Escritura por archivo temporal privado y
+  reemplazo atómico. La purga es diferida al siguiente acceso, no un job periódico.
+  Fallar la limpieza después del commit no convierte una publicación confirmada
+  en error; queda su expiración. El borrador nunca es fuente de autorización.
+- Fallback sin JS: POST/login/selección/restauración/descarte operan en servidor;
+  todos los campos siguen visibles y revisables. Si formulario/CSRF de recuperación
+  supera 15 minutos, se borra la cookie de navegación, se cambia de navegador o se
+  pierde el almacenamiento temporal, no se garantiza recuperación. Despliegues con
+  varias instancias necesitan el mismo almacenamiento privado para este directorio;
+  no se afirma soporte distribuido. Rotar SECRET_KEY invalida formularios emitidos.
+
+Evidencia: 133 Python focales/regresiones (132 PASS, 1 SKIP existente), 4/4 gate
+PostgreSQL real, Node 5/5, compileall y sintaxis JS. Sin suite completa ni aprobación
+Testing. No cambia el contrato futuro de notificaciones externas.
+
+---
+
 # DECISIONES DE ARQUITECTURA MANDOBRA
+
+## Corrección P1 UX-06A — Acciones de propietario exclusivas de CLIENTE
+
+Timestamp de corrección aprobado: 2026-09-27T19:49:55-03:00.
+Timestamp de registro: 2026-09-27T20:00:55-03:00.
+Estado: IMPLEMENTADO. Retest independiente pendiente; UX-06A no aprobado.
+Responsable: Codex, Senior Software Engineer MANDOBRA; decisión funcional del
+responsable de Producto; hallazgo vinculante de Testing 2026-09-27T19:48:47-03:00, P1,
+REQUIERE_CORRECCIONES. Documento afectado: docs/DECISIONES_ARQUITECTURA.md.
+Rama feature/ux-ui-foundation; HEAD 7af47a25a59efcb64f70c2596d9f6818ace298bc.
+
+Motivo: la ampliación de facultades de solicitante a PROFESIONAL contradice el
+paquete de aceptación y el Master Spec (roles Cliente/Profesional y Presupuestos).
+La autorización histórica **CLIENTE o PROFESIONAL queda descartada y sustituida
+por CLIENTE** para todas las acciones de propietario de solicitudes y actor cliente
+del contrato BUDGET. El registro de las 18:43:08 se conserva debajo como historia
+SUPERSEDED en cuanto a esa autorización; sus fechas y contenido no se eliminan.
+No habilita un futuro incremento de reseñas de propietario PROFESIONAL.
+
+CLIENTE activo crea, confirma, lista, consulta y administra solicitudes propias;
+los servicios verifican rol además de propiedad. PROFESIONAL participa como
+proveedor: oportunidades, ofertas propias y operaciones del profesional asignado.
+GET/POST de creación y rutas de cliente rechazan al profesional con 403 existente.
+La mera presencia de cliente_id en datos previos no concede facultades al rol PRO.
+La excepción contractual BUDGET se retira; el creador derivado vuelve al código
+canónico de HEAD. Se preservan atomicidad, rollback, estados e idempotencia.
+
+El comparador privado exige CLIENTE activo propietario. Un CLIENTE no abre el
+detalle ajeno; el profesional conserva la lectura legítima de oportunidades.
+En navbar/footer, inicio autenticado y Mercados, los enlaces de presupuesto del
+profesional llevan a /presupuestos; estilos y demás operaciones no se cambian.
+No se toca Emergencias ni se trasladan imágenes desde Downloads.
+
+Master Spec permanece intacto. La verificación se mantiene donde ya se exige
+(negociación formal); no se añade una nueva exigencia de verificación al presupuesto,
+que el spec vigente define con CLIENTE y perfil completo para el proveedor.
+Visitantes mantienen entrada informativa y next interno; el formulario, la revisión,
+los valores tras error y el fallback nativo no cambian. No existe borrador anónimo
+persistido en UX-06A, y esta corrección no lo agrega ni elimina datos existentes.
+
+Validación: 117 Python ejecutadas, 116 PASS, 1 SKIP histórico de concurrencia SQLite;
+22 focales UX-06A incluidas. 5/5 Node; compileall y sintaxis JS OK. Suite completa
+reservada a Testing. La aprobación requiere retest independiente del P1.
+
+
+## UX-06A — La capacidad de solicitar presupuestos depende de la propiedad
+
+Timestamp: 2026-09-27T18:43:08-03:00. Responsable: Producto (decisión aprobada); implementación: Codex/laptop.
+Rama `feature/ux-ui-foundation`; base `7af47a25a59efcb64f70c2596d9f6818ace298bc`.
+Estado: decisión de Producto vigente; implementación pendiente de aprobación visual y retest.
+
+Una cuenta CLIENTE o PROFESIONAL activa puede ser solicitante de presupuestos.
+El campo histórico `BudgetRequest.cliente_id` representa al propietario; no se
+renombra ni se agrega un rol, tabla o migración. La cuenta profesional mantiene
+su rol y capacidades. No se exige perfil profesional para solicitar; sí se
+conserva su exigencia para ofertar. Autoofertas siguen bloqueadas.
+
+Creación verifica actor activo. Confirmación, lista propia, cancelación y
+adjudicación conservan ownership; solo el propietario recibe el comparador privado.
+El detalle general conserva su política de lectura anterior. Contratos canónicos
+BUDGET permiten al propietario PROFESIONAL crear el contrato derivado y operar
+como solicitante (confirmar/cancelar), nunca como proveedor asignado por ser dueño.
+La excepción no habilita creación DIRECT ni deriva contratos PROPOSAL para ese rol.
+Se conservan locks, versiones, comandos idempotentes, eventos, auditoría y notificaciones.
+El detalle propio enlaza al contrato existente; no crea otro por navegar.
+
+Las reseñas conservan su autorización CLIENTE existente. Se oculta ese CTA cuando
+el solicitante no puede ejecutarlo; su ampliación requiere otro incremento.
+No se alteran dashboards, perfiles, fotografías, Emergencias, Propuestas ni pagos.
+No se cambia `budget-marketplace-v1.css`, navbar, skeleton o tokens globales.
+
+La revisión previa es progresiva y local. Solo el envío final hace POST con CSRF.
+Sin JS, los datos esenciales y el envío nativo permanecen operativos. El bloqueo
+del segundo envío es de interfaz, no una garantía durable para crear solicitudes.
+El backend rechaza campos faltantes/excesivos, prioridad desconocida y fecha inválida.
+El siguiente incremento debe resolver persistencia/atomicidad según Backlog.
+
 
 ## Cierre técnico local 4F aprobado por Testing
 

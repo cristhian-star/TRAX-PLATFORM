@@ -1,3 +1,417 @@
+# Corrección UX-06A P1/P2 — atomicidad, idempotencia y borrador
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T22:04:02-03:00
+Origen: laptop, Codex Desktop Windows; Senior Software Engineer MANDOBRA.
+Objetivo: corregir únicamente P1 creación no atómica/idempotente y P2 pérdida del
+borrador tras caducar autenticación, conservando permisos y diseño ya aprobados.
+Rama: feature/ux-ui-foundation.
+HEAD: 7af47a25a59efcb64f70c2596d9f6818ace298bc, conservado.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git, verificado.
+Precheck: ubicación/raíz correctas, exactamente 19 paths UX-06A previos y staging vacío.
+No hay cambios de Testing mezclados. Se leyeron Master Spec, estándares, ADR,
+Backlog y handoff vigentes. Los registros históricos siguientes se preservan.
+
+## Completado y decisiones
+
+- OperationCommand soporta resultado BudgetRequest sin cambios de esquema.
+- budget_service concentra autorización, comando, solicitud, INTERNAL y resultado
+  con un commit; notificación sin commit interno. Rollback completo y sesión usable.
+  No existía auditoría contractual obligatoria en esta creación: no se agregaron
+  ContractEvent/AuditLog artificiales ni cambios de adjudicación/contratación.
+- Clave servidor aleatoria/HMAC por CLIENTE/operación; formato y longitud validados;
+  payload hash estable; replay autorizado devuelve mismo resultado; conflicto 409;
+  claves diferentes crean solicitudes diferentes. Constraint canónico resuelve carrera.
+- Borrador servidor: solo seis campos conocidos con límites 160/120/120/1200/10/6;
+  fecha/prioridad saneadas, sin campos de autoridad, tokens ni datos en URL/logs.
+  Cookie privada de navegación más prueba firmada/CSRF original, 15 minutos,
+  actor activo obligatorio para guardar y mismo CLIENTE para restaurar/publicar.
+  No se exceptúa CSRF: recuperación limitada a ese endpoint, sin auth activa y con
+  comprobación criptográfica del CSRF original aunque falte la sesión. POST inválido
+  sigue 400. Login usa next interno fijo. Sin JS funciona el recorrido completo.
+- Hasta cinco borradores aislados por navegador/actor/nonce. Selección POST si hay
+  varios; descarte POST protegido, limpieza tras éxito y expiración. No se mezclan
+  pestañas. Directorio privado configurable, sin nuevas tablas/dependencias.
+- Registro completo del contrato, limitaciones y decisiones en ADR y Backlog.
+
+## Intervenidos en esta sesión (13)
+
+app/__init__.py; app/routes/operation_routes.py; app/services/budget_service.py;
+app/services/operation_notification_service.py; app/services/budget_creation_key_service.py;
+app/services/budget_draft_service.py; app/templates/nuevo_presupuesto.html;
+tests/test_budget_request_ux06a.py; tests/test_budget_creation_recovery.py;
+tests/postgresql_budget_creation_e2e.py; docs/BACKLOG.md;
+docs/DECISIONES_ARQUITECTURA.md; docs/HANDOFFS/ACTIVE_HANDOFF.md.
+
+Los otros doce paths conservan trabajo previo. No se retocó CSS, JS, navbar,
+home, Mercados, modelos, imágenes, permisos aprobados ni operaciones de Emergencias.
+
+## Inventario Git acumulado (25 paths, sin staging)
+
+- `app/__init__.py` (modificado).
+- `app/routes/operation_routes.py` (modificado).
+- `app/services/budget_service.py` (modificado).
+- `app/services/contract_service.py` (modificado).
+- `app/services/operation_notification_service.py` (modificado).
+- `app/services/operation_request_service.py` (modificado).
+- `app/services/operation_view_service.py` (modificado).
+- `app/templates/base.html` (modificado).
+- `app/templates/confirmacion_presupuesto.html` (modificado).
+- `app/templates/detalle_presupuesto.html` (modificado).
+- `app/templates/home_logged.html` (modificado).
+- `app/templates/mercados.html` (modificado).
+- `app/templates/mis_solicitudes_presupuesto.html` (modificado).
+- `app/templates/nuevo_presupuesto.html` (modificado).
+- `docs/BACKLOG.md` (modificado).
+- `docs/DECISIONES_ARQUITECTURA.md` (modificado).
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md` (modificado).
+- `app/services/budget_creation_key_service.py` (nuevo).
+- `app/services/budget_draft_service.py` (nuevo).
+- `app/static/css/budget-request-ux06a.css` (nuevo).
+- `app/static/js/budget-request-ux06a.js` (nuevo).
+- `tests/js/budget_request_ux06a.test.js` (nuevo).
+- `tests/postgresql_budget_creation_e2e.py` (nuevo).
+- `tests/test_budget_creation_recovery.py` (nuevo).
+- `tests/test_budget_request_ux06a.py` (nuevo).
+
+## Validaciones ejecutadas
+
+- 133 Python relacionados: 132 PASS, 1 SKIP, cero fallos/errores.
+  Incluye 22 UX-06A y 16 nuevas de creación/recuperación. Módulos:
+  tests.test_budget_request_ux06a, tests.test_budget_creation_recovery,
+  tests.test_sprint7_budget_to_contract, tests.test_sprint7_contracting_core,
+  tests.test_sprint7_contracting_p0_iteration1, tests.test_sprint7_contracting_p1_iteration2,
+  tests.test_sprint7_contract_event_boundary, tests.test_sprint7_proposal_to_contract,
+  tests.test_sprint7_formal_negotiation_access, tests.test_operation_architecture_services,
+  tests.test_auth_ux_redesign_v1, tests.test_navbar_drawer_ux04a,
+  tests.test_navbar_markets_ux03a, tests.test_platform_brand.
+- SKIP existente: test_real_concurrent_independent_sessions en SQLite; no es PASS.
+- Nuevas cubren una entidad/notificación, rollback tras flush de notificación,
+  comando sin éxito falso, sesión recuperable, replay secuencial, payload conflict,
+  clave ajena/malformada, cambio de rol antes de replay, claves distintas, sesión
+  completa caducada y pérdida solo de user_id, login real correcto/fallido, cuenta
+  distinta, navegador distinto, TTL de datos y prueba, campos manipulados/limitados,
+  limpieza, cancelación, múltiples pestañas y CSRF inválido con/sin autenticación.
+- Node UX-06A: 5/5 PASS, incluido doble clic/submit final y restauración bfcache.
+- python -m compileall -q app scripts y node --check JS UX-06A: OK.
+- UTF-8 estricto, whitespace, salto final y git diff --check: comprobación de cierre.
+- No suite completa ni nueva matriz visual completa: pendientes de Testing.
+  No se declara UX-06A aprobado ni se cierra el hallazgo por cuenta de Testing.
+
+## PostgreSQL real y entorno
+
+Gate: tests.postgresql_budget_creation_e2e, 4/4 PASS, repetido en código final.
+- Dos conexiones sincronizadas antes de INSERT, misma clave: un resultado/comando/INTERNAL.
+- Dos conexiones con payload distinto: un éxito, un conflicto controlado.
+- Notificación fallida después de flush: cero hechos; reintento en misma sesión exitoso.
+- Primer creador revierte mientras segundo intenta INSERT: segundo completa una vez.
+Guard existente de payment persistence invocado antes de migrar/resetear, nombre
+reservado y TRAX_POSTGRES_TEST_ALLOW_RESET=1 explícito. Dialecto real y Alembic head
+verificados. Migraciones existentes hasta 20260917_03, ninguna nueva.
+URL enmascarada:
+postgresql+psycopg2://ux06_gate:***@mandobra_ux06a_p1p2_pg:5432/trax_payment_persistence_test_ux06a
+Contenedor exclusivo: mandobra_ux06a_p1p2_pg; red interna mandobra_ux06a_p1p2_gate;
+PostgreSQL 16-alpine, tmpfs /var/lib/postgresql/data, sin puertos ni volúmenes persistentes.
+Queda disponible para repetir exclusivamente este gate; no reutilizar bases ajenas.
+SQLite se ejecutó en contenedores --rm --network none, sin volúmenes y en memoria.
+Compose mandobra_stabilization disponible en http://127.0.0.1:5050; imagen reconstruida
+con código final y solo web recreado con --no-deps. No acceso a trax_db ni alteración
+de trax-postgres. No reset del PostgreSQL del Compose ni eliminación de volúmenes.
+
+## Riesgos, pendientes e instrucciones de retoma
+
+- Borrador recuperable durante 15 minutos; prueba y CSRF también requieren antigüedad
+  máxima de 15 minutos. Fuera de ventana, cookie borrada/otro navegador/almacenamiento
+  perdido: recuperación no garantizada, nunca publicación anónima. Limpieza física
+  por expiración diferida al próximo acceso, no cron. Multinodo requiere directorio
+  compartido privado. No es un borrador durable de dominio.
+- Falla de limpieza después de commit deja caducar el archivo y registra solo aviso
+  genérico sin contenido; no devuelve un falso error de publicación.
+- La clave se firma con SECRET_KEY: rotación invalida formularios antiguos.
+- Retest independiente de ambos hallazgos y suite completa siguen PENDIENTES.
+  No hay bloqueante de Implementación conocido ni fallo de pruebas sin resolver.
+- Para retomar: verificar esta rama/HEAD y 25 paths, staging vacío; revisar esta entrada,
+  ADR y Backlog. Ejecutar focales listadas en contenedor descartable; repetir gate
+  solamente con nombre protegido y reset explícito; revisar UX con CLIENTE y PRO.
+- No realizar staging, commit, push, merge, reset, restore, stash ni clean; no acceder
+  trax_db/trax-postgres, ni alterar originales/imágenes/operaciones de Emergencias.
+
+Hashes finales: manifiesto SHA-256 externo
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux06a-p1p2-final-hashes.json
+Incluye los 25 paths y el hash final de este handoff, evitando autorreferencia.
+Sin commit, push, PR ni merge: no autorizados y retest pendiente. No se mergeó a
+develop ni se actualizó develop remoto. Trabajo completo en rama, sin integración.
+
+
+---
+
+# Corrección P1 UX-06A — Facultades exclusivas de CLIENTE
+
+Estado: READY_TO_RESUME
+Timestamp de registro: 2026-09-27T20:00:55-03:00
+Timestamp de corrección aprobado: 2026-09-27T19:49:55-03:00
+Origen: laptop, Codex Desktop Windows; Senior Software Engineer MANDOBRA.
+Hallazgo Testing: 2026-09-27T19:48:47-03:00, P1, REQUIERE_CORRECCIONES.
+Objetivo: corregir únicamente ampliación indebida de facultades del PROFESIONAL.
+Rama: feature/ux-ui-foundation.
+HEAD: 7af47a25a59efcb64f70c2596d9f6818ace298bc (conservado).
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git (verificado).
+Precheck: raíz y ubicación correctas; exactamente los 17 paths UX-06A esperados;
+staging vacío, sin archivos adicionales de Testing. Se revisaron diff, spec y posta.
+El registro histórico siguiente queda SUPERSEDED en la autorización CLIENTE/PRO;
+no se borró ni se modificó su timestamp.
+
+## Corrección implementada
+
+- CLIENTE activo exclusivamente: crear, confirmar, listar, cancelar, adjudicar;
+  propiedad obligatoria para datos y operaciones propias. GET y POST del formulario
+  rechazan PROFESIONAL con 403; no basta ocultar interfaz. Sesión con rol viejo no
+  evade comprobación del usuario en DB. Visitantes mantienen login/registro y next.
+- Defensa en budget_service para creación, cancelación, adjudicación y consultas
+  de listado de cliente. Sin cambios a oferta/cupos/transacciones/rollback.
+- contracting_core_service vuelve exactamente al contenido de HEAD: solo cliente
+  propietario activo deriva BUDGET. Por eso ese path ya no aparece modificado al final.
+- contract_service retira excepción BUDGET al rol PRO. Un propietario histórico PRO
+  no ve controles del actor cliente ni ejecuta confirmación/cancelación o replay.
+  El profesional contratado conserva aceptar/iniciar/completar; los demás tipos
+  contractuales conservan reglas canónicas.
+- operation_view_service solo trata como dueño al CLIENTE activo. Detalle no entrega
+  datos privados a rol PRO aunque figure en cliente_id. Cliente ajeno recibe 403;
+  la lectura de oportunidades del proveedor sigue operativa.
+- CTA de presupuesto para profesional: /presupuestos, en base/navbar/footer,
+  home_logged y Mercados. Solo destino/etiqueta del CTA, sin rediseño ni cambios de
+  otras operaciones. Son tres paths adicionales necesarios para el requisito de
+  no exponer al PRO acciones de cliente. No se toca el directorio de Emergencias.
+- operation_request_service, nuevo_presupuesto, confirmación, CSS, JS, pruebas Node
+  y MASTER_SPEC permanecen byte por byte iguales al inicio (SHA-256 comprobado).
+- No se amplía ni elimina una política de verificación: clientes no verificados
+  continúan bloqueados para negociación formal, como prueban sus regresiones.
+  Presupuestos no tenía ese gate y no se introduce uno ajeno al P1.
+
+## Archivos intervenidos en esta corrección (12)
+
+- `app/routes/operation_routes.py`
+- `app/services/budget_service.py`
+- `app/services/contracting_core_service.py`
+- `app/services/contract_service.py`
+- `app/services/operation_view_service.py`
+- `app/templates/base.html`
+- `app/templates/home_logged.html`
+- `app/templates/mercados.html`
+- `tests/test_budget_request_ux06a.py`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/BACKLOG.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+El inventario acumulado queda en 19 paths: 17 iniciales + base/home_logged/mercados
+menos contracting_core_service (vuelto a HEAD mediante edición focal, sin restore).
+No son 19 archivos nuevos de esta sesión; los cambios visuales UX-06A previos siguen.
+
+## Validaciones ejecutadas
+
+- 117 Python: 116 PASS, 1 SKIP, 0 fallos/errores. Incluye 22 focales UX-06A.
+- Módulos: test_budget_request_ux06a, test_sprint7_budget_to_contract,
+  test_sprint7_contracting_core, test_sprint7_contracting_p0_iteration1,
+  test_sprint7_contracting_p1_iteration2, test_sprint7_contract_event_boundary,
+  test_sprint7_proposal_to_contract, test_sprint7_formal_negotiation_access,
+  test_operation_architecture_services, test_auth_ux_redesign_v1,
+  test_navbar_drawer_ux04a, test_navbar_markets_ux03a, test_platform_brand.
+- SKIP existente: test_real_concurrent_independent_sessions, SQLite no reproduce
+  bloqueo/sesiones PostgreSQL. No se presenta como PASS ni se ejecutó gate PostgreSQL.
+- Node UX-06A: 5/5 PASS, sin modificar expectativas ni controlador.
+- python -m compileall -q app scripts OK; node --check del JS UX-06A OK.
+- git diff --check OK. Master Spec y rediseño preservados por hash.
+- Focales incluyen 403 HTML existente, GET/POST manual PRO, consultas internas,
+  propiedad heredada PRO, replay tras cambio de rol, proveedor legítimo, visitas,
+  CSRF, validación con valores conservados, cupos, rollback y acceso horizontal.
+- No suite completa: reservada al agente de Testing. No nueva matriz visual:
+  no se cambió diseño. No se declara aprobación de Testing ni aprobación UX-06A.
+
+## Docker, riesgos y continuidad
+
+Imagen descartable reconstruida; únicamente web recreado con --no-deps.
+Compose mandobra_stabilization conservado en http://127.0.0.1:5050.
+Tests: contenedor --rm --network none, sin volúmenes y SQLite en memoria.
+No acceso a trax_db, ni alteración de trax-postgres o volúmenes persistentes.
+Sin migraciones, cambios de Emergencias, imágenes de Downloads ni nuevas dependencias.
+
+Riesgos residuales: no se elimina/reasigna ninguna solicitud previa creada por PRO;
+esos datos no habilitan sus facultades de cliente. El borrador recuperable y la
+atomicidad solicitud/notificación siguen pendientes, sin modificación por el P1.
+La idempotencia contractual permanece; no se afirma idempotencia durable de crear
+solicitudes. Los enlaces internos de Emergencias quedan fuera de esta corrección;
+si llegan al formulario con PRO, el destino rechaza con 403 como cualquier acceso.
+
+Próximo paso: retest independiente del P1 y suite completa a criterio de Testing.
+Entrar por /dev/qa: CLIENTE cliente.demo@trax.local debe usar /presupuestos/nuevo;
+PROFESIONAL electricidad.pro@demo.trax.local debe obtener 403 en ese destino y usar
+/presupuestos o /presupuestos/mis-enviados como proveedor.
+Conservar rama, HEAD y cambios locales. No staging/commit/push/merge: no autorizados.
+No hubo merge ni integración; falta retest independiente. Estado GitHub no cambia.
+
+Inventario acumulado al cierre (staging vacío):
+
+```text
+ M app/routes/operation_routes.py
+ M app/services/budget_service.py
+ M app/services/contract_service.py
+ M app/services/operation_request_service.py
+ M app/services/operation_view_service.py
+ M app/templates/base.html
+ M app/templates/confirmacion_presupuesto.html
+ M app/templates/detalle_presupuesto.html
+ M app/templates/home_logged.html
+ M app/templates/mercados.html
+ M app/templates/mis_solicitudes_presupuesto.html
+ M app/templates/nuevo_presupuesto.html
+ M docs/BACKLOG.md
+ M docs/DECISIONES_ARQUITECTURA.md
+ M docs/HANDOFFS/ACTIVE_HANDOFF.md
+?? app/static/css/budget-request-ux06a.css
+?? app/static/js/budget-request-ux06a.js
+?? tests/js/budget_request_ux06a.test.js
+?? tests/test_budget_request_ux06a.py
+```
+
+---
+
+# UX-06A — Solicitud de presupuestos
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T18:43:08-03:00
+Origen: laptop, Codex Desktop Windows; agente técnico MANDOBRA.
+Objetivo: implementar el incremento aprobado de solicitud de presupuestos.
+Rama: feature/ux-ui-foundation.
+HEAD conservado: 7af47a25a59efcb64f70c2596d9f6818ace298bc.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: árbol limpio y staging vacío; ls-remote confirmó rama remota en ese HEAD.
+El encabezado histórico UX-04B/C usa base 18c422e; el commit vigente 7af47a2 ya
+registra ese trabajo. Se conserva debajo sin reinterpretarlo como estado actual.
+Estado final: cambios locales sin commit; staging vacío. Sin push, PR ni merge.
+No se integró porque falta aprobación visual y Testing independiente.
+
+## Implementación y decisiones
+
+- Entrada pública informativa, sin formulario ni preview anónimo; next seguro
+  a /presupuestos/nuevo en login/registro. POST anónimo redirige sin crear.
+- CLIENTE/PROFESIONAL activos solicitan; propiedad para confirmar, listar, cancelar,
+  adjudicar y ver ofertas privadas. Perfil profesional solo se exige para ofertar.
+- Contrato BUDGET admite propietario PROFESIONAL y mantiene separación del proveedor,
+  idempotencia, eventos, notificaciones y auditoría. DIRECT/PROPOSAL no se amplían.
+- Enlace al contrato desde detalle propio. Reseñas siguen restringidas a CLIENTE,
+  sin CTA inválido para el nuevo solicitante profesional; ampliación en Backlog.
+- Título/servicio/zona/descripción primero; fecha/prioridad opcionales. Revisión JS
+  local con foco y edición; un submit final nativo y bloqueo de doble envío local.
+  Sin JS, esenciales visibles y botón Publicar solicitud operativo.
+- Límites backend/HTML 160/120/120/1200; prioridad BAJA/NORMAL/ALTA y fecha válida.
+  Errores por campo + resumen enfocado; HTML escapado y valores conservados.
+- Confirmación real, estado y ofertas reales; sin acciones ficticias ni tiempos/promesas.
+- CSS/JS propios con tokens DSv2, foco y controles >=44; contraste local y fondo
+  completo en ambos temas. Sin cambios globales, dependencias ni migraciones.
+
+## Archivos modificados y nuevos (17)
+
+- `app/routes/operation_routes.py`
+- `app/services/budget_service.py`
+- `app/services/contract_service.py`
+- `app/services/contracting_core_service.py`
+- `app/services/operation_request_service.py`
+- `app/services/operation_view_service.py`
+- `app/templates/nuevo_presupuesto.html`
+- `app/templates/confirmacion_presupuesto.html`
+- `app/templates/detalle_presupuesto.html`
+- `app/templates/mis_solicitudes_presupuesto.html`
+- `app/static/css/budget-request-ux06a.css` (nuevo)
+- `app/static/js/budget-request-ux06a.js` (nuevo)
+- `tests/test_budget_request_ux06a.py` (nuevo)
+- `tests/js/budget_request_ux06a.test.js` (nuevo)
+- `docs/BACKLOG.md`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+## Validaciones ejecutadas
+
+- Python: 157 pruebas focales/regresiones; 156 PASS, 1 SKIP existente de
+  test_real_concurrent_independent_sessions (SQLite no equivale a bloqueo PostgreSQL).
+  Incluye 17 casos nuevos de UX-06A: visitantes, cuentas activas/inactivas, ambos
+  roles, CSRF, límite 10 POST/día, longitudes, datos conservados, autooferta, cupos,
+  propiedad, contrato idempotente y transiciones BUDGET del propietario PROFESIONAL.
+- Módulos de esa tanda: test_budget_request_ux06a, test_sprint7_budget_to_contract,
+  test_sprint7_contracting_p1_iteration2, test_operation_architecture_services,
+  test_sprint7_contracting_core, test_sprint7_contract_event_boundary,
+  test_sprint7_proposal_to_contract, test_sprint7_contract_review_service,
+  test_sprint7_contract_review_routes_ui_moderation, test_auth_ux_redesign_v1,
+  test_security_controls, test_security_compliance_phase3, test_loading_error_states,
+  test_navbar_drawer_ux04a, test_platform_brand, test_design_system_v2.
+- Revalidación final tras los textos de solicitante: 35/35 PASS (UX-06A,
+  platform_brand y navbar_drawer). Es repetición focal, no se suma a los 157 casos.
+- compileall app scripts OK en contenedor aislado; sintaxis JS OK.
+- UTF-8 estricto en 17 paths, sin BOM ni reemplazos. 62 enlaces relativos
+  documentales resuelven; assets locales de templates presentes y enlaces del
+  flujo cubiertos por Flask/navegación real. git diff --check OK.
+- Node: 16 PASS: 5 presupuesto y 11 page_loading. Se ejecuta el controlador real
+  de loading junto al formulario, sin simular mediciones de layout.
+- Primera tanda: 39 casos con un error de fixture nuevo (faltaba mensaje NOT NULL)
+  y un skip. Fixture corregido; tanda de 157 posterior sin fallos.
+- Los logs genéricos de error de los tests son escenarios deliberados de regresión;
+  no equivalen a fallos productivos. Consola de navegador: ruido chrome-extension,
+  sin error JS de UX-06A observado. Respuesta 400 inducida por validación comprobada.
+
+## Revisión visual real
+
+Chrome, viewport CSS 1440/1024/768/390/320; visitante, CLIENTE y PROFESIONAL;
+claro y oscuro. 30 combinaciones y 200 controles medidos con getBoundingClientRect:
+ancho y alto >=44 px, sin overflow horizontal en estado estable. Los cambios de
+ancho generan un instante de ajuste del navbar; las lecturas finales se tomaron
+tras estabilizarlo. Opcionales abiertos en los formularios medidos.
+
+- Primer campo a ~444 px en escritorio y ~540 px a 320; antes ~758/~943.
+- Contraste real medido: CTA 4.56:1 claro, 8.02:1 oscuro; errores >=6.04:1 claro,
+  >=8.43:1 oscuro. Texto/encabezado también superan umbral. Foco visible por teclado.
+- Validación nativa inválida: foco en título, sin skeleton ni revisión.
+- Revisión: URL permanece /presupuestos/nuevo, foco en resumen, sin skeleton;
+  editar conserva datos. Publicación real desde ambas cuentas muestra 0 de 6.
+- Error backend inducido: resumen enfocado, aria-invalid, zona/descripción conservadas.
+- Cuenta PRO ve Mis solicitudes y detalle propio, sin oferta sobre sí misma.
+- Se crearon únicamente dos solicitudes QA en la base descartable: #1 CLIENTE,
+  #2 PROFESIONAL. Se dejan para revisión, sin ofertas ni contrataciones QA reales.
+- Fallback sin JS validado por HTML/POST nativo y tests; no se desactivó JS en Chrome.
+  Doble envío y skeleton se cubren también mediante Node; no se afirma gate E2E
+  automatizado ni certificación axe/lector de pantalla. No se ejecutó suite completa
+  ni concurrencia PostgreSQL; corresponde a Testing decidir el gate independiente.
+
+Evidencia externa al repo en
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/:
+ux06a-formulario-claro.png, ux06a-formulario-oscuro.png, ux06a-formulario-movil.png,
+ux06a-mediciones.json. Las capturas de página completa se inspeccionaron; algunos
+previews de viewport de la herramienta quedaron escalados y no se usan para medir.
+
+## Entorno, límites y siguiente paso
+
+Compose descartable docker-compose.stabilization.yml, proyecto mandobra_stabilization.
+Se reconstruyó imagen y recreó solo web con --no-deps. Se deja en 127.0.0.1:5050.
+No se accedió a trax_db ni se alteró trax-postgres. Tests en contenedor --rm,
+--network none, sin volúmenes y DATABASE_URL=sqlite:///:memory:.
+
+- Visitante: http://127.0.0.1:5050/presupuestos/nuevo (cerrar sesión QA si corresponde).
+- QA: http://127.0.0.1:5050/dev/qa; botón Iniciar como este usuario.
+- CLIENTE: cliente.demo@trax.local. PROFESIONAL: electricidad.pro@demo.trax.local.
+- Tras elegir cuenta, abrir /presupuestos/nuevo. Mis solicitudes enlaza desde allí.
+
+Pendientes: aprobación visual, Testing independiente, posible gate PostgreSQL;
+Backlog conserva borradores, adjuntos, taxonomía, matching/distribución, IA,
+edición, visibilidad definitiva, atomicidad, métricas y expiración real.
+La solicitud sigue teniendo commit separado de notificación; el doble clic local
+no garantiza idempotencia de creación tras reenvío/red interrumpida. No se oculta
+esa limitación. No se amplía reseña a PRO, ni se rediseña la lista/comparador legacy.
+
+Para retomar: verificar estos 17 paths, rama/HEAD y staging; no descartar trabajo.
+Revisar pantallas con ambos roles y temas, aprobar visual, luego retest independiente.
+No ejecutar reset/clean, migraciones, suite completa o integración sin autorización.
+No tocar bases persistentes, Emergencias, Propuestas, dashboards, perfiles ni pagos.
+
+---
+
 # UX-04B/04C — Skeleton y errores amigables
 
 Estado: READY_TO_RESUME

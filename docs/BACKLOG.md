@@ -1,4 +1,96 @@
+# UX-06A — corrección P1/P2 para retest
+
+Registro: 2026-09-27T22:04:02-03:00; rama `feature/ux-ui-foundation`; HEAD `7af47a2`.
+Estado: pendiente de retest independiente, no aprobado.
+
+Implementado: transacción única de creación/notificación INTERNAL/OperationCommand,
+clave criptográfica ligada al actor y operación, replay durable y conflicto de payload;
+recuperación temporal del borrador saneado tras caducar autenticación, login real,
+CSRF mantenido, aislamiento por actor/navegador/pestaña y descarte/TTL de 15 minutos.
+Se conservan permisos CLIENTE/PROFESIONAL aprobados y diseño UX-06A.
+
+Validación de Implementación: 132 PASS + 1 SKIP en 133 Python relacionados, 4 PASS
+en PostgreSQL exclusivo real y 5 PASS Node. Pendientes: retest independiente y
+suite completa por Testing; matriz visual completa no repetida en esta corrección.
+
+Dependencias operativas futuras, fuera del incremento:
+- decidir política de purga periódica y límites globales del almacenamiento temporal;
+  hoy la expiración se aplica al acceder y no permite restaurar un borrador vencido;
+- verificar almacenamiento privado compartido antes de escalar horizontalmente;
+  recuperación actual local, sin promesa de durabilidad distribuida;
+- si Producto necesita recuperar más allá de 15 minutos o entre dispositivos,
+  diseñar un borrador persistente con política de privacidad y aprobación previa;
+- rotación de secretos invalida formularios emitidos; definir continuidad de claves
+  antiguas solo si el despliegue lo requiere. No se agrega infraestructura para ello.
+
+Sin migraciones nuevas, Redis, colas ni outbox. El historial siguiente se conserva;
+las menciones antiguas a atomicidad y borrador pendientes quedan superadas solo por
+esta implementación, nunca por una aprobación de Testing.
+
+---
+
 # BACKLOG MANDOBRA
+
+## P1 UX-06A — Corrección de facultades de propietario
+
+Corrección aprobada: 2026-09-27T19:49:55-03:00; registro: 2026-09-27T20:00:55-03:00.
+Estado: IMPLEMENTADO; RETEST INDEPENDIENTE PENDIENTE, sin aprobación de UX-06A.
+Testing: 2026-09-27T19:48:47-03:00, P1 REQUIERE_CORRECCIONES.
+
+Se descarta la ampliación CLIENTE/PROFESIONAL del registro histórico siguiente.
+Solo CLIENTE activo puede crear y administrar solicitudes propias y ejercer el
+actor cliente del contrato BUDGET. Profesional conserva oportunidades, ofertas y
+actuación como contraparte contratada. Rutas y servicios rechazan rol incorrecto;
+se cubren datos heredados, sesión desactualizada, acceso horizontal e idempotencia.
+El rediseño visual, JS, validaciones, visitantes y CSRF se conservan.
+
+El pendiente histórico de reseñas de solicitante PROFESIONAL queda descartado,
+no es una autorización futura. Permanecen los pendientes de borrador recuperable,
+adjuntos, taxonomía, matching, distribución, IA, edición, atomicidad, métricas,
+expiración e idempotencia durable de creación, fuera de esta corrección.
+No se borraron ni reasignaron datos creados bajo la implementación rechazada.
+
+Pruebas: 117 Python (116 PASS, 1 SKIP preexistente PostgreSQL), 5 Node PASS;
+compileall, sintaxis JS y diff check correctos. No hubo fallos en esta tanda.
+Pendientes: retest P1 por Testing y suite completa por ese agente. El registro
+histórico de validación de ambos roles no constituye evidencia de aceptación actual.
+
+
+## UX-06A — Solicitudes de presupuestos
+
+Timestamp: 2026-09-27T18:43:08-03:00. Rama `feature/ux-ui-foundation`; base `7af47a25a59efcb64f70c2596d9f6818ace298bc`.
+Estado: implementado localmente; aprobación visual y Testing independiente pendientes.
+
+Visitantes ven una entrada informativa con login/registro y next interno a
+/presupuestos/nuevo; no completan ni previsualizan formularios anónimos. CLIENTE
+y PROFESIONAL activos pueden solicitar y administrar exclusivamente solicitudes
+propias. El profesional conserva sus oportunidades y no puede autoofertar.
+Formulario breve, opcionales desplegables, revisión local, publicación nativa,
+validación del servidor, valores conservados y confirmación con contador real.
+
+Pendientes de dominio, fuera de UX-06A:
+
+- Borrador recuperable tras login/caducidad de sesión; hoy no hay persistencia de borradores.
+- Adjuntos y su seguridad/almacenamiento.
+- Taxonomía de rubros y catálogo administrable.
+- Matching geográfico y distribución automática: hoy no se prometen respuestas.
+- IA de asistencia o clasificación.
+- Edición posterior a publicar y reglas sobre ofertas existentes.
+- Política definitiva de visibilidad: no se amplía la exposición de ofertas privadas.
+- Atomicidad solicitud/notificación: siguen siendo commits separados; evaluar outbox.
+- Métricas de publicación, búsquedas, respuestas y conversión.
+- Expiración real; no mostrar temporizadores sin soporte de dominio.
+- Reseñas contractuales del solicitante PROFESIONAL: el permiso vigente es CLIENTE.
+  UX-06A no lo amplía ni muestra un CTA que terminaría en 403.
+- Idempotencia de creación de solicitud ante reenvío de red/recarga: el bloqueo de
+  doble clic es local. No confundirlo con la idempotencia canónica BUDGET existente.
+
+Validación: 157 pruebas Python relacionadas, 156 PASS y 1 SKIP preexistente de
+concurrencia PostgreSQL; 16 Node PASS (5 nuevas + 11 skeleton). Matriz real:
+30 combinaciones (visitante/CLIENTE/PROFESIONAL × claro/oscuro ×
+1440/1024/768/390/320), 200 controles >=44×44; cero overflow estable.
+La suite completa y el gate concurrente PostgreSQL quedan para Testing.
+
 
 ## UX-04B/04C — Estados de carga y errores amigables
 
