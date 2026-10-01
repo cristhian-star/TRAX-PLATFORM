@@ -10,6 +10,232 @@ implementacion: PENDIENTE
 
 # REQ-004 — UX-07A: Emergencias y guardia vigente
 
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+## Aceptación de ADR-002 y continuidad — 2026-09-28
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+REQ-004: APROBADO COMO ESPECIFICACIÓN / IMPLEMENTACIÓN PENDIENTE.
+[ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md) queda APROBADO tras
+el retest independiente final del `2026-09-28T20:55:50-03:00`.
+UX-07A.1 puede ingresar únicamente al preflight técnico, sin iniciar implementación,
+migraciones ni testing funcional. UX-07A.2 depende de completar y aprobar UX-07A.1.
+Las 27 filas CA-01–CA-27 permanecen intactas; no se declara el requisito implementado,
+probado funcionalmente ni desplegado.
+
+## P2 residuales: contrato aplicable — 2026-09-28
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+REQ-004 continúa APROBADO COMO ESPECIFICACIÓN, implementación PENDIENTE.
+Definición normativa completa:
+[ADR-002, P2 residuales](../ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28).
+
+**P2-01 territorial.** Profesional: provincia desde coverage_province y localidad desde
+coverage_city. Emergencia: ambos valores declarados separadamente por el cliente y
+conservados en contexto autorizado. EmergencyRequest hoy solo tiene zona; el preflight
+debe resolver mapeo/cambio mínimo antes de implementar, sin heurísticas sobre zona.
+No se acreditaron IDs territoriales canónicos; solo si se verifican podrá proponerse
+uso preferente, sin catálogo nuevo ni dependencia externa.
+
+Regla única en ambos lados: texto válido/no vacío → NFC → trim y colapso de espacios
+Unicode internos → casefold → NFC. Rechazar datos inseguros y controles no espaciales;
+no quitar acentos, transliterar ni inferir aliases. Exigir igualdad exacta CONJUNTA de
+provincia y localidad normalizadas. Homónimos necesitan provincia; ambigüedad restante,
+dato incompleto/inválido o ausencia de correspondencia exacta excluyen conservadoramente.
+Texto libre y substring/contains/fuzzy no acreditan cobertura. Sin inferencias entre
+localidades, código postal inferido, geocodificación implícita, distancia vial, ETA
+o coordenadas inventadas. Oficio es filtro independiente; PRO es neutral y el orden
+posterior sigue estable por contrato, sin inventar distancia o prioridad.
+Captura/persistencia exacta bloqueada hasta política de minimización, acceso y retención.
+
+**P2-02 IP/proxy.** Por defecto usar peer inmediato, ignorando encabezados del cliente.
+Solo interpretar X-Forwarded-For/X-Real-IP/Forwarded o equivalentes bajo proxy conocido,
+peer original en allowlist, saltos exactos y configuración validada por entorno.
+Verificar peer antes de reescritura; ProxyFix/equivalente por sí solo no acredita confianza.
+Cadena excesiva/inconsistente no amplía confianza; configuración ausente/inválida falla
+cerrada en modo proxy, sin fallback a encabezados. No confianza global ni dependencia nueva.
+Clave principal autenticada: ID estable validado por servidor + operación; IP es señal
+complementaria, nunca autorización, ownership o identidad idempotente. En anónimos,
+reconocer NAT/red compartida/IPv6/rotación y respetar el mismo contrato de confianza.
+El código actual combina usuario/IP y usa get_remote_address; no se afirma que ya cumpla.
+
+Separar cuotas por superficie/operación; conservar límites provisionales previos y
+replays contabilizados. 429 con política de reintento y Retry-After coherentes; mantener
+misma clave ante respuesta interrumpida, sin convertir replay en segunda mutación.
+memory:// no comparte contadores entre procesos/réplicas y se pierde al reiniciar;
+no basta para producción distribuida. No Redis por esta corrección.
+Preflight bloqueante antes de implementar/desplegar: actor/clave, operación, ventana,
+cantidad, respuesta 429, reintento y proxies confiables por entorno definidos/aprobados.
+IP minimizada en HTML, query strings y logs; no incluirla en resultado/payload durable
+de dominio sin justificación aprobada, respetando privacidad y retención.
+
+Casos territoriales previstos: igualdad normalizada, case/espacios, provincia igual y
+localidad distinta, homónimos entre provincias, incompletos, ambiguos, substring,
+Unicode, oficio incompatible y neutralidad PRO.
+Casos IP previstos: directo, spoofing directo, proxy no confiable, saltos exactos
+confiables, cadena excesiva, cambio de IP del usuario, NAT compartida, cuota por
+operación, replay, 429/reintento y reinicio/multiproceso memory://.
+Son escenarios complementarios de retest, no nuevos criterios ni pruebas ejecutadas.
+Las 27 filas CA-01–CA-27 permanecen exactamente intactas.
+
+## Corrección normativa para retest — 2026-09-28
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+La aprobación documental de REQ-004 se conserva; estas aclaraciones adoptadas quedan
+pendientes de retest independiente, sin aceptación de ADR-002 ni autorización técnica.
+Contrato arquitectónico de referencia:
+[corrección ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28).
+
+### Reglas adoptadas que sustituyen alternativas anteriores
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+- P1-1: exigir perfil_completo, estado_perfil VERIFICADO y verificación APROBADA de
+  tipo PROFESIONAL. Aprobar esa verificación produce la transición autorizada
+  PENDIENTE_VERIFICACION → VERIFICADO y auditoría en una operación de aplicación.
+  No reutilizar has_approved_verification() sin filtro explícito de tipo PROFESIONAL.
+  No exigir verificación de CLIENTE por traslado de reglas de contratación.
+- P1-2: invalidar por desactivación atómica, incremento de versión y auditoría en la
+  transacción del cambio de elegibilidad. Incluye rechazo/revocación, suspensión,
+  cambio de rol, pérdida de habilitación, oficio y cobertura. Todos los escritores
+  usan servicios componibles sin commits internos. Restaurar datos nunca reactiva.
+  Se descarta para este incremento la alternativa de revisión monotónica adicional.
+- P2-1: OperationCommand identifica la intención; la fila mutable no es resultado
+  histórico. Activar/renovar/desactivar y no-op conservan payload original mínimo,
+  versionado e inmutable. Solo formato, operación, resultado/no-op, versiones previa
+  y nueva, inicio/vencimiento e IDs técnicos mínimos. Puede referenciar AuditLog
+  protegido durante la vida útil del replay; sin ubicación, teléfono o datos sensibles.
+  Estado actual separado del histórico. Misma clave ante respuesta interrumpida,
+  nueva clave para otra intención; clave criptográfica servidor ligada a actor/operación.
+  Tras IntegrityError: rollback, nueva autorización, relectura y replay solo con comando
+  confirmado compatible. No convertir otros errores de integridad en éxito.
+- P2-2: renovar reemplaza desde ahora por 2/4/8 horas; puede acortar y requiere mostrar
+  y confirmar nuevo vencimiento. No renovar vencida: nueva activación explícita.
+  Reloj posterior a locks, versión esperada obligatoria y conflicto ante versión obsoleta.
+  Replay no revive ventanas; desactivación repetida puede ser no-op sin nueva transición.
+- P2-3: localidad y provincia normalizadas, comparación explícita y cobertura declarada.
+  Homónimos requieren provincia u otro contexto inequívoco; datos ambiguos/incompletos
+  se excluyen. Texto libre ayuda a buscar, no acredita cobertura. Ningún substring
+  ilike("%zona%") acredita elegibilidad. Sin PostGIS; captura exacta bloqueada.
+- P2-4: creación 10 POST/día provisional, incluidos replays; contacto 10/hora provisional.
+  La clave vigente depende de usuario/IP y memory:// no es cuota global distribuida.
+  Activar/renovar requieren cuota por actor más control IP; desactivar no comparte esa
+  cuota. Cancelación y contacto tienen límites propios. HTTP 429; cifras nuevas y
+  alcance obligatorios en preflight .1. No Redis ni garantía distribuida inventada.
+
+### Contratos complementarios 6–15
+
+Locks en orden: usuarios involucrados por ID → profesional → guardia → solicitud
+cuando corresponda → comando idempotente existente cuando corresponda.
+Profesional serializa primera activación sin fila de guardia; UNIQUE es defensa final.
+La versión complementa locks. Refrescar datos, autorizar antes de replay y revalidar
+bajo locks; PostgreSQL obligatorio para carreras de todos los escritores.
+
+Solo CLIENTE activo propietario cancela ABIERTA → CANCELADA, tras bloquear solicitud.
+Propia ya cancelada: no-op; otros estados: rechazo; no reabrir. Cancelación/contacto
+comparten lock de solicitud; un contacto emitido no se revoca retroactivamente.
+Contacto exige además consentimiento, guardia vigente y elegibilidad completa, reloj
+posterior al lock y datos refrescados. Contacto y auditoría se confirman antes de entregar
+destino; sin llamadas externas dentro de transacción ni promesa de disponibilidad futura.
+
+Coordenadas exactas BLOQUEADAS hasta definir finalidad, campos, acceso, retención,
+vencimiento lógico, purga verificable, backups y protección aplicable. Ubicación exacta
+separada de zona aproximada. Contexto vencido no se utiliza; no declarar cifrado inexistente.
+Mantener las prohibiciones de exposición por query, referrer, logs, HTML/JSON y auditoría.
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+GET únicamente lectura; POST con CSRF para crear/cancelar/activar/renovar/desactivar/contactar.
+Actor/propietario de sesión, allowlist, duración/clave/versión cuando correspondan.
+400 validación, 409 conflicto, 429 límite; denegación sin revelar solicitudes ajenas.
+POST exitoso a lectura autorizada; contacto con confirmación nativa previa a salida externa.
+Soporte básico sin JS; replay no simula creación nueva. URLs nuevas no declaradas existentes.
+
+Downgrade con pérdida requiere precondiciones, respaldo y autorización; conserva
+AuditLog/OperationCommand. Re-upgrade y replay no recrean guardias históricas.
+Diferenciar rollback de aplicación y downgrade de esquema.
+Índices candidatos: UNIQUE profesional y vencimiento de activas/no desactivadas con
+predicado estático, sin now() ni duplicar UNIQUE. Mapeo de asistencia primero; planes
+con volumen representativo después. No se declara rendimiento probado.
+Guardia es estado actual; OperationCommand resuelve idempotencia; AuditLog es evidencia
+histórica. No event sourcing ni otra tabla de historial. Retención del resultado
+idempotente separada del contexto privado, protegida mientras deba admitir replay.
+
+### Aclaración de cobertura sin renumerar CA-01–CA-27
+
+Las 27 filas de aceptación se conservan íntegramente. En su retest deberán incluir:
+CA-02/03/08: tipo de verificación, transición de perfil, rol y restauración sin resurrección;
+CA-04–10: versión obsoleta, no-op durable, orden de locks, reloj tras espera y rollback;
+CA-11/13: localidad/provincia, homónimos, datos incompletos y exclusión sin substring;
+CA-14/17: cancelación contra contacto y autorización bajo lock;
+CA-15/16: captura bloqueada, retención y límites reales con respuesta 429;
+CA-25/27: downgrade sin resurrección, historia preservada y estados bloqueados.
+No son criterios nuevos ni evidencia de pruebas ejecutadas.
+
 ## Cierre de revisión documental UX-07A — 2026-09-28
 
 Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
@@ -80,6 +306,8 @@ Referencias de código: [rutas](../../app/routes/operation_routes.py),
 [WhatsApp](../../app/services/whatsapp_contact_service.py).
 
 ## 2. Paquetes y exclusiones
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
 
 | Paquete | Entrega exigida | Gate |
 | --- | --- | --- |
@@ -157,6 +385,8 @@ recuperación indefinida ni entre dispositivos; fallback sin JS debe seguir segu
 
 ## 5. Guardia temporal y casos límite
 
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
 Aprobado: desactivada por defecto, voluntaria, 2/4/8 horas, una única disponibilidad
 vigente por profesional, renovación explícita, cancelación anticipada, timestamps
 timezone-aware, auditoría e idempotencia/concurrencia.
@@ -166,6 +396,8 @@ El vencimiento efectivo se deriva de consulta; una fila vencida nunca aparece au
 su flag permanezca activo. No requiere cron ni escritura para expirar cada búsqueda.
 
 ### Reglas operativas propuestas para revisión
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
 
 | Situación | Resultado especificado |
 | --- | --- |
@@ -197,6 +429,8 @@ inválida la ventana anterior. Un hash reversible de campos no basta: cambiar y 
 al valor anterior no debe revivir guardia. Detalle técnico sujeto al ADR y revisión.
 
 ## 6. Modelo mínimo y migración (objetivo, no código)
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
 
 Propuesta: una fila de disponibilidad actual por Professional, FK/UNIQUE profesional,
 activa por defecto false, inicio/fin aware, cancelación opcional, última actualización,
@@ -388,11 +622,11 @@ marcadas como aprobadas por Testing.
 | --- | --- | --- |
 | CA-01 | Dado el catálogo, elegir cualquiera de seis IDs resuelve su nodo; alias ambiguo/desconocido falla sin mapear a otro oficio | Unitarias de normalización y rutas con legacy |
 | CA-02 | Visitante/PRO/admin no persisten como CLIENTE; cliente inactivo tampoco; propietario activo opera solo lo propio | Rutas + servicios, roles/ownership/IDOR |
-| CA-03 | Guardia ausente/inactiva no aparece; propietario elegible activa 2/4/8 h; otras duraciones/owner se rechazan | Unitarias + integración + mass assignment |
+| CA-03 | Propietario elegible reserva bloques diurnos 07–19 o nocturnos 19–07 de 12 h, múltiples y consecutivos; T−2 min inclusivo; sin duplicados ni ingreso iniciado; horarios/owner inválidos se rechazan | Unitarias focales; integración y PostgreSQL pendientes |
 | CA-04 | En inicio exacto es temporalmente elegible; en fin exacto no; nunca depende de cron | Reloj controlado y PG tras espera de lock |
-| CA-05 | Renovación reemplaza desde ahora; no suma al fin anterior; activación repetida distinta devuelve conflicto | Integración de transiciones/versiones |
-| CA-06 | Dos activaciones/renovaciones independientes no crean dos ventanas ni pierden updates | PostgreSQL real, conexiones independientes, barrera |
-| CA-07 | Desactivar y repetir/replay de activación no revive ni duplica auditoría | Unitarias + PG carrera desactivar/renovar |
+| CA-05 | Reserva requiere aceptación expresa; confirmación inmediata; T−6 h y T−1 h solo futuros; fronteras exactas omiten avisos vencidos; reserva tardía no genera retroactivos | Unitarias focales; integración y PostgreSQL pendientes |
+| CA-06 | Reservas concurrentes del mismo profesional/bloque no duplican; bloques distintos y consecutivos se permiten | Unitarias focales; integración y PostgreSQL pendientes |
+| CA-07 | Replay de reserva no duplica bloques, aceptación, confirmación ni recordatorios; no cambia inicio/fin ni revive un bloque vencido o invalidado | Unitarias focales; integración y PostgreSQL pendientes |
 | CA-08 | Suspensión/pérdida de verificación/oficio/cobertura invalida; restaurar datos no revive ventana | Integración de políticas + PG concurrencia |
 | CA-09 | Misma clave/payload devuelve mismo resultado; otro actor/payload falla; claves diferentes permiten creaciones deliberadas | Ruta, servicio, doble clic/reenvío/replay |
 | CA-10 | Fallo de notificación/auditoría revierte solicitud/comando/hechos; sesión reutilizable y retry único | Inyección de fallos + PostgreSQL rollback |
@@ -426,6 +660,8 @@ Secuencia: revisar reglas propuestas → aprobar paquete .1 con esquema/retenci�
 privado y contratos de endpoint → implementar y verificar PG/seguridad → habilitar .2 →
 retest visual/funcional independiente. No autorización implícita de commit/deploy.
 
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
 Puntos de revisión explícitos: ventana de renovación desde ahora (puede acortar),
 invalidación sin resurrección, definición de perfil habilitado, fallback textual de
 localidades, retención del contexto exacto si se habilita, y flujo nativo de contacto
@@ -439,3 +675,15 @@ PENDIENTE. Esta sesión solo redacta documentación: no código, assets, migraci
 Docker ni base de datos. El preflight anterior aportó inspección de fuentes, imágenes y
 navegador; no certificó zoom 200 % ni guardias inexistentes. Ninguna prueba de este
 requisito se declara ejecutada. No se sustituye el retest independiente con este texto.
+
+
+### Antecedentes de criterios temporales sustituidos
+
+SUSTITUIDOS el 2026-10-01 por Cristian Sánchez; solo evidencia histórica:
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+- Criterio anterior número 03: Guardia ausente/inactiva no aparece; propietario elegible activa 2/4/8 h; otras duraciones/owner se rechazan
+- Criterio anterior número 05: Renovación reemplaza desde ahora; no suma al fin anterior; activación repetida distinta devuelve conflicto
+- Criterio anterior número 06: Dos activaciones/renovaciones independientes no crean dos ventanas ni pierden updates
+- Criterio anterior número 07: Desactivar y repetir/replay de activación no revive ni duplica auditoría

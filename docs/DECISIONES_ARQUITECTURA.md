@@ -1,3 +1,114 @@
+# UX-07A — Aceptación final de ADR-002
+
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+[ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md): APROBADO.
+Retest final APROBADO del `2026-09-28T20:55:50-03:00`, dictamen
+`APROBAR_ADR002_CON_OBSERVACIONES_MENORES`; sin P0, P1 ni P2 pendientes.
+La aceptación de Cristian Sánchez habilita solo el análisis técnico previo de .1.
+Se mantiene la arquitectura aprobada para guardia temporal, seguridad, atomicidad,
+idempotencia, concurrencia y matching neutral; no se cambian decisiones normativas.
+REQ-004 continúa como especificación aprobada e implementación pendiente.
+Implementación, migraciones y testing PostgreSQL requieren los gates y autorizaciones
+posteriores; .2 sigue bloqueado hasta completar y aprobar .1.
+
+---
+
+# UX-07A — Corrección de dos P2 residuales
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Definición normativa en [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28) y
+[REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Se precisa igualdad conjunta provincia/localidad normalizadas y contrato de confianza
+de peer/proxy para cuotas. No se reabren decisiones arquitectónicas conformes.
+Gate: retest independiente final y decisión de aceptación posterior de Cristian Sánchez.
+
+# UX-07A — Corrección arquitectónica pendiente de retest
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Contrato completo en [ADR-002 corregido](ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28),
+alineado con [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#corrección-normativa-para-retest--2026-09-28).
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+Se adoptan: habilitación profesional completa y transición auditada; invalidación
+atómica sin resurrección; locks usuarios por ID → profesional → guardia → solicitud
+→ comando existente; versión esperada y UNIQUE como complemento; resultado durable
+de OperationCommand separado de guardia mutable; renovación desde ahora aunque acorte;
+territorio explícito localidad/provincia sin substring; cuotas cuyo alcance real se
+documenta, sin garantía distribuida de memory:// ni nueva infraestructura.
+Cancelación solo propia ABIERTA; contacto revalidado/auditado bajo locks antes de
+entregar destino; captura exacta bloqueada; downgrade sin reactivación; endpoints como
+contratos sin inventar URLs; índices candidatos sin rendimiento probado.
+Guardia, identidad idempotente y evidencia histórica mantienen responsabilidades
+distintas, sin event sourcing. Historial y fechas anteriores intactos.
+No se acepta ADR-002 ni se inicia implementación: retest independiente obligatorio.
+
 # UX-06A P1/P2 — creación atómica y recuperación temporal
 
 ## Cierre de revisión documental UX-07A — 2026-09-28

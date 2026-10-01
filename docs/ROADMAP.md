@@ -1,5 +1,116 @@
 # ROADMAP MANDOBRA
 
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+## UX-07A — Secuencia autorizada tras aceptación — 2026-09-28
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+Secuencia vigente, conforme a [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md):
+
+1. ADR-002 APROBADO por Producto; retest final APROBADO del `2026-09-28T20:55:50-03:00`.
+2. Preflight técnico de UX-07A.1 AUTORIZADO, todavía no ejecutado por esta operación documental.
+3. Implementación UX-07A.1 PENDIENTE DE AUTORIZACIÓN POSTERIOR; no iniciada.
+4. Testing PostgreSQL PENDIENTE, sin ejecución en esta sesión.
+5. UX-07A.2 BLOQUEADO hasta completar y aprobar UX-07A.1.
+
+REQ-004 permanece APROBADO COMO ESPECIFICACIÓN / IMPLEMENTACIÓN PENDIENTE.
+La aceptación arquitectónica no acredita disponibilidad operativa ni habilita la interfaz
+de .2 a afirmar disponibilidad sin la verificación previa de .1.
+
+## UX-07A — Precondiciones residuales — 2026-09-28
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Fuente: [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28) y
+[REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Secuencia preservada: retest final → decisión de ADR-002 → preflight .1 → autorización
+explícita → implementación/verificación .1 → posible .2. No adelantar ejecución.
+Preflight debe resolver datos territoriales separados y todas las dimensiones de cuota
+y proxies por entorno antes de implementar/desplegar. Coordenadas exactas bloqueadas.
+Ninguna garantía distribuida se deriva de memory://.
+
+## UX-07A — Secuencia corregida y bloqueada — 2026-09-28
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Fuente: [ADR-002 corregido](ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28).
+Secuencia vigente, sin fechas de implementación ni autorización implícita:
+
+1. Retest documental y arquitectónico independiente de los 2 P1 y 4 P2 corregidos.
+2. Decisión explícita de Cristian Sánchez sobre ADR-002; continúa PROPUESTO.
+3. Preparar preflight UX-07A.1: escritores/locks, contratos de endpoint, cuotas nuevas,
+   resultado durable/retención, esquema e índices candidatos y PostgreSQL descartable.
+4. Autorizar expresamente .1 antes de código, migraciones o pruebas funcionales.
+5. Implementar y verificar .1 únicamente cuando se autorice; hasta entonces BLOQUEADO.
+6. UX-07A.2: BLOQUEADO POR DEPENDENCIA; no afirmar disponibilidad antes de .1 verificado.
+
+Captura exacta bloqueada hasta política de ubicación/contexto privado; no sustituirla
+por cookies firmadas ni afirmar cifrado inexistente. No sumar Redis/PostGIS/colas.
+Todos los trabajos técnicos permanecen pendientes. La aprobación de la especificación
+y esta corrección documental no equivalen a aceptación arquitectónica ni implementación.
+
 ## Cierre de revisión documental UX-07A — 2026-09-28
 
 Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.

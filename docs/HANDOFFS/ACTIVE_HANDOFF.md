@@ -1,3 +1,276 @@
+# Emergencias — Lógica temporal sin persistencia
+
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+### Entrega corregida a Testing
+
+Estado: READY_TO_RESUME para retest focal, no aprobado para commit.
+Rama/HEAD conservados: feature/ux-ui-foundation / a7391a87db200e678ba4320e74c0075b365df649.
+P1: causa, actualización solo en diseño dejando normativa anterior vigente; corregidos
+ocho documentos, CA-03/05/06/07 y marcado de antecedentes SUSTITUIDOS.
+P2: tuple/set/desempaquetado precedían validación; ahora valida colección, estructura,
+componentes, normaliza y recién deduplica; ShiftValidationError uniforme.
+P3: 15 pruebas permanentes. Windows 14 aprobadas/1 omisión IANA explícita; contenedor
+oficial 8772cada809b: 15 aprobadas/0 omitidas, IANA real incluida, sin red ni DB.
+Modificados en esta corrección: servicio y pruebas de turnos; ADR-002, REQ-004, decisiones,
+backlog, roadmap, taxonomía, este handoff y UX07A_TURNOS_DISENO_TECNICO.
+Inventario esperado conservado: siete tracked modificados y tres nuevos, staging vacío.
+No pruebas completas/PG, migraciones, UI, matching, worker, reservas ni despachos reales.
+No pagos/sanciones/coordenadas/canales externos añadidos. Matching legacy sigue pendiente.
+No commit, push, merge ni acceso a producción; restricciones vigentes.
+Próximo paso: Testing independiente sobre estos mismos archivos y suite focal.
+No avanzar a persistencia sin autorización; la corrección no cierra hallazgos por Testing.
+
+
+Timestamp: 2026-10-01T19:42:11-03:00. Origen: laptop, agente técnico MANDOBRA.
+Estado: READY_TO_RESUME, diseño de persistencia pendiente de aprobación.
+Rama: feature/ux-ui-foundation. HEAD: a7391a87db200e678ba4320e74c0075b365df649.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Objetivo: aplicar decisiones de Producto del 2026-10-01 únicamente como constantes,
+servicios puros, validaciones, pruebas y propuesta técnica sin migración.
+Esta autorización parcial sustituye el bloqueo total de implementación del registro
+anterior; no autoriza reservas persistidas ni despacho ni migraciones.
+
+Completado: planificación de turnos fijos 07–19/19–07, cutoff T−2 min inclusivo,
+aceptación expresa, lotes/consecutivos, ventanas de avisos, UTC y confirmación fechada.
+Pruebas: 9 unittest puras aprobadas; sin DB ni factory. Alembic heads: 20260917_03.
+No ejecutados: suite completa, PostgreSQL, Docker, UI, migraciones, despacho real.
+Validación IANA bloqueada en Python local por falta de tzdata; pruebas con offset
+inyectado explícito, sin fallback productivo ni dependencia instalada.
+Revisión documental: [diseño y propuesta](../REQUISITOS/UX07A_TURNOS_DISENO_TECNICO.md).
+No reservas, notificaciones, avales ni tags operativos creados. UI/manual intactos.
+
+Archivos de esta sesión:
+- app/services/emergency_shift_service.py (nuevo).
+- tests/test_emergency_shift_service.py (nuevo).
+- docs/REQUISITOS/UX07A_TURNOS_DISENO_TECNICO.md (nuevo).
+- docs/HANDOFFS/ACTIVE_HANDOFF.md (entrada nueva; historia intacta).
+Los otros seis documentos modificados de UX-07A se preservan sin cambios de sesión.
+Staging vacío; siete paths tracked previamente modificados y tres nuevos esperados.
+Sin commit/push/PR/merge/despliegue: no autorizados. Último commit no cambió;
+no se consultó remoto en esta sesión ni se afirma sincronización remota actual.
+
+Pendientes/riesgos: aprobar tablas/upgrade/downgrade y runtime IANA; escoger mecanismo
+fiable de recordatorios, política de retrasos, alcance territorial del aval, catálogo
+inicial, cancelación/abandono/retención y resultado idempotente del lote.
+Directorio legacy prioriza PRO y usa coordenadas; no cumple nuevo matching.
+ADR/REQ y CA-03 aún conservan 2/4/8 h como historia: reconciliar con decisiones nuevas
+antes de integrar reservas. No se inventan sanciones, cobros ni permisos de soporte.
+Próximo responsable: revisión técnica/Producto del diseño de persistencia.
+Para retomar: verificar Git y preservar cambios; leer diseño; resolver pendientes,
+aprobar migración por separado y definir gate PostgreSQL descartable.
+No tocar trax_db/trax-postgres ni producción; no crear migración automáticamente.
+No usar plan puro como confirmación persistida ni simular idempotencia de despacho.
+
+---
+
+# UX-07A — ADR-002 aprobado y preflight técnico autorizado
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+Estado del handoff: READY_TO_RESUME para preflight técnico.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Último commit local y publicado: `a7391a87db200e678ba4320e74c0075b365df649`.
+Retest independiente final APROBADO: `2026-09-28T20:55:50-03:00`;
+dictamen `APROBAR_ADR002_CON_OBSERVACIONES_MENORES`, sin P0/P1/P2 pendientes.
+Se registra el resultado comunicado por Producto; esta sesión no repite el retest.
+Aceptación final de Cristian Sánchez: ADR-002 APROBADO.
+REQ-004: APROBADO COMO ESPECIFICACIÓN / IMPLEMENTACIÓN PENDIENTE.
+Referencia vigente: [ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md).
+
+Trabajo completado: registro de aceptación y alineación de estados en los siete documentos.
+Trabajo técnico parcialmente completado: ninguno en esta sesión.
+Siguiente responsable: agente de preflight técnico de UX-07A.1.
+Próximo paso permitido: inspección y dictamen técnico previo; la autorización del preflight
+no habilita implementación, cambios de código, migraciones, pruebas, Docker ni conexiones a bases de datos.
+Para retomar: verificar origin, rama, HEAD local/remoto, los siete documentos y staging
+vacío; leer la aceptación y la normativa de ADR-002/REQ-004; preparar solo el preflight.
+Resolver en ese análisis los pendientes de mapeo territorial y cuotas/proxies por entorno.
+Implementación .1: NO AUTORIZADA; testing PostgreSQL: PENDIENTE.
+UX-07A.2: BLOQUEADO POR DEPENDENCIA hasta completar y aprobar UX-07A.1.
+Riesgo: confundir aprobación documental con capacidad operativa; no afirmar disponibilidad
+ni habilitar captura/persistencia de coordenadas exactas.
+
+Archivos actualizados, todos previamente modificados:
+- `docs/ADR/ADR-002-emergencias-guardia-vigente.md`
+- `docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/BACKLOG.md`
+- `docs/ROADMAP.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+- `docs/trax-taxonomy-v1.md`
+
+Validaciones documentales APROBADAS: UTF-8, Markdown, 142 enlaces relativos y 40 anclas,
+preservación histórica, 27 filas CA idénticas byte-a-byte a HEAD, inventario y diff --check.
+Tests ejecutados: ninguno. No ejecutados: tests funcionales/técnicos y PostgreSQL.
+Migraciones relacionadas: pendientes de UX-07A.1, ninguna creada ni ejecutada.
+Sin cambios técnicos, dependencias, infraestructura ni datos.
+Cambios documentales locales sin commit; staging vacío. No hubo staging, commit, push,
+PR, merge ni despliegue: fuera de autorización. GitHub conserva el HEAD base.
+No realizar operaciones Git mutables ni tocar trax_db/trax-postgres.
+Estado final: aprobación registrada, listo para continuar exclusivamente con preflight.
+
+---
+
+# UX-07A — Dos P2 residuales para retest final
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Estado del handoff: BLOCKED para implementación; documentación lista para retest final.
+Origen: laptop MANDOBRA. Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: HEAD local/remoto coincidentes; siete documentos modificados, cero nuevos,
+staging vacío, diff --check sin errores. Último commit publicado: a7391a8.
+Objetivo y trabajo documental: únicamente comparación territorial determinista y
+confianza de IP/proxies. Normativa en
+[ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28)
+y [REQ-004](../REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Se preservaron las decisiones conformes y las 27 filas CA sin modificaciones.
+Especificados casos territoriales/IP; ninguna prueba funcional ejecutada.
+
+Inventario sin ampliación: ADR-002, REQ-004, DECISIONES_ARQUITECTURA, BACKLOG, ROADMAP,
+ACTIVE_HANDOFF y trax-taxonomy-v1; rutas completas en el inventario de la entrada anterior.
+No nuevos archivos ni cambios en fuentes de consulta adicionales.
+Validación documental ejecutada: UTF-8 estricto, ausencia de patrones de mojibake,
+U+FFFD/NUL, bloques cerrados, Markdown, 135 enlaces relativos, 40 anclas y diff --check:
+APROBADOS. CA-01–CA-27 únicos/consecutivos; inventario de siete archivos y staging vacío.
+La comparación exacta de preservación y el estado Git final se informan al cierre.
+No ejecutados: tests funcionales, migraciones, Docker ni conexiones a bases de datos.
+No código, configuración, assets, tests o infraestructura modificados.
+Cambios locales sin staging/commit/push; remoto permanece en a7391a8. No hubo merge:
+no autorizado. No despliegue ni nuevas dependencias.
+
+Pendientes legítimos: retest independiente final, aceptación de ADR-002 y autorización
+de .1. Preflight debe resolver mapeo territorial mínimo de emergencia y contrato de
+cuotas/proxies por entorno antes de implementar/desplegar; no habilitar coordenadas exactas.
+Riesgos tratados documentalmente: homónimos/substring, IP falsificada, NAT/rotación,
+contadores locales y confusión entre IP, actor e idempotencia. No se declaran P2 cerrados.
+Para retomar: comprobar rama/HEAD/inventario/staging, leer ambas entradas residuales y
+realizar solo el retest autorizado. No reabrir otras decisiones ni implementar .1/.2.
+No tocar trax_db/trax-postgres; no staging, commit, push ni operaciones Git mutables.
+Próximo paso: retest documental y arquitectónico independiente final.
+
+---
+
+# UX-07A — Correcciones ADR-002 para retest independiente
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Estado del handoff: BLOCKED (implementación); corrección documental lista para retest.
+Origen: laptop MANDOBRA, agente documental local. Origin:
+https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: rama, HEAD local/remoto y origin coincidentes; working tree limpio y staging vacío.
+Objetivo: corregir documentación conforme a la decisión de Producto, sin aceptar ADR-002.
+Último commit: a7391a8, docs: approve emergency on-call specification; publicado en origin.
+Los cambios de esta sesión permanecen locales, sin staging ni commit ni push.
+
+Trabajo completado: contrato vigente aditivo para 2 P1 y 4 P2; decisiones 6–15 incorporadas
+y referencias alineadas. Detalle en
+[ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28).
+Habilitación/transición de perfil, invalidación atómica y locks compartidos; resultado
+idempotente durable; renovación desde ahora; territorio explícito; cuotas con alcance
+real. Cancelación/contacto, privacidad, downgrade, endpoints, índices y auditoría
+completados documentalmente. Neutralidad PRO y separación .1/.2 conservadas.
+
+Inventario de esta corrección, todos existentes:
+
+- docs/ADR/ADR-002-emergencias-guardia-vigente.md
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- docs/DECISIONES_ARQUITECTURA.md
+- docs/BACKLOG.md
+- docs/ROADMAP.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/trax-taxonomy-v1.md
+
+Master Spec, INDEX y ambos README revisados; conservan estados y registros históricos
+correctos, sin edición. Ningún archivo técnico ni archivo nuevo previsto.
+Historial íntegro, entradas nuevas con ambos timestamps; CA-01–CA-27 sin cambios de filas.
+
+Validación documental ejecutada: UTF-8 estricto, ausencia de patrones de mojibake,
+U+FFFD/NUL, newlines, enlaces/anclas, Markdown y diff --check: APROBADOS.
+Comprobados 117 enlaces relativos y 29 anclas; CA-01–CA-27 consecutivos y únicos.
+Inventario exacto de siete documentos; staging vacío. El informe final registra
+la verificación de preservación íntegra de historia y criterios contra la base.
+No ejecutadas: pruebas funcionales, unitarias/integración/PostgreSQL, Docker o migraciones.
+No código, assets, configuración ni bases de datos modificados. No nueva infraestructura.
+No error de producto diagnosticado/resuelto por ejecución; el trabajo es documental.
+
+Pendientes/bloqueantes: retest independiente y aceptación explícita de ADR-002;
+autorización de .1, cifras de cuotas nuevas, contratos concretos de rutas/respuestas,
+vida útil/retención del resultado durable, validación de planes e índices.
+Captura exacta bloqueada hasta política completa; no declarar cifrado disponible.
+Riesgos: escritores compartidos, carreras de invalidación/contacto, replay y retención.
+Los hallazgos se registran CORREGIDOS documentalmente, no aprobados por Testing/retest.
+
+Para retomar: verificar esta rama y HEAD base, staging vacío e inventario de siete
+documentos; leer la corrección ADR-002/REQ-004 y ejecutar solo el retest autorizado.
+No implementar .1 ni .2; no tocar trax_db ni trax-postgres; no generar migraciones/assets.
+No staging, commit, push, merge ni despliegue durante esta tarea. No hubo merge porque
+no está autorizado. Próximo paso: retest documental y arquitectónico independiente.
+Estado final: cambios documentales locales listos para retest, implementación bloqueada.
+
+---
+
 # UX-07A — Cierre aprobado de revisión documental
 
 Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
