@@ -1,3 +1,210 @@
+# E2 — Corrección visual de la tarjeta unificada
+
+## Ajuste focal de alineación
+
+Timestamp: 2026-10-01T22:33:20-03:00. Origen: laptop. Estado: READY_TO_RESUME.
+Provincia/Localidad: align-content: start en los campos de E2 evita que las ayudas
+de distinta longitud distribuyan espacio vertical y desalineen los inputs.
+Solo CSS E2 y este registro modificados; sin cambios funcionales.
+Navegador a 1440px: ambos inputs top=946.4625px y alto=50.4px; revisión visual correcta.
+No se repitieron suites por ajuste visual mínimo; git diff --check correcto.
+Rama feature/ux-ui-foundation, HEAD 1e1d16749f5d3f0ac7bc50da6549af4f203143c5,
+seis paths E2 conservados y staging vacío. Sin commit/push/merge: no autorizados.
+Pendiente: revisión visual del usuario y retest E2. Preview local 5062 disponible.
+
+## Corrección del retest independiente
+
+Timestamp: 2026-10-01T22:30:00-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E2_CORREGIDO_PENDIENTE_DE_RETEST.
+Rama/HEAD: feature/ux-ui-foundation / 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Precheck: origin correcto, seis paths E2 preexistentes, staging vacío; sin descarte.
+Esta actualización sustituye las afirmaciones anteriores de preservar el permiso
+legacy PROFESIONAL: REQ-004 CA-02 exige impedir su persistencia como CLIENTE.
+
+- P1 modalidad: get() tomaba solo el primer valor y el default admitía ausencia.
+  Ahora getlist() debe ser exactamente ["manual"], antes de normalizar campos o
+  consultar el actor. Todo otro conjunto aborta 400, sin redirección ni efectos.
+- P1 roles: antes bastaba cuenta activa. Ahora se consulta el rol persistido,
+  nunca se confía en user_role de sesión; usuario identificado inexistente o rol
+  distinto de CLIENTE aborta 403 antes de normalización, solicitud o notificación.
+  Anónimo y CLIENTE inactivo conservan búsqueda sin persistencia; CLIENTE activo
+  conserva creación manual y notificación. GET informativo continúa público.
+- P2 contenido: nueva introducción honesta, turnos explícitamente previstos,
+  difusión redactada en futuro y aclaración de búsqueda manual sin guardia verificada.
+  CSS, iconografía, navbar, matcher, coordenadas, PRO y backend de guardias intactos.
+
+Matriz modalidad (CLIENTE activo, CSRF válido): ausente, vacía, difundir, desconocida,
+manual/manual, difundir/difundir, manual/difundir, difundir/manual, tres manuales y
+manual/vacía: 10 variantes, todas 400, sin Location, cero solicitudes/notificaciones,
+normalización/creación/notificación no invocadas. [manual] mantiene 302 al directorio.
+Matriz roles: CLIENTE activo 302 y 1 solicitud/1 notificación; visitante y CLIENTE
+suspendido 302 sin escrituras; PROFESIONAL, ADMIN, ADMINISTRADOR, DESCONOCIDO y vacío
+403, sin Location ni escrituras. Sesión falsamente CLIENTE no elude rol persistido.
+
+Pruebas ejecutadas: python -B -m unittest tests.test_emergency_entry
+tests.test_security_controls tests.test_corporate_footer tests.test_loading_error_states
+-q: 40 OK, cero omitidas. Regresiones anteriores conocidas más seguridad; el pedido
+no enumera otros módulos del retest independiente. CSRF activo en focal E2, errores
+próximos a campos, difusión disabled, un único manual seleccionado, roles y matriz
+adversarial cubiertos. SQLite en memoria; sin PostgreSQL ni producción.
+Logs ERROR intencionales de pruebas de errores; warnings legacy Query.get/utcnow.
+
+Navegador real: claro/oscuro, 1440, 1280, 768, 770, 390 y 320 exactos sin overflow.
+769 solicitado vuelve a informar 770 efectivos. Sin instalación de dependencias;
+frontera 768/770 conservada y 769 cubierto por análisis según autorización del retest.
+CSS E2 sin cambios: breakpoints 27rem (432px), 40rem (640px), 64rem (1024px),
+ninguno entre 768 y 770. Iconos, composición y temas conservados; capturas
+e2-retest-corrections-light.jpg y e2-retest-corrections-dark.jpg fuera del repositorio.
+Preview local 5062 reiniciado con código vigente y SQLite en memoria, sin fixtures.
+
+Archivos intervenidos en esta corrección: app/routes/operation_routes.py,
+app/templates/nueva_emergencia.html, tests/test_emergency_entry.py y este handoff.
+Servicio/CSS E2 preexistentes preservados. Inventario total sigue tres modificados
+tracked y tres nuevos; staging vacío, HEAD intacto, diff --check correcto.
+No suite completa, migraciones, Docker, PostgreSQL, producción, commit, push, PR
+ni merge; integración no autorizada. Pendiente: retest independiente y aprobación.
+Para retomar: comprobar seis paths/HEAD/staging y ejecutar matrices focales; no
+habilitar difusión, persistencia de guardias ni plazos previstos como capacidad real.
+El registro inferior se conserva como evidencia histórica, no como dictamen vigente.
+
+Timestamp: 2026-10-01T22:00:05-03:00. Origen: laptop; agente implementador local.
+Estado: READY_TO_RESUME. E2_CORREGIDO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: seis paths E2 previos, staging vacío; diff inspeccionado y preservado.
+Objetivo: ajustar E2 a la referencia aportada sin cambiar dominio ni navbar.
+
+Completado: modalidades compactas dentro del único formulario «Contanos qué
+necesitás»; manual checked por defecto y difusión disabled mediante radios nativos.
+Panel derecho alineado con el hero, rubros y CTA completos, espacios y responsive.
+Macro SVG inline local, siguiendo el patrón de mercados.html: ondas, persona/lupa,
+rayo, canilla, candado/llave, neumático, reloj, escudos, lista, nube con gotas,
+información, checks circulares, pines, documento y flecha. Familia lineal original,
+currentColor y aria-hidden; sin emojis, CDN, dependencias ni assets externos.
+No se sustituyó ningún concepto iconográfico solicitado. Colores de DS v2 en ambos temas.
+Checks de identidad/documentación/perfil explican qué revisar, no acreditan resultados.
+Se conservaron las aclaraciones de capacidad pendiente y provincia contextual.
+
+Archivos editados durante esta corrección:
+- app/templates/nueva_emergencia.html
+- app/static/css/emergency-entry-v2.css (nuevo en E2)
+- tests/test_emergency_entry.py (nuevo en E2)
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Otros paths E2 conservados sin nuevas modificaciones en esta corrección:
+- app/routes/operation_routes.py
+- app/services/emergency_entry_service.py (nuevo en E2)
+
+Pruebas: python -B -m unittest tests.test_emergency_entry
+tests.test_corporate_footer tests.test_loading_error_states -q: 30 OK, 0 omitidas.
+Incluye prueba semántica de formulario único, radios dentro de él, estado inicial,
+disabled y SVG accesible; mantiene rechazo de POST difusión, CSRF, cuatro rubros,
+errores, permisos legacy y envío manual. SQLite exclusivamente en memoria.
+UTF-8 de seis archivos, AST Python, render Jinja real, tokens CSS definidos y
+git diff --check: correctos. Sin nuevo JavaScript. Advertencias legacy conocidas.
+No ejecutados: suite completa, PostgreSQL, migraciones ni pruebas persistentes.
+
+Navegador real en claro/oscuro: 1440, 1280, 390 y 320 CSS px sin overflow horizontal.
+Viewport solicitado 769: navegador informa 770 efectivos; también observado 768
+sin overflow en oscuro. La medida exacta 769 queda pendiente de retest independiente.
+Etiquetas de rubros: 48 px de alto; inputs 50.4; textarea 80; CTA 48 (67.2 a 320).
+Ancho mínimo medido de objetivos: 195.81 px; etiquetas clicables de radios medidas,
+no sus inputs visualmente reducidos. Modalidades apiladas en móvil y alineadas en desktop.
+Inspección de contraste, iconos y textos en capturas de escritorio y móvil realizada.
+Tab desde modalidad manual alcanza primer rubro; ArrowRight selecciona plomería;
+foco visible medido con outline sólido 1.6 px. Envío visitante real llega al directorio
+con categoria=plomeria, zona=La Plata, consulta_anonima=1, sin coordenadas ni solicitud.
+Consola del navegador sin errores capturados. No constituye auditoría WCAG completa.
+Capturas fuera del repositorio, en la carpeta de visualizaciones de esta sesión:
+e2-corrected-dark-1440.jpg, e2-corrected-light-1440.jpg,
+e2-corrected-dark-320.jpg y e2-corrected-light-320.jpg.
+Preview temporal: http://127.0.0.1:5062/emergencias/nueva; SQLite en memoria,
+sin reloader ni datos persistidos. Disponible mientras siga activo el proceso.
+
+Pendientes: Testing independiente y aprobación visual; guardias verificadas,
+reservas, nuevo matching, difusión, notificaciones y plazos operativos continúan
+pendientes. Directorio/matcher y permisos legacy no se modificaron en esta corrección.
+Sin cambios a turnos comiteados, modelos, migraciones, pagos, sanciones o canales.
+No Docker, trax_db, trax-postgres ni producción. No commit/push/merge/PR;
+no se integró porque este incremento debe permanecer sin commit para Testing.
+Git: tres tracked modificados y tres nuevos; staging vacío, rama/HEAD preservados.
+Próximo paso: retest focal sobre estos seis paths; no staging ni integración sin
+autorización; no presentar la difusión, los plazos o la guardia como operativos.
+La entrada siguiente conserva el historial de la implementación E2 anterior.
+
+# E2 — Interfaz inicial de Emergencias
+
+Timestamp: 2026-10-01T21:23:55-03:00. Origen: laptop; agente Frontend/Flask MANDOBRA.
+Estado: READY_TO_RESUME para Testing focal y aprobación visual.
+Rama: feature/ux-ui-foundation. HEAD inicial/final: 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: rama/HEAD/origin correctos; árbol limpio y staging vacío. El HEAD nuevo
+versionó el trabajo anterior; las entradas inferiores son evidencia de aquellas sesiones.
+Objetivo autorizado: interfaz visible en /emergencias/nueva preservando búsqueda manual.
+
+Completado: hero azul noche, alerta oficial previa a opciones, modalidades, formulario
+con cuatro rubros y panel lateral; tokens/componentes DS v2, temas existentes y responsive.
+Elegir profesional es la única modalidad operativa. Difundir solicitud: botón disabled,
+explicación accesible, sin ruta/temporizador; POST modalidad distinta de manual devuelve
+400 antes de cualquier registro. Sin nuevo JS. Navbar, skeleton y directorio intactos.
+CSRF vigente; errores 400 junto a campos, datos conservados y escape Jinja.
+Categoría/zona/descripción conservan el contrato y redirección manual; visitantes e
+inactivos no crean solicitudes; cuentas activas conservan registro/notificación legacy,
+incluido PROFESIONAL: no se cambian permisos en E2. No se simulan profesionales.
+La entrada ya no reenvía coordenadas recibidas en POST; no cambia matcher ni directorio.
+600 caracteres: límite HTML preexistente aplicado ahora también en servidor. Zona 120:
+coherente con modelo y límite del directorio. No contador de longitud divergente.
+
+Rubros: electricidad/plomeria reutilizan IDs canónicos. Cerrajería/Auxilio vehicular
+son términos literales del contrato de búsqueda legacy, no nuevos IDs de taxonomía.
+Se conservan aliases de etiquetas existentes al recibir POST. Taxonomía sin cambios.
+Provincia Buenos Aires: readonly, sin name, contextual; no se persiste ni filtra.
+Se advierte que CABA es otra jurisdicción ante el ejemplo Villa Lugano solicitado.
+El encabezado y el plazo previsto de 10 min incluyen aclaraciones inmediatas: no hay
+verificación de guardias ni solicitudes directas temporizadas implementadas.
+
+Archivos modificados en E2:
+- app/routes/operation_routes.py
+- app/templates/nueva_emergencia.html
+- app/services/emergency_entry_service.py (nuevo)
+- app/static/css/emergency-entry-v2.css (nuevo; selectores encapsulados)
+- tests/test_emergency_entry.py (nuevo)
+- docs/HANDOFFS/ACTIVE_HANDOFF.md (esta entrada; historia intacta)
+
+Pruebas ejecutadas: unittest tests.test_emergency_entry (12/12); ejecución conjunta
+con tests.test_corporate_footer y tests.test_loading_error_states: 29/29, 0 omisiones.
+SQLite exclusivamente en memoria; CSRF real y casos activos/inactivos/visitantes.
+Logs ERROR del paquete loading_error_states son errores deliberados del test;
+advertencias Query.get y datetime.utcnow son legacy sin cambio en este incremento.
+Sintaxis Python, Jinja por renderizado real, UTF-8, recursos, tokens CSS definidos,
+revisión de diff y git diff --check: correctos. Sin dependencias nuevas.
+No ejecutados: suite completa, PostgreSQL, migraciones, pruebas con datos persistentes.
+
+Revisión en navegador real, temas claro/oscuro, anchos CSS observados 1440, 1280, 769,
+390 y 320: sin overflow horizontal; objetivos de acción/radios etiquetados >=48px alto;
+columnas adaptadas y navbar preservada. Flecha derecha cambia selección, foco visible.
+Envío manual anónimo real llega al directorio con categoria/zona/consulta_anonima,
+sin coordenadas ni escritura de solicitud. Consola: sin errores capturados.
+Capturas clara/oscura/móvil fuera del repositorio; no assets nuevos en Git.
+Entorno visual temporal: http://127.0.0.1:5062/emergencias/nueva, SQLite en memoria,
+servidor sin reloader ni datos productivos; disponible mientras dure el proceso local.
+No constituye auditoría WCAG completa; retest independiente pendiente.
+
+Deuda: matcher legacy usa texto/PRO/coordenadas; no se corrige ni se presenta como nuevo
+matching aprobado. Catálogo completo, aval por especialidad, reservas, difusión,
+notificaciones programadas y verificación nocturna pendientes. Matching por acentos y
+sinónimos sigue limitado al comportamiento existente. No cambios normativos nuevos.
+Sin guardias persistidas, modelos/migraciones, pagos, sanciones, canales automáticos,
+workers o ingreso a turnos. No acceso a producción, trax_db ni trax-postgres.
+Estado Git final esperado: tres tracked modificados y tres nuevos; staging vacío.
+No staging/commit/push/merge/PR/despliegue: reservados al propietario después de Testing.
+Estado de push: no ejecutado ni remoto consultado; HEAD local preservado.
+Próximo paso: Testing E2 sobre estos seis archivos; no ampliar a backend pendiente.
+Para retomar: revalidar Git, ejecutar suite focal en SQLite en memoria, revisar ambos
+ temas y el envío manual. No usar este entorno temporal para datos reales.
+
+---
+
 # Emergencias — Lógica temporal sin persistencia
 
 ## Corrección focal de Testing — 2026-10-01

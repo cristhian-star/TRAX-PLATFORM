@@ -4,6 +4,7 @@ from flask import Blueprint, abort, redirect, render_template, request, session,
 
 from app import db, limiter
 from app.models.user import User
+from app.services.emergency_entry_service import entry_context, entry_errors
 from app.services.budget_service import (
     BudgetCreationConflict,
     MAX_OFFERS_PER_REQUEST,
@@ -870,24 +871,23 @@ def cancelar_presupuesto(id):
 @limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nueva_emergencia():
     if request.method == "POST":
-        categoria = empty_to_none(request.form.get("categoria"))
-        zona = empty_to_none(request.form.get("zona"))
-        descripcion = empty_to_none(request.form.get("descripcion"))
-
-        if not categoria or not zona or not descripcion:
-            return "Categoria, zona y descripcion son requeridas", 400
+        if request.form.getlist("modalidad") != ["manual"]:
+            abort(400, description="Modalidad inválida o ambigua. La difusión todavía no está disponible.")
+        current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
+        if session.get("user_id") and (current_user is None or current_user.rol != "CLIENTE"):
+            abort(403)
+        context = entry_context(request.form)
+        context["errors"] = entry_errors(context)
+        if context["errors"]:
+            return render_template("nueva_emergencia.html", **context), 400
+        categoria = context["form_data"]["categoria"]
+        zona = context["form_data"]["zona"]
+        descripcion = context["form_data"]["descripcion"]
 
         redirect_values = {
             "categoria": categoria,
             "zona": zona,
         }
-        coordinates = get_request_coordinates(request.form)
-        if coordinates is not None:
-            redirect_values["latitude"] = coordinates[0]
-            redirect_values["longitude"] = coordinates[1]
-
-        current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
-
         if is_user_active(current_user):
             emergency_request = create_emergency_request(
                 cliente_id=current_user.id,
@@ -910,7 +910,7 @@ def nueva_emergencia():
 
     return render_template(
         "nueva_emergencia.html",
-        form_data=get_query_prefill(request.args, "categoria", "zona", "descripcion"),
+        **entry_context(request.args),
     )
 
 
