@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { init } = require('../../app/static/js/emergency-hero-carousel-v1.js');
 const events = () => ({ listeners: {}, addEventListener(n, f) { this.listeners[n] = f; }, emit(n) { this.listeners[n]?.(); } });
 const flush = async () => { for (let i = 0; i < 12; i++) await Promise.resolve(); };
-function setup({ reduced = false, failed = [] } = {}) {
+function setup({ reduced = false, failed = [], transition } = {}) {
     const timers = new Map(), requests = [], motions = [];
     let id = 0;
     const doc = { ...events(), hidden: false }, media = { ...events(), matches: reduced };
@@ -14,10 +14,10 @@ function setup({ reduced = false, failed = [] } = {}) {
         const animation = { finished: new Promise((r, j) => { resolve = r; reject = j; }), finish: () => resolve(), cancel: () => reject(new Error('cancelled')) };
         motions.push({ frames, options, animation }); return animation;
     } }));
-    const root = { querySelectorAll(s) { return s === 'img' ? layers : Array.from({ length: 6 }, (_, i) => ({ dataset: { src: String(i), position: '62% center' } })); } };
+    const root = { dataset: { transition }, querySelectorAll(s) { return s === 'img' ? layers : Array.from({ length: 6 }, (_, i) => ({ dataset: { src: String(i), position: '62% center' } })); } };
     init(root, { doc, win, media });
     return { root, doc, win, media, timers, requests, motions, layers, async tick() {
-        assert.equal(timers.size, 1); const [key, task] = [...timers][0]; assert.equal(task.ms, 6500);
+        assert.equal(timers.size, 1); const [key, task] = [...timers][0]; assert.equal(task.ms, transition === 'fade' ? 6000 : 6500);
         timers.delete(key); task.fn(); await flush();
     }, async finish() { motions.slice(-2).forEach(m => m.animation.finish()); await flush(); } };
 }
@@ -46,5 +46,20 @@ function setup({ reduced = false, failed = [] } = {}) {
     const allBroken = setup({ failed: ['1', '2', '3', '4', '5'] }); await allBroken.tick();
     assert.equal(allBroken.layers[0].hidden, false); assert.equal(allBroken.layers[0].src, '0');
     assert.equal(allBroken.motions.length, 0);
+    const fade = setup({ transition: 'fade' }); await flush();
+    init(fade.root, { doc: fade.doc, win: fade.win, media: fade.media });
+    assert.equal(fade.timers.size, 1);
+    await fade.tick();
+    assert.deepEqual(fade.motions.at(-2).frames, [{ opacity: 1 }, { opacity: 0 }]);
+    assert.deepEqual(fade.motions.at(-1).frames, [{ opacity: 0 }, { opacity: 1 }]);
+    assert.equal(fade.motions.at(-1).options.duration, 700);
+    await fade.finish(); assert.equal(fade.layers.find(l => !l.hidden).src, '1');
+    fade.win.emit('pagehide'); assert.equal(fade.timers.size, 0);
+    fade.win.emit('pageshow'); fade.win.emit('pageshow'); assert.equal(fade.timers.size, 1);
+    fade.media.matches = true; fade.media.emit('change');
+    assert.equal(fade.timers.size, 0); assert.equal(fade.layers.find(l => !l.hidden).src, '0');
+    const still = setup({ reduced: true, transition: 'fade' });
+    assert.equal(still.timers.size, 0); assert.equal(still.requests.length, 0);
+    console.log('Propuestas: fade 6000/700, single init, BFCache and reduced motion OK');
     console.log('E3: order/loop, 6500/900, direction, cache, reduced motion, visibility, BFCache, cancellation and failed images OK');
 })().catch(error => { console.error(error); process.exitCode = 1; });

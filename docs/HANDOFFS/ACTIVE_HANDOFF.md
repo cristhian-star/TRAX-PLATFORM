@@ -1,3 +1,132 @@
+# Propuestas — Ajuste visual de acciones y encabezado
+
+Timestamp: 2026-10-04T16:23:51-03:00. Origen: Laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME, pendiente de revisión visual de este ajuste.
+Rama feature/ux-ui-foundation; HEAD 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Se preservan los 12 paths pendientes de P1.1 y la aprobación histórica de Testing.
+El usuario autoriza cambiar solo la apariencia del portal: EXPLORÁ OPORTUNIDADES
+con estilo pequeño, negrita y turquesa; acciones negras en claro y blancas en oscuro,
+incluido Ver propuesta. Tokens DS v2: secondary-hover para encabezado,
+text-strong/text-inverse para botones y text-secondary para hover/active.
+CSS encapsulado en .proposals-p1, sin modificar Home, navbar ni lógica operativa.
+
+Cambios de esta sesión: app/templates/listado_propuestas.html,
+app/static/css/proposals-portal-p1.css, docs/REQUISITOS/PROPUESTAS_P1.md y este handoff.
+Validación: tests.test_proposal_portal_p1 11/11 en SQLite memoria; revisión de ambos
+temas en navegador real. No se repitió suite completa por ser un ajuste visual.
+Sin migraciones, bases compartidas ni Docker. Preview aislado permanece en 54873.
+HEAD conservado; staging vacío. Sin commit/push/merge porque no están autorizados.
+Próximo paso: revisar colores y autorizar integración posteriormente si corresponde.
+La aprobación de Testing precedente no incluye automáticamente esta nueva paleta.
+
+---
+
+# Propuestas P1.1 — Testing independiente aprobado
+
+Timestamp: 2026-10-04T16:13:06-03:00. Origen: Laptop.
+Responsable: 05 — MANDOBRA | Testing y QA Integral.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_1_APROBADO_PARA_COMMIT.
+Rama: feature/ux-ui-foundation. HEAD: 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Preflight conforme: origin canonico, staging vacio y exactamente los 12 paths
+P1.1 declarados, sin trabajo ajeno. Testing no modifico codigo ni pruebas; solo
+agrego este cierre y la evidencia equivalente en la especificacion P1.
+
+Objetivo completado: validacion independiente del acceso canonico desde
+Operaciones, recorrido Home por rubro/ubicacion, filtros removibles, panel nativo
+plegable, presentacion visual y respuesta 400 amigable. Se confirmaron PUBLICADA,
+orden reciente, paginacion, cero escrituras GET, privacidad, escape XSS y la
+politica central proposal_application_eligibility(). No se hallaron P0-P3.
+
+Pruebas independientes, todas con DATABASE_URL SQLite en memoria y
+PYTHONDONTWRITEBYTECODE=1: focal P1/P1.1 11/11; navegacion, Home, navbar, DS,
+autenticacion y errores 59/59; regresiones de Propuestas y contratos 73
+ejecutadas, 72 aprobadas y una omitida por requerir concurrencia PostgreSQL.
+Suite completa final, ejecutada una sola vez sobre el arbol ejecutable definitivo:
+894 ejecutadas, 887 aprobadas, siete omitidas, cero fallos y cero errores en
+209.845 s. Las omisiones son cuatro gates PostgreSQL sin URL segura, una
+concurrencia PostgreSQL, una comprobacion exclusiva de imagen Docker y una zona
+IANA no disponible. PostgreSQL real y Docker: NO EJECUTADOS; trax_db no se uso.
+
+QA de navegador con fixtures aisladas: Operaciones conduce directamente a
+/propuestas para anonimo y autenticado; Home conserva rubro y ubicacion con
+tildes, espacios, ampersand y paginacion; chips quitan un filtro y vuelven a
+pagina 1; Limpiar elimina todos. Parametros invalidos devolvieron HTTP 400 real
+para anonimo y autenticado, con texto generico, sin traceback y recuperacion
+segura. Profesional pendiente: cero CTA; profesional aprobado: CTA disponible.
+
+Matriz claro/oscuro en 1440, 1280, 1024, 770, 768, 390 y 320 px: cero overflow,
+tarjetas sin solapamientos y minimo interactivo 44 px. El details/summary expuso
+estado expandido/colapsado nativo, abrio y cerro con Enter, con foco visible. El
+contraste asentado fue al menos 4.56:1 en claro y 8.02:1 en los controles opacos
+oscuros; los chips oscuros usan fondo semitransparente y superan AA al componerlo.
+Consola sin warnings/errores. El portal y su formulario GET funcionan sin JS;
+el Home conserva el enlace noscript documentado. Preview temporal retirado.
+
+Controles: compileall app scripts, sintaxis Node del controlador, UTF-8 sin
+BOM/NUL/U+FFFD, enlaces relativos, un unico salto final y git diff --check:
+aprobados. La antigua linea vacia adicional de test_proposal_portal_p1.py ya no
+existe. Sin modelos, migraciones, dependencias, estados, pagos, permisos ni reglas
+de elegibilidad modificados. Migraciones relacionadas: ninguna.
+
+Pendientes y riesgos: el gate PostgreSQL permanece omitido; la visibilidad directa
+de detalles cerrados/cancelados sigue fuera de P1.1. Proximo paso recomendado:
+revision del usuario y autorizacion separada para commit/push. No ejecutar merge,
+deploy, Alembic contra DEV ni operaciones Git destructivas. No hubo merge porque
+no estaba autorizado. Estado final del trabajo: aprobado en la rama, sin integrar.
+
+---
+
+# Propuestas P1.1 — Accesos y refinamiento visual
+
+Timestamp: 2026-10-04T15:51:19-03:00. Origen: Laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_1_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama feature/ux-ui-foundation. HEAD 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Preflight: ruta/origin correctos, HEAD local/remoto coincidentes, árbol y staging
+iniciales vacíos. Consulta remota de solo lectura tras habilitar acceso de red.
+Las entradas anteriores se conservan como historial de P1/P0.
+
+Completado: enlace canónico Operaciones → Propuestas con estado activo; Home GET
+por rubro/ubicación sin equivalencias inventadas; chips removibles; buscador visible;
+filters details nativo con mejora progresiva; refinamiento de tarjetas DS v2; error
+400 amigable exclusivo del portal; EOF del test corregido. Se reemplaza el selector
+ambiguo del Home por texto Rubro. No se duplica la política de elegibilidad.
+
+Modificados: app/templates/base.html, app/templates/home/_operation_search.html,
+app/templates/listado_propuestas.html, app/static/css/proposals-portal-p1.css,
+app/static/css/visitor-navbar-v1.css, app/services/proposal_portal_service.py,
+app/routes/operation_routes.py, tests/test_proposal_portal_p1.py,
+docs/REQUISITOS/PROPUESTAS_P1.md y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/static/js/proposals-portal-p1.js y app/templates/proposals_filter_error.html.
+
+Pruebas: 41 focales iniciales aprobadas. Suite completa: 894 ejecutadas en 341.043 s,
+887 aprobadas, siete omitidas y cero fallos/errores. DATABASE_URL SQLite en memoria;
+TRAX_POSTGRES_TEST_URL removida solo del proceso. Tests históricos de migraciones
+corrieron sobre SQLite temporal. Sin acceso a trax_db/PostgreSQL/Docker.
+Tras el último ajuste de presentación HTTP 400: 62/62 focales y regresiones de
+Propuestas, P0, Home, navbar, errores y seguridad. No se repitió suite completa tras
+ese ajuste. compileall app scripts, Node --check y git diff --check correctos.
+Deprecaciones legacy y logs deliberados de errores de las pruebas no son regresiones.
+
+QA navegador: 28 combinaciones (siete anchos exactos × dos temas × abierto/cerrado),
+0 overflow y 0 controles visibles del portal menores a 44 px. Recorridos completos,
+foco/teclado, filtros largos y recuperación HTTP 400 comprobados. Contraste estable
+4.56:1 claro / 8.01:1 oscuro. Sin errores JavaScript; 400 solicitado deliberadamente.
+Evidencia y limitaciones: [spec P1.1](../REQUISITOS/PROPUESTAS_P1.md#p11--accesos-y-refinamiento-visual).
+Capturas fuera del repositorio. Preview final puerto 54873, SQLite en memoria y
+fixtures identificadas como pruebas. El intento en 5071 mostró una instancia antigua
+y fue descartado como evidencia; no se modificó el proceso ajeno.
+
+Sin modelos, migraciones nuevas, contratación, creación, estados, pagos ni cambios
+a permisos/elegibilidad. Pendientes: Testing independiente, aprobación visual y
+los P2 históricos. Sin JS el portal funciona; Home ofrece un enlace alternativo
+porque su segmentador sigue dependiendo del controlador previo.
+Sin commit, push, PR ni merge: no autorizados. HEAD conservado, staging vacío;
+12 paths P1.1 locales. Remoto permanece en el commit base. No hay cambios ajenos.
+Próximo paso: retest del diff y recorridos según spec; no integrar ni desplegar sin
+autorización, no ejecutar gates contra bases compartidas.
+
+---
+
 # Propuestas P1 — Testing independiente aprobado
 
 Timestamp: 2026-10-04T15:04:39-03:00. Origen: laptop.
@@ -7026,3 +7155,152 @@ proveedores ni decisiones funcionales adicionales.
 - No seleccionar PSP, integracion fiscal o proveedor de IA sin evaluacion y
   aprobacion.
 - No realizar commit, push, PR o merge durante este cierre local.
+
+
+---
+
+## 2026-10-04T16:58:01-03:00 — Propuestas P1.1: carrusel fotográfico del encabezado
+
+Estado: READY_TO_RESUME — implementado, pendiente de Testing independiente.
+Origen: laptop; responsable: implementador local. Rama: feature/ux-ui-foundation.
+HEAD conservado: 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020; staging vacío.
+Se preservaron los doce paths previos autorizados. No hubo commit, push, merge,
+PR ni despliegue: no están autorizados. No se actualizó el remoto.
+
+Se incorporaron 12 WebP en `app/static/images/proposals/hero/`, exclusivamente
+como fondo del encabezado. Los originales quedaron intactos (hash antes/después).
+Todos decodifican, sin archivos omitidos. Pillow 11.3.0: RGB, orientación EXIF,
+WebP quality=80/method=6, sin ampliar, sin metadatos EXIF/XMP/ICC copiados.
+Dimensiones comunes: 1448 × 1086. Orden determinista por nombre de fuente:
+
+| Fuente | Destino | Bytes |
+| --- | --- | ---: |
+| 03.png | proposal-hero-01.webp | 141558 |
+| 04.png | proposal-hero-02.webp | 165504 |
+| 05 (2).png | proposal-hero-03.webp | 122510 |
+| 05.png | proposal-hero-04.webp | 120998 |
+| 06.png | proposal-hero-05.webp | 111668 |
+| 07.png | proposal-hero-06.webp | 138952 |
+| 09.png | proposal-hero-07.webp | 140786 |
+| 10.png | proposal-hero-08.webp | 124142 |
+| 11.png | proposal-hero-09.webp | 135060 |
+| 13.png | proposal-hero-10.webp | 120942 |
+| 16.png | proposal-hero-11.webp | 87352 |
+| 20.png | proposal-hero-12.webp | 92420 |
+
+El controlador existente `emergency-hero-carousel-v1.js` admite un modo fade
+optativo: Propuestas usa 6000 ms / 700 ms, dos capas reutilizables, caché y carga
+progresiva. Urgencias conserva su desplazamiento de 6500 ms / 900 ms.
+Guardas de inicialización, visibilidad, pagehide/pageshow y BFCache preservadas.
+No hay controles, vínculos ni foco en la capa decorativa; alt vacío/aria-hidden.
+La primera imagen tiene src nativo, dimensiones y prioridad alta; permanece sin
+JavaScript. Reduced motion evita autoplay y muestra la primera fotografía.
+Las fallas de imágenes siguientes se omiten conservando el fondo válido.
+
+Overlay local azul noche RGB(7,18,32), opacidades .90 / .74 al 60% / .70 al 100%.
+Título blanco, subtítulo #e2e8f0 y encabezado pequeño #67e8f9; mismos colores sobre
+las fotografías en ambos temas. Se reforzó el extremo derecho desde .62 a .70
+para garantizar contraste incluso sobre blanco: mínimos calculados 7.08:1,
+5.74:1 y 4.89:1 respectivamente. Sin cambios de datos, permisos, modelos,
+migraciones, contratación, navbar ni estilos globales en este incremento.
+
+Validación ejecutada sobre SQLite en memoria (sin PostgreSQL ni Docker):
+- 54 pruebas OK: test_proposal_hero_carousel, test_proposal_portal_p1,
+  test_proposal_eligibility, test_emergency_hero_carousel, test_emergency_entry,
+  test_home_hero_carousel y test_navbar_drawer_ux04a.
+- Reejecución focal final: test_proposal_hero_carousel, 2/2 OK, sin advertencias
+  por respuestas de recursos abiertas.
+- Node tests/js/emergency_hero_carousel.test.js: OK, incluidos fade 6000/700,
+  inicialización única, reduced motion y BFCache; regresión Urgencias OK.
+- compileall app scripts y sintaxis del controlador JavaScript: OK.
+- Las doce imágenes responden HTTP 200 en el cliente Flask y decodifican.
+- Navegador real, preview aislado en puerto 54873: claro/oscuro en 1440, 1280,
+  1024, 770, 768, 390 y 320 px. Sin overflow horizontal; imagen cargada;
+  buscador fuera del hero. Altura 208 px en escritorio/tablet, 241.81 px a 390
+  y 301.33 px a 320; el texto puede crecer sin recorte. Rotación observada,
+  sin vacíos observados; consola sin advertencias ni errores registrados.
+- Evidencia de escritorio y móvil en ambos temas guardada fuera del repositorio.
+
+Limitación de evidencia: no se emuló reduced motion ni JavaScript deshabilitado
+visualmente en el navegador disponible; se verificaron mediante pruebas del
+controlador y contrato HTML/CSS. No se ejecutó suite completa ni auditoría AA
+integral; el cálculo anterior corresponde al texto del hero. Testing debe
+completar esas comprobaciones y revisar transiciones en su entorno.
+
+Archivos de este incremento: app/templates/listado_propuestas.html,
+app/static/css/proposals-portal-p1.css, app/static/js/emergency-hero-carousel-v1.js,
+tests/js/emergency_hero_carousel.test.js, tests/test_proposal_hero_carousel.py,
+los doce assets indicados, docs/REQUISITOS/PROPUESTAS_P1.md y este handoff.
+No hay fallas focales conocidas. Riesgo principal: controlador compartido,
+cubierto por regresión, pendiente de retest independiente. Próximo paso:
+revisar `/propuestas` en el preview aislado y ejecutar Testing del incremento;
+no integrar ni tocar bases compartidas. Las aprobaciones históricas de P1.1
+no aprueban automáticamente este carrusel. Estado final pendiente de Testing.
+
+---
+
+## 2026-10-04T17:14:45-03:00 — Gate final Propuestas P1.1 con carrusel
+
+Estado: COMPLETED. Estado funcional:
+`PROPUESTAS_P1_1_CARRUSEL_APROBADO_PARA_COMMIT`.
+Responsable: `03 — Testing - Test Executor` independiente. Dispositivo: laptop.
+Objetivo: validar integralmente el árbol final P1.1 y reemplazar los dictámenes
+anteriores después de la incorporación del carrusel fotográfico.
+
+Identidad final verificada:
+
+- repositorio: `C:\Users\Cristhian\Proyecto Mandobra`;
+- remoto: `https://github.com/cristhian-star/TRAX-PLATFORM.git`;
+- rama: `feature/ux-ui-foundation`;
+- HEAD: `557d4fca84ea7355f3832ebf14b8a3c6ab4eb020`;
+- staging: vacío;
+- 27 paths locales documentados, sin archivos ajenos;
+- no hubo commit, push, PR, merge, rebase, reset ni deploy porque no estaban
+  autorizados.
+
+Trabajo completado:
+
+- revisión de código, templates, estilos, controlador compartido, pruebas y 12
+  assets WebP;
+- focales P1/P1.1 17/17, regresiones compartidas 37/37 y navegación/frontend
+  relacionado 40/40;
+- Node aprobado para Propuestas 6000/700 e inicialización única, y para la
+  regresión Urgencias 6500/900;
+- suite completa final única: 896 ejecutadas, 889 aprobadas, siete omitidas,
+  cero fallos y cero errores en 229.359 segundos;
+- omisiones: cuatro gates PostgreSQL sin base exclusiva, una concurrencia
+  PostgreSQL, una prueba exclusiva de imagen Docker y una zona IANA no
+  disponible;
+- `compileall`, sintaxis JavaScript, UTF-8, enlaces relativos, whitespace,
+  salto final y `git diff --check`: aprobados;
+- PostgreSQL, Docker, Alembic operativo y `trax_db`: no utilizados.
+
+Evidencia de assets y rendimiento: exactamente 12 WebP locales, 1448 × 1086,
+1.501.892 bytes totales, sin EXIF/XMP/ICC, GET/HEAD 200 `image/webp`, recargas
+304 y cero 404. Primera imagen crítica: 141.558 bytes; segunda imagen cargada al
+inicializar y las siguientes progresivamente al rotar. El DOM permaneció en dos
+capas reutilizables y doce plantillas; no hubo crecimiento por transición ni
+doble inicialización.
+
+Evidencia manual: navegador real en claro/oscuro a 1440, 1280, 1024, 770, 768,
+390 y 320 px, sin overflow o superposición, con foco visible, controles mínimos
+de 44 px, contraste AA y consola limpia. El carrusel quedó limitado al hero,
+con centro como punto focal, altura estable a cada ancho y fundido de 700 ms.
+Reduced motion mantuvo la primera imagen inmóvil durante siete segundos. Con
+JavaScript retirado por el harness aislado permanecieron visibles la primera
+imagen, título y texto, y funcionó una búsqueda GET combinada por rubro y
+ubicación. La capa es decorativa y no entra al árbol accesible.
+
+Se revalidaron Operaciones → Propuestas, Home → Propuestas, anonimato y sesiones,
+menú activo, filtros, caracteres especiales, chips, limpieza, paginación, solo
+`PUBLICADA`, orden, ausencia de escrituras GET, errores 400, XSS, privacidad y
+elegibilidad centralizada. PROFESIONAL verificado mostró doce CTA en la página;
+CLIENTE no mostró CTA de postulación.
+
+Hallazgos: ninguno P0–P3. No hay bloqueantes conocidos. Riesgo residual: los
+gates PostgreSQL y Docker omitidos no se acreditan, pero no pertenecen al alcance
+frontend de este gate. Documentación actualizada únicamente en este handoff y
+`docs/REQUISITOS/PROPUESTAS_P1.md`; código, pruebas y assets permanecen intactos.
+Próximo paso recomendado: solicitar autorización para commit y luego continuar
+con el flujo de integración que corresponda. Acciones no autorizadas: modificar
+el árbol validado, usar bases compartidas o ejecutar integración Git sin permiso.

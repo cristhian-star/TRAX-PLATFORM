@@ -64,7 +64,7 @@
                     <a class="nav-dropdown__item nav-dropdown__item--link" href="/urgencias/nueva">
                         <strong>Urgencias</strong>
                     </a>
-                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=propuestas">
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="{{ url_for('operations.marketplace_propuestas') }}"{% if request.path == '/propuestas' %} aria-current="page"{% endif %}>
                         <strong>Propuestas</strong>
                     </a>
                 </div>

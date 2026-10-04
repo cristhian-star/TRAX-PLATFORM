@@ -265,3 +265,10 @@
     outline-offset: 3px;
     box-shadow: var(--trax-focus-ring);
 }
+
+/* Only the canonical Propuestas entry added by P1.1 opts into this state. */
+.site-header--visitor .nav-dropdown:has(a[aria-current="page"]) > summary,
+.site-header--visitor .nav-dropdown a[aria-current="page"] {
+    color: var(--trax-color-action-primary);
+    box-shadow: inset 0 -2px 0 currentColor;
+}

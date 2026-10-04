@@ -1,3 +1,4 @@
+from werkzeug.exceptions import BadRequest
 import secrets
 
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for, make_response, current_app
@@ -1000,10 +1001,11 @@ def nueva_propuesta():
 
 @operations.route("/propuestas", methods=["GET"])
 def marketplace_propuestas():
-    return render_template(
-        "listado_propuestas.html",
-        **build_proposal_portal(request.args, session.get("user_id")),
-    )
+    try:
+        context = build_proposal_portal(request.args, session.get("user_id"))
+    except BadRequest:
+        return render_template("proposals_filter_error.html"), 400
+    return render_template("listado_propuestas.html", **context)
 
 
 @operations.route("/propuestas/<int:id>", methods=["GET"])

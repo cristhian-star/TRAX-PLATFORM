@@ -1,5 +1,8 @@
 """Public presentation contract against isolated, real ORM records."""
 import os
+import re
+from html import unescape
+from urllib.parse import urlencode, urlsplit, parse_qs
 import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
@@ -90,6 +93,7 @@ class ProposalPortalTest(unittest.TestCase):
                 response = self.client.get("/propuestas?" + query)
                 self.assertEqual(response.status_code, 400)
                 self.assertNotIn("Traceback", response.get_data(as_text=True))
+                self.assertIn("Revisá los filtros de búsqueda", response.get_data(as_text=True))
         self.assertIn("15 propuestas publicadas", self.html("?unknown=value"))
         self.assertIn("No encontramos coincidencias", self.html("?rubro=%27%20OR%201%3D1--"))
 
@@ -147,3 +151,41 @@ class ProposalPortalTest(unittest.TestCase):
             db.session.commit()
         self.assertIn("Todavía no hay propuestas publicadas", self.html())
 
+
+    def test_navigation_canonical_for_anonymous_and_authenticated(self):
+        for user in (None, 1, 2):
+            if user:
+                self.login(user)
+            html = self.html()
+            menu = html.split('aria-label="Operaciones principales"', 1)[1].split('</div>', 1)[0]
+            self.assertRegex(menu, r'href="/propuestas"[^>]*aria-current="page"')
+            self.assertNotIn('/?operacion=propuestas', menu)
+            self.assertIn('/?operacion=contratacion', menu)
+            self.assertIn('/urgencias/nueva', menu)
+
+    def test_home_native_get_fields_and_other_modes(self):
+        html = self.client.get('/').get_data(as_text=True)
+        panel = html.split('id="operation-panel-proposal"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('action="/propuestas" method="GET"', panel)
+        self.assertIn('name="rubro"', panel)
+        self.assertIn('name="ubicacion"', panel)
+        self.assertNotIn('name="categoria"', panel)
+        self.assertIn('action="/buscar"', html)
+        self.assertIn('/presupuestos/nuevo', html)
+        self.assertIn('/urgencias/nueva', html)
+        result = self.html('?' + urlencode({'rubro': 'Tableros', 'ubicacion': 'Palermo', 'per_page': 2}))
+        self.assertIn('value="Tableros"', result)
+        self.assertIn('value="Palermo"', result)
+        self.assertIn('8 propuestas publicadas', result)
+        self.assertIn('rubro=Tableros&amp;ubicacion=Palermo&amp;page=2', result)
+
+    def test_removable_filter_chips_preserve_other_values_and_reset_page(self):
+        html = self.html('?rubro=Tableros&ubicacion=Palermo&per_page=2&page=2')
+        chips = html.split('aria-label="Filtros activos"', 1)[1].split('</nav>', 1)[0]
+        links = [unescape(link) for link in re.findall(r'href="([^"]+)"', chips)]
+        self.assertEqual(len(links), 2)
+        queries = [parse_qs(urlsplit(link).query) for link in links]
+        self.assertEqual(queries, [{'ubicacion': ['Palermo'], 'per_page': ['2']}, {'rubro': ['Tableros'], 'per_page': ['2']}])
+        for link in links:
+            self.assertEqual(self.client.get(link).status_code, 200)
+        self.assertNotIn('aria-label="Filtros activos"', self.html())

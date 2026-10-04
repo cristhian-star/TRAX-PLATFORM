@@ -65,8 +65,14 @@ def build_proposal_portal(args, user_id):
     pages = (total + per_page - 1) // per_page
     def page_url(number):
         return url_for("operations.marketplace_propuestas", **{k:v for k,v in filters.items() if v}, page=number, per_page=per_page)
+    labels = {"industria": "Industria", "categoria": "Categoría", "rubro": "Rubro", "ubicacion": "Ubicación"}
+    active_filters = [dict(name=name, label=labels[name], value=value,
+                          remove_url=url_for("operations.marketplace_propuestas",
+                              **{k: v for k, v in filters.items() if v and k != name},
+                              per_page=per_page))
+                      for name, value in filters.items() if value]
     user = db.session.get(User, user_id) if user_id else None
-    return dict(cards=cards, filters=filters, options=options, total=total,
+    return dict(active_filters=active_filters, cards=cards, filters=filters, options=options, total=total,
                 page=page, pages=pages, per_page=per_page,
                 previous_url=page_url(page-1) if 1 < page <= pages else None,
                 next_url=page_url(page+1) if page < pages else None,

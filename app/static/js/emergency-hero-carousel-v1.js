@@ -6,7 +6,9 @@
         const slides = Array.from(root.querySelectorAll('template[data-src]'), el => el.dataset);
         const layers = Array.from(root.querySelectorAll('img'));
         if (slides.length < 2 || layers.length !== 2) return;
-        const INTERVAL = 6500, DURATION = 900;
+        // Existing Urgencias defaults remain unchanged; decorative consumers can opt in.
+        const fade = root.dataset?.transition === 'fade';
+        const INTERVAL = fade ? 6000 : 6500, DURATION = fade ? 700 : 900;
         let current = 0, front = 0, timer = null, epoch = 0, suspended = false;
         let animations = [];
         const cache = new Map();
@@ -54,10 +56,10 @@
                 incoming.style.objectPosition = slides[next].position;
                 incoming.hidden = false;
                 animations = [
-                    outgoing.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-100%)' }], { duration: DURATION, easing: 'ease-in-out', fill: 'forwards' }),
-                    incoming.animate([{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }], { duration: DURATION, easing: 'ease-in-out', fill: 'forwards' }),
+                    outgoing.animate(fade ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: 'translateX(0)' }, { transform: 'translateX(-100%)' }], { duration: DURATION, easing: 'ease-in-out', fill: 'forwards' }),
+                    incoming.animate(fade ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }], { duration: DURATION, easing: 'ease-in-out', fill: 'forwards' }),
                 ];
-                // Schedule from the start of a slide, not 900 ms after its completion.
+                // Schedule from the start of a slide, not after its animation completes.
                 schedule();
                 try { await Promise.all(animations.map(animation => animation.finished)); }
                 catch (_) { return; } // Lifecycle cancellation is expected, not an error.
@@ -89,7 +91,7 @@
         schedule();
     }
     if (typeof module !== 'undefined' && module.exports) module.exports = { init };
-    if (typeof document !== 'undefined') init(document.querySelector('[data-emergency-carousel]'), {
+    if (typeof document !== 'undefined') document.querySelectorAll('[data-emergency-carousel], [data-proposal-carousel]').forEach(root => init(root, {
         doc: document, win: window, media: window.matchMedia('(prefers-reduced-motion: reduce)'),
-    });
+    }));
 }());

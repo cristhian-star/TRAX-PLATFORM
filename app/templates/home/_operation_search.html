@@ -145,21 +145,14 @@
             <h2>Encontra trabajos para tu especialidad.</h2>
             <p>Accede al flujo de propuestas y presenta tu experiencia profesional.</p>
         </div>
-        <form action="/propuestas" method="GET" class="operation-search__form">
+        <form action="{{ url_for('operations.marketplace_propuestas') }}" method="GET" class="operation-search__form">
             <label class="operation-field">
-                <span>Industria o rubro</span>
-                <select name="categoria">
-                    <option value="">Cualquier especialidad</option>
-                    <option>Electricidad</option>
-                    <option>Refrigeracion A/C</option>
-                    <option>Plomeria</option>
-                    <option>Herreria</option>
-                    <option>Gas domiciliario</option>
-                </select>
+                <span>Rubro</span>
+                <input type="search" name="rubro" maxlength="120" placeholder="Rubro del trabajo">
             </label>
             <label class="operation-field">
                 <span>Ubicacion</span>
-                <input type="text" name="ubicacion" placeholder="Ciudad, barrio o zona">
+                <input type="text" name="ubicacion" maxlength="120" placeholder="Ciudad, barrio o zona">
             </label>
             <button class="operation-search__submit operation-search__submit--dark" type="submit">
                 Ver oportunidades
@@ -167,4 +160,7 @@
         </form>
         <p class="operation-search__help">Podés explorar sin iniciar sesión. Para postularte necesitás un perfil profesional habilitado.</p>
     </div>
+    <noscript>
+        <p><a href="{{ url_for('operations.marketplace_propuestas') }}">Buscar propuestas por rubro y ubicación</a></p>
+    </noscript>
 </section>
