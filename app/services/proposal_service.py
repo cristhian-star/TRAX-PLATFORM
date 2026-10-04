@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.exc import IntegrityError
 
 from app import db
+from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.professional import Professional
 from app.models.proposal_application import ProposalApplication
 from app.models.proposal_request import ProposalRequest
@@ -128,6 +129,10 @@ def apply_to_proposal(
     disponibilidad=None,
     pretension_economica=None,
 ):
+    eligibility = proposal_application_eligibility(professional_user_id)
+    if not eligibility.eligible:
+        raise PermissionError(eligibility.reason)
+
     proposal = ProposalRequest.query.filter_by(id=proposal_id).with_for_update().first()
     if proposal is None:
         raise ValueError("Propuesta no encontrada")
@@ -139,9 +144,6 @@ def apply_to_proposal(
         raise ValueError("Esta propuesta ya no recibe postulaciones")
 
     professional = Professional.query.filter_by(user_id=professional_user_id).first()
-    if professional is None or not professional.perfil_completo:
-        raise ValueError("Necesitas completar tu perfil profesional para postularte")
-
     if get_professional_application(proposal.id, professional_user_id):
         raise ValueError("Ya te postulaste a esta propuesta")
 

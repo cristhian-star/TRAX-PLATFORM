@@ -3,6 +3,7 @@ import secrets
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for, make_response, current_app
 
 from app import db, limiter
+from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.user import User
 from app.services.emergency_entry_service import entry_context, entry_errors
 from app.services.budget_service import (
@@ -1038,11 +1039,13 @@ def detalle_propuesta(id):
 
 
 @operations.route("/propuestas/<int:id>/postular", methods=["POST"])
-@login_required
-@role_required("PROFESIONAL")
-@profile_complete_required
 @limiter.limit("30 per day", key_func=user_rate_limit_key)
 def postular_propuesta(id):
+    eligibility = proposal_application_eligibility(session.get("user_id"))
+    if eligibility.reason == "AUTH_REQUIRED":
+        return redirect(url_for("auth.login", next=request.full_path.rstrip("?")))
+    if not eligibility.eligible:
+        abort(403)
     mensaje = empty_to_none(request.form.get("mensaje"))
     experiencia_relevante = empty_to_none(request.form.get("experiencia_relevante"))
     disponibilidad = empty_to_none(request.form.get("disponibilidad"))
@@ -1061,6 +1064,8 @@ def postular_propuesta(id):
             pretension_economica=pretension_economica,
         )
         notify_proposal_application_created(application)
+    except PermissionError:
+        abort(403)
     except ValueError as error:
         return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
 

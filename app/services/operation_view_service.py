@@ -1,6 +1,7 @@
 import re
 
 from app import db
+from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.professional import Professional
 from app.models.user import User
 from app.models.contract_request import ContractRequest
@@ -229,6 +230,7 @@ def build_proposal_detail_context(proposal, current_user_id, query_args):
         "applications": applications,
         "is_owner": is_owner,
         "is_professional": is_professional,
+        "application_eligibility": proposal_application_eligibility(current_user_id),
         "own_application": own_application,
         "current_user": current_user,
         "error": query_args.get("error"),

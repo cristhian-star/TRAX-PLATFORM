@@ -1,3 +1,99 @@
+# Propuestas P0 — Elegibilidad central para postularse
+
+Timestamp: 2026-10-04T13:43:36-03:00. Origen: laptop.
+Estado READY_TO_RESUME — PROPUESTAS_P0_ELEGIBILIDAD_IMPLEMENTADA_PENDIENTE_DE_TESTING.
+Rama feature/ux-ui-foundation. HEAD fdbe9a34951995b6c9e25c6775e378a15a4d04ba.
+Preflight conforme, origin correcto; único cambio previo: auditoría P1 de este handoff,
+preservada debajo. Staging vacío. Sin commit/push/merge: no autorizados.
+
+El bloqueo previo era la ausencia de verificación obligatoria al postular.
+Nueva política proposal_application_eligibility en proposal_eligibility_service.py:
+cuenta persistida ACTIVO, rol PROFESIONAL, perfil completo y verificación aprobada.
+Reutiliza is_user_active y has_approved_verification: VerificationRequest.estado
+APROBADO. No inventa flags ni exige PRO; no existe estado de verificación vencida.
+Resultado inmutable eligible/reason y mensaje controlado. Ruta, comando de servicio
+y detalle comparten esa política. Servicio valida antes de consultar la propuesta
+con lock o modificar entidades. Autenticados no elegibles: 403 sin Location;
+anónimos: login canónico; UI no entrega formulario operativo a no elegibles.
+Los decoradores de actor de esta única ruta se sustituyen por la política central,
+conservando CSRF global y límite 30/día. Ownership, estados, duplicación y contratación
+no se cambian. No se modifica Presupuestos ni el portal público P1.
+
+Pruebas nuevas: tests/test_proposal_eligibility.py, cuatro métodos; matriz 11 actores
+no elegibles (sin verificación, pendiente, observada, rechazada, incompleto,
+suspendido, CLIENTE, ADMIN, ADMINISTRADOR, vacío y desconocido). Cada caso comprueba
+servicio directo, presentación, POST 403 y cero ProposalApplication,
+ActivityNotification, AuditLog y ContractRequest; sesión/formulario manipulados no
+habilitan acceso. Anónimo sin escrituras; CSRF inválido 400; elegible sin PRO válido;
+repetición no duplica; propietario y propuesta cerrada siguen rechazados.
+Paquete ejecutado: 73 tests, 72 aprobados y 1 omitido preexistente:
+test_real_concurrent_independent_sessions requiere PostgreSQL y no es comprobable
+con SQLite en memoria. Incluye focales, proposal_to_contract, arquitectura,
+modular_view_services, security_controls, contracting_core/foundations/event_boundary,
+contracting_p0_iteration1 y contracting_p1_iteration2. Tras revisión final de alcance,
+focales + arquitectura + view services repetidos: 22/22 OK. No sumar repeticiones
+como cobertura nueva. Deprecaciones legacy conocidas; error deliberado de seguridad.
+
+Archivos: app/services/proposal_eligibility_service.py (nuevo),
+app/services/proposal_service.py, app/services/operation_view_service.py,
+app/routes/operation_routes.py, app/templates/detalle_propuesta.html,
+tests/test_proposal_eligibility.py (nuevo) y este handoff.
+UTF-8 correcto, sin BOM/NUL/U+FFFD ni rutas absolutas nuevas; diff --check y cached
+--check correctos. Sin dependencias, migraciones, PostgreSQL, Docker ni producción.
+Sin rediseño general, cambios en Home/navbar, filtros, montos, contratos, creación,
+vencimiento/renovación o múltiples contrataciones. Retest independiente pendiente.
+P1 aún no implementado: revisar P0 y luego retomar su gate y brechas documentadas.
+No integrar ni declarar aprobación final antes del Testing independiente.
+
+---
+
+# Propuestas P1 — Auditoría bloqueada por gate
+
+Timestamp: 2026-10-04T13:35:53-03:00. Origen: laptop.
+Estado: BLOCKED — PROPUESTAS_P1_BLOQUEADO_POR_DISENO.
+Rama feature/ux-ui-foundation. HEAD fdbe9a34951995b6c9e25c6775e378a15a4d04ba.
+Preflight: origin correcto, ls-remote coincide exactamente, árbol y staging limpios.
+La posta anterior describía E3.1 sin integrar; Git confirma ahora ese trabajo en HEAD.
+
+Bloqueo P1: app/routes/operation_routes.py:1040 exige login, rol PROFESIONAL y perfil
+completo, pero no verified_required. app/services/proposal_service.py:129 tampoco
+exige verificación aprobada. La decisión de producto exige activo Y verificado y
+prohíbe cambiar permisos en este incremento. Gate 3 no cumplido.
+Reproducción independiente SQLite en memoria con CSRF activo: verificación False,
+POST /propuestas/1/postular devuelve 302 ?postulada=1 y crea una postulación.
+GET listado público 200; detalle CANCELADA público también 200. Fixture inicial
+falló por zona obligatoria omitida; corregido solo en runner efímero, sin cambios
+al producto. No se ejecutaron suites ni revisión visual P1 porque no se implementó.
+
+Modelo real ProposalRequest: industria/categoria/rubro/especialidad, título,
+descripción, ubicación textual, modalidad, cantidad, presupuesto estimado opcional,
+fechas opcionales y created_at; sin provincia/localidad separadas ni fecha de cierre.
+Estados PUBLICADA/CERRADA/CANCELADA. ProposalApplication: POSTULADA/ACEPTADA/RECHAZADA/
+DESCARTADA. SINGLE y contratos EXTERNAL vigentes. Creación admite cualquier cuenta
+activa autenticada, incluidos profesionales; propiedad owner_user_id o cliente_id.
+Listado público filtra industria/categoria/rubro/ubicación, orden reciente, carga
+all() y pagina en memoria (24 por defecto, máximo 50); sin navegación paginada en UI.
+No rutas de edición/renovación/cierre manual; cancelar y aceptar/descartar sí existen.
+Cierre al aceptar: descarta restantes y crea ContractRequest idempotente con eventos,
+auditoría y notificaciones. Unicidad postulación declarada en migración 20260627_01
+pero no en metadata ProposalApplication: SQLite create_all no prueba ese constraint.
+
+Incremento previo recomendado: centralizar elegibilidad persistida activa/verificada/
+perfil completo para POST y presentación; pruebas de rechazo sin escrituras, rol
+manipulado, propietario y positividad. Requiere autorización específica para cambiar
+permisos. Resolver política de visibilidad de cerradas/canceladas; distinguir monto
+estimado de oferta firme. Luego P1 puede adaptar las referencias con filtros reales,
+tarjetas horizontales y panel lateral honesto, omitiendo guardadas, ranking, vencimiento
+7 días, múltiples vacantes y verificación ficticia. P2: renovación/expiración,
+contratación múltiple, ubicación estructurada, políticas económicas y privacidad.
+
+Solo se actualiza este handoff para trazabilidad obligatoria. Sin código, estilos,
+assets, migraciones, dependencias, Docker, PG o producción. No commit/push/merge:
+no autorizados. Staging vacío. Próximo paso: autorizar corrección de elegibilidad y
+retest antes de retomar P1. No publicar UI que afirme un permiso no aplicado.
+
+---
+
 Corrección focal E3.1 — 2026-10-04T13:06:07-03:00
 Estado READY_TO_RESUME — E3_1_HALLAZGOS_CORREGIDOS_PENDIENTE_DE_RETEST.
 Preflight: feature/ux-ui-foundation, HEAD 3e5647521ca186ae358043eff1be561b9db68270,
