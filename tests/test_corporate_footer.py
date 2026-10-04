@@ -38,7 +38,7 @@ class CorporateFooterTest(unittest.TestCase):
         self.assertNotIn('Marketplace premium', self.footer)
         self.assertEqual(re.findall(r'<h2 id="footer-[^"]+">([^<]+)</h2>', self.footer),
                          ['Explorar', 'Para profesionales', 'Ayuda', 'Legal'])
-        for label in ('Buscar profesionales', 'Pedir presupuestos', 'Emergencias',
+        for label in ('Buscar profesionales', 'Pedir presupuestos', 'Urgencias',
                       'Oficios destacados', 'Crear perfil profesional', 'Ver oportunidades',
                       'MANDOBRA PRO', 'Herramientas para tu trabajo', 'Cómo funciona',
                       'Preguntas frecuentes', 'Seguridad y confianza', 'Contacto',
@@ -53,7 +53,7 @@ class CorporateFooterTest(unittest.TestCase):
         self.assertEqual(links, [
             ('/buscar', 'Buscar profesionales'),
             ('/presupuestos/nuevo', 'Pedir presupuestos'),
-            ('/emergencias/nueva', 'Emergencias'),
+            ('/urgencias/nueva', 'Urgencias'),
             ('/#featured-title', 'Oficios destacados'),
             ('/register', 'Crear perfil profesional'),
             ('/propuestas', 'Ver oportunidades'),

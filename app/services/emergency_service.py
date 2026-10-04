@@ -50,7 +50,7 @@ def assign_professional(emergency_request_id, professional_id=None):
 
 def update_emergency_status(emergency_request_id, estado):
     if estado not in EmergencyRequest.ESTADOS:
-        raise ValueError("Estado de emergencia invalido")
+        raise ValueError("Estado de urgencia invalido")
 
     emergency_request = EmergencyRequest.query.get(emergency_request_id)
 

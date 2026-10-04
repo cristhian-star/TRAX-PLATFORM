@@ -1,3 +1,269 @@
+Corrección focal E3.1 — 2026-10-04T13:06:07-03:00
+Estado READY_TO_RESUME — E3_1_HALLAZGOS_CORREGIDOS_PENDIENTE_DE_RETEST.
+Preflight: feature/ux-ui-foundation, HEAD 3e5647521ca186ae358043eff1be561b9db68270,
+36 paths locales, staging vacío. Cambios previos preservados.
+P2: entry_context usaba get() y aceptaba la primera categoría de un POST multivalor.
+La ruta exige ahora len(request.form.getlist("categoria")) == 1 antes de consultar
+al actor y de normalizar/seleccionar. Orden: protecciones existentes CSRF/límite,
+modalidad exacta, cardinalidad de categoría, actor/rol persistido, catálogo/campos,
+persistencia/notificación y redirección. Duplicados iguales también responden 400.
+P3: fuente externa de seis imágenes referenciada de forma neutral con destino
+relativo app/static/images/emergencias/hero/; eliminada la ruta local nueva.
+Referencias históricas ajenas preservadas; ninguna ruta local absoluta añadida.
+
+Archivos intervenidos exclusivamente: app/routes/operation_routes.py,
+tests/test_emergency_entry.py y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Paquete solicitado: 72 pruebas OK, cero omitidas, SQLite en memoria. Incluye dos
+pruebas permanentes nuevas para cardinalidad y valor vacío/inválido; positivos de
+los siete rubros preservados. Reproducción independiente sin importar los tests:
+10/10 casos OK: ausente, vacío, inválido, electricidad/plomeria, orden inverso,
+electricidad repetida, válida/inválida, orden inverso, tres válidas y tres mixtas.
+Todos: 400, cero solicitudes/notificaciones, sin Location y sin excepción interna.
+Warnings legacy SQLAlchemy/datetime y log de error deliberado de seguridad presentes;
+ningún fallo. Sin suite general, Docker, migraciones ni acceso a PostgreSQL.
+
+Integridad: UTF-8 estricto, diff --check/cached --check correctos; inventario de
+36 paths y HEAD conservados. Hashes confirman solo estos tres archivos intervenidos.
+Sin cambios visuales, de rutas, rubros, matcher, guardias, difusión ni pagos.
+Staging vacío; sin commit/push/merge por falta de autorización. Retomar con retest
+independiente de ambos hallazgos; no declarar aprobación ni integrar todavía.
+
+Actualización 2026-10-04T12:35:58-03:00 — Acceso directo y acentos de Urgencias.
+Estado READY_TO_RESUME. Home: se retiraron rubro y zona únicamente del panel Urgencias;
+queda enlace ancho completo Buscar ayuda ahora a /urgencias/nueva. Ayuda introductoria
+ajustada al siguiente paso. Módulo: eyebrow, bordes seleccionados, iconos/puntos y
+radios usan danger del DS: #b42318 claro / #fca5a5 oscuro y fondo danger-soft.
+Turnos, instrucciones, seguridad, verificación y mal clima preservados; backend intacto.
+Archivos de esta sesión: app/templates/home/_operation_search.html,
+app/static/css/home-v1.css, app/static/css/emergency-entry-v2.css y este handoff.
+21 pruebas OK: test_urgencias_e31 y test_emergency_entry, SQLite en memoria.
+Navegador: colores computados verificados en ambos temas; panel home con cero inputs
+/selects; clic real llega a /urgencias/nueva. Preview descartable existente 5064.
+Diff --check correcto. Rama feature/ux-ui-foundation, HEAD 3e56475 preservados;
+staging vacío; cambios anteriores conservados. Sin commit/push/merge (no autorizados),
+migraciones, Docker ni bases persistentes. Pendiente revisión visual del usuario y
+Testing independiente. Retomar verificando Git; no ampliar comportamiento del módulo.
+
+Actualización 2026-10-04T12:05:41-03:00 — Siete rubros en Urgencias.
+Estado READY_TO_RESUME. Autorización directa del usuario: sumar Gasista, Destapes y
+desagües, Refrigeración y climatización al selector actual. Se conservan los cuatro
+anteriores. Refrigeración utiliza el slug existente refrigeracion; Gasista y
+Destapes y desagües son términos literales del buscador legacy, no IDs nuevos de la
+taxonomía. No se modifica matcher ni catálogo persistido. La búsqueda sigue siendo
+por coincidencia textual en servicio/especialidad: no agrega equivalencias ni aval
+profesional; un perfil con otra denominación puede no aparecer. La ampliación del
+selector no acredita matrículas ni habilita guardias/difusión. SVG locales nuevos.
+
+Archivos de esta sesión: app/services/emergency_entry_service.py,
+app/templates/nueva_emergencia.html, tests/test_emergency_entry.py y este handoff.
+Validación: 23 pruebas OK (test_emergency_entry, test_urgencias_e31,
+test_emergency_hero_carousel), SQLite en memoria; roles/modalidades/CSRF preservados.
+Navegador: siete opciones visibles a 1440px; a 320px sin overflow, objetivos >=48px.
+Evidencia urgencias-siete-rubros.jpg fuera del repositorio. Preview descartable en
+127.0.0.1:5064 con SQLite en memoria; proceso sin recarga automática. No se reinició
+el servidor del usuario. Reiniciar su preview para cargar cambios Python.
+Rama feature/ux-ui-foundation, HEAD 3e5647521ca186ae358043eff1be561b9db68270,
+staging vacío. Cambios previos preservados. Sin migraciones, Docker, acceso a PG,
+producción, commit/push/merge (no autorizados). Diff --check y UTF-8 correctos.
+Pendiente: revisión visual y Testing independiente; no suite completa en esta sesión.
+Retomar verificando inventario/HEAD; no integrar ni ampliar matching sin autorización.
+
+Actualización 2026-10-04T11:55:00-03:00 — Botón rojizo de Urgencias.
+Estado READY_TO_RESUME. Solicitud del usuario: rojo característico del módulo,
+similar al aviso de protección. Solo CSS local del submit: #b42318 con texto blanco,
+hover #912018 y active #7a1b14; foco y dimensiones preservados. Comprobado en navegador
+el color computado en claro/oscuro. Evidencia urgencias-boton-rojo.jpg fuera del repo.
+Archivos de esta corrección: app/static/css/emergency-entry-v2.css y este handoff.
+Rama/HEAD e inventario E3.1 preservados; staging vacío. Sin commit/push/merge por
+falta de autorización. Sin migraciones ni backend. No se repite suite funcional
+por ajuste de color; diff --check validado. Pendiente revisión visual del usuario.
+
+# E3.1 — Urgencias: refinamiento y compatibilidad pública
+
+Timestamp: 2026-10-04T11:50:01-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E3_1_REFINADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 3e5647521ca186ae358043eff1be561b9db68270.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Preflight conforme: staging vacío; doce archivos locales E3 preservados. Sin commit,
+push, PR ni merge: no autorizados. Sin migraciones, Docker, PostgreSQL ni producción.
+
+Decisión de Cristian Sánchez 2026-10-04: denominación pública Urgencias. Se actualizan
+textos visibles, títulos, enlaces, mensajes nuevos y presentación controlada de
+notificaciones legacy sin reescribir registros. Identificadores internos e historia
+permanecen. Decisión registrada en MASTER_SPEC y REQ-004; otros documentos intactos.
+URLs canónicas /urgencias/nueva y /urgencias/directorio; wrappers legacy 308 conservan
+query strings y POST. Un único manejador operativo; roles persistidos, CSRF y matriz
+modalidad=["manual"] preservados. Difusión continúa deshabilitada.
+
+Formulario: rubro, provincia/localidad, descripción con contador, modalidades,
+aviso funcional y botón. Orden DOM y teclado coincidentes. Contador local sin dependencia.
+Overlay claro exacto .86/.70/.38 en 0/48/100%; filtro saturate(1.08) contrast(1.04)
+brightness(.96). Oscuro .87/.77/.59 intacto, sin filtro. Sin cambios en recursos,
+controlador E3, tiempos, dirección, accesibilidad, matcher ni reglas de negocio.
+
+Validación ejecutada: 75 unittest OK, cero omitidas, SQLite en memoria. Módulos:
+test_urgencias_e31 (7 nuevas), test_emergency_entry, test_emergency_hero_carousel,
+test_corporate_footer, test_security_controls, test_loading_error_states,
+test_navbar_drawer_ux04a, test_navbar_markets_ux03a, test_home_hero_carousel.
+Node tests/js/emergency_hero_carousel.test.js OK; node --check del nuevo contador OK.
+Sin suite completa ni gates PostgreSQL. Deprecaciones legacy conocidas e inyección
+intencional de errores en pruebas de páginas amigables no representan fallos nuevos.
+
+Navegador real sobre SQLite en memoria, preview 127.0.0.1:5063. Claro/oscuro en
+1440,1280,1024,770,768,390,320: sin overflow horizontal; controles mínimo 48px alto,
+ancho mínimo observado 150.63px. Campos provincia/localidad alineados. Capturas
+completas e31-light-1440.jpg, e31-dark-1440.jpg, e31-light-390.jpg, e31-dark-390.jpg
+fuera del repositorio, carpeta de visualizaciones de la sesión. Fotos reconocibles,
+texto legible, alerta separada, modalidades apiladas en móvil. Consola sin errores
+ni advertencias. Tab real: provincia → localidad → descripción → manual → botón;
+outline solid visible. Contador Prueba local = 12.
+POST nativo real desde ruta legacy termina en /urgencias/directorio con electricidad,
+La Plata y consulta_anonima=1; CSRF conservado. Fixture /_e31/legacy-form existe solo
+en runner temporal, no en repositorio. Werkzeug follow_redirects reutiliza stream
+consumido por CSRF: regresión reenvía cuerpo explícito tras comprobar 308 y cero
+escrituras; navegador confirma reenvío nativo. Cliente activo prueba una solicitud
+y una notificación; legacy inválido no escribe; datos históricos permanecen intactos.
+
+Limitaciones: inspección de contraste visual, no auditoría WCAG numérica completa.
+Reduced motion conserva cobertura Node; emulación visual real pendiente desde E3.
+Pendientes: Testing independiente y aprobación visual; no integrar sin autorización.
+Retomar verificando rama, HEAD, inventario y staging, ejecutar paquete focal anterior.
+No habilitar guardias/difusión, no modificar datos históricos ni recursos persistentes.
+
+Integridad final: UTF-8 estricto sin BOM/NUL/U+FFFD. Se retiró únicamente el BOM
+preexistente en cliente_dashboard.html (también presente en HEAD). Sin dependencias,
+migraciones ni recursos externos nuevos. diff --check correcto, staging vacío.
+
+Inventario acumulado E3 + E3.1 sin commit:
+- app/static/images/emergencias/hero/auxilio-movil-moto.webp
+- app/static/images/emergencias/hero/auxilio-vehicular-auto.webp
+- app/static/images/emergencias/hero/cerrajero-automotor.webp
+- app/static/images/emergencias/hero/cerrajero-hogar.webp
+- app/static/images/emergencias/hero/electricista-tablero.webp
+- app/static/images/emergencias/hero/plomero-desague.webp
+- app/static/js/emergency-entry-form.js
+- app/static/js/emergency-hero-carousel-v1.js
+- tests/js/emergency_hero_carousel.test.js
+- tests/test_emergency_hero_carousel.py
+- tests/test_urgencias_e31.py
+- app/routes/notification_routes.py
+- app/routes/operation_routes.py
+- app/services/client_dashboard_service.py
+- app/services/emergency_service.py
+- app/services/notification_service.py
+- app/services/operation_notification_service.py
+- app/services/whatsapp_contact_service.py
+- app/static/css/emergency-entry-v2.css
+- app/templates/base.html
+- app/templates/cliente_dashboard.html
+- app/templates/completar_perfil_profesional.html
+- app/templates/dev_qa_panel.html
+- app/templates/directorio_emergencias.html
+- app/templates/home/_operation_search.html
+- app/templates/home_logged.html
+- app/templates/notificaciones.html
+- app/templates/nueva_emergencia.html
+- app/templates/profesional_dashboard.html
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/REQUISITOS/MASTER_SPEC.md
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- tests/test_corporate_footer.py
+- tests/test_emergency_entry.py
+
+---
+
+# E3 — Carrusel fotográfico decorativo de Emergencias
+
+Actualización visual: 2026-10-01T23:52:24-03:00. A pedido del usuario se reduce
+la opacidad del overlay 0.05 en ambos temas: claro .89/.81/.65 y oscuro .87/.77/.59.
+Solo CSS y esta nota; alerta, fotos, estructura y comportamiento preservados.
+Estado READY_TO_RESUME; misma rama/HEAD e inventario E3, staging vacío.
+Sin suite repetida por ajuste visual mínimo; diff --check correcto.
+Sin commit/push/merge; próxima acción: revisión visual del usuario.
+
+Timestamp: 2026-10-01T23:51:32-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E3_CARRUSEL_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 3e5647521ca186ae358043eff1be561b9db68270.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck confirmado: working tree limpio, staging vacío; E2 anterior ya versionado.
+
+Las seis imágenes fuente (01–06.png) fueron proporcionadas externamente por el responsable
+del producto y copiadas como recursos optimizados en app/static/images/emergencias/hero/.
+Las seis decodifican: PNG RGB 1448x1086 horizontal 4:3, hashes distintos. Originales
+releídos al cierre, preservados. Pillow 11.3.0 / WebP local; save WEBP quality=82,
+method=6, sin resize, ampliación, deformación ni metadatos EXIF/XMP/ICC transferidos.
+Sin instalación ni servicios externos. Destino app/static/images/emergencias/hero/.
+
+| Fuente | Bytes fuente | SHA-256 fuente | WebP final | Bytes final |
+| --- | ---: | --- | --- | ---: |
+| 01.png | 2196786 | 9698c352717b0ca9989c35c2197823676f188ca395ba00d0081876feb9002576 | electricista-tablero.webp | 116678 |
+| 02.png | 2179629 | 79302366a049ff8fc40a0e7f66b3bddae2582815ad4e089c8c1063dd188c6ac3 | plomero-desague.webp | 125192 |
+| 03.png | 2082913 | 7768d32752a6d5b151d4ccb5473c5580871e3db764cbf7d37b2c49ac29444e0f | cerrajero-hogar.webp | 101366 |
+| 04.png | 2142490 | 900f0cea09ffa957eec0e358b66198519c4a9f9a314c5ab7c5c50e30f076a013 | cerrajero-automotor.webp | 116764 |
+| 05.png | 2550736 | 049f82f904643cac306e0cc2124d119dc75903eb25b549266bfa2e109397d98c | auxilio-vehicular-auto.webp | 196988 |
+| 06.png | 2333768 | 87bf5ea6c2d3ecd868cda69d519f9ab68700dea50e4e2894621b41d80acdd32b | auxilio-movil-moto.webp | 167408 |
+
+Inspección comparativa de las seis WebP: detalle suficiente para fondo, sin bloques
+ni halos notorios. Todas conservan exactamente 1448x1086. No PNG copiados al repo.
+
+Contenedor hero-stage exclusivamente alrededor del encabezado y alerta; formulario,
+navbar, footer y panel lateral fuera. Dos capas decorativas reutilizables aria-hidden,
+alt vacío, sin controles/foco, pointer-events:none/user-select:none. Primera con src
+real, eager/high y dimensiones; segunda hidden. Fuentes en templates inertes ordenados.
+Precarga progresiva cacheada; imágenes fallidas se omiten. Web Animations API:
+actual 0→-100%, siguiente 100%→0, 900ms; timer único 6500ms entre inicios.
+Sin fundido principal, cambios de altura o backend. Visibilidad/pagehide cancelan
+timer/animaciones; epoch invalida cargas obsoletas. Pageshow/BFCache sin duplicados.
+Reduced motion no inicia timer/precarga; cambio dinámico restaura primera foto.
+Revisados home-hero-carousel.js, explore-motion.js y markets-carousel.js; patrón
+encapsulado de Explorar sin modificar otras pantallas ni extraer núcleo compartido.
+
+Overlays exactos: claro rgba(246,249,253) .94/.86/.70 y oscuro rgba(7,18,32)
+.92/.82/.64 en 0/58/100%; sin ajustes de opacidad. Alerta 94%: rgba(254,242,242,.94)
+y rgba(49,23,32,.94), conserva borde/icono/texto. Paneles laterales sólidos.
+Encuadre adaptado: cover a ancho completo cortaba rostros/tareas. Ventana fotográfica
+4:3 anclada a derecha DENTRO del bloque izquierdo, borde suavizado con máscara
+estática; resto del stage conserva superficie/overlay. En <=640px ocupa todo ancho,
+4:3 arriba; texto y aviso crecen hacia abajo sin recorte. No se estira imagen para
+cubrir toda altura móvil. Object-fit:cover; posiciones 70% 20%,58% 20%,68% 20%,
+70% 20%,62% 65%,62% 65%. Adaptación de encuadre pendiente de aprobación visual.
+
+Pruebas permanentes: test_emergency_hero_carousel (2: semántica/orden/fallback y
+seis WebP decodificadas/peso/metadatos). Junto a test_emergency_entry,
+test_security_controls, test_corporate_footer, test_loading_error_states: 42 OK,
+cero omitidas. SQLite en memoria. Node tests/js/emergency_hero_carousel.test.js:
+orden/ciclo, 6500/900, dirección, caché, reduced motion inicial/dinámico, visibilidad,
+BFCache, cancelación y fallos aprobados. Node --check OK. Sin suite completa ni PG.
+Logs ERROR intencionales de pruebas de errores; deprecaciones legacy conocidas.
+
+Navegador real claro/oscuro: 1440,1280,1024,770,768,390,320 exactos sin overflow.
+Capturas e3-light-*.jpg/e3-dark-*.jpg a 1440/1280/768/390/320 fuera del repo, carpeta
+de visualizaciones de esta sesión. Legibilidad y superficies revisadas. Formulario
+top=436.1375px a 1440 antes/después de slides: estable. Transición observada con
+ambas capas visibles y transformaciones -7.87/+401.64px; e3-transition-final.jpg,
+e3-first-final.jpg y e3-last-final.jpg (sexta foto estable). Consola normal limpia.
+Fallback sin JS: runner temporal /_e3/nojs con CSP script-src 'none', primera imagen
+cargada (1448px), segunda hidden/sin src; captura e3-nojs.jpg. Envío nativo real
+llega al directorio con categoria=electricidad, zona=La Plata, consulta_anonima=1.
+Avisos CSP deliberados; endpoint solo en runner temporal, no agregado al repositorio.
+LIMITACIÓN: navegador no expone emulación de prefers-reduced-motion y Playwright
+no está instalado. No se instaló nada. Lógica cubierta por Node; captura visual
+real de reduced motion pendiente de Testing. No se presenta fallback sin-JS como
+emulación de reduced motion. Tampoco se declara auditoría WCAG completa ni contraste
+numérico de todos los píxeles. Incidencia auxiliar: Python sin tzdata; timestamp
+obtenido del offset local -03:00 sin instalar paquetes ni cambiar configuración.
+
+Modificados: app/templates/nueva_emergencia.html, app/static/css/emergency-entry-v2.css,
+docs/HANDOFFS/ACTIVE_HANDOFF.md. Nuevos: app/static/js/emergency-hero-carousel-v1.js,
+tests/test_emergency_hero_carousel.py, tests/js/emergency_hero_carousel.test.js y seis WebP.
+Total 12 archivos. E2 rutas/servicios, modalidad, roles, CSRF, rubros, matcher, PRO,
+modelos, guardias, navbar/footer y textos funcionales intactos. UTF-8 y diff --check OK.
+Staging vacío, rama/HEAD preservados. Sin commit/push/PR/merge: no autorizados.
+Sin Docker, migraciones, PostgreSQL ni producción. Preview 5062 con SQLite en memoria,
+disponible mientras siga el proceso. Pendientes: retest independiente, reduced motion
+visual y aprobación del encuadre. Retomar verificando 12 paths/HEAD/staging y ejecutar
+los paquetes indicados; no integrar ni ampliar backend sin autorización.
+
 # E2 — Corrección visual de la tarjeta unificada
 
 ## Ajuste focal de alineación

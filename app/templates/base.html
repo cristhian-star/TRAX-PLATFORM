@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANDOBRA Marketplace</title>
+    <title>{% block title %}MANDOBRA Marketplace{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/branding/mandobra/mandobra-symbol-compact.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system-v2.css') }}">
@@ -61,8 +61,8 @@
                     <a class="nav-dropdown__item nav-dropdown__item--link" href="{{ url_for('operations.marketplace_presupuestos' if session.get('user_role') == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">
                         <strong>Presupuestos</strong>
                     </a>
-                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/emergencias/nueva">
-                        <strong>Emergencias</strong>
+                    <a class="nav-dropdown__item nav-dropdown__item--link" href="/urgencias/nueva">
+                        <strong>Urgencias</strong>
                     </a>
                     <a class="nav-dropdown__item nav-dropdown__item--link" href="/?operacion=propuestas">
                         <strong>Propuestas</strong>
@@ -122,12 +122,13 @@
                     {% if navbar_notifications %}
                         <div class="notification-dropdown__list">
                             {% for notification in navbar_notifications %}
+                            {% set notification_copy = present_notification(notification) %}
                                 <a
                                     class="notification-dropdown__item {{ 'is-unread' if not notification.leida else 'is-read' }}"
-                                    href="{{ notification.url_destino or '/notificaciones' }}">
-                                    <span>{{ notification.categoria }}</span>
-                                    <strong>{{ notification.titulo }}</strong>
-                                    <small>{{ notification.mensaje }}</small>
+                                    href="{{ notification_copy.url_destino or '/notificaciones' }}">
+                                    <span>{{ notification_copy.categoria }}</span>
+                                    <strong>{{ notification_copy.titulo }}</strong>
+                                    <small>{{ notification_copy.mensaje }}</small>
                                     <time datetime="{{ notification.created_at.isoformat() }}">
                                         {{ notification.created_at.strftime("%d/%m/%Y") }}
                                     </time>
@@ -248,7 +249,7 @@
                     <ul>
                         <li><a href="{{ url_for('main.buscar') }}">Buscar profesionales</a></li>
                         <li><a href="{{ url_for('operations.marketplace_presupuestos' if session.get('user_role') == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">{{ 'Ver solicitudes de presupuesto' if session.get('user_role') == 'PROFESIONAL' else 'Pedir presupuestos' }}</a></li>
-                        <li><a href="{{ url_for('operations.nueva_emergencia') }}">Emergencias</a></li>
+                        <li><a href="{{ url_for('operations.nueva_emergencia') }}">Urgencias</a></li>
                         {% if not session.get('user_id') %}
                             <li><a href="{{ url_for('main.home') }}#featured-title">Oficios destacados</a></li>
                         {% else %}

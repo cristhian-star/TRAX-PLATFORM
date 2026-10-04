@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Directorio de urgencias | MANDOBRA{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
@@ -9,8 +10,8 @@
     <section class="emergency-directory__hero">
         <div class="shell emergency-directory__hero-layout">
             <div>
-                <span>Directorio de emergencia</span>
-                <h1>Profesionales para {{ categoria or "tu emergencia" }}</h1>
+                <span>Directorio de urgencias</span>
+                <h1>Profesionales para {{ categoria or "tu urgencia" }}</h1>
                 <p>
                     Categoria buscada: <strong>{{ categoria or "todas" }}</strong>.
                     Zona buscada: <strong>{{ zona or "sin zona especifica" }}</strong>.
@@ -29,7 +30,7 @@
             <span aria-hidden="true">!</span>
             <p>
                 Si hay riesgo para personas, incendio, fuga grave o peligro inmediato,
-                contacta primero a emergencias oficiales.
+                contacta primero a los servicios oficiales de respuesta inmediata.
             </p>
         </div>
 
@@ -56,7 +57,7 @@
                 <span>Zona</span>
                 <strong>{{ zona or "Todas" }}</strong>
             </div>
-            <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+            <a href="/urgencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
                 Ajustar busqueda
             </a>
         </div>
@@ -80,7 +81,7 @@
                     si no necesitas asistencia inmediata.
                 </p>
                 <div class="emergency-empty__actions">
-                    <a href="/emergencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
+                    <a href="/urgencias/nueva?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
                         Ampliar busqueda
                     </a>
                     <a href="/presupuestos/nuevo?categoria={{ categoria|urlencode }}&zona={{ zona|urlencode }}">
@@ -103,7 +104,7 @@
             </article>
             <article>
                 <strong>PRO</strong>
-                <p>Emergencias ilimitadas proximamente.</p>
+                <p>Urgencias ilimitadas proximamente.</p>
             </article>
         </section>
     </section>

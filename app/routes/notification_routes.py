@@ -5,10 +5,16 @@ from app.services.notification_service import (
     marcar_como_leida,
     marcar_todas_como_leidas,
     obtener_notificaciones_usuario,
+    present_notification,
 )
 from app.utils.decorators import login_required
 
 notifications = Blueprint("notifications", __name__)
+
+
+@notifications.app_context_processor
+def notification_presentation():
+    return {"present_notification": present_notification}
 
 
 @notifications.route("/notificaciones", methods=["GET"])

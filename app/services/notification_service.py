@@ -47,6 +47,26 @@ TIPO_CUENTA_VERIFICADA = "CUENTA_VERIFICADA"
 TIPO_PLAN_ACTUALIZADO = "PLAN_ACTUALIZADO"
 
 
+def present_notification(notification):
+    """Current public labels for controlled legacy events; never mutate stored history."""
+    result = {name: getattr(notification, name) for name in
+              ("categoria", "titulo", "mensaje", "url_destino")}
+    if notification.categoria == CATEGORIA_EMERGENCIAS:
+        result["categoria"] = "Urgencias"
+    if notification.tipo == TIPO_EMERGENCIA_PUBLICADA:
+        if result["titulo"] == "Publicaste una emergencia":
+            result["titulo"] = "Publicaste una solicitud urgente"
+        if result["mensaje"].startswith("Tu emergencia de "):
+            result["mensaje"] = "Tu solicitud urgente de " + result["mensaje"][len("Tu emergencia de "):]
+        destination = result["url_destino"] or ""
+        for legacy, canonical in (("/emergencias/nueva", "/urgencias/nueva"),
+                                  ("/emergencias/directorio", "/urgencias/directorio")):
+            if destination == legacy or destination.startswith((legacy + "?", legacy + "#")):
+                result["url_destino"] = canonical + destination[len(legacy):]
+                break
+    return result
+
+
 def _validate_choice(value, allowed_values, field_label):
     if value not in allowed_values:
         raise ValueError(f"{field_label} invalido")

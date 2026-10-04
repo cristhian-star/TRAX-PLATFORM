@@ -178,7 +178,7 @@ def resolver_identificador_contacto(professional):
 def _build_message(professional, operation_type):
     operation_labels = {
         OPERATION_PROFILE: "tu perfil profesional en MANDOBRA",
-        OPERATION_EMERGENCY: "una emergencia publicada en MANDOBRA",
+        OPERATION_EMERGENCY: "una solicitud urgente publicada en MANDOBRA",
         OPERATION_BUDGET_AWARDED: "un presupuesto adjudicado en MANDOBRA",
         OPERATION_PROPOSAL_ACCEPTED: "una propuesta aceptada en MANDOBRA",
         OPERATION_DIRECT_CONTACT: "MANDOBRA",
@@ -225,7 +225,7 @@ def validar_operacion(
         if entity_id:
             emergency = db.session.get(EmergencyRequest, entity_id)
             if emergency is None:
-                raise ValueError("Emergencia no encontrada")
+                raise ValueError("Solicitud urgente no encontrada")
             if actor_user_id and emergency.cliente_id != actor_user_id:
                 raise PermissionError("Solo el cliente dueno puede iniciar este contacto")
         return professional

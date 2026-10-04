@@ -50,11 +50,11 @@ def build_client_activity_rows(budget_rows, emergency_requests, proposal_request
 
     for emergency in emergency_requests:
         activity_rows.append({
-            "kind": "Emergencia",
-            "title": f"Publicaste una emergencia de {emergency.categoria}",
+            "kind": "Urgencia",
+            "title": f"Publicaste una solicitud urgente de {emergency.categoria}",
             "detail": f"{emergency.zona} - Estado {emergency.estado}",
             "date": emergency.fecha_creacion,
-            "href": "/emergencias/nueva",
+            "href": "/urgencias/nueva",
         })
 
     for proposal in proposal_requests:
@@ -199,9 +199,9 @@ def build_client_dashboard_context(user_id):
         })
     if not emergency_requests:
         recommendations.append({
-            "title": "Preparar una emergencia",
+            "title": "Solicitar asistencia urgente",
             "detail": "Conoce el flujo urgente antes de necesitarlo.",
-            "href": "/emergencias/nueva",
+            "href": "/urgencias/nueva",
         })
     if not proposal_requests:
         recommendations.append({
@@ -232,12 +232,12 @@ def build_client_dashboard_context(user_id):
             "empty": "Todavia no publicaste solicitudes de presupuesto.",
         },
         {
-            "title": "Emergencias",
+            "title": "Urgencias",
             "count": len(emergency_requests),
             "active_count": active_emergency_count,
             "items": emergency_requests[:3],
-            "href": "/emergencias/nueva",
-            "empty": "Todavia no registraste emergencias.",
+            "href": "/urgencias/nueva",
+            "empty": "Todavia no registraste solicitudes urgentes.",
         },
         {
             "title": "Propuestas",

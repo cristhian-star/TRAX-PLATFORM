@@ -10,6 +10,19 @@ revision_codigo: 1548935
 
 # MANDOBRA Master Spec
 
+## Denominación pública vigente — 2026-10-04
+
+Registro: 2026-10-04T11:44:28-03:00. Decisión de Producto: Cristian Sánchez, 2026-10-04.
+La denominación pública del módulo pasa a ser **Urgencias**; acción: **solicitar
+asistencia urgente**. Rutas canónicas: `/urgencias/nueva` y `/urgencias/directorio`.
+Las rutas `/emergencias/...` se conservan como redirecciones 308, preservando método,
+cuerpo y query string. Los nombres técnicos, archivos, tablas, columnas y tipos
+controlados anteriores permanecen temporalmente por compatibilidad. Los registros
+anteriores de este documento conservan su denominación histórica, sustituida en la
+presentación pública por esta decisión. No se habilitan difusión ni guardias reales.
+Implementación E3.1 local: pendiente de Testing; esta decisión no acredita su validación.
+
+
 ## Cierre de revisión documental UX-07A — 2026-09-28
 
 Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.

@@ -16,6 +16,9 @@ def emergency_entry_categories():
         (categories["plomeria"]["slug"], "Plomería"),
         ("Cerrajería", "Cerrajería"),
         ("Auxilio vehicular", "Auxilio vehicular"),
+        ("Gasista", "Gasista"),
+        ("Destapes y desagües", "Destapes y desagües"),
+        (categories["refrigeracion"]["slug"], "Refrigeración y climatización"),
     )
 
 
@@ -36,7 +39,7 @@ def entry_errors(context, mode="manual"):
     if mode != "manual":
         errors["modalidad"] = "La difusión todavía no está disponible. Elegí la búsqueda manual."
     if not context["selected_category"]:
-        errors["categoria"] = "Seleccioná uno de los cuatro rubros disponibles."
+        errors["categoria"] = "Seleccioná uno de los rubros disponibles."
     if not data["zona"] or len(data["zona"]) > MAX_ZONE_LENGTH:
         errors["zona"] = "Indicá una localidad de hasta 120 caracteres."
     if not data["descripcion"] or len(data["descripcion"]) > MAX_DESCRIPTION_LENGTH:

@@ -867,12 +867,24 @@ def cancelar_presupuesto(id):
     return redirect(url_for("operations.mis_solicitudes_presupuesto", estado="canceladas"))
 
 
-@operations.route("/emergencias/nueva", methods=["GET", "POST"])
+@operations.route("/emergencias/nueva", methods=["GET", "POST"], defaults={"target": "operations.nueva_emergencia"})
+@operations.route("/emergencias/directorio", methods=["GET"], defaults={"target": "operations.directorio_emergencias"})
+def legacy_emergency_redirect(target):
+    # Preserve raw query bytes and POST body/CSRF; persistence only happens at the canonical endpoint.
+    destination = url_for(target)
+    if request.query_string:
+        destination += "?" + request.query_string.decode("latin-1")
+    return redirect(destination, code=308)
+
+
+@operations.route("/urgencias/nueva", methods=["GET", "POST"])
 @limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nueva_emergencia():
     if request.method == "POST":
         if request.form.getlist("modalidad") != ["manual"]:
             abort(400, description="Modalidad inválida o ambigua. La difusión todavía no está disponible.")
+        if len(request.form.getlist("categoria")) != 1:
+            abort(400, description="Seleccioná una única categoría para la urgencia.")
         current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
         if session.get("user_id") and (current_user is None or current_user.rol != "CLIENTE"):
             abort(403)
@@ -914,7 +926,7 @@ def nueva_emergencia():
     )
 
 
-@operations.route("/emergencias/directorio", methods=["GET"])
+@operations.route("/urgencias/directorio", methods=["GET"])
 def directorio_emergencias():
     categoria = normalize_limited_text(request.args.get("categoria", ""))
     zona = normalize_limited_text(request.args.get("zona", ""))

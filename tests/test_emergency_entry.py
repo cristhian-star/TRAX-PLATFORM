@@ -37,12 +37,12 @@ class EmergencyEntryTest(unittest.TestCase):
             db.engine.dispose()
 
     def post(self, **overrides):
-        html = self.client.get('/emergencias/nueva').get_data(as_text=True)
+        html = self.client.get('/urgencias/nueva').get_data(as_text=True)
         token = re.search(r'name="csrf_token" value="([^"]+)"', html)[1]
         data = dict(categoria="electricidad", zona="Villa Lugano", descripcion="Corte de luz",
                     csrf_token=token, modalidad="manual")
         data.update(overrides)
-        return self.client.post('/emergencias/nueva', data=data)
+        return self.client.post('/urgencias/nueva', data=data)
 
     def counts(self):
         with self.app.app_context():
@@ -53,7 +53,7 @@ class EmergencyEntryTest(unittest.TestCase):
             session.update(user_id=user_id, user_role=role)
 
     def test_public_render_content_and_accessibility(self):
-        r = self.client.get('/emergencias/nueva')
+        r = self.client.get('/urgencias/nueva')
         self.assertEqual(r.status_code, 200)
         html = r.get_data(as_text=True)
         main = html.split('<main class="emergency-e2">')[1].split('</main>')[0]
@@ -64,8 +64,9 @@ class EmergencyEntryTest(unittest.TestCase):
                      'aria-describedby=', '<fieldset', '<legend>Rubro de la urgencia</legend>', 'readonly'):
             self.assertIn(text, main)
         self.assertEqual(re.findall(r'name="categoria" value="([^"]+)"', main),
-                         ['electricidad', 'plomeria', 'Cerrajería', 'Auxilio vehicular'])
-        for text in ('Refrigeración', 'Albañilería', 'Prioridad PRO', 'latitude', 'longitude', 'geolocation'):
+                         ['electricidad', 'plomeria', 'Cerrajería', 'Auxilio vehicular',
+                          'Gasista', 'Destapes y desagües', 'refrigeracion'])
+        for text in ('Albañilería', 'Prioridad PRO', 'latitude', 'longitude', 'geolocation'):
             self.assertNotIn(text, main)
         self.assertIn('disabled aria-describedby="broadcast-help"', main)
         self.assertEqual(main.count('<form '), 1)
@@ -82,7 +83,7 @@ class EmergencyEntryTest(unittest.TestCase):
         r = self.post(categoria="Electricidad")
         self.assertEqual(r.status_code, 302)
         target = urlsplit(r.location)
-        self.assertEqual(target.path, '/emergencias/directorio')
+        self.assertEqual(target.path, '/urgencias/directorio')
         self.assertEqual(parse_qs(target.query), dict(categoria=['Electricidad'], zona=['Villa Lugano'], consulta_anonima=['1']))
         self.assertEqual(self.counts(), (0, 0))
 
@@ -107,12 +108,12 @@ class EmergencyEntryTest(unittest.TestCase):
                     db.session.get(User, 3).rol = role
                     db.session.commit()
                 self.login(3, 'CLIENTE')  # Session role must not override the stored role.
-                html = self.client.get('/emergencias/nueva').get_data(as_text=True)
+                html = self.client.get('/urgencias/nueva').get_data(as_text=True)
                 token = re.search(r'name="csrf_token" value="([^"]+)"', html)[1]
                 with patch('app.routes.operation_routes.entry_context') as context, \
                      patch('app.routes.operation_routes.create_emergency_request') as create, \
                      patch('app.routes.operation_routes.notify_emergency_created') as notify:
-                    r = self.client.post('/emergencias/nueva', data=dict(
+                    r = self.client.post('/urgencias/nueva', data=dict(
                         csrf_token=token, modalidad='manual', categoria='electricidad',
                         zona='Palermo', descripcion='Prueba'))
                     self.assertEqual(r.status_code, 403)
@@ -129,7 +130,7 @@ class EmergencyEntryTest(unittest.TestCase):
         self.login(1)
         for modes in cases:
             with self.subTest(modes=modes):
-                html = self.client.get('/emergencias/nueva').get_data(as_text=True)
+                html = self.client.get('/urgencias/nueva').get_data(as_text=True)
                 token = re.search(r'name="csrf_token" value="([^"]+)"', html)[1]
                 data = MultiDict([('csrf_token', token), ('categoria', 'electricidad'),
                                   ('zona', 'Palermo'), ('descripcion', 'Prueba')]
@@ -137,12 +138,49 @@ class EmergencyEntryTest(unittest.TestCase):
                 with patch('app.routes.operation_routes.entry_context') as context, \
                      patch('app.routes.operation_routes.create_emergency_request') as create, \
                      patch('app.routes.operation_routes.notify_emergency_created') as notify:
-                    r = self.client.post('/emergencias/nueva', data=data)
+                    r = self.client.post('/urgencias/nueva', data=data)
                     self.assertEqual(r.status_code, 400)
                     self.assertIsNone(r.location)
                     context.assert_not_called()
                     create.assert_not_called()
                     notify.assert_not_called()
+                self.assertEqual(self.counts(), (0, 0))
+
+    def test_category_multiplicity_fails_before_actor_or_side_effects(self):
+        cases = [[], ['electricidad', 'plomeria'], ['plomeria', 'electricidad'],
+                 ['electricidad', 'electricidad'], ['electricidad', 'invalida'],
+                 ['invalida', 'electricidad'], ['electricidad', 'plomeria', 'Gasista'],
+                 ['electricidad', 'invalida', 'Gasista']]
+        self.login(1)
+        for categories in cases:
+            with self.subTest(categories=categories):
+                html = self.client.get('/urgencias/nueva').get_data(as_text=True)
+                token = re.search(r'name="csrf_token" value="([^"]+)"', html)[1]
+                data = MultiDict([('csrf_token', token), ('modalidad', 'manual'),
+                                 ('zona', 'Palermo'), ('descripcion', 'Prueba')]
+                                + [('categoria', value) for value in categories])
+                with patch('app.routes.operation_routes.User') as actor, \
+                     patch('app.routes.operation_routes.entry_context') as context, \
+                     patch('app.routes.operation_routes.create_emergency_request') as create, \
+                     patch('app.routes.operation_routes.notify_emergency_created') as notify:
+                    response = self.client.post('/urgencias/nueva', data=data)
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIsNone(response.location)
+                    actor.query.get.assert_not_called()
+                    context.assert_not_called()
+                    create.assert_not_called()
+                    notify.assert_not_called()
+                self.assertEqual(self.counts(), (0, 0))
+                for internal_error in ('TypeError', 'ValueError', 'Traceback'):
+                    self.assertNotIn(internal_error, response.get_data(as_text=True))
+
+    def test_single_empty_or_invalid_category_rejected_without_writes(self):
+        self.login(1)
+        for category in ('', 'invalida'):
+            with self.subTest(category=category):
+                response = self.post(categoria=category)
+                self.assertEqual(response.status_code, 400)
+                self.assertIsNone(response.location)
                 self.assertEqual(self.counts(), (0, 0))
 
     def test_disabled_broadcast_rejected_without_side_effects(self):
@@ -153,7 +191,7 @@ class EmergencyEntryTest(unittest.TestCase):
         self.assertEqual(self.counts(), (0, 0))
 
     def test_field_errors_preserve_values_and_escape(self):
-        r = self.post(categoria="Refrigeración", zona="", descripcion='<script>alert(1)</script>')
+        r = self.post(categoria="Rubro inexistente", zona="", descripcion='<script>alert(1)</script>')
         html = r.get_data(as_text=True)
         self.assertEqual(r.status_code, 400)
         self.assertIn('id="category-error"', html)
@@ -170,7 +208,9 @@ class EmergencyEntryTest(unittest.TestCase):
         self.assertEqual(self.post(descripcion='a' * 600, zona='b' * 120).status_code, 302)
 
     def test_allowed_categories_and_legacy_aliases(self):
-        for category in ('electricidad', 'plomeria', 'Plomería', 'Cerrajería', 'Auxilio vehicular'):
+        for category in ('electricidad', 'plomeria', 'Plomería', 'Cerrajería', 'Auxilio vehicular',
+                         'Gasista', 'Destapes y desagües', 'refrigeracion',
+                         'Refrigeración y climatización'):
             with self.subTest(category=category):
                 self.assertEqual(self.post(categoria=category).status_code, 302)
 
@@ -187,7 +227,7 @@ class EmergencyEntryTest(unittest.TestCase):
             self.assertNotIn(key, parse_qs(urlsplit(r.location).query))
 
     def test_prefill_and_resource(self):
-        html = self.client.get('/emergencias/nueva?categoria=Plomer%C3%ADa&zona=Palermo').get_data(as_text=True)
+        html = self.client.get('/urgencias/nueva?categoria=Plomer%C3%ADa&zona=Palermo').get_data(as_text=True)
         self.assertIn('value="plomeria" required checked', html)
         self.assertIn('value="Palermo"', html)
         with self.client.get('/static/css/emergency-entry-v2.css') as response:
@@ -212,7 +252,7 @@ class EmergencyEntryTest(unittest.TestCase):
             def handle_endtag(self, tag):
                 if tag == 'form':
                     self.current = None
-        html = self.client.get('/emergencias/nueva').get_data(as_text=True)
+        html = self.client.get('/urgencias/nueva').get_data(as_text=True)
         parser = FormParser()
         parser.feed(html)
         forms = [f for f in parser.forms if f['attrs'].get('aria-labelledby') == 'emergency-form-title']
@@ -231,7 +271,7 @@ class EmergencyEntryTest(unittest.TestCase):
         self.assertIn('Esta lista es orientativa', html)
         names = {a['data-icon'] for a in parser.icons}
         self.assertTrue({'broadcast', 'person-search', 'bolt', 'tap', 'lock-key', 'wheel',
-                         'clock', 'rain', 'check', 'shield-check', 'shield-alert',
+                         'flame', 'drain', 'snowflake', 'clock', 'rain', 'check', 'shield-check', 'shield-alert',
                          'pin', 'document', 'arrow', 'info', 'list'} <= names)
         for a in parser.icons:
             self.assertEqual(a.get('aria-hidden'), 'true')
