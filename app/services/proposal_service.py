@@ -86,7 +86,7 @@ def create_proposal_request(
     return proposal_request
 
 
-def get_open_proposals(industria=None, categoria=None, rubro=None, ubicacion=None):
+def open_proposals_query(industria=None, categoria=None, rubro=None, ubicacion=None):
     query = ProposalRequest.query.filter(ProposalRequest.estado.in_(OPEN_STATUSES))
 
     if industria:
@@ -98,7 +98,11 @@ def get_open_proposals(industria=None, categoria=None, rubro=None, ubicacion=Non
     if ubicacion:
         query = query.filter(ProposalRequest.ubicacion.ilike(f"%{ubicacion}%"))
 
-    return query.order_by(ProposalRequest.created_at.desc(), ProposalRequest.id.desc()).all()
+    return query.order_by(ProposalRequest.created_at.desc(), ProposalRequest.id.desc())
+
+
+def get_open_proposals(industria=None, categoria=None, rubro=None, ubicacion=None):
+    return open_proposals_query(industria, categoria, rubro, ubicacion).all()
 
 
 def get_proposal_by_id(proposal_id):

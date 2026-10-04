@@ -3,6 +3,7 @@ import secrets
 from flask import Blueprint, abort, redirect, render_template, request, session, url_for, make_response, current_app
 
 from app import db, limiter
+from app.services.proposal_portal_service import build_proposal_portal
 from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.user import User
 from app.services.emergency_entry_service import entry_context, entry_errors
@@ -56,7 +57,6 @@ from app.services.proposal_service import (
     cancel_proposal,
     create_proposal_request,
     discard_application,
-    get_open_proposals,
 )
 from app.services.professional_service import (
     get_professional_by_id,
@@ -1000,28 +1000,9 @@ def nueva_propuesta():
 
 @operations.route("/propuestas", methods=["GET"])
 def marketplace_propuestas():
-    industria = normalize_limited_text(request.args.get("industria", ""))
-    categoria = normalize_limited_text(request.args.get("categoria", ""))
-    rubro = normalize_limited_text(request.args.get("rubro", ""))
-    ubicacion = normalize_limited_text(request.args.get("ubicacion", ""))
-    proposals = get_open_proposals(
-        industria=industria,
-        categoria=categoria,
-        rubro=rubro,
-        ubicacion=ubicacion,
-    )
-    proposals = paginate_items(proposals)
-
     return render_template(
         "listado_propuestas.html",
-        proposals=proposals,
-        filters={
-            "industria": industria,
-            "categoria": categoria,
-            "rubro": rubro,
-            "ubicacion": ubicacion,
-        },
-        taxonomy=build_proposal_taxonomy_options(include_specialties=False),
+        **build_proposal_portal(request.args, session.get("user_id")),
     )
 
 

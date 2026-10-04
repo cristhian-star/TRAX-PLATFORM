@@ -1,3 +1,106 @@
+# Propuestas P1 — Testing independiente aprobado
+
+Timestamp: 2026-10-04T15:04:39-03:00. Origen: laptop.
+Responsable: 05 — MANDOBRA | Testing y QA Integral.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_APROBADO_PARA_COMMIT.
+Rama: feature/ux-ui-foundation. HEAD: 26ee98d0e0b18c3589fcf39f151ed70929309930.
+Staging vacío. El preflight confirmó los nueve paths P1 esperados, sin trabajo
+ajeno. Testing agregó únicamente el troubleshooting autorizado del incidente
+PostgreSQL y actualizó esta especificación/handoff con resultados reales.
+
+Revisión: listado limitado a PUBLICADA, acceso anónimo de lectura, filtros GET,
+orden determinista, paginación SQL, view models sin columnas privadas, escape
+Jinja, cero escrituras GET y elegibilidad central P0 confirmados. No se hallaron
+P0, P1, P2 ni P3 atribuibles al incremento. Cerradas y canceladas no aparecen
+en el portal; su visibilidad por URL directa sigue pendiente y fuera de P1.
+
+Pruebas: focales/regresiones 120 ejecutadas, 119 aprobadas, una omitida, cero
+fallos y cero errores. Suite completa 891 ejecutadas, 884 aprobadas, siete
+omitidas, cero fallos y cero errores. Las omisiones son cuatro gates PostgreSQL,
+una concurrencia PostgreSQL, una comprobación dentro de imagen Docker y una
+zona IANA ausente. `compileall app scripts` y `git diff --check`: PASS.
+Tests históricos de migración se ejecutaron solo contra SQLite temporal; nunca
+se utilizó ni modificó `trax_db`. PostgreSQL real: NO EJECUTADO y no acreditado.
+
+QA navegador: filtros combinados y paginación operativos; estado vacío seguro;
+profesional pendiente sin CTA; profesional aprobado con CTA y formulario en el
+detalle. Claro/oscuro y 1440/1280/1024/770/390/320 px sin overflow; por escala
+del navegador se verificaron 767/769 como fronteras de 768. Controles mínimo
+44 px, foco visible, contraste mínimo 5.48:1 claro y 8.02:1 oscuro, consola sin
+errores. Fixtures y servidor fueron SQLite en memoria y se retiraron al cerrar.
+
+Documentación: [especificación P1](../REQUISITOS/PROPUESTAS_P1.md) actualizada y
+[troubleshooting PostgreSQL](../TROUBLESHOOTING/2026-10-04-postgresql-dev-schema-desalineado.md)
+creado. No se modificó código productivo durante Testing.
+
+Pendiente: revisión del usuario y autorización separada para commit/push. No
+hacer merge, deploy, migraciones contra DEV ni operaciones destructivas. Si se
+requiere gate PostgreSQL, crear y proteger una base exclusiva descartable; no
+usar `trax_db`.
+
+---
+
+# Propuestas P1 — Portal público implementado
+
+Timestamp: 2026-10-04T14:16:52-03:00. Origen: laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 26ee98d0e0b18c3589fcf39f151ed70929309930.
+Preflight local/remoto coincidente; origin canónico; árbol inicial limpio y staging
+vacío. P0 presente y gate desbloqueado; las entradas históricas inferiores reflejan
+estados anteriores y quedan preservadas. No se repitió la auditoría completa.
+
+Completado: listado público PUBLICADA, filtros GET reales, paginación SQL, conteos
+agregados, view models públicos, política central P0, tarjetas de referencia,
+DS v2 claro/oscuro y acceso canónico desde Home. No se cambia navbar global.
+Detalles y límites: [especificación P1](../REQUISITOS/PROPUESTAS_P1.md).
+
+Archivos modificados: app/routes/operation_routes.py,
+app/services/proposal_service.py, app/templates/listado_propuestas.html,
+app/templates/home/_operation_search.html y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/services/proposal_portal_service.py,
+app/static/css/proposals-portal-p1.css, tests/test_proposal_portal_p1.py y
+docs/REQUISITOS/PROPUESTAS_P1.md.
+
+Validación: paquete focal y regresiones, 120 pruebas: 119 aprobadas y una omitida
+(test_real_concurrent_independent_sessions, requiere PostgreSQL real).
+Módulos: test_proposal_portal_p1, test_proposal_eligibility,
+test_sprint7_proposal_to_contract, test_operation_architecture_services,
+test_modular_view_services, test_security_controls, test_sprint7_contracting_core,
+test_sprint7_contracting_foundations, test_sprint7_contract_event_boundary,
+test_sprint7_contracting_p0_iteration1, test_sprint7_contracting_p1_iteration2,
+test_home_hero_carousel, test_corporate_footer, test_design_system_v2 y
+test_loading_error_states. No suite completa. Entorno: DATABASE_URL SQLite en
+memoria, PYTHONDONTWRITEBYTECODE=1, sin datos persistidos. Deprecaciones legacy y
+mensajes de error deliberados de las pruebas de seguridad/errores amigables.
+El primer intento de la fixture P1 omitía professional_id requerido; corregido
+antes de las ejecuciones aprobadas, sin cambio de dominio.
+
+Revisión visual: los siete anchos exactos 1440/1280/1024/770/768/390/320, ambos temas,
+0 overflow horizontal y 0 controles del portal inferiores a 44 × 44. Se normalizó
+el zoom del navegador y se repitió la matriz con innerWidth confirmado. Foco visible,
+filtro real operativo, sin solapamientos observados, consola limpia. Contraste de
+texto mínimo claro 4.56:1 / oscuro 8.01:1; corregido el pequeño encabezado y borde
+local de campos. Capturas de escritorio/móvil en ambos temas fuera del repositorio.
+Preview en puerto 5070 con fixtures SQLite en memoria; no usar sus datos como reales.
+
+Pendientes: retest independiente, revisión del producto, gate PostgreSQL cuando se
+autorice y política de detalle cerrado/cancelado. Sin vencimiento, renovación,
+pagos, múltiples contrataciones ni oferta firme. No hay migraciones relacionadas.
+Riesgo conocido: títulos/descripciones/ubicaciones son texto público del autor;
+no hay un detector de PII embebida. No se exponen columnas privadas del usuario.
+No se tocó contratación, creación, modelos, permisos P0, navbar, Docker ni producción.
+
+Cierre técnico: git diff --check y cached --check sin errores; sintaxis Python
+(AST) y UTF-8 sin BOM/NUL/U+FFFD, sin mojibake ni rutas locales nuevas. HEAD
+conservado y staging vacío verificados; nueve paths P1.
+
+Sin staging, commit, push, PR ni merge: fuera de autorización. El remoto permanece
+en la base; hay nueve paths locales P1 sin commit. Próximo paso: ejecutar Testing
+independiente sobre este diff y su spec, conservando HEAD y staging vacío. No hacer
+migraciones, acceder a PostgreSQL compartido ni integrar hasta autorización.
+
+---
+
 # Propuestas P0 — Elegibilidad central para postularse
 
 Timestamp: 2026-10-04T13:43:36-03:00. Origen: laptop.
