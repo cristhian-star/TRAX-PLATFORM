@@ -30,19 +30,20 @@
         {% if notifications %}
             <section class="notifications-page__list" aria-label="Listado de notificaciones">
                 {% for notification in notifications %}
+                            {% set notification_copy = present_notification(notification) %}
                     <article class="trax-card notification-card {{ 'is-unread' if not notification.leida else 'is-read' }}">
                         <div class="notification-card__meta">
-                            <span class="trax-badge trax-badge--info">{{ notification.categoria }}</span>
+                            <span class="trax-badge trax-badge--info">{{ notification_copy.categoria }}</span>
                             <span class="trax-badge {{ 'trax-badge--warning' if notification.requiere_accion else 'trax-badge--info' }}">{{ notification.prioridad|replace("_", " ")|title }}</span>
                             <time class="trax-badge" datetime="{{ notification.created_at.isoformat() }}">
                                 {{ format_notification_date(notification.created_at) }}
                             </time>
                         </div>
-                        <h2>{{ notification.titulo }}</h2>
-                        <p>{{ notification.mensaje }}</p>
+                        <h2>{{ notification_copy.titulo }}</h2>
+                        <p>{{ notification_copy.mensaje }}</p>
                         <div class="notification-card__actions">
-                            {% if notification.url_destino %}
-                                <a class="trax-button trax-button--ghost trax-button--small" href="{{ notification.url_destino }}">Abrir destino</a>
+                            {% if notification_copy.url_destino %}
+                                <a class="trax-button trax-button--ghost trax-button--small" href="{{ notification_copy.url_destino }}">Abrir destino</a>
                             {% endif %}
                             {% if not notification.leida %}
                                 <form action="/notificaciones/{{ notification.id }}/leer" method="POST">

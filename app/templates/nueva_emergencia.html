@@ -1,88 +1,100 @@
 {% extends "base.html" %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-directory-v1.css') }}">
-{% endblock %}
-
+{% block title %}Solicitar asistencia urgente | MANDOBRA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-entry-v2.css') }}">{% endblock %}
+{% macro icon(name) -%}
+<svg class="emergency-e2__icon" data-icon="{{ name }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{% if name == 'broadcast' %}<circle cx="12" cy="12" r="2"/><path d="M8 8a6 6 0 0 0 0 8m8-8a6 6 0 0 1 0 8M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>
+{% elif name == 'person-search' %}<circle cx="9" cy="7" r="4"/><path d="M3 21v-2a6 6 0 0 1 9-5"/><circle cx="17" cy="16" r="4"/><path d="m20 19 3 3"/>
+{% elif name == 'bolt' %}<path d="m13 2-7 11h6l-1 9 7-12h-6Z"/>
+{% elif name == 'tap' %}<path d="M3 12h5V9h6v3h3a4 4 0 0 1 4 4v1h-5v-2H8v2H3Zm8-3V5M7 5h8M3 10v9"/><path d="M18 19s-2 2-2 3a2 2 0 0 0 4 0c0-1-2-3-2-3Z"/>
+{% elif name == 'lock-key' %}<rect x="2" y="9" width="11" height="12" rx="2"/><path d="M4 9V6a3.5 3.5 0 0 1 7 0v3M7.5 14v3"/><circle cx="18" cy="7" r="3"/><path d="M18 10v10h3m-3-3h2"/>
+{% elif name == 'wheel' %}<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1"/><path d="m12 6 0 5m1 2 4 2m-6-2-4 2M9 2l1 3m7-2-1 3m6 3-3 1m2 7-3-1m-3 6-1-3m-7 2 1-3m-6-3 3-1m-2-7 3 1"/>
+{% elif name == 'flame' %}<path d="M12 2c1 5 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 3 1 4 2 4 2-2 2-5 1-9Z"/>
+{% elif name == 'drain' %}<path d="M4 3v8a6 6 0 0 0 6 6h10M8 3v8a2 2 0 0 0 2 2h10M2 3h8m10 8v8M12 20h6m-3-2 3 2-3 2"/>
+{% elif name == 'snowflake' %}<path d="M12 2v20M3 7l18 10M3 17 21 7M9 4l3 3 3-3M9 20l3-3 3 3M3 10l4-1-1-4M21 14l-4 1 1 4M3 14l4 1-1 4M21 10l-4-1 1-4"/>
+{% elif name == 'clock' %}<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>
+{% elif name == 'shield-alert' %}<path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6Z"/><path d="M12 7v6m0 3v1"/>
+{% elif name == 'shield-check' %}<path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6Z"/><path d="m8 12 3 3 5-6"/>
+{% elif name == 'list' %}<path d="M9 5h12M9 12h12M9 19h12"/><circle cx="3" cy="5" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="19" r="1"/>
+{% elif name == 'rain' %}<path d="M6 14a4 4 0 0 1-1-8 6 6 0 0 1 11-1 4.5 4.5 0 1 1 2 9Z"/><path d="m6 17-1 2m7-2-1 2m7-2-1 2m-8 2-1 2m7-2-1 2"/>
+{% elif name == 'info' %}<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>
+{% elif name == 'check' %}<circle cx="12" cy="12" r="10"/><path d="m7 12 3 3 7-7"/>
+{% elif name == 'pin' %}<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>
+{% elif name == 'document' %}<path d="M4 2h10l6 6v14H4ZM14 2v6h6M8 12h8M8 16h8"/>
+{% elif name == 'arrow' %}<path d="M3 12h18m-6-6 6 6-6 6"/>
+{% endif %}</svg>
+{%- endmacro %}
 {% block content %}
-{% set entry_data = form_data|default({}) %}
-
-<main class="emergency-entry">
-    <section class="emergency-entry__hero">
-        <div class="shell emergency-entry__hero-content">
-            <span>Asistencia urgente MANDOBRA</span>
-            <h1>Busca ayuda tecnica disponible para resolver una urgencia.</h1>
-            <p>
-                Completa categoria, zona y una descripcion breve. MANDOBRA te mostrara profesionales compatibles
-                para contactar por WhatsApp o llamada, sin prometer tiempos de respuesta garantizados.
-            </p>
+<main class="emergency-e2">
+<div class="emergency-e2__container emergency-e2__layout">
+    <div class="emergency-e2__primary">
+        <div class="emergency-e2__hero-stage">
+            <div class="emergency-e2__photos" data-emergency-carousel aria-hidden="true">
+                {% for name, position in [('electricista-tablero', '70% 20%'), ('plomero-desague', '58% 20%'), ('cerrajero-hogar', '68% 20%'), ('cerrajero-automotor', '70% 20%'), ('auxilio-vehicular-auto', '62% 65%'), ('auxilio-movil-moto', '62% 65%')] %}
+                <template data-src="{{ url_for('static', filename='images/emergencias/hero/' ~ name ~ '.webp') }}" data-position="{{ position }}"></template>
+                {% endfor %}
+                <img src="{{ url_for('static', filename='images/emergencias/hero/electricista-tablero.webp') }}" width="1448" height="1086" alt="" aria-hidden="true" fetchpriority="high" loading="eager" decoding="async" draggable="false" style="object-position: 70% 20%">
+                <img width="1448" height="1086" alt="" aria-hidden="true" decoding="async" draggable="false" hidden>
+            </div>
+        <header class="emergency-e2__hero">
+            <span class="emergency-e2__eyebrow">ASISTENCIA URGENTE MANDOBRA</span>
+            <h1>Encontrá ayuda técnica para una urgencia</h1>
+            <p>Indicá qué necesitás y dónde. Podrás explorar profesionales compatibles y confirmar su disponibilidad antes de elegir.</p>
+            <p class="emergency-e2__scope">En esta versión está disponible la búsqueda manual. Las guardias aún no se verifican: revisá el perfil y confirmá disponibilidad directamente.</p>
+            <p class="emergency-e2__schedule">{{ icon('clock') }} <span><strong>Turnos previstos de 12 horas</strong> · Día 07:00–19:00 · Noche 19:00–07:00</span></p>
+        </header>
+        <section class="trax-alert trax-alert--danger emergency-e2__safety" aria-labelledby="emergency-safety-title">
+            {{ icon('shield-alert') }}
+            <div><h2 id="emergency-safety-title">Primero, protegé a las personas</h2><p>Si existe incendio, fuga grave, riesgo eléctrico, personas heridas o peligro inmediato, contactá a Bomberos, Defensa Civil o los servicios oficiales de respuesta inmediata. Mandobra no reemplaza esos servicios.</p></div>
+        </section>
         </div>
-    </section>
-
-    <section class="shell emergency-entry__layout">
-        <form action="/emergencias/nueva" method="POST" class="emergency-form">
+        <form id="emergency-form" class="trax-card emergency-e2__form" action="{{ url_for('operations.nueva_emergencia') }}" method="POST" aria-labelledby="emergency-form-title">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="prioridad" value="ALTA">
+            <div class="emergency-e2__wide"><h2 id="emergency-form-title">Contanos qué necesitás</h2><p>Seleccioná un rubro, indicá tu ubicación y describí la urgencia.</p></div>
+            {% if errors %}<div class="trax-alert trax-alert--danger emergency-e2__wide" role="alert"><strong>Revisá los datos para continuar.</strong>{% if errors.get('modalidad') %}<p>{{ errors.modalidad }}</p>{% endif %}</div>{% endif %}
 
-            <div class="emergency-form__heading">
-                <span>Solicitud urgente</span>
-                <h2>Buscar ayuda ahora</h2>
-                <p>Te llevamos directo al directorio de profesionales compatibles para que confirmes disponibilidad.</p>
-            </div>
-
-            <label>
-                <span>Tipo de emergencia / categoria</span>
-                <input
-                    type="text"
-                    name="categoria"
-                    value="{{ entry_data.get('categoria', '') }}"
-                    placeholder="Ej: Electricidad, plomeria, refrigeracion"
-                    required>
-            </label>
-
-            <label>
-                <span>Zona</span>
-                <input
-                    type="text"
-                    name="zona"
-                    value="{{ entry_data.get('zona', '') }}"
-                    placeholder="Barrio, localidad o area"
-                    required>
-            </label>
-
-            <label class="emergency-form__wide">
-                <span>Descripcion breve</span>
-                <textarea
-                    name="descripcion"
-                    maxlength="600"
-                    placeholder="Describi que ocurre, que instalacion esta afectada y cualquier riesgo visible."
-                    required>{{ entry_data.get('descripcion', '') }}</textarea>
-            </label>
-
-            <button class="emergency-form__wide emergency-form__submit" type="submit">Buscar ayuda ahora</button>
-        </form>
-
-        <aside class="emergency-entry__aside">
-            <section class="emergency-legal" aria-labelledby="emergency-legal-title">
-                <span aria-hidden="true">!</span>
-                <div>
-                    <h2 id="emergency-legal-title">Primero, protege a las personas</h2>
-                    <p>
-                        Si hay riesgo para personas, incendio, fuga grave o peligro inmediato,
-                        contacta primero a emergencias oficiales.
-                    </p>
+                    <fieldset class="emergency-e2__wide" aria-describedby="category-help{% if errors.get('categoria') %} category-error{% endif %}">
+                        <legend>Rubro de la urgencia</legend>
+                        <p id="category-help" class="trax-field__help">Elegí el rubro que corresponde a tu urgencia.</p>
+                        <div class="emergency-e2__categories">
+                        {% for value, label in categories %}
+                            <label class="emergency-e2__category" for="category-{{ loop.index }}"><input class="trax-radio" id="category-{{ loop.index }}" type="radio" name="categoria" value="{{ value }}" required{% if selected_category == value %} checked{% endif %}{% if errors.get('categoria') %} aria-invalid="true" aria-describedby="category-error"{% endif %}>{{ icon(['bolt', 'tap', 'lock-key', 'wheel', 'flame', 'drain', 'snowflake'][loop.index0]) }}<span>{{ label }}</span></label>
+                        {% endfor %}
+                        </div>
+                        {% if errors.get('categoria') %}<p id="category-error" class="trax-field__error">{{ errors.categoria }}</p>{% endif %}
+                    </fieldset>
+                    <div class="trax-field"><label class="trax-field__label" for="emergency-province">Provincia</label><div class="emergency-e2__input-icon">{{ icon("pin") }}<input class="trax-input" id="emergency-province" value="Buenos Aires" readonly aria-describedby="province-help"></div><p id="province-help" class="trax-field__help">Dato contextual: no filtra la búsqueda. Indicá la localidad real; CABA no pertenece a la provincia de Buenos Aires.</p></div>
+                    <div class="trax-field"><label class="trax-field__label" for="emergency-zone">Localidad</label><div class="emergency-e2__input-icon">{{ icon("pin") }}<input class="trax-input" id="emergency-zone" name="zona" value="{{ form_data.get('zona', '') }}" placeholder="Ej.: Villa Lugano" maxlength="{{ max_zone_length }}" required aria-describedby="zone-help{% if errors.get('zona') %} zone-error{% endif %}"{% if errors.get('zona') %} aria-invalid="true"{% endif %}></div><p id="zone-help" class="trax-field__help">Sin dirección exacta. Usamos la búsqueda actual por zona declarada.</p>{% if errors.get('zona') %}<p id="zone-error" class="trax-field__error">{{ errors.zona }}</p>{% endif %}</div>
+                    <div class="trax-field emergency-e2__wide"><label class="trax-field__label" for="emergency-description">Descripción breve</label><div class="emergency-e2__input-icon">{{ icon("document") }}<textarea class="trax-textarea" id="emergency-description" name="descripcion" maxlength="{{ max_description_length }}" required placeholder="Describí qué ocurre, qué instalación o vehículo está afectado y cualquier riesgo visible." aria-describedby="description-help{% if errors.get('descripcion') %} description-error{% endif %}"{% if errors.get('descripcion') %} aria-invalid="true"{% endif %}>{{ form_data.get('descripcion', '') }}</textarea></div><p id="description-help" class="trax-field__help"><output id="emergency-description-count" for="emergency-description">{{ form_data.get('descripcion', '')|length }}</output>/{{ max_description_length }} caracteres. No incluyas documentos ni datos privados.</p>{% if errors.get('descripcion') %}<p id="description-error" class="trax-field__error">{{ errors.descripcion }}</p>{% endif %}</div>
+            <fieldset class="emergency-e2__wide" aria-describedby="mode-help broadcast-help">
+                <legend>¿Cómo querés recibir ayuda?</legend>
+                <div class="emergency-e2__modes">
+                    <label class="emergency-e2__mode" for="mode-broadcast">
+                        <input id="mode-broadcast" type="radio" name="modalidad" value="difundir" disabled aria-describedby="broadcast-help">
+                        <span class="emergency-e2__mode-icon">{{ icon('broadcast') }}</span>
+                        <span class="emergency-e2__mode-copy"><strong>Difundir solicitud</strong><span class="emergency-e2__badge">Próximamente</span><span>Cuando se habilite, avisará a profesionales de guardia de tu rubro y localidad.</span><span class="emergency-e2__facts"><span>{{ icon('clock') }} 15 minutos</span><span>Hasta 3 intentos</span></span></span>
+                    </label>
+                    <label class="emergency-e2__mode" for="mode-manual">
+                        <input id="mode-manual" type="radio" name="modalidad" value="manual" checked aria-describedby="mode-help">
+                        <span class="emergency-e2__mode-icon">{{ icon('person-search') }}</span>
+                        <span class="emergency-e2__mode-copy"><strong>Elegir profesional</strong><span>Explorá perfiles compatibles y elegí a quién contactar.</span><span class="emergency-e2__facts"><span>{{ icon('clock') }} Hasta 10 minutos</span><span>{{ icon('list') }} Selección manual</span></span></span>
+                    </label>
                 </div>
-            </section>
-
-            <section class="emergency-process" aria-labelledby="emergency-process-title">
-                <h2 id="emergency-process-title">Como funciona esta version</h2>
-                <ol>
-                    <li>Registras categoria, zona y que esta pasando.</li>
-                    <li>MANDOBRA muestra profesionales compatibles por rubro y area declarada.</li>
-                    <li>Confirmas disponibilidad por WhatsApp o llamada.</li>
-                </ol>
-            </section>
-        </aside>
-    </section>
+                <p id="broadcast-help" class="emergency-e2__small">Difusión próximamente: requiere reservas, matching y notificaciones todavía pendientes.</p>
+                <p id="mode-help" class="emergency-e2__small">Los 10 minutos son un plazo previsto, todavía no implementado ni garantizado. Mandobra nunca asigna un profesional automáticamente.</p>
+            </fieldset>
+                    <p class="emergency-e2__wide emergency-e2__small">{{ icon("info") }} La búsqueda es manual por zona declarada: no verifica guardias ni garantiza disponibilidad o llegada. Confirmá la cobertura directamente con el profesional.</p>
+                    <button class="trax-button trax-button--primary trax-button--large emergency-e2__wide" type="submit">Buscar profesionales {{ icon("arrow") }}</button>
+        </form>
+    </div>
+    <aside class="emergency-e2__aside" aria-label="Información antes de contactar">
+        <section class="trax-card"><h2><span class="emergency-e2__round-icon">{{ icon('list') }}</span>Antes de solicitar</h2><ol><li>Confirmá que el lugar sea seguro.</li><li>Indicá provincia y localidad.</li><li>Revisá el perfil antes de elegir.</li><li>El contacto podrá continuar mediante los canales actualmente habilitados.</li></ol><p class="emergency-e2__small">En horario nocturno podrán solicitarse datos adicionales de identidad y domicilio. Esta verificación reforzada todavía no está disponible.</p></section>
+        <section class="trax-card"><h2><span class="emergency-e2__round-icon">{{ icon('rain') }}</span>La asistencia puede rechazarse por seguridad</h2><p>Un profesional puede rechazar o cancelar la solicitud si las condiciones climáticas —como lluvia o humedad— hacen inseguro el trabajo. Deberá informar el motivo.</p><p class="emergency-e2__info">{{ icon('info') }}<span>La disponibilidad no garantiza la realización cuando existe un riesgo real.</span></p></section>
+        <section class="trax-card" aria-labelledby="verification-title"><h2 id="verification-title"><span class="emergency-e2__round-icon emergency-e2__verified">{{ icon('shield-check') }}</span>Profesionales verificados</h2><p class="emergency-e2__small">Qué revisar en cada perfil cuando esas verificaciones estén acreditadas:</p><ul class="emergency-e2__checks"><li>{{ icon('check') }}Identidad validada</li><li>{{ icon('check') }}Documentación validada</li><li>{{ icon('check') }}Perfil revisado</li></ul><p class="emergency-e2__small">Esta lista es orientativa: no acredita a los resultados de búsqueda. Podrás revisar en cada perfil las verificaciones que estén realmente disponibles.</p></section>
+    </aside>
+</div>
 </main>
 {% endblock %}
+
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/emergency-entry-form.js') }}" defer></script><script src="{{ url_for('static', filename='js/emergency-hero-carousel-v1.js') }}" defer></script>{% endblock %}

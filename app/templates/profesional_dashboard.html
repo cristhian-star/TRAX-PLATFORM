@@ -96,7 +96,7 @@
                 <small>{{ accepted_proposal_applications_count }} aceptadas</small>
             </article>
             <article>
-                <span>Emergencias</span>
+                <span>Urgencias</span>
                 <strong>Placeholder</strong>
                 <small>Guardias y disponibilidad operativa proximamente</small>
             </article>
@@ -153,10 +153,11 @@
                 {% if recent_activity %}
                     <div class="pro-dashboard__notification-list">
                         {% for notification in recent_activity %}
-                            <a href="{{ notification.url_destino or '/notificaciones' }}" class="{{ 'is-unread' if not notification.leida else 'is-read' }}">
-                                <span>{{ notification.categoria }}</span>
-                                <strong>{{ notification.titulo }}</strong>
-                                <small>{{ notification.mensaje }} - {{ format_notification_date(notification.created_at) }}</small>
+                            {% set notification_copy = present_notification(notification) %}
+                            <a href="{{ notification_copy.url_destino or '/notificaciones' }}" class="{{ 'is-unread' if not notification.leida else 'is-read' }}">
+                                <span>{{ notification_copy.categoria }}</span>
+                                <strong>{{ notification_copy.titulo }}</strong>
+                                <small>{{ notification_copy.mensaje }} - {{ format_notification_date(notification.created_at) }}</small>
                             </a>
                         {% endfor %}
                     </div>
@@ -209,10 +210,10 @@
             <article class="pro-dashboard__panel">
                 <div class="pro-dashboard__section-head">
                     <div>
-                        <span class="pro-dashboard__eyebrow">Emergencias</span>
+                        <span class="pro-dashboard__eyebrow">Urgencias</span>
                         <h2>Operacion urgente</h2>
                     </div>
-                    <a href="/emergencias/nueva">Ver flujo</a>
+                    <a href="/urgencias/nueva">Ver flujo</a>
                 </div>
                 <div class="pro-dashboard__placeholder">
                     <strong>Guardias proximamente</strong>

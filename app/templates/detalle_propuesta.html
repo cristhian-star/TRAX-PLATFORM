@@ -137,7 +137,7 @@
                         <p>Esta propuesta ya no recibe postulaciones.</p>
                     {% endif %}
                 </section>
-            {% elif is_professional %}
+            {% elif application_eligibility.eligible %}
                 <section class="proposal-panel">
                     <h2>Postularme</h2>
                     {% if own_application %}
@@ -158,8 +158,10 @@
             {% else %}
                 <section class="proposal-panel">
                     <h2>Postulaciones profesionales</h2>
-                    <p>Inicia sesion como profesional para postularte.</p>
+                    <p>{{ application_eligibility.message }}</p>
+                    {% if application_eligibility.reason == "AUTH_REQUIRED" %}
                     <a class="proposal-button proposal-button--primary" href="/login?next=/propuestas/{{ proposal.id }}">Iniciar sesion</a>
+                    {% endif %}
                 </section>
             {% endif %}
         </aside>

@@ -603,6 +603,8 @@ def get_contract_detail_context(contract, user_id):
     from app.models.review import Review
 
     is_client = contract.cliente_id == user_id
+    if is_client and contract.source_type == ContractRequest.SOURCE_BUDGET:
+        require_client_owner(contract, user_id)
     is_professional = contract.professional_user_id == user_id
     if not is_client and not is_professional:
         raise PermissionError("No tenes permiso para ver esta contratacion")
@@ -616,6 +618,7 @@ def get_contract_detail_context(contract, user_id):
         "contract_review": contract_review,
         "can_create_contract_review": (
             is_client
+            and db.session.get(User, user_id).rol == "CLIENTE"
             and contract.estado == "CONFIRMADA"
             and contract_review is None
         ),

@@ -1,111 +1,65 @@
 {% extends "base.html" %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-marketplace-v1.css') }}">
-{% endblock %}
-
+{% block title %}Propuestas de trabajo | MANDOBRA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-portal-p1.css') }}">{% endblock %}
 {% block content %}
-<main class="proposal-page">
-    <section class="proposal-hero">
-        <div class="shell proposal-hero__layout">
-            <div>
-                <span class="proposal-eyebrow">Marketplace de oportunidades</span>
-                <h1>Propuestas abiertas para profesionales MANDOBRA.</h1>
-                <p>Explora proyectos publicados por clientes, empresas y contratistas.</p>
-            </div>
-            <a class="proposal-button proposal-button--secondary" href="/propuestas/nueva">Publicar propuesta</a>
+<main class="proposals-p1">
+  <div class="proposals-p1__layout">
+      <header class="proposals-p1__header">
+        <div class="proposals-p1__photos" data-proposal-carousel data-transition="fade" aria-hidden="true">
+          {% for number in range(1, 13) %}
+          <template data-src="{{ url_for('static', filename='images/proposals/hero/proposal-hero-%02d.webp' % number) }}" data-position="center"></template>
+          {% endfor %}
+          <img src="{{ url_for('static', filename='images/proposals/hero/proposal-hero-01.webp') }}" width="1448" height="1086" alt="" aria-hidden="true" fetchpriority="high" loading="eager" decoding="async" draggable="false">
+          <img width="1448" height="1086" alt="" aria-hidden="true" decoding="async" draggable="false" hidden>
         </div>
+        <div><p class="proposals-p1__eyebrow">EXPLORÁ OPORTUNIDADES</p><h1 id="portal-title">Propuestas de trabajo</h1><p>Encontrá nuevas oportunidades publicadas por clientes y profesionales.</p></div>
+        {% if can_create %}<a class="trax-button trax-button--primary" href="{{ url_for('operations.nueva_propuesta') }}">Crear propuesta</a>{% else %}<a class="trax-button trax-button--primary" href="{{ url_for('auth.login', next=url_for('operations.nueva_propuesta')) }}">Ingresar para crear</a>{% endif %}
+      </header>
+      <div class="proposals-p1__search"><label class="trax-field" for="proposal-trade"><span>Buscar por rubro</span><input id="proposal-trade" class="trax-input" type="search" name="rubro" form="proposal-filters" value="{{ filters.rubro }}" maxlength="120" placeholder="Rubro del trabajo"></label><button class="trax-button trax-button--primary" form="proposal-filters" type="submit">Buscar propuestas</button></div>
+    <aside class="proposals-p1__filters trax-card" aria-labelledby="filters-title">
+      <details class="proposals-p1__filter-disclosure" open>
+      <summary id="filters-title">Filtrar propuestas <span aria-hidden="true">+</span></summary>
+      <form id="proposal-filters" action="{{ url_for('operations.marketplace_propuestas') }}" method="GET">
+        {% for name, label in [('industria', 'Industria'), ('categoria', 'Categoría')] %}
+        <label class="trax-field"><span>{{ label }}</span><select class="trax-select" name="{{ name }}"><option value="">Todas</option>{% for value in options[name] %}<option value="{{ value }}"{% if filters[name] == value %} selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+        {% endfor %}
+        <label class="trax-field"><span>Ubicación</span><input class="trax-input" type="search" name="ubicacion" maxlength="120" value="{{ filters.ubicacion }}" placeholder="Localidad o zona"></label>
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+        <button class="trax-button trax-button--primary" type="submit">Aplicar filtros</button>
+        <a class="proposals-p1__clear" href="{{ url_for('operations.marketplace_propuestas') }}">Limpiar filtros</a>
+      </form>
+      </details>
+    </aside>
+    <section class="proposals-p1__results" aria-labelledby="portal-title">
+
+
+      {% if active_filters %}
+      <nav class="proposals-p1__active-filters" aria-label="Filtros activos">
+        {% for filter in active_filters %}
+        <a href="{{ filter.remove_url }}" aria-label="Quitar {{ filter.label }}: {{ filter.value }}">{{ filter.label }}: {{ filter.value }} <span aria-hidden="true">×</span></a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+      <div class="proposals-p1__toolbar"><strong>Más recientes</strong><span>{{ total }} propuesta{{ '' if total == 1 else 's' }} publicada{{ '' if total == 1 else 's' }}</span></div>
+      {% for card in cards %}
+      <article class="proposals-p1__card trax-card" aria-labelledby="proposal-title-{{ card.id }}">
+        <div class="proposals-p1__meta"><span class="proposals-p1__tag">{{ card.category }}</span>{% if card.location %}<span>{{ card.location }}</span>{% endif %}<span>Publicada{% if card.published %} · <time datetime="{{ card.published.isoformat() }}">{{ card.published.strftime('%d/%m/%Y') }}</time>{% endif %}</span></div>
+        <h2 id="proposal-title-{{ card.id }}">{{ card.title }}</h2>
+        <p class="proposals-p1__description">{{ card.description }}</p>
+        <div class="proposals-p1__tags">{% if card.trade %}<span>{{ card.trade }}</span>{% endif %}{% if card.specialty %}<span>{{ card.specialty }}</span>{% endif %}</div>
+        <footer><div class="proposals-p1__facts"><span>{{ card.applications }} {{ 'postulación' if card.applications == 1 else 'postulaciones' }}</span>{% if card.budget is not none %}<span>Presupuesto estimado <strong>${{ "{:,.2f}".format(card.budget) }}</strong></span>{% endif %}</div><div class="proposals-p1__actions">{% if card.applied %}<span>Ya te postulaste</span>{% elif card.can_apply %}<a class="trax-button trax-button--primary" href="{{ url_for('operations.detalle_propuesta', id=card.id) }}">Postularme</a>{% endif %}<a class="trax-button trax-button--secondary" href="{{ url_for('operations.detalle_propuesta', id=card.id) }}">Ver propuesta</a></div></footer>
+      </article>
+      {% else %}
+      <div class="trax-card proposals-p1__empty"><h2>{% if total and page > pages %}Esta página no tiene propuestas{% elif has_filters %}No encontramos coincidencias{% else %}Todavía no hay propuestas publicadas{% endif %}</h2><p>{% if total and page > pages %}Volvé a la primera página para ver los resultados.{% else %}Podés volver más tarde o probar otros filtros.{% endif %}</p><a class="trax-button trax-button--secondary" href="{{ first_url if total else url_for('operations.marketplace_propuestas') }}">{{ 'Primera página' if total else 'Ver todas' }}</a></div>
+      {% endfor %}
+      <nav class="proposals-p1__pagination" aria-label="Paginación de propuestas">{% if previous_url %}<a class="trax-button trax-button--secondary" href="{{ previous_url }}">Anterior</a>{% endif %}<span>Página {{ page }}{% if pages %} de {{ pages }}{% endif %}</span>{% if next_url %}<a class="trax-button trax-button--secondary" href="{{ next_url }}">Siguiente</a>{% endif %}</nav>
     </section>
-
-    <section class="shell proposal-section">
-        <form class="proposal-filter" action="/propuestas" method="GET" aria-label="Filtrar propuestas">
-            <label>
-                <span>Industria</span>
-                <select name="industria">
-                    <option value="">Todas</option>
-                    {% for item in taxonomy.industrias %}
-                        <option value="{{ item.nombre }}" {% if filters.industria == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label>
-                <span>Categoria</span>
-                <select name="categoria">
-                    <option value="">Todas</option>
-                    {% for item in taxonomy.categorias %}
-                        <option value="{{ item.nombre }}" {% if filters.categoria == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label>
-                <span>Rubro</span>
-                <select name="rubro">
-                    <option value="">Todos</option>
-                    {% for item in taxonomy.rubros %}
-                        <option value="{{ item.nombre }}" {% if filters.rubro == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label>
-                <span>Ubicacion</span>
-                <input type="search" name="ubicacion" value="{{ filters.ubicacion }}" placeholder="Ciudad, zona o remoto">
-            </label>
-            <button class="proposal-button proposal-button--primary" type="submit">Filtrar</button>
-        </form>
-
-        <div class="proposal-section__heading">
-            <span class="proposal-eyebrow">Propuestas publicadas</span>
-            <h2>{{ proposals|length }} oportunidades</h2>
-        </div>
-
-        {% if proposals %}
-            <div class="proposal-grid">
-                {% for proposal in proposals %}
-                    <article class="proposal-card">
-                        <header>
-                            <span class="proposal-status proposal-status--{{ proposal.estado|lower }}">{{ proposal.estado }}</span>
-                            <span>{{ proposal.modalidad or "A coordinar" }}</span>
-                        </header>
-                        <div class="proposal-card__body">
-                            <span class="proposal-eyebrow">{{ proposal.industria or "Industria" }} / {{ proposal.categoria }}</span>
-                            <h2>{{ proposal.titulo or proposal.categoria }}</h2>
-                            <p>{{ proposal.descripcion|truncate(180) }}</p>
-                        </div>
-                        <dl class="proposal-card__facts">
-                            <div>
-                                <dt>Rubro</dt>
-                                <dd>{{ proposal.rubro or proposal.categoria }}</dd>
-                            </div>
-                            <div>
-                                <dt>Ubicacion</dt>
-                                <dd>{{ proposal.ubicacion or "A coordinar" }}</dd>
-                            </div>
-                            <div>
-                                <dt>Cantidad</dt>
-                                <dd>{{ proposal.cantidad_profesionales or 1 }} profesional{% if (proposal.cantidad_profesionales or 1) != 1 %}es{% endif %}</dd>
-                            </div>
-                            <div>
-                                <dt>Limite</dt>
-                                <dd>
-                                    {% if proposal.fecha_limite_postulacion %}
-                                        {{ proposal.fecha_limite_postulacion.strftime('%d/%m/%Y') }}
-                                    {% else %}
-                                        Sin fecha limite
-                                    {% endif %}
-                                </dd>
-                            </div>
-                        </dl>
-                        <a class="proposal-button proposal-button--primary" href="/propuestas/{{ proposal.id }}">Ver propuesta</a>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <section class="proposal-empty">
-                <h2>No encontramos propuestas con esos filtros.</h2>
-                <p>Proba ajustar industria, categoria, rubro o ubicacion.</p>
-                <a class="proposal-button proposal-button--secondary" href="/propuestas">Ver todas</a>
-            </section>
-        {% endif %}
-    </section>
+    <aside class="proposals-p1__aside" aria-label="Información para postularte">
+      <section class="trax-card"><h2>Tu próximo trabajo</h2><p>{{ "Tu perfil está habilitado para postularte. Revisá las condiciones de cada propuesta." if eligibility.eligible else eligibility.message }}</p>{% if eligibility.reason == 'AUTH_REQUIRED' %}<a class="trax-button trax-button--secondary" href="{{ url_for('auth.login', next=url_for('operations.marketplace_propuestas')) }}">Iniciar sesión</a>{% endif %}</section>
+      <section class="trax-card"><h2>Antes de postularte</h2><p>Explorá las propuestas de forma gratuita. Para postularte necesitás una cuenta profesional activa, un perfil completo y una verificación aprobada.</p><p>Leé el detalle y las condiciones del trabajo antes de enviar tu postulación.</p></section>
+    </aside>
+  </div>
 </main>
 {% endblock %}
+
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/proposals-portal-p1.js') }}" defer></script><script src="{{ url_for('static', filename='js/emergency-hero-carousel-v1.js') }}" defer></script>{% endblock %}

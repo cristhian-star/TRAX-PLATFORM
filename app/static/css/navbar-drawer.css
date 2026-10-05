@@ -1,0 +1,215 @@
+/* UX-04A: the measured full-width row determines the mode, not a device breakpoint.
+   200px is the approved logo box; gaps/gutters use the existing DS scale.
+   The unenhanced layout wraps naturally, retaining links without JavaScript. */
+.site-header--visitor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--trax-space-6);
+    padding: 14px var(--trax-space-10);
+    min-height: 85px;
+}
+
+.site-header--visitor .navigation-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--trax-space-6);
+    min-width: 0;
+}
+
+.site-header--visitor .main-nav--visitor {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    width: auto;
+    gap: var(--trax-space-5);
+    padding: 0;
+    border: 0;
+    font-size: var(--trax-font-size-14);
+}
+
+.site-header--visitor .header-utilities,
+.site-header--visitor .header-actions--visitor {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    padding: 0;
+    border: 0;
+}
+
+.site-header--visitor .theme-switch { width: auto; }
+.site-header--visitor .theme-switch__label { display: inline; min-width: 5ch; }
+.site-header--visitor .account-summary__text small { max-width: 10rem; }
+.site-header--visitor :is(a, button, summary) { min-height: 44px; }
+.site-header--visitor .notification-summary { width: 44px; }
+.site-header--visitor .notification-summary::after { content: none; }
+.site-header--visitor .notification-summary__count { position: absolute; }
+.site-header--visitor .menu-toggle { display: none; width: 44px; height: 44px; margin: 0; }
+.site-header--visitor [hidden] { display: none; }
+
+/* Both the real horizontal row and its short-lived inert measurement use these
+   exact dimensions. No text is squeezed or hidden to make the row fit. */
+.site-header--visitor:is([data-nav-mode="horizontal"], .nav-measure),
+.site-header--visitor:is([data-nav-mode="horizontal"], .nav-measure) :is(.navigation-content, .main-nav--visitor) {
+    flex-wrap: nowrap;
+}
+.site-header--visitor.nav-measure {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: max-content;
+    max-width: none;
+    visibility: hidden;
+    pointer-events: none;
+}
+.site-header--visitor.nav-measure :is(.navigation-content, .main-nav--visitor) {
+    flex: 0 0 auto;
+    width: max-content;
+}
+
+.site-header--visitor[data-nav-mode="drawer"] { padding-inline: var(--trax-space-5); }
+.site-header--visitor[data-nav-mode="drawer"] .menu-toggle { display: block; margin-left: auto; }
+.site-header--visitor[data-nav-mode="drawer"] .brand {
+    width: clamp(144px, 46vw, 180px);
+    height: 56px;
+    min-width: 0;
+}
+
+/* Native modal dialog supplies the top layer, inert background and focus guard.
+   24rem caps reading width; 1rem leaves the underlying page visible at 320px. */
+.site-header--visitor .nav-drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(24rem, calc(100% - 1rem));
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--trax-ds-border-subtle);
+    background: var(--trax-ds-surface);
+    color: var(--trax-ds-text);
+    box-shadow: var(--trax-ds-shadow-lg);
+    overflow: hidden;
+    transform: translateX(100%);
+    transition: transform var(--trax-ds-duration-base) var(--trax-ds-ease),
+        display var(--trax-ds-duration-base) allow-discrete,
+        overlay var(--trax-ds-duration-base) allow-discrete;
+}
+.site-header--visitor .nav-drawer[open] { display: flex; flex-direction: column; transform: translateX(0); }
+.site-header--visitor .nav-drawer:not([open]) { display: none; }
+.nav-drawer::backdrop { background: var(--trax-ds-overlay); }
+@starting-style { .site-header--visitor .nav-drawer[open] { transform: translateX(100%); } }
+
+.nav-drawer__head {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--trax-space-4);
+    padding: var(--trax-space-4) var(--trax-space-5);
+    border-bottom: 1px solid var(--trax-ds-border-subtle);
+}
+.nav-drawer__head h2 { margin: 0; font-size: var(--trax-font-size-18); }
+.nav-drawer__close {
+    width: 44px;
+    border: 1px solid var(--trax-ds-border-subtle);
+    border-radius: var(--trax-radius-md);
+    color: inherit;
+    background: var(--trax-ds-bg-subtle);
+    font-size: 1.75rem;
+    cursor: pointer;
+}
+.nav-drawer__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--trax-space-5); }
+.site-header--visitor .nav-drawer .navigation-content {
+    min-height: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: var(--trax-space-6);
+}
+.site-header--visitor .nav-drawer .main-nav--visitor {
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--trax-space-2);
+    white-space: normal;
+}
+.site-header--visitor .nav-drawer .header-utilities {
+    margin-top: auto;
+    padding-top: var(--trax-space-5);
+    border-top: 1px solid var(--trax-ds-border-subtle);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--trax-space-3);
+}
+.site-header--visitor .nav-drawer :is(.header-actions--visitor, .visitor-start, .nav-dropdown, .theme-switch) { width: 100%; }
+.site-header--visitor .nav-drawer .theme-switch { justify-content: space-between; }
+.site-header--visitor .nav-drawer .main-nav--visitor > a,
+.nav-drawer .nav-accordion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--trax-space-3);
+    border: 0;
+    border-radius: var(--trax-radius-md);
+    color: var(--trax-ds-text-strong);
+    background: transparent;
+    font: inherit;
+    font-weight: var(--trax-font-weight-bold);
+    text-align: left;
+    cursor: pointer;
+}
+.nav-drawer .nav-accordion::after { content: "+"; font-size: 1.25rem; }
+.nav-drawer .nav-accordion[aria-expanded="true"]::after { content: "−"; }
+.site-header--visitor .nav-drawer .main-nav--visitor > a:hover,
+.nav-drawer .nav-accordion:hover { background: var(--trax-ds-bg-subtle); }
+.site-header--visitor .main-nav--visitor > a[aria-current="page"],
+.site-header--visitor .nav-dropdown__item[aria-current="page"] {
+    color: var(--trax-ds-primary);
+    box-shadow: inset 0 -2px 0 currentColor;
+}
+.site-header--visitor .nav-drawer .nav-dropdown__menu {
+    position: static;
+    width: 100%;
+    margin: var(--trax-space-1) 0 0;
+    padding: var(--trax-space-2);
+    transform: none;
+    box-shadow: none;
+    background: var(--trax-ds-bg-subtle);
+}
+.nav-drawer .nav-dropdown__menu::before { display: none; }
+.nav-drawer .notification-dropdown__head { flex-wrap: wrap; }
+.nav-drawer .notification-dropdown__head a { display: inline-flex; align-items: center; }
+.nav-drawer .account-logout-form button { padding: var(--trax-space-2); }
+/* P2: the dialog ID outranks the legacy two-class direct-link selector.
+   Only controls inside the drawer participate; the horizontal measurement
+   clone and DS control-height tokens retain their existing dimensions. */
+#navigation-drawer :is(a[href], button, summary) {
+    box-sizing: border-box;
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+}
+.site-header--visitor :is(a, button, summary):focus-visible {
+    outline: 2px solid var(--trax-ds-text-strong);
+    outline-offset: 2px;
+    box-shadow: var(--trax-focus-ring);
+}
+
+/* No-JS/unsupported-dialog fallback: wrap all options; native details remain usable. */
+.site-header--visitor:not([data-nav-ready]):not(.nav-measure) { position: relative; padding-inline: var(--trax-space-5); }
+.site-header--visitor:not([data-nav-ready]):not(.nav-measure) .navigation-content { flex-basis: 100%; }
+.site-header--visitor:not([data-nav-ready]):not(.nav-measure) .header-utilities { flex-wrap: wrap; max-width: 100%; }
+.site-header--visitor:not([data-nav-ready]):not(.nav-measure) .nav-dropdown__menu { position: static; width: min(19rem, 100%); transform: none; }
+.site-header--visitor:not([data-nav-ready]):not(.nav-measure) .nav-dropdown__menu::before { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .site-header--visitor .nav-drawer,
+    .site-header--visitor .nav-drawer *,
+    .nav-drawer::backdrop { transition: none; animation: none; }
+}

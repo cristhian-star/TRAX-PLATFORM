@@ -33,6 +33,9 @@
 
     <div class="budget-shell budget-detail-layout">
         <div class="budget-detail-main">
+            {% if budget_contract %}
+                <a class="trax-button trax-button--primary" href="{{ url_for('operations.contract_detail', id=budget_contract.id) }}">Ver contrato del presupuesto adjudicado</a>
+            {% endif %}
             {% if awarded %}
                 <div class="budget-alert budget-alert--success" role="status">
                     Presupuesto adjudicado correctamente. El profesional ganador ya figura como Adjudicado.
@@ -336,7 +339,7 @@
                 <ul class="budget-rules">
                     <li>Hasta 6 presupuestos por solicitud.</li>
                     <li>Un presupuesto por profesional.</li>
-                    <li>Solo el cliente dueño puede adjudicar.</li>
+                    <li>Solo quien creó la solicitud puede adjudicar.</li>
                     <li>MANDOBRA no procesa pagos en esta etapa.</li>
                 </ul>
             </div>

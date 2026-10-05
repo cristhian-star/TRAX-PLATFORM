@@ -30,7 +30,7 @@
             aria-controls="operation-panel-emergency"
             tabindex="-1"
             data-operation-tab="emergency">
-            Emergencias
+            Urgencias
         </button>
         <button
             class="operation-search__tab"
@@ -124,28 +124,10 @@
         <div class="operation-search__heading">
             <span>Asistencia prioritaria</span>
             <h2>Necesito resolver una urgencia.</h2>
-            <p>Indica el tipo de problema y tu zona para iniciar la solicitud.</p>
+            <p>Encontrá ayuda técnica para tu urgencia. Contanos qué necesitás en el siguiente paso.</p>
         </div>
-        <form action="/emergencias/nueva" method="GET" class="operation-search__form">
-            <label class="operation-field">
-                <span>Tipo de emergencia</span>
-                <select name="categoria">
-                    <option value="">Seleccionar problema</option>
-                    <option>Electricidad</option>
-                    <option>Perdida de agua</option>
-                    <option>Gas domiciliario</option>
-                    <option>Climatizacion</option>
-                    <option>Cerrajeria</option>
-                </select>
-            </label>
-            <label class="operation-field">
-                <span>Zona</span>
-                <input type="text" name="zona" placeholder="Ubicacion de la urgencia">
-            </label>
-            <button class="operation-search__submit operation-search__submit--emergency" type="submit">
-                Buscar ayuda ahora
-            </button>
-        </form>
+        <a class="operation-search__submit operation-search__submit--emergency operation-search__urgent-link"
+           href="{{ url_for('operations.nueva_emergencia') }}">Buscar ayuda ahora</a>
         <p class="operation-search__help">
             Si existe riesgo para personas o bienes, contacta primero al servicio local adecuado.
         </p>
@@ -163,26 +145,22 @@
             <h2>Encontra trabajos para tu especialidad.</h2>
             <p>Accede al flujo de propuestas y presenta tu experiencia profesional.</p>
         </div>
-        <form action="/propuestas/nueva" method="GET" class="operation-search__form">
+        <form action="{{ url_for('operations.marketplace_propuestas') }}" method="GET" class="operation-search__form">
             <label class="operation-field">
-                <span>Industria o rubro</span>
-                <select name="categoria">
-                    <option value="">Cualquier especialidad</option>
-                    <option>Electricidad</option>
-                    <option>Refrigeracion A/C</option>
-                    <option>Plomeria</option>
-                    <option>Herreria</option>
-                    <option>Gas domiciliario</option>
-                </select>
+                <span>Rubro</span>
+                <input type="search" name="rubro" maxlength="120" placeholder="Rubro del trabajo">
             </label>
             <label class="operation-field">
                 <span>Ubicacion</span>
-                <input type="text" name="ubicacion" placeholder="Ciudad, barrio o zona">
+                <input type="text" name="ubicacion" maxlength="120" placeholder="Ciudad, barrio o zona">
             </label>
             <button class="operation-search__submit operation-search__submit--dark" type="submit">
                 Ver oportunidades
             </button>
         </form>
-        <p class="operation-search__help">El acceso puede requerir un perfil profesional completo.</p>
+        <p class="operation-search__help">Podés explorar sin iniciar sesión. Para postularte necesitás un perfil profesional habilitado.</p>
     </div>
+    <noscript>
+        <p><a href="{{ url_for('operations.marketplace_propuestas') }}">Buscar propuestas por rubro y ubicación</a></p>
+    </noscript>
 </section>

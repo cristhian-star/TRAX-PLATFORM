@@ -30,6 +30,7 @@ def user_display_name(user_id, fallback="Usuario MANDOBRA"):
 
 def notify_budget_created(budget_request):
     registrar_evento(
+        commit=False,
         user_id=budget_request.cliente_id,
         actor_user_id=budget_request.cliente_id,
         tipo=TIPO_PRESUPUESTO_PUBLICADO,
@@ -140,9 +141,9 @@ def notify_emergency_created(emergency_request):
         actor_user_id=emergency_request.cliente_id,
         tipo=TIPO_EMERGENCIA_PUBLICADA,
         categoria=CATEGORIA_EMERGENCIAS,
-        titulo="Publicaste una emergencia",
-        mensaje=f"Tu emergencia de {emergency_request.categoria} en {emergency_request.zona} quedo registrada.",
-        url_destino="/emergencias/directorio",
+        titulo="Publicaste una solicitud urgente",
+        mensaje=f"Tu solicitud urgente de {emergency_request.categoria} en {emergency_request.zona} quedo registrada.",
+        url_destino="/urgencias/directorio",
         entity_type="EmergencyRequest",
         entity_id=emergency_request.id,
         prioridad=PRIORIDAD_ACCION_REQUERIDA,

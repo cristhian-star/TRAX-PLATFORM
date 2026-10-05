@@ -55,7 +55,7 @@
                 <a href="{{ profile_url }}">Mi perfil</a>
                 <a href="{{ budget_url }}">Mis trabajos</a>
                 <a href="/propuestas">Propuestas</a>
-                <a href="/emergencias/nueva">Emergencias</a>
+                <a href="/urgencias/nueva">Urgencias</a>
                 <a href="/mercados">Mercados</a>
                 <a href="/planes">Planes</a>
                 <a href="{{ dashboard_url }}">Dashboard</a>
@@ -102,13 +102,13 @@
                     <a href="/presupuestos">Ver todos</a>
                 </div>
                 <div class="logged-work__grid">
-                    <a href="/emergencias/nueva" class="logged-work-card is-featured">
+                    <a href="/urgencias/nueva" class="logged-work-card is-featured">
                         <span>Destacado</span>
                         <strong>Instalacion electrica comercial</strong>
                         <small>Caballito, CABA</small>
                         <b>$ 120.000</b>
                     </a>
-                    <a href="/presupuestos/nuevo" class="logged-work-card">
+                    <a href="{{ url_for('operations.marketplace_presupuestos' if user_role == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}" class="logged-work-card">
                         <strong>Mantenimiento de tableros trifasicos</strong>
                         <small>Villa Crespo, CABA</small>
                         <b>$ 85.000</b>
@@ -166,7 +166,7 @@
                 <h2>Herramientas rapidas</h2>
                 <div>
                     <a href="/mercados">Calculadora</a>
-                    <a href="/presupuestos/nuevo">Presupuesto</a>
+                    <a href="{{ url_for('operations.marketplace_presupuestos' if user_role == 'PROFESIONAL' else 'operations.nuevo_presupuesto') }}">Presupuesto</a>
                     <a href="/propuestas/nueva">Plantillas</a>
                     <a href="/explorar">Guias</a>
                 </div>

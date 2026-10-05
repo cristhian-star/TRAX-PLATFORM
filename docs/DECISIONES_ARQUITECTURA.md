@@ -1,4 +1,272 @@
+# UX-07A — Aceptación final de ADR-002
+
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+[ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md): APROBADO.
+Retest final APROBADO del `2026-09-28T20:55:50-03:00`, dictamen
+`APROBAR_ADR002_CON_OBSERVACIONES_MENORES`; sin P0, P1 ni P2 pendientes.
+La aceptación de Cristian Sánchez habilita solo el análisis técnico previo de .1.
+Se mantiene la arquitectura aprobada para guardia temporal, seguridad, atomicidad,
+idempotencia, concurrencia y matching neutral; no se cambian decisiones normativas.
+REQ-004 continúa como especificación aprobada e implementación pendiente.
+Implementación, migraciones y testing PostgreSQL requieren los gates y autorizaciones
+posteriores; .2 sigue bloqueado hasta completar y aprobar .1.
+
+---
+
+# UX-07A — Corrección de dos P2 residuales
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Definición normativa en [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28) y
+[REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Se precisa igualdad conjunta provincia/localidad normalizadas y contrato de confianza
+de peer/proxy para cuotas. No se reabren decisiones arquitectónicas conformes.
+Gate: retest independiente final y decisión de aceptación posterior de Cristian Sánchez.
+
+# UX-07A — Corrección arquitectónica pendiente de retest
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Contrato completo en [ADR-002 corregido](ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28),
+alineado con [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#corrección-normativa-para-retest--2026-09-28).
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+Se adoptan: habilitación profesional completa y transición auditada; invalidación
+atómica sin resurrección; locks usuarios por ID → profesional → guardia → solicitud
+→ comando existente; versión esperada y UNIQUE como complemento; resultado durable
+de OperationCommand separado de guardia mutable; renovación desde ahora aunque acorte;
+territorio explícito localidad/provincia sin substring; cuotas cuyo alcance real se
+documenta, sin garantía distribuida de memory:// ni nueva infraestructura.
+Cancelación solo propia ABIERTA; contacto revalidado/auditado bajo locks antes de
+entregar destino; captura exacta bloqueada; downgrade sin reactivación; endpoints como
+contratos sin inventar URLs; índices candidatos sin rendimiento probado.
+Guardia, identidad idempotente y evidencia histórica mantienen responsabilidades
+distintas, sin event sourcing. Historial y fechas anteriores intactos.
+No se acepta ADR-002 ni se inicia implementación: retest independiente obligatorio.
+
+# UX-06A P1/P2 — creación atómica y recuperación temporal
+
+## Cierre de revisión documental UX-07A — 2026-09-28
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+
+Registro: 2026-09-27T22:04:02-03:00. Estado: implementado, pendiente de retest independiente.
+Responsable: Codex, laptop MANDOBRA. Rama `feature/ux-ui-foundation`,
+HEAD `7af47a25a59efcb64f70c2596d9f6818ace298bc`, sin commit.
+
+Se conserva la decisión previa de facultades exclusivamente CLIENTE. Esta entrada
+supera solamente los pendientes históricos de atomicidad y recuperación de borrador.
+
+- Causa P1: `create_budget_request` confirmaba BudgetRequest antes de que la ruta
+  invocara una notificación con commit propio; el reenvío no tenía ledger durable.
+- OperationCommand ya permite `result_entity_type=BudgetRequest` y un id genérico.
+  No requiere modelos ni migraciones nuevas. Se reutiliza su restricción única
+  `(actor_user_id, operation, idempotency_key)` para `BUDGET_REQUEST_CREATE`.
+- La aplicación autoriza CLIENTE activo antes de cualquier replay. La clave
+  `b1.actor.nonce.firma` lleva 128 bits aleatorios y HMAC-SHA256 ligado al actor y
+  operación; límite 160 caracteres, formato estricto. Un formulario nuevo recibe
+  una clave nueva, los errores de validación y la recuperación conservan la misma.
+- Hash SHA-256 de JSON ordenado de los seis valores normalizados; misma clave y
+  mismo payload recuperan el mismo id; payload distinto devuelve 409; clave ajena,
+  malformada o ausente devuelve 400; PROFESIONAL conserva 403. No se deduplica por
+  semejanza de datos: claves distintas permiten dos solicitudes deliberadas.
+- Límite transaccional: autorización, comando PROCESSING, solicitud, notificación
+  INTERNAL, resultado SUCCEEDED y un commit final en budget_service. El helper usa
+  `commit=False`; la ruta no confirma ni notifica. Esta creación no tenía un
+  AuditLog/ContractEvent obligatorio previo; no se inventan hechos contractuales.
+  Un fallo revierte todos los hechos creados y deja la sesión utilizable. La carrera
+  se resuelve mediante unicidad PostgreSQL y lectura del comando ganador después
+  de rollback; se vuelve a autorizar antes de recuperar ese resultado.
+- Causa P2: el POST anónimo redirigía al login descartando los campos; si vencía la
+  cookie completa, CSRF lo rechazaba antes de entrar a la ruta.
+- Recuperación: archivos privados temporales en `instance/budget_drafts` (directorio
+  configurable con `BUDGET_DRAFT_DIRECTORY`), únicamente seis campos saneados y
+  acotados más metadatos actor/nonce/vencimiento. Sin contraseñas, tokens CSRF,
+  claves idempotentes completas, archivos adjuntos ni secretos en el registro.
+  No se usan query strings ni logs para datos del borrador; no se usan sessionStorage,
+  Redis, colas, outbox ni nuevas dependencias.
+- Cookie independiente HttpOnly, SameSite=Strict y Secure según configuración,
+  aleatoria de 256 bits, vincula navegador; no contiene campos del formulario.
+  Prueba firmada en el formulario vincula actor, nonce, hash de navegador y hash
+  del CSRF original. Solo un POST a nuevo_presupuesto sin autenticación activa
+  puede recuperar usando firma y CSRF original válidos, ambos de hasta 15 minutos.
+  El manejador 400 no exime CSRF ni crea entidades: valida esa prueba para guardar
+  el borrador y redirigir al login interno fijo. Otro CSRF inválido conserva 400.
+- Reautenticación obligatoria: solo el mismo CLIENTE activo/navegador recupera.
+  Los valores se revalidan al publicar; propietario/rol/estado/ids enviados se
+  descartan. Hasta cinco borradores por actor/navegador, separados por nonce;
+  con varios se elige mediante POST protegido y nunca se fusionan pestañas.
+- TTL de datos: 15 minutos desde recuperación; limpieza al éxito, descarte explícito
+  y acceso posterior tras vencimiento. Escritura por archivo temporal privado y
+  reemplazo atómico. La purga es diferida al siguiente acceso, no un job periódico.
+  Fallar la limpieza después del commit no convierte una publicación confirmada
+  en error; queda su expiración. El borrador nunca es fuente de autorización.
+- Fallback sin JS: POST/login/selección/restauración/descarte operan en servidor;
+  todos los campos siguen visibles y revisables. Si formulario/CSRF de recuperación
+  supera 15 minutos, se borra la cookie de navegación, se cambia de navegador o se
+  pierde el almacenamiento temporal, no se garantiza recuperación. Despliegues con
+  varias instancias necesitan el mismo almacenamiento privado para este directorio;
+  no se afirma soporte distribuido. Rotar SECRET_KEY invalida formularios emitidos.
+
+Evidencia: 133 Python focales/regresiones (132 PASS, 1 SKIP existente), 4/4 gate
+PostgreSQL real, Node 5/5, compileall y sintaxis JS. Sin suite completa ni aprobación
+Testing. No cambia el contrato futuro de notificaciones externas.
+
+---
+
 # DECISIONES DE ARQUITECTURA MANDOBRA
+
+## Corrección P1 UX-06A — Acciones de propietario exclusivas de CLIENTE
+
+Timestamp de corrección aprobado: 2026-09-27T19:49:55-03:00.
+Timestamp de registro: 2026-09-27T20:00:55-03:00.
+Estado: IMPLEMENTADO. Retest independiente pendiente; UX-06A no aprobado.
+Responsable: Codex, Senior Software Engineer MANDOBRA; decisión funcional del
+responsable de Producto; hallazgo vinculante de Testing 2026-09-27T19:48:47-03:00, P1,
+REQUIERE_CORRECCIONES. Documento afectado: docs/DECISIONES_ARQUITECTURA.md.
+Rama feature/ux-ui-foundation; HEAD 7af47a25a59efcb64f70c2596d9f6818ace298bc.
+
+Motivo: la ampliación de facultades de solicitante a PROFESIONAL contradice el
+paquete de aceptación y el Master Spec (roles Cliente/Profesional y Presupuestos).
+La autorización histórica **CLIENTE o PROFESIONAL queda descartada y sustituida
+por CLIENTE** para todas las acciones de propietario de solicitudes y actor cliente
+del contrato BUDGET. El registro de las 18:43:08 se conserva debajo como historia
+SUPERSEDED en cuanto a esa autorización; sus fechas y contenido no se eliminan.
+No habilita un futuro incremento de reseñas de propietario PROFESIONAL.
+
+CLIENTE activo crea, confirma, lista, consulta y administra solicitudes propias;
+los servicios verifican rol además de propiedad. PROFESIONAL participa como
+proveedor: oportunidades, ofertas propias y operaciones del profesional asignado.
+GET/POST de creación y rutas de cliente rechazan al profesional con 403 existente.
+La mera presencia de cliente_id en datos previos no concede facultades al rol PRO.
+La excepción contractual BUDGET se retira; el creador derivado vuelve al código
+canónico de HEAD. Se preservan atomicidad, rollback, estados e idempotencia.
+
+El comparador privado exige CLIENTE activo propietario. Un CLIENTE no abre el
+detalle ajeno; el profesional conserva la lectura legítima de oportunidades.
+En navbar/footer, inicio autenticado y Mercados, los enlaces de presupuesto del
+profesional llevan a /presupuestos; estilos y demás operaciones no se cambian.
+No se toca Emergencias ni se trasladan imágenes desde Downloads.
+
+Master Spec permanece intacto. La verificación se mantiene donde ya se exige
+(negociación formal); no se añade una nueva exigencia de verificación al presupuesto,
+que el spec vigente define con CLIENTE y perfil completo para el proveedor.
+Visitantes mantienen entrada informativa y next interno; el formulario, la revisión,
+los valores tras error y el fallback nativo no cambian. No existe borrador anónimo
+persistido en UX-06A, y esta corrección no lo agrega ni elimina datos existentes.
+
+Validación: 117 Python ejecutadas, 116 PASS, 1 SKIP histórico de concurrencia SQLite;
+22 focales UX-06A incluidas. 5/5 Node; compileall y sintaxis JS OK. Suite completa
+reservada a Testing. La aprobación requiere retest independiente del P1.
+
+
+## UX-06A — La capacidad de solicitar presupuestos depende de la propiedad
+
+Timestamp: 2026-09-27T18:43:08-03:00. Responsable: Producto (decisión aprobada); implementación: Codex/laptop.
+Rama `feature/ux-ui-foundation`; base `7af47a25a59efcb64f70c2596d9f6818ace298bc`.
+Estado: decisión de Producto vigente; implementación pendiente de aprobación visual y retest.
+
+Una cuenta CLIENTE o PROFESIONAL activa puede ser solicitante de presupuestos.
+El campo histórico `BudgetRequest.cliente_id` representa al propietario; no se
+renombra ni se agrega un rol, tabla o migración. La cuenta profesional mantiene
+su rol y capacidades. No se exige perfil profesional para solicitar; sí se
+conserva su exigencia para ofertar. Autoofertas siguen bloqueadas.
+
+Creación verifica actor activo. Confirmación, lista propia, cancelación y
+adjudicación conservan ownership; solo el propietario recibe el comparador privado.
+El detalle general conserva su política de lectura anterior. Contratos canónicos
+BUDGET permiten al propietario PROFESIONAL crear el contrato derivado y operar
+como solicitante (confirmar/cancelar), nunca como proveedor asignado por ser dueño.
+La excepción no habilita creación DIRECT ni deriva contratos PROPOSAL para ese rol.
+Se conservan locks, versiones, comandos idempotentes, eventos, auditoría y notificaciones.
+El detalle propio enlaza al contrato existente; no crea otro por navegar.
+
+Las reseñas conservan su autorización CLIENTE existente. Se oculta ese CTA cuando
+el solicitante no puede ejecutarlo; su ampliación requiere otro incremento.
+No se alteran dashboards, perfiles, fotografías, Emergencias, Propuestas ni pagos.
+No se cambia `budget-marketplace-v1.css`, navbar, skeleton o tokens globales.
+
+La revisión previa es progresiva y local. Solo el envío final hace POST con CSRF.
+Sin JS, los datos esenciales y el envío nativo permanecen operativos. El bloqueo
+del segundo envío es de interfaz, no una garantía durable para crear solicitudes.
+El backend rechaza campos faltantes/excesivos, prioridad desconocida y fecha inválida.
+El siguiente incremento debe resolver persistencia/atomicidad según Backlog.
+
 
 ## Cierre técnico local 4F aprobado por Testing
 
@@ -899,3 +1167,28 @@ Alcance:
 Criterio:
 
 Las nuevas pantallas deberan consumir variables semanticas del Design System v2 para heredar automaticamente Light/Dark.
+
+## UX-07A — Propuesta de guardia vigente y orden neutral
+
+Registro: `2026-09-27T23:14:25-03:00`. Responsable de Producto: Cristian Sánchez; redacción: Codex, laptop MANDOBRA.
+Rama: `feature/ux-ui-foundation`. HEAD: `4489c5c208245368a2a9bfd1672a261cf3004c93`.
+Motivo: formalizar el preflight UX-07A aprobado y la decisión de Producto de
+`2026-09-27T23:03:15-03:00`, `APROBADO PARA ESPECIFICACIÓN`.
+Estado: especificación para revisión; implementación PENDIENTE. El preflight es el
+antecedente de inspección del chat, no evidencia de guardias implementadas.
+Orden neutral: PRO no habilita ni prioriza Emergencias; verificación es filtro obligatorio,
+no privilegio adicional de orden. Próximo paso: revisar REQ-004/ADR-002 y autorizar
+UX-07A.1; UX-07A.2 depende de su verificación.
+
+
+Nueva propuesta: [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md), estado PROPUESTO;
+contrato funcional: [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md).
+Se propone una disponibilidad actual única por profesional, timestamps aware, versión y
+locks, invalidación sin reactivación implícita y vencimiento por consulta. Reutilizar
+OperationCommand/AuditLog y transacción única para solicitud/notificación/comando/auditoría.
+
+Orden objetivo de Emergencias: elegibilidad completa primero, asistencia/cobertura,
+distancia aproximada válida, rating verificable como desempate y nombre/ID estable.
+Antecedentes de prioridad PRO quedan históricos para este alcance futuro; el código
+actual no se declara modificado. Contacto revalida guardia y ownership; geodatos privados
+no viajan en URLs. Alembic y PostgreSQL serán obligatorios en .1, sin infraestructura nueva.

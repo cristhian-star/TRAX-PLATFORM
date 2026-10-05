@@ -1,5 +1,7 @@
+import logging
 import os
 import unittest
+from contextlib import contextmanager
 from unittest.mock import patch
 
 
@@ -12,6 +14,38 @@ from app.models.professional import Professional
 from app.models.user import User
 from app.services.coverage_service import obtener_cobertura_profesional
 from app.services.terms_service import accept_terms, has_accepted_terms
+
+
+def _logger_state(logger):
+    return {
+        "disabled": logger.disabled,
+        "level": logger.level,
+        "propagate": logger.propagate,
+        "handlers": tuple(logger.handlers),
+        "filters": tuple(logger.filters),
+        "manager_disable": logging.root.manager.disable,
+    }
+
+
+def _restore_logger_state(logger, state):
+    logger.disabled = state["disabled"]
+    logger.setLevel(state["level"])
+    logger.propagate = state["propagate"]
+    logger.handlers[:] = state["handlers"]
+    logger.filters[:] = state["filters"]
+    logging.disable(state["manager_disable"])
+
+
+@contextmanager
+def _enabled_logger_capture(logger):
+    state = _logger_state(logger)
+    try:
+        logging.disable(logging.NOTSET)
+        logger.disabled = False
+        logger.filters[:] = []
+        yield
+    finally:
+        _restore_logger_state(logger, state)
 
 
 class SecurityCompliancePhase3Test(unittest.TestCase):
@@ -67,6 +101,20 @@ class SecurityCompliancePhase3Test(unittest.TestCase):
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
+
+    def _capture_unexpected_error(self):
+        marker = "Authorization=Bearer abc SECRET_KEY=leak telefono=5491112345678"
+        endpoint = f"phase3_error_{self._testMethodName}"
+        path = f"/_test/phase3/error/{self._testMethodName}"
+
+        def _test_error():
+            raise RuntimeError(marker)
+
+        self.app.add_url_rule(path, endpoint=endpoint, view_func=_test_error)
+        with _enabled_logger_capture(self.app.logger):
+            with self.assertLogs(self.app.logger, level="ERROR") as captured:
+                response = self.client.get(path, headers={"Accept": "application/json"})
+        return response, "\n".join(captured.output), marker
 
     def test_gitignore_covers_sensitive_local_artifacts(self):
         with open(".gitignore", encoding="utf-8") as gitignore_file:
@@ -140,19 +188,35 @@ class SecurityCompliancePhase3Test(unittest.TestCase):
         self.assertNotEqual(coverage["public_longitude"], -58.381592)
 
     def test_error_log_does_not_include_sensitive_exception_payload(self):
-        @self.app.route("/_test/phase3/error")
-        def _test_error():
-            raise RuntimeError("Authorization=Bearer abc SECRET_KEY=leak telefono=5491112345678")
-
-        with self.assertLogs(self.app.logger.name, level="ERROR") as captured:
-            response = self.client.get("/_test/phase3/error", headers={"Accept": "application/json"})
+        response, logs, marker = self._capture_unexpected_error()
 
         self.assertEqual(response.status_code, 500)
-        logs = "\n".join(captured.output)
         self.assertIn("Error inesperado procesando la solicitud", logs)
-        self.assertNotIn("Authorization", logs)
-        self.assertNotIn("SECRET_KEY", logs)
-        self.assertNotIn("5491112345678", logs)
+        for sensitive_fragment in ("Authorization", "SECRET_KEY", "5491112345678", marker):
+            self.assertNotIn(sensitive_fragment, logs)
+
+    def test_error_log_capture_restores_preexisting_logger_state(self):
+        logger = self.app.logger
+        original_state = _logger_state(logger)
+        sentinel_handler = logging.NullHandler()
+        sentinel_filter = logging.Filter("unrelated.logger")
+        try:
+            logger.disabled = True
+            logger.setLevel(logging.CRITICAL)
+            logger.propagate = False
+            logger.handlers[:] = [sentinel_handler]
+            logger.filters[:] = [sentinel_filter]
+            logging.disable(logging.CRITICAL)
+            contaminated_state = _logger_state(logger)
+
+            response, logs, marker = self._capture_unexpected_error()
+
+            self.assertEqual(response.status_code, 500)
+            self.assertIn("Error inesperado procesando la solicitud", logs)
+            self.assertNotIn(marker, logs)
+            self.assertEqual(_logger_state(logger), contaminated_state)
+        finally:
+            _restore_logger_state(logger, original_state)
 
     def test_headers_do_not_expose_powered_by_and_csp_is_restricted(self):
         response = self.client.get("/")

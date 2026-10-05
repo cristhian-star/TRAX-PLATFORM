@@ -1,8 +1,10 @@
 import re
 
 from app import db
+from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.professional import Professional
 from app.models.user import User
+from app.models.contract_request import ContractRequest
 from app.services.budget_service import (
     MAX_OFFERS_PER_REQUEST,
     get_budget_offers,
@@ -153,7 +155,12 @@ def build_professional_budget_offer_rows(user_id):
 
 def build_budget_detail_context(budget_request, current_user_id, query_args):
     current_user = db.session.get(User, current_user_id)
-    is_owner = budget_request.cliente_id == current_user_id
+    is_owner = (
+        current_user is not None
+        and current_user.estado == "ACTIVO"
+        and current_user.rol == "CLIENTE"
+        and budget_request.cliente_id == current_user_id
+    )
     current_professional = Professional.query.filter_by(user_id=current_user_id).first()
     is_professional = (
         current_user is not None
@@ -176,6 +183,13 @@ def build_budget_detail_context(budget_request, current_user_id, query_args):
         "offer_count": len(offers),
         "max_offers": MAX_OFFERS_PER_REQUEST,
         "is_owner": is_owner,
+        "budget_contract": (
+            ContractRequest.query.filter(
+                ContractRequest.cliente_id == current_user_id,
+                ContractRequest.source_type == ContractRequest.SOURCE_BUDGET,
+                ContractRequest.budget_offer_id.in_([offer.id for offer in offers]),
+            ).first() if is_owner else None
+        ),
         "is_professional": is_professional,
         "own_offer": own_offer,
         "offer_allowance": get_offer_allowance(current_user_id) if is_professional else None,
@@ -216,6 +230,7 @@ def build_proposal_detail_context(proposal, current_user_id, query_args):
         "applications": applications,
         "is_owner": is_owner,
         "is_professional": is_professional,
+        "application_eligibility": proposal_application_eligibility(current_user_id),
         "own_application": own_application,
         "current_user": current_user,
         "error": query_args.get("error"),

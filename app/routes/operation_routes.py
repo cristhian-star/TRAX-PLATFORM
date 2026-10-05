@@ -1,10 +1,15 @@
+from werkzeug.exceptions import BadRequest
 import secrets
 
-from flask import Blueprint, abort, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, redirect, render_template, request, session, url_for, make_response, current_app
 
 from app import db, limiter
+from app.services.proposal_portal_service import build_proposal_portal
+from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.user import User
+from app.services.emergency_entry_service import entry_context, entry_errors
 from app.services.budget_service import (
+    BudgetCreationConflict,
     MAX_OFFERS_PER_REQUEST,
     award_budget_offer,
     cancel_budget_request,
@@ -53,14 +58,12 @@ from app.services.proposal_service import (
     cancel_proposal,
     create_proposal_request,
     discard_application,
-    get_open_proposals,
 )
 from app.services.professional_service import (
     get_professional_by_id,
 )
 from app.services.operation_notification_service import (
     notify_budget_cancelled,
-    notify_budget_created,
     notify_budget_offer_created,
     notify_emergency_created,
     notify_proposal_application_created,
@@ -81,7 +84,7 @@ from app.services.operation_request_service import (
     get_request_coordinates,
     parse_date,
     parse_datetime,
-    validate_budget_form_data,
+    budget_form_errors,
     validate_proposal_form_data,
 )
 from app.services.operation_view_service import (
@@ -583,74 +586,106 @@ def cancelar_contratacion(id):
     return redirect(f"/contratacion/{id}")
 
 
+def _budget_form(actor_id, data, *, key=None, status=200, **context):
+    from app.services.budget_draft_service import form_credentials, attach_navigation_cookie
+    key, proof, browser = form_credentials(actor_id, key)
+    response = make_response(render_template(
+        "nuevo_presupuesto.html", form_data=data, is_anonymous=False,
+        idempotency_key=key, draft_proof=proof, **context,
+    ), status)
+    return attach_navigation_cookie(response, browser)
+
+
+def recover_budget_expired_post():
+    """Only proof-validated draft recovery; never an authenticated operation."""
+    from app.services.budget_draft_service import preserve_expired_form
+    if request.endpoint != "operations.nuevo_presupuesto" or request.method != "POST":
+        return None
+    actor = db.session.get(User, session.get("user_id")) if session.get("user_id") else None
+    if is_user_active(actor):
+        return None
+    if preserve_expired_form():
+        session.clear()
+        return redirect(url_for("auth.login", next=url_for("operations.nuevo_presupuesto")))
+    return None
+
+
 @operations.route("/presupuestos/nuevo", methods=["GET", "POST"])
 @limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nuevo_presupuesto():
-    current_user = (
-        db.session.get(User, session.get("user_id"))
-        if session.get("user_id")
-        else None
-    )
+    from app.services.budget_creation_key_service import issue_budget_key, validate_budget_key
+    from app.services.budget_draft_service import list_drafts, delete_draft
+    current_user = db.session.get(User, session.get("user_id")) if session.get("user_id") else None
     is_anonymous = not is_user_active(current_user)
-
+    if not is_anonymous and current_user.rol != "CLIENTE":
+        abort(403)
     if request.method == "POST":
+        if is_anonymous:
+            recovered = recover_budget_expired_post()
+            if recovered is not None:
+                return recovered
+            session.clear()
+            return redirect(url_for("auth.login", next=url_for("operations.nuevo_presupuesto")))
         form_data = build_budget_form_data(request.form)
-        form_error = validate_budget_form_data(form_data)
-        if form_error:
-            return render_template(
-                "nuevo_presupuesto.html",
-                form_data=form_data,
-                error=form_error,
-                is_anonymous=is_anonymous,
-            ), 400
-
+        key = request.form.get("idempotency_key", "")
         try:
-            estimated_date = parse_date(form_data["fecha_estimada"])
-        except ValueError:
-            return render_template(
-                "nuevo_presupuesto.html",
-                form_data=form_data,
-                error="La fecha estimada no es valida.",
-                is_anonymous=is_anonymous,
-            ), 400
-
-        if not is_anonymous:
+            validate_budget_key(key, current_user.id)
+        except ValueError as exc:
+            return _budget_form(current_user.id, form_data, status=400, form_error=str(exc))
+        errors = budget_form_errors(form_data)
+        if errors:
+            return _budget_form(current_user.id, form_data, key=key, status=400, field_errors=errors)
+        try:
             budget_request = create_budget_request(
                 cliente_id=current_user.id,
-                categoria=form_data["categoria"],
-                titulo=form_data["titulo"],
-                descripcion=form_data["descripcion"],
-                zona=form_data["zona"],
-                fecha_estimada=estimated_date,
-                urgencia=form_data["urgencia"],
+                categoria=form_data["categoria"], titulo=form_data["titulo"],
+                descripcion=form_data["descripcion"], zona=form_data["zona"],
+                fecha_estimada=parse_date(form_data["fecha_estimada"]),
+                urgencia=form_data["urgencia"], idempotency_key=key,
             )
-            notify_budget_created(budget_request)
+        except BudgetCreationConflict as exc:
+            return _budget_form(current_user.id, form_data, key=key, status=409, form_error=str(exc))
+        try:
+            delete_draft(current_user.id, key)
+        except OSError:
+            # A temporary-file cleanup failure cannot undo a committed result.
+            current_app.logger.warning("Budget draft cleanup deferred to expiry")
+        return redirect(url_for("operations.confirmacion_presupuesto", id=budget_request.id))
+    data = {
+        **get_query_prefill(request.args, "categoria", "zona", "titulo", "descripcion"),
+        "fecha_estimada": empty_to_none(request.args.get("fecha_estimada")) or "",
+        "urgencia": empty_to_none(request.args.get("urgencia")) or "NORMAL",
+    }
+    if is_anonymous:
+        if session.get("user_id"):
+            session.clear()
+        return render_template("nuevo_presupuesto.html", form_data=data, is_anonymous=True)
+    drafts = list_drafts(current_user.id)
+    if len(drafts) == 1:
+        draft = drafts[0]
+        return _budget_form(current_user.id, draft["data"], key=issue_budget_key(current_user.id, draft["nonce"]), restored=True)
+    return _budget_form(current_user.id, data, pending_drafts=drafts)
 
-            return redirect(url_for("operations.confirmacion_presupuesto", id=budget_request.id))
 
-        return render_template(
-            "nuevo_presupuesto.html",
-            form_data=form_data,
-            anonymous_preview={
-                **form_data,
-                "fecha_estimada_display": (
-                    estimated_date.strftime("%d/%m/%Y")
-                    if estimated_date
-                    else "A coordinar"
-                ),
-            },
-            is_anonymous=True,
-        )
-
-    return render_template(
-        "nuevo_presupuesto.html",
-        form_data={
-            **get_query_prefill(request.args, "categoria", "zona", "titulo", "descripcion"),
-            "fecha_estimada": empty_to_none(request.args.get("fecha_estimada")) or "",
-            "urgencia": empty_to_none(request.args.get("urgencia")) or "NORMAL",
-        },
-        is_anonymous=is_anonymous,
-    )
+@operations.route("/presupuestos/borrador", methods=["POST"])
+@login_required
+@role_required("CLIENTE")
+def recuperar_borrador_presupuesto():
+    from app.services.budget_creation_key_service import issue_budget_key
+    from app.services.budget_draft_service import delete_draft, list_drafts
+    actor = db.session.get(User, session["user_id"])
+    if not is_user_active(actor):
+        abort(403)
+    if request.form.get("action") == "cancel":
+        try:
+            delete_draft(actor.id, request.form.get("idempotency_key"))
+        except ValueError:
+            abort(400)
+        return redirect(url_for("operations.nuevo_presupuesto"))
+    draft = next((d for d in list_drafts(actor.id) if d["nonce"] == request.form.get("draft_handle")), None)
+    if draft is None:
+        abort(404)
+    return _budget_form(actor.id, draft["data"], key=issue_budget_key(actor.id, draft["nonce"]), restored=True)
 
 
 @operations.route("/presupuestos/mis-solicitudes", methods=["GET"])
@@ -730,6 +765,11 @@ def detalle_presupuesto(id):
         abort(404)
 
     current_user_id = session["user_id"]
+    current_user = db.session.get(User, current_user_id)
+    if budget_request.cliente_id == current_user_id and current_user.rol != "CLIENTE":
+        abort(403)
+    if current_user.rol == "CLIENTE" and budget_request.cliente_id != current_user_id:
+        abort(403)
 
     return render_template(
         "detalle_presupuesto.html",
@@ -783,6 +823,7 @@ def ofertar_presupuesto(id):
     methods=["POST"],
 )
 @login_required
+@role_required("CLIENTE")
 def adjudicar_presupuesto(id, presupuesto_id):
     try:
         award_budget_offer(
@@ -828,28 +869,39 @@ def cancelar_presupuesto(id):
     return redirect(url_for("operations.mis_solicitudes_presupuesto", estado="canceladas"))
 
 
-@operations.route("/emergencias/nueva", methods=["GET", "POST"])
+@operations.route("/emergencias/nueva", methods=["GET", "POST"], defaults={"target": "operations.nueva_emergencia"})
+@operations.route("/emergencias/directorio", methods=["GET"], defaults={"target": "operations.directorio_emergencias"})
+def legacy_emergency_redirect(target):
+    # Preserve raw query bytes and POST body/CSRF; persistence only happens at the canonical endpoint.
+    destination = url_for(target)
+    if request.query_string:
+        destination += "?" + request.query_string.decode("latin-1")
+    return redirect(destination, code=308)
+
+
+@operations.route("/urgencias/nueva", methods=["GET", "POST"])
 @limiter.limit("10 per day", methods=["POST"], key_func=user_or_ip_rate_limit_key)
 def nueva_emergencia():
     if request.method == "POST":
-        categoria = empty_to_none(request.form.get("categoria"))
-        zona = empty_to_none(request.form.get("zona"))
-        descripcion = empty_to_none(request.form.get("descripcion"))
-
-        if not categoria or not zona or not descripcion:
-            return "Categoria, zona y descripcion son requeridas", 400
+        if request.form.getlist("modalidad") != ["manual"]:
+            abort(400, description="Modalidad inválida o ambigua. La difusión todavía no está disponible.")
+        if len(request.form.getlist("categoria")) != 1:
+            abort(400, description="Seleccioná una única categoría para la urgencia.")
+        current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
+        if session.get("user_id") and (current_user is None or current_user.rol != "CLIENTE"):
+            abort(403)
+        context = entry_context(request.form)
+        context["errors"] = entry_errors(context)
+        if context["errors"]:
+            return render_template("nueva_emergencia.html", **context), 400
+        categoria = context["form_data"]["categoria"]
+        zona = context["form_data"]["zona"]
+        descripcion = context["form_data"]["descripcion"]
 
         redirect_values = {
             "categoria": categoria,
             "zona": zona,
         }
-        coordinates = get_request_coordinates(request.form)
-        if coordinates is not None:
-            redirect_values["latitude"] = coordinates[0]
-            redirect_values["longitude"] = coordinates[1]
-
-        current_user = User.query.get(session.get("user_id")) if session.get("user_id") else None
-
         if is_user_active(current_user):
             emergency_request = create_emergency_request(
                 cliente_id=current_user.id,
@@ -872,11 +924,11 @@ def nueva_emergencia():
 
     return render_template(
         "nueva_emergencia.html",
-        form_data=get_query_prefill(request.args, "categoria", "zona", "descripcion"),
+        **entry_context(request.args),
     )
 
 
-@operations.route("/emergencias/directorio", methods=["GET"])
+@operations.route("/urgencias/directorio", methods=["GET"])
 def directorio_emergencias():
     categoria = normalize_limited_text(request.args.get("categoria", ""))
     zona = normalize_limited_text(request.args.get("zona", ""))
@@ -949,29 +1001,11 @@ def nueva_propuesta():
 
 @operations.route("/propuestas", methods=["GET"])
 def marketplace_propuestas():
-    industria = normalize_limited_text(request.args.get("industria", ""))
-    categoria = normalize_limited_text(request.args.get("categoria", ""))
-    rubro = normalize_limited_text(request.args.get("rubro", ""))
-    ubicacion = normalize_limited_text(request.args.get("ubicacion", ""))
-    proposals = get_open_proposals(
-        industria=industria,
-        categoria=categoria,
-        rubro=rubro,
-        ubicacion=ubicacion,
-    )
-    proposals = paginate_items(proposals)
-
-    return render_template(
-        "listado_propuestas.html",
-        proposals=proposals,
-        filters={
-            "industria": industria,
-            "categoria": categoria,
-            "rubro": rubro,
-            "ubicacion": ubicacion,
-        },
-        taxonomy=build_proposal_taxonomy_options(include_specialties=False),
-    )
+    try:
+        context = build_proposal_portal(request.args, session.get("user_id"))
+    except BadRequest:
+        return render_template("proposals_filter_error.html"), 400
+    return render_template("listado_propuestas.html", **context)
 
 
 @operations.route("/propuestas/<int:id>", methods=["GET"])
@@ -988,11 +1022,13 @@ def detalle_propuesta(id):
 
 
 @operations.route("/propuestas/<int:id>/postular", methods=["POST"])
-@login_required
-@role_required("PROFESIONAL")
-@profile_complete_required
 @limiter.limit("30 per day", key_func=user_rate_limit_key)
 def postular_propuesta(id):
+    eligibility = proposal_application_eligibility(session.get("user_id"))
+    if eligibility.reason == "AUTH_REQUIRED":
+        return redirect(url_for("auth.login", next=request.full_path.rstrip("?")))
+    if not eligibility.eligible:
+        abort(403)
     mensaje = empty_to_none(request.form.get("mensaje"))
     experiencia_relevante = empty_to_none(request.form.get("experiencia_relevante"))
     disponibilidad = empty_to_none(request.form.get("disponibilidad"))
@@ -1011,6 +1047,8 @@ def postular_propuesta(id):
             pretension_economica=pretension_economica,
         )
         notify_proposal_application_created(application)
+    except PermissionError:
+        abort(403)
     except ValueError as error:
         return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
 

@@ -1,64 +1,23 @@
 {% extends "base.html" %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
-{% endblock %}
-
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-request-ux06a.css') }}">{% endblock %}
 {% block content %}
-<main class="budget-page">
-    <section class="budget-detail-hero">
-        <div class="budget-shell budget-confirmation-hero">
-            <div>
-                <span class="budget-eyebrow">Solicitud publicada</span>
-                <h1>Solicitud publicada correctamente.</h1>
-                <p>Tu pedido ya quedo disponible para que profesionales compatibles puedan enviar presupuestos preliminares.</p>
-            </div>
-            <div class="budget-counter" aria-label="{{ offer_count }} de {{ max_offers }} presupuestos recibidos">
-                <strong>{{ offer_count }}/{{ max_offers }}</strong>
-                <span>Presupuestos recibidos</span>
-                <div class="budget-counter__track" aria-hidden="true">
-                    <span style="width: {{ (offer_count / max_offers * 100)|round|int }}%"></span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="budget-shell budget-entry">
-        <div class="budget-panel budget-confirmation-card">
-            <div class="budget-section-heading">
-                <span class="budget-status budget-status--{{ budget_request.estado|lower }}">
-                    {{ budget_request.estado }}
-                </span>
-                <h2>{{ budget_request.titulo }}</h2>
-                <p>{{ budget_request.categoria }} · {{ budget_request.zona }}</p>
-            </div>
-
-            <dl class="budget-facts">
-                <div>
-                    <dt>Estado</dt>
-                    <dd>Esperando presupuestos</dd>
-                </div>
-                <div>
-                    <dt>Tiempo restante</dt>
-                    <dd>Publicacion activa. Calculo automatico proximamente.</dd>
-                </div>
-                <div>
-                    <dt>Fecha de publicacion</dt>
-                    <dd>{{ budget_request.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</dd>
-                </div>
-            </dl>
-
-            <div class="budget-form__actions budget-actions-wrap">
-                <a class="budget-button budget-button--primary" href="/presupuestos/{{ budget_request.id }}">
-                    Ver presupuestos recibidos
-                </a>
-                <span class="budget-button budget-button--disabled" aria-disabled="true">
-                    Editar solicitud no disponible
-                </span>
-                <span class="budget-button budget-button--disabled" aria-disabled="true">
-                    Cancelar solicitud no disponible
-                </span>
-            </div>
+<main class="budget-request">
+    <header class="budget-request__header">
+        <span class="budget-request__eyebrow">Solicitud #{{ budget_request.id }}</span>
+        <h1>Tu solicitud fue publicada</h1>
+        <p>Podés consultar las ofertas desde el detalle. Recibir respuestas no está garantizado.</p>
+    </header>
+    <section class="budget-request__panel" aria-labelledby="budget-confirmation-title">
+        <h2 id="budget-confirmation-title">{{ budget_request.titulo }}</h2>
+        <dl class="budget-request__summary">
+            <div><dt>Rubro o servicio</dt><dd>{{ budget_request.categoria }}</dd></div>
+            <div><dt>Zona</dt><dd>{{ budget_request.zona }}</dd></div>
+            <div><dt>Estado actual</dt><dd>{{ budget_request.estado }}</dd></div>
+            <div><dt>Ofertas recibidas</dt><dd>{{ offer_count }} de {{ max_offers }}</dd></div>
+        </dl>
+        <div class="budget-request__actions">
+            <a class="trax-button trax-button--primary" href="{{ url_for('operations.detalle_presupuesto', id=budget_request.id) }}">Ver solicitud y ofertas</a>
+            <a class="trax-button trax-button--secondary" href="{{ url_for('operations.mis_solicitudes_presupuesto') }}">Mis solicitudes</a>
         </div>
     </section>
 </main>

@@ -10,6 +10,33 @@ revision_codigo: 1548935
 
 # MANDOBRA Master Spec
 
+## Denominación pública vigente — 2026-10-04
+
+Registro: 2026-10-04T11:44:28-03:00. Decisión de Producto: Cristian Sánchez, 2026-10-04.
+La denominación pública del módulo pasa a ser **Urgencias**; acción: **solicitar
+asistencia urgente**. Rutas canónicas: `/urgencias/nueva` y `/urgencias/directorio`.
+Las rutas `/emergencias/...` se conservan como redirecciones 308, preservando método,
+cuerpo y query string. Los nombres técnicos, archivos, tablas, columnas y tipos
+controlados anteriores permanecen temporalmente por compatibilidad. Los registros
+anteriores de este documento conservan su denominación histórica, sustituida en la
+presentación pública por esta decisión. No se habilitan difusión ni guardias reales.
+Implementación E3.1 local: pendiente de Testing; esta decisión no acredita su validación.
+
+
+## Cierre de revisión documental UX-07A — 2026-09-28
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+
 ## Proposito
 
 MANDOBRA conecta clientes con profesionales y organiza el descubrimiento,
@@ -21,6 +48,32 @@ Este documento describe la linea base observada en el codigo. No convierte
 prototipos visuales ni campos reservados en funcionalidades aprobadas.
 
 ## Registro de revision posterior
+
+### 2026-09-27 - UX-07A — Alcance futuro de Emergencias y guardia vigente
+
+Registro: `2026-09-27T23:14:25-03:00`. Responsable de Producto: Cristian Sánchez; redacción: Codex, laptop MANDOBRA.
+Rama: `feature/ux-ui-foundation`. HEAD: `4489c5c208245368a2a9bfd1672a261cf3004c93`.
+Motivo: formalizar el preflight UX-07A aprobado y la decisión de Producto de
+`2026-09-27T23:03:15-03:00`, `APROBADO PARA ESPECIFICACIÓN`.
+Estado: especificación para revisión; implementación PENDIENTE. El preflight es el
+antecedente de inspección del chat, no evidencia de guardias implementadas.
+Orden neutral: PRO no habilita ni prioriza Emergencias; verificación es filtro obligatorio,
+no privilegio adicional de orden. Próximo paso: revisar REQ-004/ADR-002 y autorizar
+UX-07A.1; UX-07A.2 depende de su verificación.
+
+
+[REQ-004](REQ-004-emergencias-guardia-vigente.md) formaliza seis asistencias y dos paquetes:
+UX-07A.1 implementará guardia temporal, matching neutral, permisos, privacidad, creación
+atómica/idempotente y contacto seguro, con gate PostgreSQL. UX-07A.2 abordará experiencia
+visual después de verificar .1. [ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md)
+registra la propuesta técnica. Modelo/migración e implementación permanecen pendientes.
+
+Esta entrada amplía el alcance objetivo; no modifica la línea base histórica ni acredita
+capacidades actuales. Activo o PRO no equivale a disponible. Verificación obligatoria y
+ventana 2/4/8 h vigente son filtros, sin prioridad comercial. No despacho, aceptación
+bilateral, contrato EMERGENCY, ETA, pagos, recurrencias ni asignación automática.
+Las reglas detalladas propuestas requieren revisión antes de autorizar UX-07A.1.
+
 
 ### 2026-09-17 - Dirección vigente de integración 4C
 

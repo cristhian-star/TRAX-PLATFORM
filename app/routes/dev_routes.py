@@ -9,6 +9,7 @@ from flask import (
 )
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
+from time import sleep
 
 from app.models.user import User
 from app.services.subscription_service import has_pro_access
@@ -156,6 +157,29 @@ def qa_panel():
         current_user_name=session.get("user_name"),
         current_user_role=session.get("user_role"),
     )
+
+
+@dev.route("/dev/qa/estados", methods=["GET", "POST"])
+def qa_states():
+    _require_dev_qa_panel()
+    # Bounded delay, only in the existing opt-in QA environment. Never on HEAD.
+    delay = request.values.get("demora", "0")
+    if request.method != "HEAD" and delay in ("3", "10"):
+        sleep(int(delay))
+    response = current_app.make_response(render_template("dev_qa_states.html"))
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@dev.route("/dev/qa/estados/<int:code>", methods=["GET"])
+def qa_error_preview(code):
+    _require_dev_qa_panel()
+    from app.utils.error_pages import ERROR_PAGES, render_error_page
+    if code not in ERROR_PAGES:
+        abort(404)
+    response = current_app.make_response(render_error_page(code, preview=True))
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @dev.route("/dev/qa/payments/simulator", methods=["GET", "POST"])

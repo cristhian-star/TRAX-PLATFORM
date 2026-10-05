@@ -1,4 +1,409 @@
+# UX-07A — Preflight autorizado después de aprobar ADR-002
+
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+[ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md) APROBADO; retest final
+APROBADO del `2026-09-28T20:55:50-03:00`, sin P0/P1/P2 pendientes.
+
+| Incremento | Estado vigente | Próximo paso |
+| --- | --- | --- |
+| UX-07A.1 | PREFLIGHT AUTORIZADO / IMPLEMENTACIÓN BLOQUEADA HASTA NUEVA AUTORIZACIÓN | Realizar únicamente el preflight técnico y presentar su dictamen. |
+| UX-07A.2 | BLOQUEADO POR DEPENDENCIA DE UX-07A.1 | Esperar finalización y aprobación de UX-07A.1. |
+
+REQ-004 sigue APROBADO COMO ESPECIFICACIÓN / IMPLEMENTACIÓN PENDIENTE.
+Ninguna tarea técnica se marca iniciada o completada: dominio, seguridad, migración,
+matching, contratos y validaciones PostgreSQL siguen pendientes.
+El preflight debe concretar el mapeo territorial mínimo y el contrato de cuotas/proxies
+por entorno conforme al ADR aprobado, sin ejecutar la implementación ni habilitar geodatos exactos.
+
+---
+
+# UX-07A — Gates de los P2 residuales
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Fuente: [ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28) y
+[REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Pendientes bloqueantes del preflight: mapeo provincia/localidad en ambos lados (la
+emergencia hoy solo guarda zona); clave/operación/ventana/cifra/429/reintento y confianza
+de proxies por entorno. Sin substring temporal ni confianza irrestricta en encabezados.
+Documentados casos territoriales y de IP/proxy; no ejecutados. Las tareas previas
+siguen pendientes, sin cambio de alcance; retest independiente final obligatorio.
+
+# UX-07A — Correcciones documentales y bloqueos vigentes
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Fuente normativa: [ADR-002 corregido](ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28)
+y [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md#corrección-normativa-para-retest--2026-09-28).
+Las tareas de implementación existentes permanecen PENDIENTES, con ejecución BLOQUEADA.
+
+| Hallazgo | Contrato corregido; trabajo técnico todavía pendiente |
+| --- | --- |
+| P1-1 | Habilitación: perfil completo/VERIFICADO y verificación PROFESIONAL; transición y auditoría atómicas |
+| P1-2 | Escritores de elegibilidad componibles, desactivación/versionado/auditoría y orden común de locks; restaurar no revive |
+| P2-1 | Resultado histórico durable mínimo para comandos/no-op, protección de retención y recuperación tras IntegrityError |
+| P2-2 | Renovación desde ahora con confirmación si acorta, reloj tras locks, versión obligatoria y no resurrección |
+| P2-3 | Localidad/provincia explícitas; excluir ambigüedad/incompletitud y substring; alinear pruebas previstas |
+| P2-4 | Cuotas por operación/actor e IP, 429, alcance de memory:// y cifras nuevas decididas en preflight |
+
+Pendientes antes de autorizar .1: retest documental/arquitectónico independiente,
+decisión explícita de ADR-002 y paquete de implementación. Preflight debe concretar
+cifras de límites nuevos, rutas/respuestas, retención del resultado durable y planes
+de consulta. Geodatos exactos siguen bloqueados hasta política completa de finalidad,
+acceso, almacenamiento, vencimiento/purga, backups y protección.
+Incluir pruebas de cancelación/contacto, todos los escritores, rollback/no-op/replay,
+downgrade y consumidores compartidos; PostgreSQL obligatorio para concurrencia.
+UX-07A.2 continúa bloqueado por dependencia de .1 implementado y verificado.
+
+# UX-06A — corrección P1/P2 para retest
+
+## Cierre de revisión documental UX-07A — 2026-09-28
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+Las tareas de implementación y sus gates conservan su estado PENDIENTE.
+
+Registro: 2026-09-27T22:04:02-03:00; rama `feature/ux-ui-foundation`; HEAD `7af47a2`.
+Estado: pendiente de retest independiente, no aprobado.
+
+Implementado: transacción única de creación/notificación INTERNAL/OperationCommand,
+clave criptográfica ligada al actor y operación, replay durable y conflicto de payload;
+recuperación temporal del borrador saneado tras caducar autenticación, login real,
+CSRF mantenido, aislamiento por actor/navegador/pestaña y descarte/TTL de 15 minutos.
+Se conservan permisos CLIENTE/PROFESIONAL aprobados y diseño UX-06A.
+
+Validación de Implementación: 132 PASS + 1 SKIP en 133 Python relacionados, 4 PASS
+en PostgreSQL exclusivo real y 5 PASS Node. Pendientes: retest independiente y
+suite completa por Testing; matriz visual completa no repetida en esta corrección.
+
+Dependencias operativas futuras, fuera del incremento:
+- decidir política de purga periódica y límites globales del almacenamiento temporal;
+  hoy la expiración se aplica al acceder y no permite restaurar un borrador vencido;
+- verificar almacenamiento privado compartido antes de escalar horizontalmente;
+  recuperación actual local, sin promesa de durabilidad distribuida;
+- si Producto necesita recuperar más allá de 15 minutos o entre dispositivos,
+  diseñar un borrador persistente con política de privacidad y aprobación previa;
+- rotación de secretos invalida formularios emitidos; definir continuidad de claves
+  antiguas solo si el despliegue lo requiere. No se agrega infraestructura para ello.
+
+Sin migraciones nuevas, Redis, colas ni outbox. El historial siguiente se conserva;
+las menciones antiguas a atomicidad y borrador pendientes quedan superadas solo por
+esta implementación, nunca por una aprobación de Testing.
+
+---
+
 # BACKLOG MANDOBRA
+
+## P1 UX-06A — Corrección de facultades de propietario
+
+Corrección aprobada: 2026-09-27T19:49:55-03:00; registro: 2026-09-27T20:00:55-03:00.
+Estado: IMPLEMENTADO; RETEST INDEPENDIENTE PENDIENTE, sin aprobación de UX-06A.
+Testing: 2026-09-27T19:48:47-03:00, P1 REQUIERE_CORRECCIONES.
+
+Se descarta la ampliación CLIENTE/PROFESIONAL del registro histórico siguiente.
+Solo CLIENTE activo puede crear y administrar solicitudes propias y ejercer el
+actor cliente del contrato BUDGET. Profesional conserva oportunidades, ofertas y
+actuación como contraparte contratada. Rutas y servicios rechazan rol incorrecto;
+se cubren datos heredados, sesión desactualizada, acceso horizontal e idempotencia.
+El rediseño visual, JS, validaciones, visitantes y CSRF se conservan.
+
+El pendiente histórico de reseñas de solicitante PROFESIONAL queda descartado,
+no es una autorización futura. Permanecen los pendientes de borrador recuperable,
+adjuntos, taxonomía, matching, distribución, IA, edición, atomicidad, métricas,
+expiración e idempotencia durable de creación, fuera de esta corrección.
+No se borraron ni reasignaron datos creados bajo la implementación rechazada.
+
+Pruebas: 117 Python (116 PASS, 1 SKIP preexistente PostgreSQL), 5 Node PASS;
+compileall, sintaxis JS y diff check correctos. No hubo fallos en esta tanda.
+Pendientes: retest P1 por Testing y suite completa por ese agente. El registro
+histórico de validación de ambos roles no constituye evidencia de aceptación actual.
+
+
+## UX-06A — Solicitudes de presupuestos
+
+Timestamp: 2026-09-27T18:43:08-03:00. Rama `feature/ux-ui-foundation`; base `7af47a25a59efcb64f70c2596d9f6818ace298bc`.
+Estado: implementado localmente; aprobación visual y Testing independiente pendientes.
+
+Visitantes ven una entrada informativa con login/registro y next interno a
+/presupuestos/nuevo; no completan ni previsualizan formularios anónimos. CLIENTE
+y PROFESIONAL activos pueden solicitar y administrar exclusivamente solicitudes
+propias. El profesional conserva sus oportunidades y no puede autoofertar.
+Formulario breve, opcionales desplegables, revisión local, publicación nativa,
+validación del servidor, valores conservados y confirmación con contador real.
+
+Pendientes de dominio, fuera de UX-06A:
+
+- Borrador recuperable tras login/caducidad de sesión; hoy no hay persistencia de borradores.
+- Adjuntos y su seguridad/almacenamiento.
+- Taxonomía de rubros y catálogo administrable.
+- Matching geográfico y distribución automática: hoy no se prometen respuestas.
+- IA de asistencia o clasificación.
+- Edición posterior a publicar y reglas sobre ofertas existentes.
+- Política definitiva de visibilidad: no se amplía la exposición de ofertas privadas.
+- Atomicidad solicitud/notificación: siguen siendo commits separados; evaluar outbox.
+- Métricas de publicación, búsquedas, respuestas y conversión.
+- Expiración real; no mostrar temporizadores sin soporte de dominio.
+- Reseñas contractuales del solicitante PROFESIONAL: el permiso vigente es CLIENTE.
+  UX-06A no lo amplía ni muestra un CTA que terminaría en 403.
+- Idempotencia de creación de solicitud ante reenvío de red/recarga: el bloqueo de
+  doble clic es local. No confundirlo con la idempotencia canónica BUDGET existente.
+
+Validación: 157 pruebas Python relacionadas, 156 PASS y 1 SKIP preexistente de
+concurrencia PostgreSQL; 16 Node PASS (5 nuevas + 11 skeleton). Matriz real:
+30 combinaciones (visitante/CLIENTE/PROFESIONAL × claro/oscuro ×
+1440/1024/768/390/320), 200 controles >=44×44; cero overflow estable.
+La suite completa y el gate concurrente PostgreSQL quedan para Testing.
+
+
+## UX-04B/04C — Estados de carga y errores amigables
+
+Timestamp: 2026-09-27T16:12:05-03:00. Rama feature/ux-ui-foundation; base 18c422e.
+Estado: implementado localmente; aprobación visual y Testing independiente pendientes.
+
+Skeleton global: enlaces internos elegibles y submits válidos, espera 300 ms,
+mensaje a 8 s, cleanup pageshow/bfcache/Escape/Navigation API y fail-safe 30 s.
+Excluye externos, protocolos especiales, descargas, targets nuevos, anclas locales,
+modificadores, eventos cancelados, data-no-loading y formularios inválidos.
+Sin SPA/intercepción/reenvío; no opera antes de la primera respuesta HTML absoluta.
+Sin Navigation API, cancelaciones no observables dependen de Escape/pageshow/límite.
+
+403/404/500/503 comparten template seguro, marca, temas, acciones reales y SVG
+local original animado suavemente; movimiento reducido desactiva animaciones.
+TESTING/JSON, health, webhooks, CSRF, headers y logs genéricos preservados;
+render de errores no consulta notificaciones. QA aislado en /dev/qa/estados.
+
+Evidencia: 143 Python PASS tras corregir orden de CSS, última tanda focal/seguridad/
+webhook 65 PASS (solapada, no sumar), Node final40 PASS; compileall, sintaxis,
+UTF-8, enlaces y diff-check. Chrome48 casos errores +12 skeleton en seis anchos y
+ambos temas; mínimos44px, sin overflow estable. Alcances exactos en ACTIVE_HANDOFF.
+
+Pendientes: aprobación visual; suite completa/retest independiente; AT, JS apagado,
+bfcache real y navegadores legacy; reduced motion del SO y zoom real (720px equiv.
+200% ya revisado). No confundir estas reservas con un PASS de Testing.
+No migraciones ni nuevas dependencias. Sin staging/commit/push/merge.
+
+## UX-05A: ajuste visual exclusivo de Explorar
+
+Timestamp: 2026-09-27T14:30:36-03:00. Implementado localmente, revision visual pendiente.
+Capa azul superior reforzada; sin controles visibles de pausa/anterior/siguiente.
+Autoplay8s y fade750ms conservados; pausas de accesibilidad automaticas.
+Home congelado por instruccion de Producto, hashes verificados sin cambios.
+19 Python y6 Node PASS. Sin staging/commit/push/merge. Evidencia y limites en handoff.
+
+## UX-05A: bandas grandes enlazadas, sin las seis tarjetas fijas
+
+Timestamp: 2026-09-27T14:18:48-03:00. Estado: implementado localmente, revision visual pendiente.
+Decision nueva de Producto: las bandas reemplazan las seis tarjetas fijas del home.
+376/248px por tarjeta, titulos enlazados a /buscar?servicio=..., velocidad lineal
+aproximadamente12% menor; hover/foco pausa y teclado expone originales desplazables.
+Doce assets intactos. Sin cambios al hero principal, Explorar ni backend.
+64 Python y13 Node PASS;16 focales repetidos tras corregir especificidad del foco,
+PASS. Chrome siete anchos x dos temas,12 enlaces visibles por Tab a320/escritorio.
+Sin staging/commit/push/merge. Handoff conserva resultados, mapeo y limitaciones.
+Aprobacion visual, Testing/suite completa y CLS instrumental pendientes.
+
+## UX-05A refinado: Explorar sereno y bandas dentro del home
+
+Timestamp: 2026-09-27T14:00:27-03:00. Rama `feature/ux-ui-foundation`; base `85a7f22`.
+Estado: implementado localmente; NUEVA APROBACION VISUAL PENDIENTE.
+La aprobacion visual anterior queda retirada por exceso de movimiento en Explorar.
+La autorizacion de los doce assets y sus excepciones se conserva.
+
+Explorar: siete escenas, fundido750ms/intervalo8s, controles laterales, pausas por
+interaccion/visibilidad y modo reducido; sin bandas, pausa visible ni contador.
+Home: dos bandas opuestas60s dentro de Oficios destacados, despues del texto y
+antes de las seis tarjetas intactas. Hero principal, buscador y veinte rubros sin
+cambios funcionales. Doce WebP reutilizados con SHA-256 identicos, sin duplicacion.
+
+94 Python +28 Node PASS; compileall/sintaxis/UTF-8/relativos/diff-check PASS.
+Chrome:28 combinaciones (dos paginas x dos temas x siete anchos),42 controles
+>=44x44, sin overflow persistente; capturas y trazabilidad en
+[handoff activo](HANDOFFS/ACTIVE_HANDOFF.md). Compose descartable5050 disponible.
+Pendientes: revision visual del responsable, Testing independiente y suite
+completa posterior; CLS instrumental y emulacion visual sin JS/reduced-motion.
+No declarar aprobado ni integrado. Sin staging/commit/push/merge/migraciones.
+
+### Registro historico: primera composicion supersedida
+
+## UX-05A: doble carrusel decorativo de Explorar rubros
+
+Timestamp: 2026-09-27T12:48:26-03:00. Estado: implementado localmente, aprobacion visual PENDIENTE.
+Rama feature/ux-ui-foundation; base 85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Producto autorizo las doce imagenes actuales y sus excepciones visuales; PNG
+externos intactos. Doce WebP 960x540, RGB, sin metadatos, total 1021870 bytes.
+Dos filas con seis escenas y copias decorativas, sentidos opuestos, 60s; pausa
+accesible, fallback estatico sin JS, reduced-motion y print. Sin cambios al
+catalogo, busqueda ni backend. Orden y procesamiento completos en el
+[handoff activo](HANDOFFS/ACTIVE_HANDOFF.md).
+
+77 Python y 24 Node PASS; matriz Chrome 14 combinaciones sin overflow, control
+44x44 y contraste de texto >=15,9:1. Suite completa y retest independiente
+pendientes. Completar CLS instrumental y emulacion visual sin JS/reduced-motion/
+print; no confundir cobertura estructural con medicion real. Entorno descartable
+5050/explorar disponible. Sin staging/commit/push/merge.
+
+
+## UX-04A: navbar adaptable con drawer vertical
+
+Timestamp: 2026-09-26T21:03:18-03:00. Rama: `feature/ux-ui-foundation`.
+Base: `263a158dfec83d280e3686edd5ca34271992b3fc`. Estado: implementado localmente,
+pendiente de aprobacion visual e integracion Git. No hubo commit, push ni merge.
+
+- Una sola navegacion, reubicada en dialog modal a la derecha cuando la fila no
+  cabe completa. El ancho se mide nuevamente ante resize, fuentes o cambios de
+  texto; no se comprimen etiquetas ni se elige un breakpoint fijo por dispositivo.
+- Con los usuarios demo actuales: minimo util 1141 px (claro) / 1146 px (oscuro)
+  visitante; 1301 / 1306 px CLIENTE y PROFESIONAL. Incluye logo, opciones, controles,
+  separaciones y padding. Comparacion contra el ancho real del header, descontando
+  el espacio ocupado por scrollbar. Los numeros son evidencia, no constantes JS.
+- Dialog nativo con backdrop, Escape, foco contenido/restaurado, bloqueo de scroll,
+  botones de acordeon, acciones de cuenta al final y fallback HTML/CSS sin JS.
+- Verificacion focal: 62 unittest PASS y 18 casos/archivos Node PASS; matriz visual
+  de tres perfiles y dos temas entre 320 y 1440 px, extremos del umbral y reflow
+  equivalente a 200 % (720 CSS px desde una base de 1440).
+- Pendiente: aprobacion humana, revision visual real sin JS y emulacion visual de
+  movimiento reducido. La apertura del fixture local sin scripts fue rechazada por
+  la politica de URL del navegador; no se eludio. Esos contratos tienen pruebas
+  estructurales/controlador, no evidencia visual equivalente a un navegador sin JS.
+- Pendiente posterior: retest independiente y compatibilidad en otros motores.
+  Suite completa no ejecutada por alcance. Panel privado, skeletons, paginas de
+  error, backend y migraciones permanecen fuera de UX-04A.
+
+Detalle y continuidad: [ACTIVE_HANDOFF.md](HANDOFFS/ACTIVE_HANDOFF.md).
+
+## Futuro: datos reales y metodología de Precios de mercado
+
+Timestamp: 2026-09-22T22:33:48-03:00. Rama: `feature/ux-ui-foundation`.
+UX-03 presenta una guía pública con datos ficticios y estables para validar la
+experiencia. No implementa analítica, persistencia nueva ni mediciones reales.
+Antes de reemplazar la demostración se deberá definir y aprobar:
+
+- búsquedas anonimizadas por oficio y zona, con privacidad y retención explícitas;
+- presupuestos emitidos y aceptados, y precios finalmente acordados;
+- distribución por oficio y zona, separando mano de obra y materiales;
+- detección y tratamiento de valores atípicos;
+- tamaño mínimo de muestra antes de publicar una referencia;
+- fecha de actualización visible;
+- metodología versionada y trazable;
+- revisión administrativa de métricas y calidad de datos.
+
+Las referencias futuras deberán distinguir estimaciones de cotizaciones y no
+afirmar representatividad cuando la muestra sea insuficiente.
+
+## Futuro: evolución de búsqueda y catálogo de rubros
+
+Timestamp: 2026-09-21T20:18:54-03:00. Rama: `feature/ux-ui-foundation`.
+UX-02 presenta veinte rubros editoriales y mantiene correspondencias de búsqueda
+explícitas, sin ampliar la taxonomía canónica ni afirmar oferta, demanda o
+popularidad. Quedan para incrementos posteriores:
+
+- sinónimos y aliases revisados para cada rubro;
+- catálogo canónico administrable y su gobierno editorial;
+- búsqueda por especialidades;
+- normalización territorial de CABA y AMBA;
+- métricas de búsquedas con criterios de privacidad y retención;
+- registro y análisis de búsquedas sin resultados;
+- medición de oferta real por región;
+- conversión desde búsqueda a perfil y contratación;
+- ranking basado en evidencia y resistente a manipulación;
+- revisión del tratamiento global de errores.
+
+## Futuro: identidad legal y perfiles sociales del footer
+
+Timestamp: 2026-09-20T16:31:28-03:00. Rama: `feature/ux-ui-foundation`.
+El footer UX-01 es una **presentación demostrativa**. Los documentos legales y perfiles externos todavía no están disponibles ni se anuncian como vigentes. Pendientes: crear y verificar perfiles oficiales de Instagram, Facebook y LinkedIn; conectar únicamente URLs oficiales verificadas; definir propiedad, recuperación, autenticación reforzada y responsables internos de las cuentas. Redactar Términos y condiciones, Política de privacidad, Política de cookies, reglas de pagos, cancelaciones y reembolsos, Normas de la comunidad, y política de contenido, imágenes y autorizaciones. Someterlas a revisión legal y fiscal antes de producción; crear rutas reales y retirar cada indicación «Próximamente» cuando el recurso correspondiente esté aprobado y habilitado. No se incorporan redes, rastreadores, cookies ni enlaces legales ficticios en este incremento.
+
+## Futuro: asistencia documentada y soporte humano
+
+Timestamp: 2026-09-20T16:08:46-03:00. Rama: `feature/ux-ui-foundation`.
+El FAQ del home UX-01 filtra seis preguntas y respuestas **exclusivamente en el navegador**; no transmite ni conserva consultas. Incremento posterior: asistente RAG restringido a documentación aprobada, respuestas con fuentes, derivación a soporte humano, tickets de consulta con estados y responsables, consentimiento y privacidad, retención de mensajes, límites de frecuencia y protección contra abuso, notificaciones de respuesta, vinculación opcional con WhatsApp y métricas anonimizadas de preguntas no resueltas. Definir políticas y autorización antes de incorporar persistencia, servicios externos o IA.
+
+## Futuro: búsqueda territorial y ranking de oficios con evidencia
+
+Timestamp: 2026-09-20T15:39:04-03:00. Rama: `feature/ux-ui-foundation`.
+Las seis tarjetas de "Oficios destacados" del home UX-01 son una **selección editorial inicial**, no un ranking basado en métricas. No afirmar popularidad, demanda o volumen hasta diseñar y validar:
+
+- eventos anonimizados de búsquedas por oficio y zona, con criterios de privacidad y retención;
+- normalización territorial de Capital Federal y AMBA;
+- cantidad de profesionales activos y verificados por especialidad y relación entre oferta y demanda;
+- búsquedas sin resultados y conversión de búsqueda a contacto, presupuesto y contratación;
+- ranking dinámico con ventana temporal, tamaño mínimo de muestra y protección contra manipulación;
+- fallback editorial explícito cuando la muestra sea insuficiente.
+
+La captura de eventos, el ranking y la evolución del catálogo/filtros quedan para un incremento posterior. En UX-01 no se implementa analítica ni persistencia de búsquedas.
 
 ## Cierre técnico local 4F aprobado por Testing
 
@@ -279,3 +684,44 @@ Timestamp: 2026-09-04T10:29:16-03:00
   administrativas legacy que todavia combinan servicios con commits propios.
   La revocacion PRO ya fue corregida; este registro no autoriza refactorizar las
   demas acciones dentro del alcance actual.
+
+## UX-07A — Paquetes pendientes de implementación
+
+Registro: `2026-09-27T23:14:25-03:00`. Responsable de Producto: Cristian Sánchez; redacción: Codex, laptop MANDOBRA.
+Rama: `feature/ux-ui-foundation`. HEAD: `4489c5c208245368a2a9bfd1672a261cf3004c93`.
+Motivo: formalizar el preflight UX-07A aprobado y la decisión de Producto de
+`2026-09-27T23:03:15-03:00`, `APROBADO PARA ESPECIFICACIÓN`.
+Estado: especificación para revisión; implementación PENDIENTE. El preflight es el
+antecedente de inspección del chat, no evidencia de guardias implementadas.
+Orden neutral: PRO no habilita ni prioriza Emergencias; verificación es filtro obligatorio,
+no privilegio adicional de orden. Próximo paso: revisar REQ-004/ADR-002 y autorizar
+UX-07A.1; UX-07A.2 depende de su verificación.
+
+
+Fuente: [REQ-004](REQUISITOS/REQ-004-emergencias-guardia-vigente.md) y
+[ADR-002](ADR/ADR-002-emergencias-guardia-vigente.md). Todos los ítems siguientes PENDIENTES.
+
+> SUSTITUIDAS (2026-10-01, Cristian Sánchez): las reglas temporales de duración libre, 2/4/8 h, fila única y activar/renovar/desactivar de este antecedente. Rige la corrección focal superior; las demás reglas se conservan.
+
+| Prioridad / paquete | Trabajo y condición de cierre |
+| --- | --- |
+| P0 / .1 | Catálogo de seis asistencias: IDs/aliases explícitos, desconocidos rechazados, compatibilidad sin mapeos falsos |
+| P0 / .1 | Modelo/Alembic de guardia por propietario, 2/4/8 h, aware, unicidad, versión/locks, activar/renovar/desactivar con interfaz mínima operativa |
+| P0 / .1 | Invalidación por suspensión/verificación/oficio/cobertura sin resurrección; vencimiento exacto sin cron |
+| P0 / .1 | Creación autorizada y atómica con OperationCommand, notificación interna y auditoría; replay antes no, después de autorización sí |
+| P0 / .1 | Matching: filtros completos, fuera de cobertura excluido, orden neutral sin PRO, distancia aproximada sin ETA |
+| P0 / .1 | Contexto privado/ownership, protección de coordenadas y logs; revisar retención antes de capturar geodatos exactos |
+| P0 / .1 | Contacto centralizado con revalidación al momento de actuar, consentimiento y rechazo de emergency_id anónimo/ajeno |
+| Gate / .1 | PostgreSQL exclusivo: carreras, reloj tras lock, replay, rollback, constraints, migración y regresiones de consumidores |
+| P1 / .2 | Seis WebP revisados individualmente, hero accesible rojo, controles/pausa/táctil, 6 s y 600–750 ms |
+| P1 / .2 | Formulario nativo breve, skeleton UX-04B, resultados/vacío/errores honestos, claro/oscuro, responsive, teclado y sin JS |
+| Gate / .2 | .1 verificado antes de afirmar guardia; revisión visual independiente y matriz de aceptación completa |
+
+Antes de implementar: revisar renovación que reemplaza desde ahora, perfil habilitado,
+fallback de cobertura textual, cancelación ABIERTA, almacenamiento/retención y contratos
+concretos de rutas. Son detalles propuestos, no aprobaciones adicionales ya obtenidas.
+
+Backlog posterior separado, sin autorización de ejecución: despacho/aceptación bilateral,
+asignación, contrato EMERGENCY, rutas/ETA, pagos/garantía, recurrencias/agenda, invitaciones,
+WhatsApp Business API, polling/WebSockets/colas. Cron no requerido. Priorización PRO queda
+excluida por decisión neutral, no es una mejora pendiente de este paquete.

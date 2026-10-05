@@ -37,6 +37,10 @@
                 <span>Servicio</span>
                 <select name="servicio">
                     <option value="">Todos los servicios</option>
+                    {% set closed_services = ("Electricidad", "Refrigeracion A/C", "Refrigeración A/C", "Plomeria", "Plomería", "Herreria", "Gas domiciliario") %}
+                    {% if servicio and servicio not in closed_services %}
+                        <option value="{{ servicio }}" selected>{{ servicio }}</option>
+                    {% endif %}
                     <option {% if servicio in ("Electricidad",) %}selected{% endif %}>Electricidad</option>
                     <option
                         value="Refrigeración A/C"

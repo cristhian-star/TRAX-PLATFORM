@@ -1,0 +1,41 @@
+/* UX-05A: one decorative scene; search and catalog keep their own layout. */
+.explore-rubros__hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-top: 220px;
+    background: var(--trax-steel-950);
+}
+.explore-scenes { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.explore-scenes__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    opacity: 0;
+    transition: opacity 750ms ease;
+}
+.explore-scenes__image.is-active { opacity: 1; }
+.explore-scenes::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* At content start the 94% blue layer guarantees contrast even over white. */
+    background: linear-gradient(180deg, rgba(12, 35, 60, .62), rgba(12, 35, 60, .72) 130px,
+        rgba(12, 35, 60, .94) 220px, var(--trax-steel-950) 100%);
+}
+@media (max-width: 47.99rem) {
+    .explore-rubros__hero { padding-top: 176px; }
+    .explore-scenes::after {
+        background: linear-gradient(180deg, rgba(12, 35, 60, .62), rgba(12, 35, 60, .72) 96px,
+            rgba(12, 35, 60, .94) 176px, var(--trax-steel-950) 100%);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .explore-scenes__image { transition: none; }
+}
+@media print {
+    .explore-scenes__image { transition: none; }
+}

@@ -66,6 +66,23 @@ def validate_budget_form_data(form_data):
     return None
 
 
+def budget_form_errors(form_data):
+    """Field-level validation shared by the budget entry route and its tests."""
+    errors = {}
+    for name, limit in (("titulo", 160), ("categoria", 120), ("zona", 120), ("descripcion", 1200)):
+        if not form_data[name]:
+            errors[name] = "Completá este campo."
+        elif len(form_data[name]) > limit:
+            errors[name] = f"Usá hasta {limit} caracteres."
+    if form_data["urgencia"] not in ("BAJA", "NORMAL", "ALTA"):
+        errors["urgencia"] = "Elegí una de las opciones disponibles."
+    try:
+        parse_date(form_data["fecha_estimada"])
+    except ValueError:
+        errors["fecha_estimada"] = "Ingresá una fecha válida (AAAA-MM-DD)."
+    return errors
+
+
 def build_proposal_form_data(form):
     required_fields = ("industria", "categoria", "rubro", "titulo", "descripcion", "ubicacion", "modalidad")
     form_data = {field: empty_to_none(form.get(field)) or "" for field in required_fields}

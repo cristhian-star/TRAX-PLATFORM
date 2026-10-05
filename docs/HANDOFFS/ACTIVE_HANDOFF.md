@@ -1,3 +1,3184 @@
+# Propuestas — Ajuste visual de acciones y encabezado
+
+Timestamp: 2026-10-04T16:23:51-03:00. Origen: Laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME, pendiente de revisión visual de este ajuste.
+Rama feature/ux-ui-foundation; HEAD 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Se preservan los 12 paths pendientes de P1.1 y la aprobación histórica de Testing.
+El usuario autoriza cambiar solo la apariencia del portal: EXPLORÁ OPORTUNIDADES
+con estilo pequeño, negrita y turquesa; acciones negras en claro y blancas en oscuro,
+incluido Ver propuesta. Tokens DS v2: secondary-hover para encabezado,
+text-strong/text-inverse para botones y text-secondary para hover/active.
+CSS encapsulado en .proposals-p1, sin modificar Home, navbar ni lógica operativa.
+
+Cambios de esta sesión: app/templates/listado_propuestas.html,
+app/static/css/proposals-portal-p1.css, docs/REQUISITOS/PROPUESTAS_P1.md y este handoff.
+Validación: tests.test_proposal_portal_p1 11/11 en SQLite memoria; revisión de ambos
+temas en navegador real. No se repitió suite completa por ser un ajuste visual.
+Sin migraciones, bases compartidas ni Docker. Preview aislado permanece en 54873.
+HEAD conservado; staging vacío. Sin commit/push/merge porque no están autorizados.
+Próximo paso: revisar colores y autorizar integración posteriormente si corresponde.
+La aprobación de Testing precedente no incluye automáticamente esta nueva paleta.
+
+---
+
+# Propuestas P1.1 — Testing independiente aprobado
+
+Timestamp: 2026-10-04T16:13:06-03:00. Origen: Laptop.
+Responsable: 05 — MANDOBRA | Testing y QA Integral.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_1_APROBADO_PARA_COMMIT.
+Rama: feature/ux-ui-foundation. HEAD: 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Preflight conforme: origin canonico, staging vacio y exactamente los 12 paths
+P1.1 declarados, sin trabajo ajeno. Testing no modifico codigo ni pruebas; solo
+agrego este cierre y la evidencia equivalente en la especificacion P1.
+
+Objetivo completado: validacion independiente del acceso canonico desde
+Operaciones, recorrido Home por rubro/ubicacion, filtros removibles, panel nativo
+plegable, presentacion visual y respuesta 400 amigable. Se confirmaron PUBLICADA,
+orden reciente, paginacion, cero escrituras GET, privacidad, escape XSS y la
+politica central proposal_application_eligibility(). No se hallaron P0-P3.
+
+Pruebas independientes, todas con DATABASE_URL SQLite en memoria y
+PYTHONDONTWRITEBYTECODE=1: focal P1/P1.1 11/11; navegacion, Home, navbar, DS,
+autenticacion y errores 59/59; regresiones de Propuestas y contratos 73
+ejecutadas, 72 aprobadas y una omitida por requerir concurrencia PostgreSQL.
+Suite completa final, ejecutada una sola vez sobre el arbol ejecutable definitivo:
+894 ejecutadas, 887 aprobadas, siete omitidas, cero fallos y cero errores en
+209.845 s. Las omisiones son cuatro gates PostgreSQL sin URL segura, una
+concurrencia PostgreSQL, una comprobacion exclusiva de imagen Docker y una zona
+IANA no disponible. PostgreSQL real y Docker: NO EJECUTADOS; trax_db no se uso.
+
+QA de navegador con fixtures aisladas: Operaciones conduce directamente a
+/propuestas para anonimo y autenticado; Home conserva rubro y ubicacion con
+tildes, espacios, ampersand y paginacion; chips quitan un filtro y vuelven a
+pagina 1; Limpiar elimina todos. Parametros invalidos devolvieron HTTP 400 real
+para anonimo y autenticado, con texto generico, sin traceback y recuperacion
+segura. Profesional pendiente: cero CTA; profesional aprobado: CTA disponible.
+
+Matriz claro/oscuro en 1440, 1280, 1024, 770, 768, 390 y 320 px: cero overflow,
+tarjetas sin solapamientos y minimo interactivo 44 px. El details/summary expuso
+estado expandido/colapsado nativo, abrio y cerro con Enter, con foco visible. El
+contraste asentado fue al menos 4.56:1 en claro y 8.02:1 en los controles opacos
+oscuros; los chips oscuros usan fondo semitransparente y superan AA al componerlo.
+Consola sin warnings/errores. El portal y su formulario GET funcionan sin JS;
+el Home conserva el enlace noscript documentado. Preview temporal retirado.
+
+Controles: compileall app scripts, sintaxis Node del controlador, UTF-8 sin
+BOM/NUL/U+FFFD, enlaces relativos, un unico salto final y git diff --check:
+aprobados. La antigua linea vacia adicional de test_proposal_portal_p1.py ya no
+existe. Sin modelos, migraciones, dependencias, estados, pagos, permisos ni reglas
+de elegibilidad modificados. Migraciones relacionadas: ninguna.
+
+Pendientes y riesgos: el gate PostgreSQL permanece omitido; la visibilidad directa
+de detalles cerrados/cancelados sigue fuera de P1.1. Proximo paso recomendado:
+revision del usuario y autorizacion separada para commit/push. No ejecutar merge,
+deploy, Alembic contra DEV ni operaciones Git destructivas. No hubo merge porque
+no estaba autorizado. Estado final del trabajo: aprobado en la rama, sin integrar.
+
+---
+
+# Propuestas P1.1 — Accesos y refinamiento visual
+
+Timestamp: 2026-10-04T15:51:19-03:00. Origen: Laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_1_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama feature/ux-ui-foundation. HEAD 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020.
+Preflight: ruta/origin correctos, HEAD local/remoto coincidentes, árbol y staging
+iniciales vacíos. Consulta remota de solo lectura tras habilitar acceso de red.
+Las entradas anteriores se conservan como historial de P1/P0.
+
+Completado: enlace canónico Operaciones → Propuestas con estado activo; Home GET
+por rubro/ubicación sin equivalencias inventadas; chips removibles; buscador visible;
+filters details nativo con mejora progresiva; refinamiento de tarjetas DS v2; error
+400 amigable exclusivo del portal; EOF del test corregido. Se reemplaza el selector
+ambiguo del Home por texto Rubro. No se duplica la política de elegibilidad.
+
+Modificados: app/templates/base.html, app/templates/home/_operation_search.html,
+app/templates/listado_propuestas.html, app/static/css/proposals-portal-p1.css,
+app/static/css/visitor-navbar-v1.css, app/services/proposal_portal_service.py,
+app/routes/operation_routes.py, tests/test_proposal_portal_p1.py,
+docs/REQUISITOS/PROPUESTAS_P1.md y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/static/js/proposals-portal-p1.js y app/templates/proposals_filter_error.html.
+
+Pruebas: 41 focales iniciales aprobadas. Suite completa: 894 ejecutadas en 341.043 s,
+887 aprobadas, siete omitidas y cero fallos/errores. DATABASE_URL SQLite en memoria;
+TRAX_POSTGRES_TEST_URL removida solo del proceso. Tests históricos de migraciones
+corrieron sobre SQLite temporal. Sin acceso a trax_db/PostgreSQL/Docker.
+Tras el último ajuste de presentación HTTP 400: 62/62 focales y regresiones de
+Propuestas, P0, Home, navbar, errores y seguridad. No se repitió suite completa tras
+ese ajuste. compileall app scripts, Node --check y git diff --check correctos.
+Deprecaciones legacy y logs deliberados de errores de las pruebas no son regresiones.
+
+QA navegador: 28 combinaciones (siete anchos exactos × dos temas × abierto/cerrado),
+0 overflow y 0 controles visibles del portal menores a 44 px. Recorridos completos,
+foco/teclado, filtros largos y recuperación HTTP 400 comprobados. Contraste estable
+4.56:1 claro / 8.01:1 oscuro. Sin errores JavaScript; 400 solicitado deliberadamente.
+Evidencia y limitaciones: [spec P1.1](../REQUISITOS/PROPUESTAS_P1.md#p11--accesos-y-refinamiento-visual).
+Capturas fuera del repositorio. Preview final puerto 54873, SQLite en memoria y
+fixtures identificadas como pruebas. El intento en 5071 mostró una instancia antigua
+y fue descartado como evidencia; no se modificó el proceso ajeno.
+
+Sin modelos, migraciones nuevas, contratación, creación, estados, pagos ni cambios
+a permisos/elegibilidad. Pendientes: Testing independiente, aprobación visual y
+los P2 históricos. Sin JS el portal funciona; Home ofrece un enlace alternativo
+porque su segmentador sigue dependiendo del controlador previo.
+Sin commit, push, PR ni merge: no autorizados. HEAD conservado, staging vacío;
+12 paths P1.1 locales. Remoto permanece en el commit base. No hay cambios ajenos.
+Próximo paso: retest del diff y recorridos según spec; no integrar ni desplegar sin
+autorización, no ejecutar gates contra bases compartidas.
+
+---
+
+# Propuestas P1 — Testing independiente aprobado
+
+Timestamp: 2026-10-04T15:04:39-03:00. Origen: laptop.
+Responsable: 05 — MANDOBRA | Testing y QA Integral.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_APROBADO_PARA_COMMIT.
+Rama: feature/ux-ui-foundation. HEAD: 26ee98d0e0b18c3589fcf39f151ed70929309930.
+Staging vacío. El preflight confirmó los nueve paths P1 esperados, sin trabajo
+ajeno. Testing agregó únicamente el troubleshooting autorizado del incidente
+PostgreSQL y actualizó esta especificación/handoff con resultados reales.
+
+Revisión: listado limitado a PUBLICADA, acceso anónimo de lectura, filtros GET,
+orden determinista, paginación SQL, view models sin columnas privadas, escape
+Jinja, cero escrituras GET y elegibilidad central P0 confirmados. No se hallaron
+P0, P1, P2 ni P3 atribuibles al incremento. Cerradas y canceladas no aparecen
+en el portal; su visibilidad por URL directa sigue pendiente y fuera de P1.
+
+Pruebas: focales/regresiones 120 ejecutadas, 119 aprobadas, una omitida, cero
+fallos y cero errores. Suite completa 891 ejecutadas, 884 aprobadas, siete
+omitidas, cero fallos y cero errores. Las omisiones son cuatro gates PostgreSQL,
+una concurrencia PostgreSQL, una comprobación dentro de imagen Docker y una
+zona IANA ausente. `compileall app scripts` y `git diff --check`: PASS.
+Tests históricos de migración se ejecutaron solo contra SQLite temporal; nunca
+se utilizó ni modificó `trax_db`. PostgreSQL real: NO EJECUTADO y no acreditado.
+
+QA navegador: filtros combinados y paginación operativos; estado vacío seguro;
+profesional pendiente sin CTA; profesional aprobado con CTA y formulario en el
+detalle. Claro/oscuro y 1440/1280/1024/770/390/320 px sin overflow; por escala
+del navegador se verificaron 767/769 como fronteras de 768. Controles mínimo
+44 px, foco visible, contraste mínimo 5.48:1 claro y 8.02:1 oscuro, consola sin
+errores. Fixtures y servidor fueron SQLite en memoria y se retiraron al cerrar.
+
+Documentación: [especificación P1](../REQUISITOS/PROPUESTAS_P1.md) actualizada y
+[troubleshooting PostgreSQL](../TROUBLESHOOTING/2026-10-04-postgresql-dev-schema-desalineado.md)
+creado. No se modificó código productivo durante Testing.
+
+Pendiente: revisión del usuario y autorización separada para commit/push. No
+hacer merge, deploy, migraciones contra DEV ni operaciones destructivas. Si se
+requiere gate PostgreSQL, crear y proteger una base exclusiva descartable; no
+usar `trax_db`.
+
+---
+
+# Propuestas P1 — Portal público implementado
+
+Timestamp: 2026-10-04T14:16:52-03:00. Origen: laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME — PROPUESTAS_P1_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 26ee98d0e0b18c3589fcf39f151ed70929309930.
+Preflight local/remoto coincidente; origin canónico; árbol inicial limpio y staging
+vacío. P0 presente y gate desbloqueado; las entradas históricas inferiores reflejan
+estados anteriores y quedan preservadas. No se repitió la auditoría completa.
+
+Completado: listado público PUBLICADA, filtros GET reales, paginación SQL, conteos
+agregados, view models públicos, política central P0, tarjetas de referencia,
+DS v2 claro/oscuro y acceso canónico desde Home. No se cambia navbar global.
+Detalles y límites: [especificación P1](../REQUISITOS/PROPUESTAS_P1.md).
+
+Archivos modificados: app/routes/operation_routes.py,
+app/services/proposal_service.py, app/templates/listado_propuestas.html,
+app/templates/home/_operation_search.html y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/services/proposal_portal_service.py,
+app/static/css/proposals-portal-p1.css, tests/test_proposal_portal_p1.py y
+docs/REQUISITOS/PROPUESTAS_P1.md.
+
+Validación: paquete focal y regresiones, 120 pruebas: 119 aprobadas y una omitida
+(test_real_concurrent_independent_sessions, requiere PostgreSQL real).
+Módulos: test_proposal_portal_p1, test_proposal_eligibility,
+test_sprint7_proposal_to_contract, test_operation_architecture_services,
+test_modular_view_services, test_security_controls, test_sprint7_contracting_core,
+test_sprint7_contracting_foundations, test_sprint7_contract_event_boundary,
+test_sprint7_contracting_p0_iteration1, test_sprint7_contracting_p1_iteration2,
+test_home_hero_carousel, test_corporate_footer, test_design_system_v2 y
+test_loading_error_states. No suite completa. Entorno: DATABASE_URL SQLite en
+memoria, PYTHONDONTWRITEBYTECODE=1, sin datos persistidos. Deprecaciones legacy y
+mensajes de error deliberados de las pruebas de seguridad/errores amigables.
+El primer intento de la fixture P1 omitía professional_id requerido; corregido
+antes de las ejecuciones aprobadas, sin cambio de dominio.
+
+Revisión visual: los siete anchos exactos 1440/1280/1024/770/768/390/320, ambos temas,
+0 overflow horizontal y 0 controles del portal inferiores a 44 × 44. Se normalizó
+el zoom del navegador y se repitió la matriz con innerWidth confirmado. Foco visible,
+filtro real operativo, sin solapamientos observados, consola limpia. Contraste de
+texto mínimo claro 4.56:1 / oscuro 8.01:1; corregido el pequeño encabezado y borde
+local de campos. Capturas de escritorio/móvil en ambos temas fuera del repositorio.
+Preview en puerto 5070 con fixtures SQLite en memoria; no usar sus datos como reales.
+
+Pendientes: retest independiente, revisión del producto, gate PostgreSQL cuando se
+autorice y política de detalle cerrado/cancelado. Sin vencimiento, renovación,
+pagos, múltiples contrataciones ni oferta firme. No hay migraciones relacionadas.
+Riesgo conocido: títulos/descripciones/ubicaciones son texto público del autor;
+no hay un detector de PII embebida. No se exponen columnas privadas del usuario.
+No se tocó contratación, creación, modelos, permisos P0, navbar, Docker ni producción.
+
+Cierre técnico: git diff --check y cached --check sin errores; sintaxis Python
+(AST) y UTF-8 sin BOM/NUL/U+FFFD, sin mojibake ni rutas locales nuevas. HEAD
+conservado y staging vacío verificados; nueve paths P1.
+
+Sin staging, commit, push, PR ni merge: fuera de autorización. El remoto permanece
+en la base; hay nueve paths locales P1 sin commit. Próximo paso: ejecutar Testing
+independiente sobre este diff y su spec, conservando HEAD y staging vacío. No hacer
+migraciones, acceder a PostgreSQL compartido ni integrar hasta autorización.
+
+---
+
+# Propuestas P0 — Elegibilidad central para postularse
+
+Timestamp: 2026-10-04T13:43:36-03:00. Origen: laptop.
+Estado READY_TO_RESUME — PROPUESTAS_P0_ELEGIBILIDAD_IMPLEMENTADA_PENDIENTE_DE_TESTING.
+Rama feature/ux-ui-foundation. HEAD fdbe9a34951995b6c9e25c6775e378a15a4d04ba.
+Preflight conforme, origin correcto; único cambio previo: auditoría P1 de este handoff,
+preservada debajo. Staging vacío. Sin commit/push/merge: no autorizados.
+
+El bloqueo previo era la ausencia de verificación obligatoria al postular.
+Nueva política proposal_application_eligibility en proposal_eligibility_service.py:
+cuenta persistida ACTIVO, rol PROFESIONAL, perfil completo y verificación aprobada.
+Reutiliza is_user_active y has_approved_verification: VerificationRequest.estado
+APROBADO. No inventa flags ni exige PRO; no existe estado de verificación vencida.
+Resultado inmutable eligible/reason y mensaje controlado. Ruta, comando de servicio
+y detalle comparten esa política. Servicio valida antes de consultar la propuesta
+con lock o modificar entidades. Autenticados no elegibles: 403 sin Location;
+anónimos: login canónico; UI no entrega formulario operativo a no elegibles.
+Los decoradores de actor de esta única ruta se sustituyen por la política central,
+conservando CSRF global y límite 30/día. Ownership, estados, duplicación y contratación
+no se cambian. No se modifica Presupuestos ni el portal público P1.
+
+Pruebas nuevas: tests/test_proposal_eligibility.py, cuatro métodos; matriz 11 actores
+no elegibles (sin verificación, pendiente, observada, rechazada, incompleto,
+suspendido, CLIENTE, ADMIN, ADMINISTRADOR, vacío y desconocido). Cada caso comprueba
+servicio directo, presentación, POST 403 y cero ProposalApplication,
+ActivityNotification, AuditLog y ContractRequest; sesión/formulario manipulados no
+habilitan acceso. Anónimo sin escrituras; CSRF inválido 400; elegible sin PRO válido;
+repetición no duplica; propietario y propuesta cerrada siguen rechazados.
+Paquete ejecutado: 73 tests, 72 aprobados y 1 omitido preexistente:
+test_real_concurrent_independent_sessions requiere PostgreSQL y no es comprobable
+con SQLite en memoria. Incluye focales, proposal_to_contract, arquitectura,
+modular_view_services, security_controls, contracting_core/foundations/event_boundary,
+contracting_p0_iteration1 y contracting_p1_iteration2. Tras revisión final de alcance,
+focales + arquitectura + view services repetidos: 22/22 OK. No sumar repeticiones
+como cobertura nueva. Deprecaciones legacy conocidas; error deliberado de seguridad.
+
+Archivos: app/services/proposal_eligibility_service.py (nuevo),
+app/services/proposal_service.py, app/services/operation_view_service.py,
+app/routes/operation_routes.py, app/templates/detalle_propuesta.html,
+tests/test_proposal_eligibility.py (nuevo) y este handoff.
+UTF-8 correcto, sin BOM/NUL/U+FFFD ni rutas absolutas nuevas; diff --check y cached
+--check correctos. Sin dependencias, migraciones, PostgreSQL, Docker ni producción.
+Sin rediseño general, cambios en Home/navbar, filtros, montos, contratos, creación,
+vencimiento/renovación o múltiples contrataciones. Retest independiente pendiente.
+P1 aún no implementado: revisar P0 y luego retomar su gate y brechas documentadas.
+No integrar ni declarar aprobación final antes del Testing independiente.
+
+---
+
+# Propuestas P1 — Auditoría bloqueada por gate
+
+Timestamp: 2026-10-04T13:35:53-03:00. Origen: laptop.
+Estado: BLOCKED — PROPUESTAS_P1_BLOQUEADO_POR_DISENO.
+Rama feature/ux-ui-foundation. HEAD fdbe9a34951995b6c9e25c6775e378a15a4d04ba.
+Preflight: origin correcto, ls-remote coincide exactamente, árbol y staging limpios.
+La posta anterior describía E3.1 sin integrar; Git confirma ahora ese trabajo en HEAD.
+
+Bloqueo P1: app/routes/operation_routes.py:1040 exige login, rol PROFESIONAL y perfil
+completo, pero no verified_required. app/services/proposal_service.py:129 tampoco
+exige verificación aprobada. La decisión de producto exige activo Y verificado y
+prohíbe cambiar permisos en este incremento. Gate 3 no cumplido.
+Reproducción independiente SQLite en memoria con CSRF activo: verificación False,
+POST /propuestas/1/postular devuelve 302 ?postulada=1 y crea una postulación.
+GET listado público 200; detalle CANCELADA público también 200. Fixture inicial
+falló por zona obligatoria omitida; corregido solo en runner efímero, sin cambios
+al producto. No se ejecutaron suites ni revisión visual P1 porque no se implementó.
+
+Modelo real ProposalRequest: industria/categoria/rubro/especialidad, título,
+descripción, ubicación textual, modalidad, cantidad, presupuesto estimado opcional,
+fechas opcionales y created_at; sin provincia/localidad separadas ni fecha de cierre.
+Estados PUBLICADA/CERRADA/CANCELADA. ProposalApplication: POSTULADA/ACEPTADA/RECHAZADA/
+DESCARTADA. SINGLE y contratos EXTERNAL vigentes. Creación admite cualquier cuenta
+activa autenticada, incluidos profesionales; propiedad owner_user_id o cliente_id.
+Listado público filtra industria/categoria/rubro/ubicación, orden reciente, carga
+all() y pagina en memoria (24 por defecto, máximo 50); sin navegación paginada en UI.
+No rutas de edición/renovación/cierre manual; cancelar y aceptar/descartar sí existen.
+Cierre al aceptar: descarta restantes y crea ContractRequest idempotente con eventos,
+auditoría y notificaciones. Unicidad postulación declarada en migración 20260627_01
+pero no en metadata ProposalApplication: SQLite create_all no prueba ese constraint.
+
+Incremento previo recomendado: centralizar elegibilidad persistida activa/verificada/
+perfil completo para POST y presentación; pruebas de rechazo sin escrituras, rol
+manipulado, propietario y positividad. Requiere autorización específica para cambiar
+permisos. Resolver política de visibilidad de cerradas/canceladas; distinguir monto
+estimado de oferta firme. Luego P1 puede adaptar las referencias con filtros reales,
+tarjetas horizontales y panel lateral honesto, omitiendo guardadas, ranking, vencimiento
+7 días, múltiples vacantes y verificación ficticia. P2: renovación/expiración,
+contratación múltiple, ubicación estructurada, políticas económicas y privacidad.
+
+Solo se actualiza este handoff para trazabilidad obligatoria. Sin código, estilos,
+assets, migraciones, dependencias, Docker, PG o producción. No commit/push/merge:
+no autorizados. Staging vacío. Próximo paso: autorizar corrección de elegibilidad y
+retest antes de retomar P1. No publicar UI que afirme un permiso no aplicado.
+
+---
+
+Corrección focal E3.1 — 2026-10-04T13:06:07-03:00
+Estado READY_TO_RESUME — E3_1_HALLAZGOS_CORREGIDOS_PENDIENTE_DE_RETEST.
+Preflight: feature/ux-ui-foundation, HEAD 3e5647521ca186ae358043eff1be561b9db68270,
+36 paths locales, staging vacío. Cambios previos preservados.
+P2: entry_context usaba get() y aceptaba la primera categoría de un POST multivalor.
+La ruta exige ahora len(request.form.getlist("categoria")) == 1 antes de consultar
+al actor y de normalizar/seleccionar. Orden: protecciones existentes CSRF/límite,
+modalidad exacta, cardinalidad de categoría, actor/rol persistido, catálogo/campos,
+persistencia/notificación y redirección. Duplicados iguales también responden 400.
+P3: fuente externa de seis imágenes referenciada de forma neutral con destino
+relativo app/static/images/emergencias/hero/; eliminada la ruta local nueva.
+Referencias históricas ajenas preservadas; ninguna ruta local absoluta añadida.
+
+Archivos intervenidos exclusivamente: app/routes/operation_routes.py,
+tests/test_emergency_entry.py y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Paquete solicitado: 72 pruebas OK, cero omitidas, SQLite en memoria. Incluye dos
+pruebas permanentes nuevas para cardinalidad y valor vacío/inválido; positivos de
+los siete rubros preservados. Reproducción independiente sin importar los tests:
+10/10 casos OK: ausente, vacío, inválido, electricidad/plomeria, orden inverso,
+electricidad repetida, válida/inválida, orden inverso, tres válidas y tres mixtas.
+Todos: 400, cero solicitudes/notificaciones, sin Location y sin excepción interna.
+Warnings legacy SQLAlchemy/datetime y log de error deliberado de seguridad presentes;
+ningún fallo. Sin suite general, Docker, migraciones ni acceso a PostgreSQL.
+
+Integridad: UTF-8 estricto, diff --check/cached --check correctos; inventario de
+36 paths y HEAD conservados. Hashes confirman solo estos tres archivos intervenidos.
+Sin cambios visuales, de rutas, rubros, matcher, guardias, difusión ni pagos.
+Staging vacío; sin commit/push/merge por falta de autorización. Retomar con retest
+independiente de ambos hallazgos; no declarar aprobación ni integrar todavía.
+
+Actualización 2026-10-04T12:35:58-03:00 — Acceso directo y acentos de Urgencias.
+Estado READY_TO_RESUME. Home: se retiraron rubro y zona únicamente del panel Urgencias;
+queda enlace ancho completo Buscar ayuda ahora a /urgencias/nueva. Ayuda introductoria
+ajustada al siguiente paso. Módulo: eyebrow, bordes seleccionados, iconos/puntos y
+radios usan danger del DS: #b42318 claro / #fca5a5 oscuro y fondo danger-soft.
+Turnos, instrucciones, seguridad, verificación y mal clima preservados; backend intacto.
+Archivos de esta sesión: app/templates/home/_operation_search.html,
+app/static/css/home-v1.css, app/static/css/emergency-entry-v2.css y este handoff.
+21 pruebas OK: test_urgencias_e31 y test_emergency_entry, SQLite en memoria.
+Navegador: colores computados verificados en ambos temas; panel home con cero inputs
+/selects; clic real llega a /urgencias/nueva. Preview descartable existente 5064.
+Diff --check correcto. Rama feature/ux-ui-foundation, HEAD 3e56475 preservados;
+staging vacío; cambios anteriores conservados. Sin commit/push/merge (no autorizados),
+migraciones, Docker ni bases persistentes. Pendiente revisión visual del usuario y
+Testing independiente. Retomar verificando Git; no ampliar comportamiento del módulo.
+
+Actualización 2026-10-04T12:05:41-03:00 — Siete rubros en Urgencias.
+Estado READY_TO_RESUME. Autorización directa del usuario: sumar Gasista, Destapes y
+desagües, Refrigeración y climatización al selector actual. Se conservan los cuatro
+anteriores. Refrigeración utiliza el slug existente refrigeracion; Gasista y
+Destapes y desagües son términos literales del buscador legacy, no IDs nuevos de la
+taxonomía. No se modifica matcher ni catálogo persistido. La búsqueda sigue siendo
+por coincidencia textual en servicio/especialidad: no agrega equivalencias ni aval
+profesional; un perfil con otra denominación puede no aparecer. La ampliación del
+selector no acredita matrículas ni habilita guardias/difusión. SVG locales nuevos.
+
+Archivos de esta sesión: app/services/emergency_entry_service.py,
+app/templates/nueva_emergencia.html, tests/test_emergency_entry.py y este handoff.
+Validación: 23 pruebas OK (test_emergency_entry, test_urgencias_e31,
+test_emergency_hero_carousel), SQLite en memoria; roles/modalidades/CSRF preservados.
+Navegador: siete opciones visibles a 1440px; a 320px sin overflow, objetivos >=48px.
+Evidencia urgencias-siete-rubros.jpg fuera del repositorio. Preview descartable en
+127.0.0.1:5064 con SQLite en memoria; proceso sin recarga automática. No se reinició
+el servidor del usuario. Reiniciar su preview para cargar cambios Python.
+Rama feature/ux-ui-foundation, HEAD 3e5647521ca186ae358043eff1be561b9db68270,
+staging vacío. Cambios previos preservados. Sin migraciones, Docker, acceso a PG,
+producción, commit/push/merge (no autorizados). Diff --check y UTF-8 correctos.
+Pendiente: revisión visual y Testing independiente; no suite completa en esta sesión.
+Retomar verificando inventario/HEAD; no integrar ni ampliar matching sin autorización.
+
+Actualización 2026-10-04T11:55:00-03:00 — Botón rojizo de Urgencias.
+Estado READY_TO_RESUME. Solicitud del usuario: rojo característico del módulo,
+similar al aviso de protección. Solo CSS local del submit: #b42318 con texto blanco,
+hover #912018 y active #7a1b14; foco y dimensiones preservados. Comprobado en navegador
+el color computado en claro/oscuro. Evidencia urgencias-boton-rojo.jpg fuera del repo.
+Archivos de esta corrección: app/static/css/emergency-entry-v2.css y este handoff.
+Rama/HEAD e inventario E3.1 preservados; staging vacío. Sin commit/push/merge por
+falta de autorización. Sin migraciones ni backend. No se repite suite funcional
+por ajuste de color; diff --check validado. Pendiente revisión visual del usuario.
+
+# E3.1 — Urgencias: refinamiento y compatibilidad pública
+
+Timestamp: 2026-10-04T11:50:01-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E3_1_REFINADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 3e5647521ca186ae358043eff1be561b9db68270.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Preflight conforme: staging vacío; doce archivos locales E3 preservados. Sin commit,
+push, PR ni merge: no autorizados. Sin migraciones, Docker, PostgreSQL ni producción.
+
+Decisión de Cristian Sánchez 2026-10-04: denominación pública Urgencias. Se actualizan
+textos visibles, títulos, enlaces, mensajes nuevos y presentación controlada de
+notificaciones legacy sin reescribir registros. Identificadores internos e historia
+permanecen. Decisión registrada en MASTER_SPEC y REQ-004; otros documentos intactos.
+URLs canónicas /urgencias/nueva y /urgencias/directorio; wrappers legacy 308 conservan
+query strings y POST. Un único manejador operativo; roles persistidos, CSRF y matriz
+modalidad=["manual"] preservados. Difusión continúa deshabilitada.
+
+Formulario: rubro, provincia/localidad, descripción con contador, modalidades,
+aviso funcional y botón. Orden DOM y teclado coincidentes. Contador local sin dependencia.
+Overlay claro exacto .86/.70/.38 en 0/48/100%; filtro saturate(1.08) contrast(1.04)
+brightness(.96). Oscuro .87/.77/.59 intacto, sin filtro. Sin cambios en recursos,
+controlador E3, tiempos, dirección, accesibilidad, matcher ni reglas de negocio.
+
+Validación ejecutada: 75 unittest OK, cero omitidas, SQLite en memoria. Módulos:
+test_urgencias_e31 (7 nuevas), test_emergency_entry, test_emergency_hero_carousel,
+test_corporate_footer, test_security_controls, test_loading_error_states,
+test_navbar_drawer_ux04a, test_navbar_markets_ux03a, test_home_hero_carousel.
+Node tests/js/emergency_hero_carousel.test.js OK; node --check del nuevo contador OK.
+Sin suite completa ni gates PostgreSQL. Deprecaciones legacy conocidas e inyección
+intencional de errores en pruebas de páginas amigables no representan fallos nuevos.
+
+Navegador real sobre SQLite en memoria, preview 127.0.0.1:5063. Claro/oscuro en
+1440,1280,1024,770,768,390,320: sin overflow horizontal; controles mínimo 48px alto,
+ancho mínimo observado 150.63px. Campos provincia/localidad alineados. Capturas
+completas e31-light-1440.jpg, e31-dark-1440.jpg, e31-light-390.jpg, e31-dark-390.jpg
+fuera del repositorio, carpeta de visualizaciones de la sesión. Fotos reconocibles,
+texto legible, alerta separada, modalidades apiladas en móvil. Consola sin errores
+ni advertencias. Tab real: provincia → localidad → descripción → manual → botón;
+outline solid visible. Contador Prueba local = 12.
+POST nativo real desde ruta legacy termina en /urgencias/directorio con electricidad,
+La Plata y consulta_anonima=1; CSRF conservado. Fixture /_e31/legacy-form existe solo
+en runner temporal, no en repositorio. Werkzeug follow_redirects reutiliza stream
+consumido por CSRF: regresión reenvía cuerpo explícito tras comprobar 308 y cero
+escrituras; navegador confirma reenvío nativo. Cliente activo prueba una solicitud
+y una notificación; legacy inválido no escribe; datos históricos permanecen intactos.
+
+Limitaciones: inspección de contraste visual, no auditoría WCAG numérica completa.
+Reduced motion conserva cobertura Node; emulación visual real pendiente desde E3.
+Pendientes: Testing independiente y aprobación visual; no integrar sin autorización.
+Retomar verificando rama, HEAD, inventario y staging, ejecutar paquete focal anterior.
+No habilitar guardias/difusión, no modificar datos históricos ni recursos persistentes.
+
+Integridad final: UTF-8 estricto sin BOM/NUL/U+FFFD. Se retiró únicamente el BOM
+preexistente en cliente_dashboard.html (también presente en HEAD). Sin dependencias,
+migraciones ni recursos externos nuevos. diff --check correcto, staging vacío.
+
+Inventario acumulado E3 + E3.1 sin commit:
+- app/static/images/emergencias/hero/auxilio-movil-moto.webp
+- app/static/images/emergencias/hero/auxilio-vehicular-auto.webp
+- app/static/images/emergencias/hero/cerrajero-automotor.webp
+- app/static/images/emergencias/hero/cerrajero-hogar.webp
+- app/static/images/emergencias/hero/electricista-tablero.webp
+- app/static/images/emergencias/hero/plomero-desague.webp
+- app/static/js/emergency-entry-form.js
+- app/static/js/emergency-hero-carousel-v1.js
+- tests/js/emergency_hero_carousel.test.js
+- tests/test_emergency_hero_carousel.py
+- tests/test_urgencias_e31.py
+- app/routes/notification_routes.py
+- app/routes/operation_routes.py
+- app/services/client_dashboard_service.py
+- app/services/emergency_service.py
+- app/services/notification_service.py
+- app/services/operation_notification_service.py
+- app/services/whatsapp_contact_service.py
+- app/static/css/emergency-entry-v2.css
+- app/templates/base.html
+- app/templates/cliente_dashboard.html
+- app/templates/completar_perfil_profesional.html
+- app/templates/dev_qa_panel.html
+- app/templates/directorio_emergencias.html
+- app/templates/home/_operation_search.html
+- app/templates/home_logged.html
+- app/templates/notificaciones.html
+- app/templates/nueva_emergencia.html
+- app/templates/profesional_dashboard.html
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/REQUISITOS/MASTER_SPEC.md
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- tests/test_corporate_footer.py
+- tests/test_emergency_entry.py
+
+---
+
+# E3 — Carrusel fotográfico decorativo de Emergencias
+
+Actualización visual: 2026-10-01T23:52:24-03:00. A pedido del usuario se reduce
+la opacidad del overlay 0.05 en ambos temas: claro .89/.81/.65 y oscuro .87/.77/.59.
+Solo CSS y esta nota; alerta, fotos, estructura y comportamiento preservados.
+Estado READY_TO_RESUME; misma rama/HEAD e inventario E3, staging vacío.
+Sin suite repetida por ajuste visual mínimo; diff --check correcto.
+Sin commit/push/merge; próxima acción: revisión visual del usuario.
+
+Timestamp: 2026-10-01T23:51:32-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E3_CARRUSEL_IMPLEMENTADO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 3e5647521ca186ae358043eff1be561b9db68270.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck confirmado: working tree limpio, staging vacío; E2 anterior ya versionado.
+
+Las seis imágenes fuente (01–06.png) fueron proporcionadas externamente por el responsable
+del producto y copiadas como recursos optimizados en app/static/images/emergencias/hero/.
+Las seis decodifican: PNG RGB 1448x1086 horizontal 4:3, hashes distintos. Originales
+releídos al cierre, preservados. Pillow 11.3.0 / WebP local; save WEBP quality=82,
+method=6, sin resize, ampliación, deformación ni metadatos EXIF/XMP/ICC transferidos.
+Sin instalación ni servicios externos. Destino app/static/images/emergencias/hero/.
+
+| Fuente | Bytes fuente | SHA-256 fuente | WebP final | Bytes final |
+| --- | ---: | --- | --- | ---: |
+| 01.png | 2196786 | 9698c352717b0ca9989c35c2197823676f188ca395ba00d0081876feb9002576 | electricista-tablero.webp | 116678 |
+| 02.png | 2179629 | 79302366a049ff8fc40a0e7f66b3bddae2582815ad4e089c8c1063dd188c6ac3 | plomero-desague.webp | 125192 |
+| 03.png | 2082913 | 7768d32752a6d5b151d4ccb5473c5580871e3db764cbf7d37b2c49ac29444e0f | cerrajero-hogar.webp | 101366 |
+| 04.png | 2142490 | 900f0cea09ffa957eec0e358b66198519c4a9f9a314c5ab7c5c50e30f076a013 | cerrajero-automotor.webp | 116764 |
+| 05.png | 2550736 | 049f82f904643cac306e0cc2124d119dc75903eb25b549266bfa2e109397d98c | auxilio-vehicular-auto.webp | 196988 |
+| 06.png | 2333768 | 87bf5ea6c2d3ecd868cda69d519f9ab68700dea50e4e2894621b41d80acdd32b | auxilio-movil-moto.webp | 167408 |
+
+Inspección comparativa de las seis WebP: detalle suficiente para fondo, sin bloques
+ni halos notorios. Todas conservan exactamente 1448x1086. No PNG copiados al repo.
+
+Contenedor hero-stage exclusivamente alrededor del encabezado y alerta; formulario,
+navbar, footer y panel lateral fuera. Dos capas decorativas reutilizables aria-hidden,
+alt vacío, sin controles/foco, pointer-events:none/user-select:none. Primera con src
+real, eager/high y dimensiones; segunda hidden. Fuentes en templates inertes ordenados.
+Precarga progresiva cacheada; imágenes fallidas se omiten. Web Animations API:
+actual 0→-100%, siguiente 100%→0, 900ms; timer único 6500ms entre inicios.
+Sin fundido principal, cambios de altura o backend. Visibilidad/pagehide cancelan
+timer/animaciones; epoch invalida cargas obsoletas. Pageshow/BFCache sin duplicados.
+Reduced motion no inicia timer/precarga; cambio dinámico restaura primera foto.
+Revisados home-hero-carousel.js, explore-motion.js y markets-carousel.js; patrón
+encapsulado de Explorar sin modificar otras pantallas ni extraer núcleo compartido.
+
+Overlays exactos: claro rgba(246,249,253) .94/.86/.70 y oscuro rgba(7,18,32)
+.92/.82/.64 en 0/58/100%; sin ajustes de opacidad. Alerta 94%: rgba(254,242,242,.94)
+y rgba(49,23,32,.94), conserva borde/icono/texto. Paneles laterales sólidos.
+Encuadre adaptado: cover a ancho completo cortaba rostros/tareas. Ventana fotográfica
+4:3 anclada a derecha DENTRO del bloque izquierdo, borde suavizado con máscara
+estática; resto del stage conserva superficie/overlay. En <=640px ocupa todo ancho,
+4:3 arriba; texto y aviso crecen hacia abajo sin recorte. No se estira imagen para
+cubrir toda altura móvil. Object-fit:cover; posiciones 70% 20%,58% 20%,68% 20%,
+70% 20%,62% 65%,62% 65%. Adaptación de encuadre pendiente de aprobación visual.
+
+Pruebas permanentes: test_emergency_hero_carousel (2: semántica/orden/fallback y
+seis WebP decodificadas/peso/metadatos). Junto a test_emergency_entry,
+test_security_controls, test_corporate_footer, test_loading_error_states: 42 OK,
+cero omitidas. SQLite en memoria. Node tests/js/emergency_hero_carousel.test.js:
+orden/ciclo, 6500/900, dirección, caché, reduced motion inicial/dinámico, visibilidad,
+BFCache, cancelación y fallos aprobados. Node --check OK. Sin suite completa ni PG.
+Logs ERROR intencionales de pruebas de errores; deprecaciones legacy conocidas.
+
+Navegador real claro/oscuro: 1440,1280,1024,770,768,390,320 exactos sin overflow.
+Capturas e3-light-*.jpg/e3-dark-*.jpg a 1440/1280/768/390/320 fuera del repo, carpeta
+de visualizaciones de esta sesión. Legibilidad y superficies revisadas. Formulario
+top=436.1375px a 1440 antes/después de slides: estable. Transición observada con
+ambas capas visibles y transformaciones -7.87/+401.64px; e3-transition-final.jpg,
+e3-first-final.jpg y e3-last-final.jpg (sexta foto estable). Consola normal limpia.
+Fallback sin JS: runner temporal /_e3/nojs con CSP script-src 'none', primera imagen
+cargada (1448px), segunda hidden/sin src; captura e3-nojs.jpg. Envío nativo real
+llega al directorio con categoria=electricidad, zona=La Plata, consulta_anonima=1.
+Avisos CSP deliberados; endpoint solo en runner temporal, no agregado al repositorio.
+LIMITACIÓN: navegador no expone emulación de prefers-reduced-motion y Playwright
+no está instalado. No se instaló nada. Lógica cubierta por Node; captura visual
+real de reduced motion pendiente de Testing. No se presenta fallback sin-JS como
+emulación de reduced motion. Tampoco se declara auditoría WCAG completa ni contraste
+numérico de todos los píxeles. Incidencia auxiliar: Python sin tzdata; timestamp
+obtenido del offset local -03:00 sin instalar paquetes ni cambiar configuración.
+
+Modificados: app/templates/nueva_emergencia.html, app/static/css/emergency-entry-v2.css,
+docs/HANDOFFS/ACTIVE_HANDOFF.md. Nuevos: app/static/js/emergency-hero-carousel-v1.js,
+tests/test_emergency_hero_carousel.py, tests/js/emergency_hero_carousel.test.js y seis WebP.
+Total 12 archivos. E2 rutas/servicios, modalidad, roles, CSRF, rubros, matcher, PRO,
+modelos, guardias, navbar/footer y textos funcionales intactos. UTF-8 y diff --check OK.
+Staging vacío, rama/HEAD preservados. Sin commit/push/PR/merge: no autorizados.
+Sin Docker, migraciones, PostgreSQL ni producción. Preview 5062 con SQLite en memoria,
+disponible mientras siga el proceso. Pendientes: retest independiente, reduced motion
+visual y aprobación del encuadre. Retomar verificando 12 paths/HEAD/staging y ejecutar
+los paquetes indicados; no integrar ni ampliar backend sin autorización.
+
+# E2 — Corrección visual de la tarjeta unificada
+
+## Ajuste focal de alineación
+
+Timestamp: 2026-10-01T22:33:20-03:00. Origen: laptop. Estado: READY_TO_RESUME.
+Provincia/Localidad: align-content: start en los campos de E2 evita que las ayudas
+de distinta longitud distribuyan espacio vertical y desalineen los inputs.
+Solo CSS E2 y este registro modificados; sin cambios funcionales.
+Navegador a 1440px: ambos inputs top=946.4625px y alto=50.4px; revisión visual correcta.
+No se repitieron suites por ajuste visual mínimo; git diff --check correcto.
+Rama feature/ux-ui-foundation, HEAD 1e1d16749f5d3f0ac7bc50da6549af4f203143c5,
+seis paths E2 conservados y staging vacío. Sin commit/push/merge: no autorizados.
+Pendiente: revisión visual del usuario y retest E2. Preview local 5062 disponible.
+
+## Corrección del retest independiente
+
+Timestamp: 2026-10-01T22:30:00-03:00. Origen: laptop, implementador local MANDOBRA.
+Estado: READY_TO_RESUME — E2_CORREGIDO_PENDIENTE_DE_RETEST.
+Rama/HEAD: feature/ux-ui-foundation / 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Precheck: origin correcto, seis paths E2 preexistentes, staging vacío; sin descarte.
+Esta actualización sustituye las afirmaciones anteriores de preservar el permiso
+legacy PROFESIONAL: REQ-004 CA-02 exige impedir su persistencia como CLIENTE.
+
+- P1 modalidad: get() tomaba solo el primer valor y el default admitía ausencia.
+  Ahora getlist() debe ser exactamente ["manual"], antes de normalizar campos o
+  consultar el actor. Todo otro conjunto aborta 400, sin redirección ni efectos.
+- P1 roles: antes bastaba cuenta activa. Ahora se consulta el rol persistido,
+  nunca se confía en user_role de sesión; usuario identificado inexistente o rol
+  distinto de CLIENTE aborta 403 antes de normalización, solicitud o notificación.
+  Anónimo y CLIENTE inactivo conservan búsqueda sin persistencia; CLIENTE activo
+  conserva creación manual y notificación. GET informativo continúa público.
+- P2 contenido: nueva introducción honesta, turnos explícitamente previstos,
+  difusión redactada en futuro y aclaración de búsqueda manual sin guardia verificada.
+  CSS, iconografía, navbar, matcher, coordenadas, PRO y backend de guardias intactos.
+
+Matriz modalidad (CLIENTE activo, CSRF válido): ausente, vacía, difundir, desconocida,
+manual/manual, difundir/difundir, manual/difundir, difundir/manual, tres manuales y
+manual/vacía: 10 variantes, todas 400, sin Location, cero solicitudes/notificaciones,
+normalización/creación/notificación no invocadas. [manual] mantiene 302 al directorio.
+Matriz roles: CLIENTE activo 302 y 1 solicitud/1 notificación; visitante y CLIENTE
+suspendido 302 sin escrituras; PROFESIONAL, ADMIN, ADMINISTRADOR, DESCONOCIDO y vacío
+403, sin Location ni escrituras. Sesión falsamente CLIENTE no elude rol persistido.
+
+Pruebas ejecutadas: python -B -m unittest tests.test_emergency_entry
+tests.test_security_controls tests.test_corporate_footer tests.test_loading_error_states
+-q: 40 OK, cero omitidas. Regresiones anteriores conocidas más seguridad; el pedido
+no enumera otros módulos del retest independiente. CSRF activo en focal E2, errores
+próximos a campos, difusión disabled, un único manual seleccionado, roles y matriz
+adversarial cubiertos. SQLite en memoria; sin PostgreSQL ni producción.
+Logs ERROR intencionales de pruebas de errores; warnings legacy Query.get/utcnow.
+
+Navegador real: claro/oscuro, 1440, 1280, 768, 770, 390 y 320 exactos sin overflow.
+769 solicitado vuelve a informar 770 efectivos. Sin instalación de dependencias;
+frontera 768/770 conservada y 769 cubierto por análisis según autorización del retest.
+CSS E2 sin cambios: breakpoints 27rem (432px), 40rem (640px), 64rem (1024px),
+ninguno entre 768 y 770. Iconos, composición y temas conservados; capturas
+e2-retest-corrections-light.jpg y e2-retest-corrections-dark.jpg fuera del repositorio.
+Preview local 5062 reiniciado con código vigente y SQLite en memoria, sin fixtures.
+
+Archivos intervenidos en esta corrección: app/routes/operation_routes.py,
+app/templates/nueva_emergencia.html, tests/test_emergency_entry.py y este handoff.
+Servicio/CSS E2 preexistentes preservados. Inventario total sigue tres modificados
+tracked y tres nuevos; staging vacío, HEAD intacto, diff --check correcto.
+No suite completa, migraciones, Docker, PostgreSQL, producción, commit, push, PR
+ni merge; integración no autorizada. Pendiente: retest independiente y aprobación.
+Para retomar: comprobar seis paths/HEAD/staging y ejecutar matrices focales; no
+habilitar difusión, persistencia de guardias ni plazos previstos como capacidad real.
+El registro inferior se conserva como evidencia histórica, no como dictamen vigente.
+
+Timestamp: 2026-10-01T22:00:05-03:00. Origen: laptop; agente implementador local.
+Estado: READY_TO_RESUME. E2_CORREGIDO_PENDIENTE_DE_TESTING.
+Rama: feature/ux-ui-foundation. HEAD: 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: seis paths E2 previos, staging vacío; diff inspeccionado y preservado.
+Objetivo: ajustar E2 a la referencia aportada sin cambiar dominio ni navbar.
+
+Completado: modalidades compactas dentro del único formulario «Contanos qué
+necesitás»; manual checked por defecto y difusión disabled mediante radios nativos.
+Panel derecho alineado con el hero, rubros y CTA completos, espacios y responsive.
+Macro SVG inline local, siguiendo el patrón de mercados.html: ondas, persona/lupa,
+rayo, canilla, candado/llave, neumático, reloj, escudos, lista, nube con gotas,
+información, checks circulares, pines, documento y flecha. Familia lineal original,
+currentColor y aria-hidden; sin emojis, CDN, dependencias ni assets externos.
+No se sustituyó ningún concepto iconográfico solicitado. Colores de DS v2 en ambos temas.
+Checks de identidad/documentación/perfil explican qué revisar, no acreditan resultados.
+Se conservaron las aclaraciones de capacidad pendiente y provincia contextual.
+
+Archivos editados durante esta corrección:
+- app/templates/nueva_emergencia.html
+- app/static/css/emergency-entry-v2.css (nuevo en E2)
+- tests/test_emergency_entry.py (nuevo en E2)
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Otros paths E2 conservados sin nuevas modificaciones en esta corrección:
+- app/routes/operation_routes.py
+- app/services/emergency_entry_service.py (nuevo en E2)
+
+Pruebas: python -B -m unittest tests.test_emergency_entry
+tests.test_corporate_footer tests.test_loading_error_states -q: 30 OK, 0 omitidas.
+Incluye prueba semántica de formulario único, radios dentro de él, estado inicial,
+disabled y SVG accesible; mantiene rechazo de POST difusión, CSRF, cuatro rubros,
+errores, permisos legacy y envío manual. SQLite exclusivamente en memoria.
+UTF-8 de seis archivos, AST Python, render Jinja real, tokens CSS definidos y
+git diff --check: correctos. Sin nuevo JavaScript. Advertencias legacy conocidas.
+No ejecutados: suite completa, PostgreSQL, migraciones ni pruebas persistentes.
+
+Navegador real en claro/oscuro: 1440, 1280, 390 y 320 CSS px sin overflow horizontal.
+Viewport solicitado 769: navegador informa 770 efectivos; también observado 768
+sin overflow en oscuro. La medida exacta 769 queda pendiente de retest independiente.
+Etiquetas de rubros: 48 px de alto; inputs 50.4; textarea 80; CTA 48 (67.2 a 320).
+Ancho mínimo medido de objetivos: 195.81 px; etiquetas clicables de radios medidas,
+no sus inputs visualmente reducidos. Modalidades apiladas en móvil y alineadas en desktop.
+Inspección de contraste, iconos y textos en capturas de escritorio y móvil realizada.
+Tab desde modalidad manual alcanza primer rubro; ArrowRight selecciona plomería;
+foco visible medido con outline sólido 1.6 px. Envío visitante real llega al directorio
+con categoria=plomeria, zona=La Plata, consulta_anonima=1, sin coordenadas ni solicitud.
+Consola del navegador sin errores capturados. No constituye auditoría WCAG completa.
+Capturas fuera del repositorio, en la carpeta de visualizaciones de esta sesión:
+e2-corrected-dark-1440.jpg, e2-corrected-light-1440.jpg,
+e2-corrected-dark-320.jpg y e2-corrected-light-320.jpg.
+Preview temporal: http://127.0.0.1:5062/emergencias/nueva; SQLite en memoria,
+sin reloader ni datos persistidos. Disponible mientras siga activo el proceso.
+
+Pendientes: Testing independiente y aprobación visual; guardias verificadas,
+reservas, nuevo matching, difusión, notificaciones y plazos operativos continúan
+pendientes. Directorio/matcher y permisos legacy no se modificaron en esta corrección.
+Sin cambios a turnos comiteados, modelos, migraciones, pagos, sanciones o canales.
+No Docker, trax_db, trax-postgres ni producción. No commit/push/merge/PR;
+no se integró porque este incremento debe permanecer sin commit para Testing.
+Git: tres tracked modificados y tres nuevos; staging vacío, rama/HEAD preservados.
+Próximo paso: retest focal sobre estos seis paths; no staging ni integración sin
+autorización; no presentar la difusión, los plazos o la guardia como operativos.
+La entrada siguiente conserva el historial de la implementación E2 anterior.
+
+# E2 — Interfaz inicial de Emergencias
+
+Timestamp: 2026-10-01T21:23:55-03:00. Origen: laptop; agente Frontend/Flask MANDOBRA.
+Estado: READY_TO_RESUME para Testing focal y aprobación visual.
+Rama: feature/ux-ui-foundation. HEAD inicial/final: 1e1d16749f5d3f0ac7bc50da6549af4f203143c5.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: rama/HEAD/origin correctos; árbol limpio y staging vacío. El HEAD nuevo
+versionó el trabajo anterior; las entradas inferiores son evidencia de aquellas sesiones.
+Objetivo autorizado: interfaz visible en /emergencias/nueva preservando búsqueda manual.
+
+Completado: hero azul noche, alerta oficial previa a opciones, modalidades, formulario
+con cuatro rubros y panel lateral; tokens/componentes DS v2, temas existentes y responsive.
+Elegir profesional es la única modalidad operativa. Difundir solicitud: botón disabled,
+explicación accesible, sin ruta/temporizador; POST modalidad distinta de manual devuelve
+400 antes de cualquier registro. Sin nuevo JS. Navbar, skeleton y directorio intactos.
+CSRF vigente; errores 400 junto a campos, datos conservados y escape Jinja.
+Categoría/zona/descripción conservan el contrato y redirección manual; visitantes e
+inactivos no crean solicitudes; cuentas activas conservan registro/notificación legacy,
+incluido PROFESIONAL: no se cambian permisos en E2. No se simulan profesionales.
+La entrada ya no reenvía coordenadas recibidas en POST; no cambia matcher ni directorio.
+600 caracteres: límite HTML preexistente aplicado ahora también en servidor. Zona 120:
+coherente con modelo y límite del directorio. No contador de longitud divergente.
+
+Rubros: electricidad/plomeria reutilizan IDs canónicos. Cerrajería/Auxilio vehicular
+son términos literales del contrato de búsqueda legacy, no nuevos IDs de taxonomía.
+Se conservan aliases de etiquetas existentes al recibir POST. Taxonomía sin cambios.
+Provincia Buenos Aires: readonly, sin name, contextual; no se persiste ni filtra.
+Se advierte que CABA es otra jurisdicción ante el ejemplo Villa Lugano solicitado.
+El encabezado y el plazo previsto de 10 min incluyen aclaraciones inmediatas: no hay
+verificación de guardias ni solicitudes directas temporizadas implementadas.
+
+Archivos modificados en E2:
+- app/routes/operation_routes.py
+- app/templates/nueva_emergencia.html
+- app/services/emergency_entry_service.py (nuevo)
+- app/static/css/emergency-entry-v2.css (nuevo; selectores encapsulados)
+- tests/test_emergency_entry.py (nuevo)
+- docs/HANDOFFS/ACTIVE_HANDOFF.md (esta entrada; historia intacta)
+
+Pruebas ejecutadas: unittest tests.test_emergency_entry (12/12); ejecución conjunta
+con tests.test_corporate_footer y tests.test_loading_error_states: 29/29, 0 omisiones.
+SQLite exclusivamente en memoria; CSRF real y casos activos/inactivos/visitantes.
+Logs ERROR del paquete loading_error_states son errores deliberados del test;
+advertencias Query.get y datetime.utcnow son legacy sin cambio en este incremento.
+Sintaxis Python, Jinja por renderizado real, UTF-8, recursos, tokens CSS definidos,
+revisión de diff y git diff --check: correctos. Sin dependencias nuevas.
+No ejecutados: suite completa, PostgreSQL, migraciones, pruebas con datos persistentes.
+
+Revisión en navegador real, temas claro/oscuro, anchos CSS observados 1440, 1280, 769,
+390 y 320: sin overflow horizontal; objetivos de acción/radios etiquetados >=48px alto;
+columnas adaptadas y navbar preservada. Flecha derecha cambia selección, foco visible.
+Envío manual anónimo real llega al directorio con categoria/zona/consulta_anonima,
+sin coordenadas ni escritura de solicitud. Consola: sin errores capturados.
+Capturas clara/oscura/móvil fuera del repositorio; no assets nuevos en Git.
+Entorno visual temporal: http://127.0.0.1:5062/emergencias/nueva, SQLite en memoria,
+servidor sin reloader ni datos productivos; disponible mientras dure el proceso local.
+No constituye auditoría WCAG completa; retest independiente pendiente.
+
+Deuda: matcher legacy usa texto/PRO/coordenadas; no se corrige ni se presenta como nuevo
+matching aprobado. Catálogo completo, aval por especialidad, reservas, difusión,
+notificaciones programadas y verificación nocturna pendientes. Matching por acentos y
+sinónimos sigue limitado al comportamiento existente. No cambios normativos nuevos.
+Sin guardias persistidas, modelos/migraciones, pagos, sanciones, canales automáticos,
+workers o ingreso a turnos. No acceso a producción, trax_db ni trax-postgres.
+Estado Git final esperado: tres tracked modificados y tres nuevos; staging vacío.
+No staging/commit/push/merge/PR/despliegue: reservados al propietario después de Testing.
+Estado de push: no ejecutado ni remoto consultado; HEAD local preservado.
+Próximo paso: Testing E2 sobre estos seis archivos; no ampliar a backend pendiente.
+Para retomar: revalidar Git, ejecutar suite focal en SQLite en memoria, revisar ambos
+ temas y el envío manual. No usar este entorno temporal para datos reales.
+
+---
+
+# Emergencias — Lógica temporal sin persistencia
+
+## Corrección focal de Testing — 2026-10-01
+
+Registro: 2026-10-01T20:07:29-03:00. Responsable técnico: agente MANDOBRA, laptop.
+Responsable de Producto: Cristian Sánchez. Fecha de sustitución: 2026-10-01.
+Fuente: retest 2026-10-01T20:00:59-03:00, RECHAZADO_REQUIERE_CORRECCIONES.
+Estado: CORREGIDO DOCUMENTALMENTE / PENDIENTE DE RETEST FOCAL.
+
+**Regla vigente: TURNOS FIJOS DE 12 HORAS CON MÚLTIPLES BLOQUES PROGRAMADOS.**
+
+- GUARDIA_DIURNA: 07:00–19:00; GUARDIA_NOCTURNA: 19:00–07:00 del día siguiente.
+- Múltiples bloques futuros, diurnos/nocturnos y consecutivos; nunca duplicar el mismo bloque.
+- Reserva hasta T−2 minutos inclusive; después se rechaza. No incorporación al bloque iniciado.
+- Confirmación inmediata con aceptación expresa; avisos T−6 h y T−1 h solo si aún son futuros.
+  En T−6 h se omite ese aviso; en T−1 h se omiten ambos. No avisos retroactivos.
+- Disponibilidad temporal derivada del bloque activo: starts_at <= ahora < ends_at;
+  además se mantienen las condiciones de elegibilidad aprobadas. No requiere cron para expirar.
+- Zona America/Argentina/Buenos_Aires, instantes UTC; 06:58:00/18:58:00 exactos se admiten,
+  un microsegundo posterior se rechaza. Sin redondeos.
+- Tarifas bajo autonomía profesional; no cálculo automático por horario.
+
+**SUSTITUIDAS:** reglas de 2/4/8 horas, duración libre, activación/renovación desde ahora
+y una única fila mutable por profesional. Los antecedentes inferiores que las describen
+son históricos, no normativa activa; sus referencias a activar/renovar/desactivar no
+autorizan tales operaciones en este incremento. Cancelar/modificar/abandonar turnos sigue
+pendiente. Se conserva el resto de las decisiones de seguridad, matching, pagos,
+sanciones, privacidad y soporte sin modificación. Las afirmaciones históricas de
+«sin cambios normativos» describen sus sesiones originales, no esta sustitución.
+Alcance actual: lógica pura y corrección focal, sin persistencia, migración ni interfaz.
+
+### Entrega corregida a Testing
+
+Estado: READY_TO_RESUME para retest focal, no aprobado para commit.
+Rama/HEAD conservados: feature/ux-ui-foundation / a7391a87db200e678ba4320e74c0075b365df649.
+P1: causa, actualización solo en diseño dejando normativa anterior vigente; corregidos
+ocho documentos, CA-03/05/06/07 y marcado de antecedentes SUSTITUIDOS.
+P2: tuple/set/desempaquetado precedían validación; ahora valida colección, estructura,
+componentes, normaliza y recién deduplica; ShiftValidationError uniforme.
+P3: 15 pruebas permanentes. Windows 14 aprobadas/1 omisión IANA explícita; contenedor
+oficial 8772cada809b: 15 aprobadas/0 omitidas, IANA real incluida, sin red ni DB.
+Modificados en esta corrección: servicio y pruebas de turnos; ADR-002, REQ-004, decisiones,
+backlog, roadmap, taxonomía, este handoff y UX07A_TURNOS_DISENO_TECNICO.
+Inventario esperado conservado: siete tracked modificados y tres nuevos, staging vacío.
+No pruebas completas/PG, migraciones, UI, matching, worker, reservas ni despachos reales.
+No pagos/sanciones/coordenadas/canales externos añadidos. Matching legacy sigue pendiente.
+No commit, push, merge ni acceso a producción; restricciones vigentes.
+Próximo paso: Testing independiente sobre estos mismos archivos y suite focal.
+No avanzar a persistencia sin autorización; la corrección no cierra hallazgos por Testing.
+
+
+Timestamp: 2026-10-01T19:42:11-03:00. Origen: laptop, agente técnico MANDOBRA.
+Estado: READY_TO_RESUME, diseño de persistencia pendiente de aprobación.
+Rama: feature/ux-ui-foundation. HEAD: a7391a87db200e678ba4320e74c0075b365df649.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Objetivo: aplicar decisiones de Producto del 2026-10-01 únicamente como constantes,
+servicios puros, validaciones, pruebas y propuesta técnica sin migración.
+Esta autorización parcial sustituye el bloqueo total de implementación del registro
+anterior; no autoriza reservas persistidas ni despacho ni migraciones.
+
+Completado: planificación de turnos fijos 07–19/19–07, cutoff T−2 min inclusivo,
+aceptación expresa, lotes/consecutivos, ventanas de avisos, UTC y confirmación fechada.
+Pruebas: 9 unittest puras aprobadas; sin DB ni factory. Alembic heads: 20260917_03.
+No ejecutados: suite completa, PostgreSQL, Docker, UI, migraciones, despacho real.
+Validación IANA bloqueada en Python local por falta de tzdata; pruebas con offset
+inyectado explícito, sin fallback productivo ni dependencia instalada.
+Revisión documental: [diseño y propuesta](../REQUISITOS/UX07A_TURNOS_DISENO_TECNICO.md).
+No reservas, notificaciones, avales ni tags operativos creados. UI/manual intactos.
+
+Archivos de esta sesión:
+- app/services/emergency_shift_service.py (nuevo).
+- tests/test_emergency_shift_service.py (nuevo).
+- docs/REQUISITOS/UX07A_TURNOS_DISENO_TECNICO.md (nuevo).
+- docs/HANDOFFS/ACTIVE_HANDOFF.md (entrada nueva; historia intacta).
+Los otros seis documentos modificados de UX-07A se preservan sin cambios de sesión.
+Staging vacío; siete paths tracked previamente modificados y tres nuevos esperados.
+Sin commit/push/PR/merge/despliegue: no autorizados. Último commit no cambió;
+no se consultó remoto en esta sesión ni se afirma sincronización remota actual.
+
+Pendientes/riesgos: aprobar tablas/upgrade/downgrade y runtime IANA; escoger mecanismo
+fiable de recordatorios, política de retrasos, alcance territorial del aval, catálogo
+inicial, cancelación/abandono/retención y resultado idempotente del lote.
+Directorio legacy prioriza PRO y usa coordenadas; no cumple nuevo matching.
+ADR/REQ y CA-03 aún conservan 2/4/8 h como historia: reconciliar con decisiones nuevas
+antes de integrar reservas. No se inventan sanciones, cobros ni permisos de soporte.
+Próximo responsable: revisión técnica/Producto del diseño de persistencia.
+Para retomar: verificar Git y preservar cambios; leer diseño; resolver pendientes,
+aprobar migración por separado y definir gate PostgreSQL descartable.
+No tocar trax_db/trax-postgres ni producción; no crear migración automáticamente.
+No usar plan puro como confirmación persistida ni simular idempotencia de despacho.
+
+---
+
+# UX-07A — ADR-002 aprobado y preflight técnico autorizado
+
+Fecha y hora: `2026-09-28T21:10:35-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Documento/decisión: ADR-002.
+Motivo: registrar aceptación arquitectónica posterior al retest independiente final.
+Decisión de Producto: Cristian Sánchez, `2026-09-28T20:59:57-03:00`.
+Estado: ADR-002 APROBADO. Alcance siguiente: PREFLIGHT UX-07A.1.
+Implementación UX-07A.1: NO AUTORIZADA. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Captura y persistencia de coordenadas exactas: BLOQUEADAS.
+Esta entrada actualiza los estados vigentes; las entradas anteriores conservan su
+valor histórico. No modifica la normativa aprobada ni declara trabajo técnico iniciado.
+
+Estado del handoff: READY_TO_RESUME para preflight técnico.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Último commit local y publicado: `a7391a87db200e678ba4320e74c0075b365df649`.
+Retest independiente final APROBADO: `2026-09-28T20:55:50-03:00`;
+dictamen `APROBAR_ADR002_CON_OBSERVACIONES_MENORES`, sin P0/P1/P2 pendientes.
+Se registra el resultado comunicado por Producto; esta sesión no repite el retest.
+Aceptación final de Cristian Sánchez: ADR-002 APROBADO.
+REQ-004: APROBADO COMO ESPECIFICACIÓN / IMPLEMENTACIÓN PENDIENTE.
+Referencia vigente: [ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md).
+
+Trabajo completado: registro de aceptación y alineación de estados en los siete documentos.
+Trabajo técnico parcialmente completado: ninguno en esta sesión.
+Siguiente responsable: agente de preflight técnico de UX-07A.1.
+Próximo paso permitido: inspección y dictamen técnico previo; la autorización del preflight
+no habilita implementación, cambios de código, migraciones, pruebas, Docker ni conexiones a bases de datos.
+Para retomar: verificar origin, rama, HEAD local/remoto, los siete documentos y staging
+vacío; leer la aceptación y la normativa de ADR-002/REQ-004; preparar solo el preflight.
+Resolver en ese análisis los pendientes de mapeo territorial y cuotas/proxies por entorno.
+Implementación .1: NO AUTORIZADA; testing PostgreSQL: PENDIENTE.
+UX-07A.2: BLOQUEADO POR DEPENDENCIA hasta completar y aprobar UX-07A.1.
+Riesgo: confundir aprobación documental con capacidad operativa; no afirmar disponibilidad
+ni habilitar captura/persistencia de coordenadas exactas.
+
+Archivos actualizados, todos previamente modificados:
+- `docs/ADR/ADR-002-emergencias-guardia-vigente.md`
+- `docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/BACKLOG.md`
+- `docs/ROADMAP.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+- `docs/trax-taxonomy-v1.md`
+
+Validaciones documentales APROBADAS: UTF-8, Markdown, 142 enlaces relativos y 40 anclas,
+preservación histórica, 27 filas CA idénticas byte-a-byte a HEAD, inventario y diff --check.
+Tests ejecutados: ninguno. No ejecutados: tests funcionales/técnicos y PostgreSQL.
+Migraciones relacionadas: pendientes de UX-07A.1, ninguna creada ni ejecutada.
+Sin cambios técnicos, dependencias, infraestructura ni datos.
+Cambios documentales locales sin commit; staging vacío. No hubo staging, commit, push,
+PR, merge ni despliegue: fuera de autorización. GitHub conserva el HEAD base.
+No realizar operaciones Git mutables ni tocar trax_db/trax-postgres.
+Estado final: aprobación registrada, listo para continuar exclusivamente con preflight.
+
+---
+
+# UX-07A — Dos P2 residuales para retest final
+
+Fecha y hora: `2026-09-28T20:45:39-03:00` (America/Argentina/Buenos_Aires).
+Responsable: agente de corrección documental (Codex), laptop.
+Rama: `feature/ux-ui-foundation`.
+HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las decisiones aprobadas para cerrar los P2 residuales sobre
+contrato territorial y confianza de IP/proxy.
+Estado: CORREGIDO / PENDIENTE DE RETEST INDEPENDIENTE.
+Autorización de Producto: Cristian Sánchez, `2026-09-28T20:42:54-03:00`.
+Los dos P2 están corregidos documentalmente, no cerrados ni aprobados por este agente.
+ADR-002: PROPUESTO / EN CORRECCIÓN; UX-07A.1: BLOQUEADO;
+UX-07A.2: BLOQUEADO POR DEPENDENCIA. Implementación pendiente, sin autorización.
+Esta entrada precisa exclusivamente esos dos contratos y prevalece sobre sus
+formulaciones previas; conserva las demás decisiones, las 27 filas CA y el historial.
+
+Estado del handoff: BLOCKED para implementación; documentación lista para retest final.
+Origen: laptop MANDOBRA. Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: HEAD local/remoto coincidentes; siete documentos modificados, cero nuevos,
+staging vacío, diff --check sin errores. Último commit publicado: a7391a8.
+Objetivo y trabajo documental: únicamente comparación territorial determinista y
+confianza de IP/proxies. Normativa en
+[ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md#p2-residuales-territorio-e-ip-confiable--2026-09-28)
+y [REQ-004](../REQUISITOS/REQ-004-emergencias-guardia-vigente.md#p2-residuales-contrato-aplicable--2026-09-28).
+Se preservaron las decisiones conformes y las 27 filas CA sin modificaciones.
+Especificados casos territoriales/IP; ninguna prueba funcional ejecutada.
+
+Inventario sin ampliación: ADR-002, REQ-004, DECISIONES_ARQUITECTURA, BACKLOG, ROADMAP,
+ACTIVE_HANDOFF y trax-taxonomy-v1; rutas completas en el inventario de la entrada anterior.
+No nuevos archivos ni cambios en fuentes de consulta adicionales.
+Validación documental ejecutada: UTF-8 estricto, ausencia de patrones de mojibake,
+U+FFFD/NUL, bloques cerrados, Markdown, 135 enlaces relativos, 40 anclas y diff --check:
+APROBADOS. CA-01–CA-27 únicos/consecutivos; inventario de siete archivos y staging vacío.
+La comparación exacta de preservación y el estado Git final se informan al cierre.
+No ejecutados: tests funcionales, migraciones, Docker ni conexiones a bases de datos.
+No código, configuración, assets, tests o infraestructura modificados.
+Cambios locales sin staging/commit/push; remoto permanece en a7391a8. No hubo merge:
+no autorizado. No despliegue ni nuevas dependencias.
+
+Pendientes legítimos: retest independiente final, aceptación de ADR-002 y autorización
+de .1. Preflight debe resolver mapeo territorial mínimo de emergencia y contrato de
+cuotas/proxies por entorno antes de implementar/desplegar; no habilitar coordenadas exactas.
+Riesgos tratados documentalmente: homónimos/substring, IP falsificada, NAT/rotación,
+contadores locales y confusión entre IP, actor e idempotencia. No se declaran P2 cerrados.
+Para retomar: comprobar rama/HEAD/inventario/staging, leer ambas entradas residuales y
+realizar solo el retest autorizado. No reabrir otras decisiones ni implementar .1/.2.
+No tocar trax_db/trax-postgres; no staging, commit, push ni operaciones Git mutables.
+Próximo paso: retest documental y arquitectónico independiente final.
+
+---
+
+# UX-07A — Correcciones ADR-002 para retest independiente
+
+Registro de corrección: `2026-09-28T20:15:29-03:00`.
+Decisión de Producto: `2026-09-28T20:12:39-03:00`, Cristian Sánchez,
+APROBADO PARA CORRECCIÓN DOCUMENTAL. Autor: agente documental local (Codex), laptop.
+Rama: `feature/ux-ui-foundation`; HEAD base: `a7391a87db200e678ba4320e74c0075b365df649`.
+Motivo: incorporar las recomendaciones arquitectónicas adoptadas sobre 2 hallazgos P1
+y 4 hallazgos P2. Estado de la corrección: CORREGIDO / PENDIENTE DE RETEST.
+ADR-002: PROPUESTO / EN CORRECCIÓN, no aceptado.
+UX-07A.1: BLOQUEADO. UX-07A.2: BLOQUEADO POR DEPENDENCIA.
+Implementación, migraciones y pruebas técnicas/funcionales: PENDIENTES, sin autorización.
+Esta entrada expresa el contrato vigente para retest y prevalece sobre las alternativas
+y próximos pasos de registros anteriores, que se conservan como historia.
+La adopción de recomendaciones no acepta ADR-002 ni autoriza implementar UX-07A.1.
+
+Estado del handoff: BLOCKED (implementación); corrección documental lista para retest.
+Origen: laptop MANDOBRA, agente documental local. Origin:
+https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: rama, HEAD local/remoto y origin coincidentes; working tree limpio y staging vacío.
+Objetivo: corregir documentación conforme a la decisión de Producto, sin aceptar ADR-002.
+Último commit: a7391a8, docs: approve emergency on-call specification; publicado en origin.
+Los cambios de esta sesión permanecen locales, sin staging ni commit ni push.
+
+Trabajo completado: contrato vigente aditivo para 2 P1 y 4 P2; decisiones 6–15 incorporadas
+y referencias alineadas. Detalle en
+[ADR-002](../ADR/ADR-002-emergencias-guardia-vigente.md#corrección-arquitectónica-adoptada--2026-09-28).
+Habilitación/transición de perfil, invalidación atómica y locks compartidos; resultado
+idempotente durable; renovación desde ahora; territorio explícito; cuotas con alcance
+real. Cancelación/contacto, privacidad, downgrade, endpoints, índices y auditoría
+completados documentalmente. Neutralidad PRO y separación .1/.2 conservadas.
+
+Inventario de esta corrección, todos existentes:
+
+- docs/ADR/ADR-002-emergencias-guardia-vigente.md
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- docs/DECISIONES_ARQUITECTURA.md
+- docs/BACKLOG.md
+- docs/ROADMAP.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/trax-taxonomy-v1.md
+
+Master Spec, INDEX y ambos README revisados; conservan estados y registros históricos
+correctos, sin edición. Ningún archivo técnico ni archivo nuevo previsto.
+Historial íntegro, entradas nuevas con ambos timestamps; CA-01–CA-27 sin cambios de filas.
+
+Validación documental ejecutada: UTF-8 estricto, ausencia de patrones de mojibake,
+U+FFFD/NUL, newlines, enlaces/anclas, Markdown y diff --check: APROBADOS.
+Comprobados 117 enlaces relativos y 29 anclas; CA-01–CA-27 consecutivos y únicos.
+Inventario exacto de siete documentos; staging vacío. El informe final registra
+la verificación de preservación íntegra de historia y criterios contra la base.
+No ejecutadas: pruebas funcionales, unitarias/integración/PostgreSQL, Docker o migraciones.
+No código, assets, configuración ni bases de datos modificados. No nueva infraestructura.
+No error de producto diagnosticado/resuelto por ejecución; el trabajo es documental.
+
+Pendientes/bloqueantes: retest independiente y aceptación explícita de ADR-002;
+autorización de .1, cifras de cuotas nuevas, contratos concretos de rutas/respuestas,
+vida útil/retención del resultado durable, validación de planes e índices.
+Captura exacta bloqueada hasta política completa; no declarar cifrado disponible.
+Riesgos: escritores compartidos, carreras de invalidación/contacto, replay y retención.
+Los hallazgos se registran CORREGIDOS documentalmente, no aprobados por Testing/retest.
+
+Para retomar: verificar esta rama y HEAD base, staging vacío e inventario de siete
+documentos; leer la corrección ADR-002/REQ-004 y ejecutar solo el retest autorizado.
+No implementar .1 ni .2; no tocar trax_db ni trax-postgres; no generar migraciones/assets.
+No staging, commit, push, merge ni despliegue durante esta tarea. No hubo merge porque
+no está autorizado. Próximo paso: retest documental y arquitectónico independiente.
+Estado final: cambios documentales locales listos para retest, implementación bloqueada.
+
+---
+
+# UX-07A — Cierre aprobado de revisión documental
+
+Registro: `2026-09-28T19:42:16-03:00`. Dictamen: `2026-09-28T19:31:39-03:00`.
+Responsable de Producto: Cristian Sánchez. Revisor: agente documental local.
+Estado: APROBADO COMO ESPECIFICACIÓN. Hallazgos: P0: 0; P1: 0; P2: 0; P3: 0.
+Implementación: PENDIENTE. Pruebas técnicas y funcionales: PENDIENTES.
+ADR-002: PROPUESTO / PENDIENTE DE DECISIÓN ARQUITECTÓNICA; no aceptado ni implementado.
+UX-07A.1 permanece pendiente de aprobación arquitectónica y autorización de implementación.
+UX-07A.2 depende de UX-07A.1 implementado y verificado antes de afirmar disponibilidad.
+Próximo paso: decidir ADR-002 y preparar el paquete UX-07A.1. Ninguna implementación iniciada.
+Este cierre aprueba la especificación documental; no acredita implementación ni pruebas
+funcionales, ni acepta las soluciones técnicas propuestas. Los 27 criterios se conservan.
+Los registros fechados anteriores mantienen su estado histórico; este cierre expresa el vigente.
+
+Estado del handoff: READY_TO_RESUME.
+Origen: laptop MANDOBRA; agente documental local.
+Rama: feature/ux-ui-foundation. Commit base: 4489c5c208245368a2a9bfd1672a261cf3004c93.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: nueve documentos modificados, dos nuevos, staging vacío; ningún archivo técnico.
+Objetivo de esta sesión: registrar el cierre, validar once documentos, crear un único
+commit documental y publicarlo en la rama actual, por autorización explícita de Producto.
+Validación previa aprobada: lectura completa, UTF-8, enlaces/anclas, 27 criterios y diff sin errores.
+El cierre de versionado exige repetir las validaciones documentales, staging exacto de once
+documentos, commit correcto, working tree limpio y HEAD local igual al remoto tras el push.
+Publicación: autorizada para esta sesión; el registro se redacta antes del commit y push.
+El hash final y el resultado de publicación deben verificarse en Git y en el informe de cierre;
+este registro no anticipa como ejecutadas las operaciones posteriores a su escritura.
+Archivos del paquete: los once del inventario histórico inmediato, sin ampliación de alcance.
+No ejecutadas: pruebas técnicas/funcionales, Docker, migraciones ni despliegue.
+No se modifican código, assets, infraestructura ni datos. Ninguna migración creada.
+Pendientes y riesgos: decisión de ADR-002, reglas técnicas propuestas, privacidad y gates PostgreSQL.
+No hay hallazgos documentales abiertos. Las capacidades futuras siguen sin implementar.
+No hubo merge: no está autorizado y este cierre solo publica documentación en su rama.
+Para retomar: comprobar rama, HEAD y limpieza; leer REQ-004 y ADR-002; decidir la arquitectura
+y preparar UX-07A.1 con autorización explícita antes de ejecutar cambios técnicos.
+No implementar UX-07A.2 ni afirmar disponibilidad antes de verificar UX-07A.1.
+
+---
+
+# UX-07A — Especificación de Emergencias y guardia vigente
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T23:20:19-03:00
+Origen: laptop MANDOBRA, Codex Desktop Windows. Redacción: Codex.
+Responsable de Producto: Cristian Sánchez.
+Objetivo: formalización documental del preflight UX-07A y decisiones de Producto.
+Aprobación recibida: 2026-09-27T23:03:15-03:00, APROBADO PARA ESPECIFICACIÓN.
+Rama: feature/ux-ui-foundation.
+HEAD local y remoto verificados: 4489c5c208245368a2a9bfd1672a261cf3004c93.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Motivo: registrar contrato revisable y separar .1 guardia/matching/seguridad de .2 visual.
+Relación con preflight: informe aprobado del chat local; diagnóstico incorporado en REQ-004,
+sin inventar una ruta documental anterior ni atribuir implementación al antecedente.
+Orden neutral: PRO no concede elegibilidad ni prioridad; verificación obligatoria es filtro.
+Siguiente paso: revisión de REQ-004/ADR-002 y autorización explícita de UX-07A.1.
+
+## Git y continuidad
+
+Precheck: ubicación/raíz, origin, rama y SHA coincidentes; árbol limpio y staging vacío.
+La rama remota se verificó con consulta de lectura. No se mutaron referencias Git.
+Estado final previsto/verificado en cierre: dos archivos nuevos y nueve modificados,
+todos documentación sin commit; staging vacío, rama y HEAD conservados.
+El remoto conserva la base verificada; estos cambios documentales NO fueron publicados.
+No hubo commit, push, PR, merge ni despliegue: esta sesión no los autoriza.
+La entrada anterior conserva su estado histórico de UX-06A; no representa el HEAD actual.
+No se alteró ni se repitió su evidencia de pruebas ni se emitió aprobación de Testing.
+
+## Trabajo completado y decisiones
+
+- REQ-004 disponible según convención; especificación creada con catálogo de seis
+  asistencias, actores, guardia temporal 2/4/8 h, ownership, reloj, idempotencia,
+  transacción única, elegibilidad neutral, privacidad y revalidación de contacto.
+- ADR-002 propuesto: fila única por profesional, locks/versiones, auditoría existente,
+  reutilización de OperationCommand, PostgreSQL obligatorio y downgrade con pérdida potencial.
+- UX-07A.2 documenta imágenes, posiciones focales, hero/carrusel con controles y táctil,
+  formulario nativo, skeleton, seguridad, vacío, temas, responsive y accesibilidad.
+- Veintisiete criterios verificables y matriz de pruebas. .2 no afirma guardia hasta .1.
+- Master Spec, decisiones, taxonomía, backlog, roadmap e índices relacionados.
+- Se preservaron íntegros registros y fechas históricas mediante entradas aditivas.
+
+## Pendientes, riesgos y bloqueantes
+
+Implementación completa PENDIENTE. No bloqueante técnico para esta entrega documental.
+Revisión pendiente de reglas propuestas: renovación desde ahora (puede acortar ventana),
+invalidación sin resurrección, perfil habilitado, fallback textual, cancelación ABIERTA,
+retención/contexto privado y contratos concretos de endpoints. Aprobación para especificar
+no aprueba automáticamente esos detalles ni autoriza implementarlos.
+Riesgos: carrera contacto/desactivación, reloj antiguo tras esperar lock, ownership,
+exposición geográfica y dependencias compartidas de autenticación/WhatsApp/taxonomía.
+No capturar coordenadas exactas hasta definir política de retención y almacenamiento.
+Migración Alembic será necesaria en .1; ninguna creada ni ejecutada. No fijar revisión
+antes de inspeccionar head vigente. Downgrade puede destruir ventanas/contexto nuevo.
+No se diagnosticó error técnico nuevo ni se requirió troubleshooting en esta sesión.
+
+## Validaciones y límites de evidencia
+
+Ejecutadas: precheck de lectura, revisión de convención/IDs, UTF-8 estricto y newline final,
+enlaces relativos incorporados, preservación de contenido histórico, inventario documental,
+`git diff --check` y comprobación final de staging/branch/HEAD.
+Resultado documental: sin enlaces incorporados rotos, sin borrados de registros históricos,
+sin cambios fuera de los once documentos indicados. Sin errores de whitespace.
+No ejecutadas: pruebas unitarias/integración/Node/PostgreSQL, navegador, compilación,
+migraciones ni suite completa; esta autorización es solo documentación.
+No se usó Docker ni base de datos. No código, assets ni infraestructura modificados.
+Las verificaciones del preflight son antecedentes, no pruebas nuevas de este requisito.
+
+## Inventario exacto
+
+Creados:
+- docs/REQUISITOS/REQ-004-emergencias-guardia-vigente.md
+- docs/ADR/ADR-002-emergencias-guardia-vigente.md
+
+Modificados:
+- docs/REQUISITOS/MASTER_SPEC.md
+- docs/DECISIONES_ARQUITECTURA.md
+- docs/trax-taxonomy-v1.md
+- docs/BACKLOG.md
+- docs/ROADMAP.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+- docs/INDEX.md
+- docs/REQUISITOS/README.md
+- docs/ADR/README.md
+
+## Instrucciones para retomar
+
+1. Verificar origin/rama/HEAD/staging e inventario anterior; conservar estos cambios.
+2. Leer REQ-004, ADR-002 y esta entrada antes de cualquier implementación.
+3. Revisar propuestas con Producto; preparar paquete .1 con alcance/criterios/entorno
+   descartable y autorización explícita. Implementar/verificar .1 antes de disponibilidad .2.
+4. No tocar trax_db ni trax-postgres, no desplegar, no convertir imágenes ni escribir
+   migraciones durante revisión documental. No staging/commit/push/merge sin autorización.
+5. Tras revisión, solicitar autorización de versionado/publicación de esta rama para
+   continuidad entre dispositivos; no proponer merge a develop como si ya estuviera aprobado.
+
+Estado final: documentación lista para revisión, producto aprobado para especificación;
+implementación y retest independientes PENDIENTES. No hubo merge por alcance autorizado.
+
+---
+
+# Corrección UX-06A P1/P2 — atomicidad, idempotencia y borrador
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T22:04:02-03:00
+Origen: laptop, Codex Desktop Windows; Senior Software Engineer MANDOBRA.
+Objetivo: corregir únicamente P1 creación no atómica/idempotente y P2 pérdida del
+borrador tras caducar autenticación, conservando permisos y diseño ya aprobados.
+Rama: feature/ux-ui-foundation.
+HEAD: 7af47a25a59efcb64f70c2596d9f6818ace298bc, conservado.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git, verificado.
+Precheck: ubicación/raíz correctas, exactamente 19 paths UX-06A previos y staging vacío.
+No hay cambios de Testing mezclados. Se leyeron Master Spec, estándares, ADR,
+Backlog y handoff vigentes. Los registros históricos siguientes se preservan.
+
+## Completado y decisiones
+
+- OperationCommand soporta resultado BudgetRequest sin cambios de esquema.
+- budget_service concentra autorización, comando, solicitud, INTERNAL y resultado
+  con un commit; notificación sin commit interno. Rollback completo y sesión usable.
+  No existía auditoría contractual obligatoria en esta creación: no se agregaron
+  ContractEvent/AuditLog artificiales ni cambios de adjudicación/contratación.
+- Clave servidor aleatoria/HMAC por CLIENTE/operación; formato y longitud validados;
+  payload hash estable; replay autorizado devuelve mismo resultado; conflicto 409;
+  claves diferentes crean solicitudes diferentes. Constraint canónico resuelve carrera.
+- Borrador servidor: solo seis campos conocidos con límites 160/120/120/1200/10/6;
+  fecha/prioridad saneadas, sin campos de autoridad, tokens ni datos en URL/logs.
+  Cookie privada de navegación más prueba firmada/CSRF original, 15 minutos,
+  actor activo obligatorio para guardar y mismo CLIENTE para restaurar/publicar.
+  No se exceptúa CSRF: recuperación limitada a ese endpoint, sin auth activa y con
+  comprobación criptográfica del CSRF original aunque falte la sesión. POST inválido
+  sigue 400. Login usa next interno fijo. Sin JS funciona el recorrido completo.
+- Hasta cinco borradores aislados por navegador/actor/nonce. Selección POST si hay
+  varios; descarte POST protegido, limpieza tras éxito y expiración. No se mezclan
+  pestañas. Directorio privado configurable, sin nuevas tablas/dependencias.
+- Registro completo del contrato, limitaciones y decisiones en ADR y Backlog.
+
+## Intervenidos en esta sesión (13)
+
+app/__init__.py; app/routes/operation_routes.py; app/services/budget_service.py;
+app/services/operation_notification_service.py; app/services/budget_creation_key_service.py;
+app/services/budget_draft_service.py; app/templates/nuevo_presupuesto.html;
+tests/test_budget_request_ux06a.py; tests/test_budget_creation_recovery.py;
+tests/postgresql_budget_creation_e2e.py; docs/BACKLOG.md;
+docs/DECISIONES_ARQUITECTURA.md; docs/HANDOFFS/ACTIVE_HANDOFF.md.
+
+Los otros doce paths conservan trabajo previo. No se retocó CSS, JS, navbar,
+home, Mercados, modelos, imágenes, permisos aprobados ni operaciones de Emergencias.
+
+## Inventario Git acumulado (25 paths, sin staging)
+
+- `app/__init__.py` (modificado).
+- `app/routes/operation_routes.py` (modificado).
+- `app/services/budget_service.py` (modificado).
+- `app/services/contract_service.py` (modificado).
+- `app/services/operation_notification_service.py` (modificado).
+- `app/services/operation_request_service.py` (modificado).
+- `app/services/operation_view_service.py` (modificado).
+- `app/templates/base.html` (modificado).
+- `app/templates/confirmacion_presupuesto.html` (modificado).
+- `app/templates/detalle_presupuesto.html` (modificado).
+- `app/templates/home_logged.html` (modificado).
+- `app/templates/mercados.html` (modificado).
+- `app/templates/mis_solicitudes_presupuesto.html` (modificado).
+- `app/templates/nuevo_presupuesto.html` (modificado).
+- `docs/BACKLOG.md` (modificado).
+- `docs/DECISIONES_ARQUITECTURA.md` (modificado).
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md` (modificado).
+- `app/services/budget_creation_key_service.py` (nuevo).
+- `app/services/budget_draft_service.py` (nuevo).
+- `app/static/css/budget-request-ux06a.css` (nuevo).
+- `app/static/js/budget-request-ux06a.js` (nuevo).
+- `tests/js/budget_request_ux06a.test.js` (nuevo).
+- `tests/postgresql_budget_creation_e2e.py` (nuevo).
+- `tests/test_budget_creation_recovery.py` (nuevo).
+- `tests/test_budget_request_ux06a.py` (nuevo).
+
+## Validaciones ejecutadas
+
+- 133 Python relacionados: 132 PASS, 1 SKIP, cero fallos/errores.
+  Incluye 22 UX-06A y 16 nuevas de creación/recuperación. Módulos:
+  tests.test_budget_request_ux06a, tests.test_budget_creation_recovery,
+  tests.test_sprint7_budget_to_contract, tests.test_sprint7_contracting_core,
+  tests.test_sprint7_contracting_p0_iteration1, tests.test_sprint7_contracting_p1_iteration2,
+  tests.test_sprint7_contract_event_boundary, tests.test_sprint7_proposal_to_contract,
+  tests.test_sprint7_formal_negotiation_access, tests.test_operation_architecture_services,
+  tests.test_auth_ux_redesign_v1, tests.test_navbar_drawer_ux04a,
+  tests.test_navbar_markets_ux03a, tests.test_platform_brand.
+- SKIP existente: test_real_concurrent_independent_sessions en SQLite; no es PASS.
+- Nuevas cubren una entidad/notificación, rollback tras flush de notificación,
+  comando sin éxito falso, sesión recuperable, replay secuencial, payload conflict,
+  clave ajena/malformada, cambio de rol antes de replay, claves distintas, sesión
+  completa caducada y pérdida solo de user_id, login real correcto/fallido, cuenta
+  distinta, navegador distinto, TTL de datos y prueba, campos manipulados/limitados,
+  limpieza, cancelación, múltiples pestañas y CSRF inválido con/sin autenticación.
+- Node UX-06A: 5/5 PASS, incluido doble clic/submit final y restauración bfcache.
+- python -m compileall -q app scripts y node --check JS UX-06A: OK.
+- UTF-8 estricto, whitespace, salto final y git diff --check: comprobación de cierre.
+- No suite completa ni nueva matriz visual completa: pendientes de Testing.
+  No se declara UX-06A aprobado ni se cierra el hallazgo por cuenta de Testing.
+
+## PostgreSQL real y entorno
+
+Gate: tests.postgresql_budget_creation_e2e, 4/4 PASS, repetido en código final.
+- Dos conexiones sincronizadas antes de INSERT, misma clave: un resultado/comando/INTERNAL.
+- Dos conexiones con payload distinto: un éxito, un conflicto controlado.
+- Notificación fallida después de flush: cero hechos; reintento en misma sesión exitoso.
+- Primer creador revierte mientras segundo intenta INSERT: segundo completa una vez.
+Guard existente de payment persistence invocado antes de migrar/resetear, nombre
+reservado y TRAX_POSTGRES_TEST_ALLOW_RESET=1 explícito. Dialecto real y Alembic head
+verificados. Migraciones existentes hasta 20260917_03, ninguna nueva.
+URL enmascarada:
+postgresql+psycopg2://ux06_gate:***@mandobra_ux06a_p1p2_pg:5432/trax_payment_persistence_test_ux06a
+Contenedor exclusivo: mandobra_ux06a_p1p2_pg; red interna mandobra_ux06a_p1p2_gate;
+PostgreSQL 16-alpine, tmpfs /var/lib/postgresql/data, sin puertos ni volúmenes persistentes.
+Queda disponible para repetir exclusivamente este gate; no reutilizar bases ajenas.
+SQLite se ejecutó en contenedores --rm --network none, sin volúmenes y en memoria.
+Compose mandobra_stabilization disponible en http://127.0.0.1:5050; imagen reconstruida
+con código final y solo web recreado con --no-deps. No acceso a trax_db ni alteración
+de trax-postgres. No reset del PostgreSQL del Compose ni eliminación de volúmenes.
+
+## Riesgos, pendientes e instrucciones de retoma
+
+- Borrador recuperable durante 15 minutos; prueba y CSRF también requieren antigüedad
+  máxima de 15 minutos. Fuera de ventana, cookie borrada/otro navegador/almacenamiento
+  perdido: recuperación no garantizada, nunca publicación anónima. Limpieza física
+  por expiración diferida al próximo acceso, no cron. Multinodo requiere directorio
+  compartido privado. No es un borrador durable de dominio.
+- Falla de limpieza después de commit deja caducar el archivo y registra solo aviso
+  genérico sin contenido; no devuelve un falso error de publicación.
+- La clave se firma con SECRET_KEY: rotación invalida formularios antiguos.
+- Retest independiente de ambos hallazgos y suite completa siguen PENDIENTES.
+  No hay bloqueante de Implementación conocido ni fallo de pruebas sin resolver.
+- Para retomar: verificar esta rama/HEAD y 25 paths, staging vacío; revisar esta entrada,
+  ADR y Backlog. Ejecutar focales listadas en contenedor descartable; repetir gate
+  solamente con nombre protegido y reset explícito; revisar UX con CLIENTE y PRO.
+- No realizar staging, commit, push, merge, reset, restore, stash ni clean; no acceder
+  trax_db/trax-postgres, ni alterar originales/imágenes/operaciones de Emergencias.
+
+Hashes finales: manifiesto SHA-256 externo
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux06a-p1p2-final-hashes.json
+Incluye los 25 paths y el hash final de este handoff, evitando autorreferencia.
+Sin commit, push, PR ni merge: no autorizados y retest pendiente. No se mergeó a
+develop ni se actualizó develop remoto. Trabajo completo en rama, sin integración.
+
+
+---
+
+# Corrección P1 UX-06A — Facultades exclusivas de CLIENTE
+
+Estado: READY_TO_RESUME
+Timestamp de registro: 2026-09-27T20:00:55-03:00
+Timestamp de corrección aprobado: 2026-09-27T19:49:55-03:00
+Origen: laptop, Codex Desktop Windows; Senior Software Engineer MANDOBRA.
+Hallazgo Testing: 2026-09-27T19:48:47-03:00, P1, REQUIERE_CORRECCIONES.
+Objetivo: corregir únicamente ampliación indebida de facultades del PROFESIONAL.
+Rama: feature/ux-ui-foundation.
+HEAD: 7af47a25a59efcb64f70c2596d9f6818ace298bc (conservado).
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git (verificado).
+Precheck: raíz y ubicación correctas; exactamente los 17 paths UX-06A esperados;
+staging vacío, sin archivos adicionales de Testing. Se revisaron diff, spec y posta.
+El registro histórico siguiente queda SUPERSEDED en la autorización CLIENTE/PRO;
+no se borró ni se modificó su timestamp.
+
+## Corrección implementada
+
+- CLIENTE activo exclusivamente: crear, confirmar, listar, cancelar, adjudicar;
+  propiedad obligatoria para datos y operaciones propias. GET y POST del formulario
+  rechazan PROFESIONAL con 403; no basta ocultar interfaz. Sesión con rol viejo no
+  evade comprobación del usuario en DB. Visitantes mantienen login/registro y next.
+- Defensa en budget_service para creación, cancelación, adjudicación y consultas
+  de listado de cliente. Sin cambios a oferta/cupos/transacciones/rollback.
+- contracting_core_service vuelve exactamente al contenido de HEAD: solo cliente
+  propietario activo deriva BUDGET. Por eso ese path ya no aparece modificado al final.
+- contract_service retira excepción BUDGET al rol PRO. Un propietario histórico PRO
+  no ve controles del actor cliente ni ejecuta confirmación/cancelación o replay.
+  El profesional contratado conserva aceptar/iniciar/completar; los demás tipos
+  contractuales conservan reglas canónicas.
+- operation_view_service solo trata como dueño al CLIENTE activo. Detalle no entrega
+  datos privados a rol PRO aunque figure en cliente_id. Cliente ajeno recibe 403;
+  la lectura de oportunidades del proveedor sigue operativa.
+- CTA de presupuesto para profesional: /presupuestos, en base/navbar/footer,
+  home_logged y Mercados. Solo destino/etiqueta del CTA, sin rediseño ni cambios de
+  otras operaciones. Son tres paths adicionales necesarios para el requisito de
+  no exponer al PRO acciones de cliente. No se toca el directorio de Emergencias.
+- operation_request_service, nuevo_presupuesto, confirmación, CSS, JS, pruebas Node
+  y MASTER_SPEC permanecen byte por byte iguales al inicio (SHA-256 comprobado).
+- No se amplía ni elimina una política de verificación: clientes no verificados
+  continúan bloqueados para negociación formal, como prueban sus regresiones.
+  Presupuestos no tenía ese gate y no se introduce uno ajeno al P1.
+
+## Archivos intervenidos en esta corrección (12)
+
+- `app/routes/operation_routes.py`
+- `app/services/budget_service.py`
+- `app/services/contracting_core_service.py`
+- `app/services/contract_service.py`
+- `app/services/operation_view_service.py`
+- `app/templates/base.html`
+- `app/templates/home_logged.html`
+- `app/templates/mercados.html`
+- `tests/test_budget_request_ux06a.py`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/BACKLOG.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+El inventario acumulado queda en 19 paths: 17 iniciales + base/home_logged/mercados
+menos contracting_core_service (vuelto a HEAD mediante edición focal, sin restore).
+No son 19 archivos nuevos de esta sesión; los cambios visuales UX-06A previos siguen.
+
+## Validaciones ejecutadas
+
+- 117 Python: 116 PASS, 1 SKIP, 0 fallos/errores. Incluye 22 focales UX-06A.
+- Módulos: test_budget_request_ux06a, test_sprint7_budget_to_contract,
+  test_sprint7_contracting_core, test_sprint7_contracting_p0_iteration1,
+  test_sprint7_contracting_p1_iteration2, test_sprint7_contract_event_boundary,
+  test_sprint7_proposal_to_contract, test_sprint7_formal_negotiation_access,
+  test_operation_architecture_services, test_auth_ux_redesign_v1,
+  test_navbar_drawer_ux04a, test_navbar_markets_ux03a, test_platform_brand.
+- SKIP existente: test_real_concurrent_independent_sessions, SQLite no reproduce
+  bloqueo/sesiones PostgreSQL. No se presenta como PASS ni se ejecutó gate PostgreSQL.
+- Node UX-06A: 5/5 PASS, sin modificar expectativas ni controlador.
+- python -m compileall -q app scripts OK; node --check del JS UX-06A OK.
+- git diff --check OK. Master Spec y rediseño preservados por hash.
+- Focales incluyen 403 HTML existente, GET/POST manual PRO, consultas internas,
+  propiedad heredada PRO, replay tras cambio de rol, proveedor legítimo, visitas,
+  CSRF, validación con valores conservados, cupos, rollback y acceso horizontal.
+- No suite completa: reservada al agente de Testing. No nueva matriz visual:
+  no se cambió diseño. No se declara aprobación de Testing ni aprobación UX-06A.
+
+## Docker, riesgos y continuidad
+
+Imagen descartable reconstruida; únicamente web recreado con --no-deps.
+Compose mandobra_stabilization conservado en http://127.0.0.1:5050.
+Tests: contenedor --rm --network none, sin volúmenes y SQLite en memoria.
+No acceso a trax_db, ni alteración de trax-postgres o volúmenes persistentes.
+Sin migraciones, cambios de Emergencias, imágenes de Downloads ni nuevas dependencias.
+
+Riesgos residuales: no se elimina/reasigna ninguna solicitud previa creada por PRO;
+esos datos no habilitan sus facultades de cliente. El borrador recuperable y la
+atomicidad solicitud/notificación siguen pendientes, sin modificación por el P1.
+La idempotencia contractual permanece; no se afirma idempotencia durable de crear
+solicitudes. Los enlaces internos de Emergencias quedan fuera de esta corrección;
+si llegan al formulario con PRO, el destino rechaza con 403 como cualquier acceso.
+
+Próximo paso: retest independiente del P1 y suite completa a criterio de Testing.
+Entrar por /dev/qa: CLIENTE cliente.demo@trax.local debe usar /presupuestos/nuevo;
+PROFESIONAL electricidad.pro@demo.trax.local debe obtener 403 en ese destino y usar
+/presupuestos o /presupuestos/mis-enviados como proveedor.
+Conservar rama, HEAD y cambios locales. No staging/commit/push/merge: no autorizados.
+No hubo merge ni integración; falta retest independiente. Estado GitHub no cambia.
+
+Inventario acumulado al cierre (staging vacío):
+
+```text
+ M app/routes/operation_routes.py
+ M app/services/budget_service.py
+ M app/services/contract_service.py
+ M app/services/operation_request_service.py
+ M app/services/operation_view_service.py
+ M app/templates/base.html
+ M app/templates/confirmacion_presupuesto.html
+ M app/templates/detalle_presupuesto.html
+ M app/templates/home_logged.html
+ M app/templates/mercados.html
+ M app/templates/mis_solicitudes_presupuesto.html
+ M app/templates/nuevo_presupuesto.html
+ M docs/BACKLOG.md
+ M docs/DECISIONES_ARQUITECTURA.md
+ M docs/HANDOFFS/ACTIVE_HANDOFF.md
+?? app/static/css/budget-request-ux06a.css
+?? app/static/js/budget-request-ux06a.js
+?? tests/js/budget_request_ux06a.test.js
+?? tests/test_budget_request_ux06a.py
+```
+
+---
+
+# UX-06A — Solicitud de presupuestos
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T18:43:08-03:00
+Origen: laptop, Codex Desktop Windows; agente técnico MANDOBRA.
+Objetivo: implementar el incremento aprobado de solicitud de presupuestos.
+Rama: feature/ux-ui-foundation.
+HEAD conservado: 7af47a25a59efcb64f70c2596d9f6818ace298bc.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: árbol limpio y staging vacío; ls-remote confirmó rama remota en ese HEAD.
+El encabezado histórico UX-04B/C usa base 18c422e; el commit vigente 7af47a2 ya
+registra ese trabajo. Se conserva debajo sin reinterpretarlo como estado actual.
+Estado final: cambios locales sin commit; staging vacío. Sin push, PR ni merge.
+No se integró porque falta aprobación visual y Testing independiente.
+
+## Implementación y decisiones
+
+- Entrada pública informativa, sin formulario ni preview anónimo; next seguro
+  a /presupuestos/nuevo en login/registro. POST anónimo redirige sin crear.
+- CLIENTE/PROFESIONAL activos solicitan; propiedad para confirmar, listar, cancelar,
+  adjudicar y ver ofertas privadas. Perfil profesional solo se exige para ofertar.
+- Contrato BUDGET admite propietario PROFESIONAL y mantiene separación del proveedor,
+  idempotencia, eventos, notificaciones y auditoría. DIRECT/PROPOSAL no se amplían.
+- Enlace al contrato desde detalle propio. Reseñas siguen restringidas a CLIENTE,
+  sin CTA inválido para el nuevo solicitante profesional; ampliación en Backlog.
+- Título/servicio/zona/descripción primero; fecha/prioridad opcionales. Revisión JS
+  local con foco y edición; un submit final nativo y bloqueo de doble envío local.
+  Sin JS, esenciales visibles y botón Publicar solicitud operativo.
+- Límites backend/HTML 160/120/120/1200; prioridad BAJA/NORMAL/ALTA y fecha válida.
+  Errores por campo + resumen enfocado; HTML escapado y valores conservados.
+- Confirmación real, estado y ofertas reales; sin acciones ficticias ni tiempos/promesas.
+- CSS/JS propios con tokens DSv2, foco y controles >=44; contraste local y fondo
+  completo en ambos temas. Sin cambios globales, dependencias ni migraciones.
+
+## Archivos modificados y nuevos (17)
+
+- `app/routes/operation_routes.py`
+- `app/services/budget_service.py`
+- `app/services/contract_service.py`
+- `app/services/contracting_core_service.py`
+- `app/services/operation_request_service.py`
+- `app/services/operation_view_service.py`
+- `app/templates/nuevo_presupuesto.html`
+- `app/templates/confirmacion_presupuesto.html`
+- `app/templates/detalle_presupuesto.html`
+- `app/templates/mis_solicitudes_presupuesto.html`
+- `app/static/css/budget-request-ux06a.css` (nuevo)
+- `app/static/js/budget-request-ux06a.js` (nuevo)
+- `tests/test_budget_request_ux06a.py` (nuevo)
+- `tests/js/budget_request_ux06a.test.js` (nuevo)
+- `docs/BACKLOG.md`
+- `docs/DECISIONES_ARQUITECTURA.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+## Validaciones ejecutadas
+
+- Python: 157 pruebas focales/regresiones; 156 PASS, 1 SKIP existente de
+  test_real_concurrent_independent_sessions (SQLite no equivale a bloqueo PostgreSQL).
+  Incluye 17 casos nuevos de UX-06A: visitantes, cuentas activas/inactivas, ambos
+  roles, CSRF, límite 10 POST/día, longitudes, datos conservados, autooferta, cupos,
+  propiedad, contrato idempotente y transiciones BUDGET del propietario PROFESIONAL.
+- Módulos de esa tanda: test_budget_request_ux06a, test_sprint7_budget_to_contract,
+  test_sprint7_contracting_p1_iteration2, test_operation_architecture_services,
+  test_sprint7_contracting_core, test_sprint7_contract_event_boundary,
+  test_sprint7_proposal_to_contract, test_sprint7_contract_review_service,
+  test_sprint7_contract_review_routes_ui_moderation, test_auth_ux_redesign_v1,
+  test_security_controls, test_security_compliance_phase3, test_loading_error_states,
+  test_navbar_drawer_ux04a, test_platform_brand, test_design_system_v2.
+- Revalidación final tras los textos de solicitante: 35/35 PASS (UX-06A,
+  platform_brand y navbar_drawer). Es repetición focal, no se suma a los 157 casos.
+- compileall app scripts OK en contenedor aislado; sintaxis JS OK.
+- UTF-8 estricto en 17 paths, sin BOM ni reemplazos. 62 enlaces relativos
+  documentales resuelven; assets locales de templates presentes y enlaces del
+  flujo cubiertos por Flask/navegación real. git diff --check OK.
+- Node: 16 PASS: 5 presupuesto y 11 page_loading. Se ejecuta el controlador real
+  de loading junto al formulario, sin simular mediciones de layout.
+- Primera tanda: 39 casos con un error de fixture nuevo (faltaba mensaje NOT NULL)
+  y un skip. Fixture corregido; tanda de 157 posterior sin fallos.
+- Los logs genéricos de error de los tests son escenarios deliberados de regresión;
+  no equivalen a fallos productivos. Consola de navegador: ruido chrome-extension,
+  sin error JS de UX-06A observado. Respuesta 400 inducida por validación comprobada.
+
+## Revisión visual real
+
+Chrome, viewport CSS 1440/1024/768/390/320; visitante, CLIENTE y PROFESIONAL;
+claro y oscuro. 30 combinaciones y 200 controles medidos con getBoundingClientRect:
+ancho y alto >=44 px, sin overflow horizontal en estado estable. Los cambios de
+ancho generan un instante de ajuste del navbar; las lecturas finales se tomaron
+tras estabilizarlo. Opcionales abiertos en los formularios medidos.
+
+- Primer campo a ~444 px en escritorio y ~540 px a 320; antes ~758/~943.
+- Contraste real medido: CTA 4.56:1 claro, 8.02:1 oscuro; errores >=6.04:1 claro,
+  >=8.43:1 oscuro. Texto/encabezado también superan umbral. Foco visible por teclado.
+- Validación nativa inválida: foco en título, sin skeleton ni revisión.
+- Revisión: URL permanece /presupuestos/nuevo, foco en resumen, sin skeleton;
+  editar conserva datos. Publicación real desde ambas cuentas muestra 0 de 6.
+- Error backend inducido: resumen enfocado, aria-invalid, zona/descripción conservadas.
+- Cuenta PRO ve Mis solicitudes y detalle propio, sin oferta sobre sí misma.
+- Se crearon únicamente dos solicitudes QA en la base descartable: #1 CLIENTE,
+  #2 PROFESIONAL. Se dejan para revisión, sin ofertas ni contrataciones QA reales.
+- Fallback sin JS validado por HTML/POST nativo y tests; no se desactivó JS en Chrome.
+  Doble envío y skeleton se cubren también mediante Node; no se afirma gate E2E
+  automatizado ni certificación axe/lector de pantalla. No se ejecutó suite completa
+  ni concurrencia PostgreSQL; corresponde a Testing decidir el gate independiente.
+
+Evidencia externa al repo en
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/:
+ux06a-formulario-claro.png, ux06a-formulario-oscuro.png, ux06a-formulario-movil.png,
+ux06a-mediciones.json. Las capturas de página completa se inspeccionaron; algunos
+previews de viewport de la herramienta quedaron escalados y no se usan para medir.
+
+## Entorno, límites y siguiente paso
+
+Compose descartable docker-compose.stabilization.yml, proyecto mandobra_stabilization.
+Se reconstruyó imagen y recreó solo web con --no-deps. Se deja en 127.0.0.1:5050.
+No se accedió a trax_db ni se alteró trax-postgres. Tests en contenedor --rm,
+--network none, sin volúmenes y DATABASE_URL=sqlite:///:memory:.
+
+- Visitante: http://127.0.0.1:5050/presupuestos/nuevo (cerrar sesión QA si corresponde).
+- QA: http://127.0.0.1:5050/dev/qa; botón Iniciar como este usuario.
+- CLIENTE: cliente.demo@trax.local. PROFESIONAL: electricidad.pro@demo.trax.local.
+- Tras elegir cuenta, abrir /presupuestos/nuevo. Mis solicitudes enlaza desde allí.
+
+Pendientes: aprobación visual, Testing independiente, posible gate PostgreSQL;
+Backlog conserva borradores, adjuntos, taxonomía, matching/distribución, IA,
+edición, visibilidad definitiva, atomicidad, métricas y expiración real.
+La solicitud sigue teniendo commit separado de notificación; el doble clic local
+no garantiza idempotencia de creación tras reenvío/red interrumpida. No se oculta
+esa limitación. No se amplía reseña a PRO, ni se rediseña la lista/comparador legacy.
+
+Para retomar: verificar estos 17 paths, rama/HEAD y staging; no descartar trabajo.
+Revisar pantallas con ambos roles y temas, aprobar visual, luego retest independiente.
+No ejecutar reset/clean, migraciones, suite completa o integración sin autorización.
+No tocar bases persistentes, Emergencias, Propuestas, dashboards, perfiles ni pagos.
+
+---
+
+# UX-04B/04C — Skeleton y errores amigables
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T16:12:05-03:00
+Origen: laptop, Codex Desktop Windows; agente técnico MANDOBRA.
+Rama: feature/ux-ui-foundation.
+HEAD conservado: 18c422e35ed20f109e2567ffbf8a51fa440cfe8f.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Precheck: working tree limpio, staging vacío. La entrada anterior conserva una
+base histórica 85a7f22 y cambios de UX-05A; el pedido vigente y Git confirman que
+ese trabajo ya está guardado en la nueva base 18c422e. No se reescribe el historial.
+
+## Alcance implementado
+
+- Skeleton global desde base.html y páginas de error: enlace interno elegible o
+  submit nativo válido; demora 300 ms, mensaje a los 8 s, liberación a los 30 s.
+  No intercepta respuestas, no cambia métodos, no reenvía, no llama preventDefault.
+- Excluye externos, protocolos no HTTP, WhatsApp externo, downloads, otros targets,
+  modificadores, anclas locales, eventos cancelados, data-no-loading, controles
+  locales y formularios inválidos. Respeta overrides del submitter y novalidate.
+- Limpia timers en pageshow/pagehide (incluido bfcache), Escape, invalid y eventos
+  Navigation API de cancelación/resultado. Un aborto antiguo no cancela una carga
+  nueva. Sin beforeunload ni variables globales. Inicialización idempotente.
+- Overlay fijo, sin captar eventos ni mover foco; aria-busy restaurado al valor
+  anterior, mensaje polite, formas decorativas. CSS/JS con liberación de seguridad.
+  Movimiento reducido desactiva shimmer; la liberación CSS diferida no anima formas.
+- HTML compartido para 403/404/500/503, navegación segura a / y /explorar, logo y
+  tema, ilustración SVG original local de vivienda/maletín/señal, animación lenta
+  de transform/opacity desactivada con prefers-reduced-motion. Sin fuentes externas,
+  scripts, texto ni recursos externos dentro del SVG. MIME SVG explícito.
+- Contexto de errores evita consultas de notificaciones incluso con sesión activa
+  y fallo de DB. No depende del navbar completo. No expone argumentos de excepción.
+- TESTING, Accept JSON y request JSON conservan negociación existente. Respuestas
+  JSON directas de health/webhooks intactas. /healthz y /api/ no usan plantilla
+  corporativa; los errores genéricos mantienen texto anterior sin Accept JSON.
+  400/CSRF, 413, 429 siguen genéricos. HTTPException no seleccionadas siguen
+  passthrough, 405 conserva Allow; 503 conserva Retry-After. Seguridad global intacta.
+  500 registra el mensaje genérico existente una vez, sin payload ni excepción.
+- QA usa el guard existente development/testing + ENABLE_DEV_QA_PANEL; blueprint
+  ausente en producción. Previews 200 rotuladas sin errores artificiales ni logs.
+  Esperas GET/POST acotadas a 3/10 s, HEAD sin demora, CSRF conservado, no-store.
+  Simulación visual de 12 s con el mismo controlador sólo mediante marcador QA.
+- Sin cambios de negocio, modelos, migraciones, dependencias, assets previos,
+  home, carruseles o navbar, salvo inclusión global del skeleton en base.html.
+
+## Revisión local
+
+Compose descartable: docker-compose.stabilization.yml, proyecto mandobra_stabilization.
+Sólo se reconstruyó imagen y recreó web con --no-deps. Disponible en 127.0.0.1:5050.
+No se accedió a trax_db ni se alteró trax-postgres; tests en contenedores --rm,
+--network none, sin volúmenes y DATABASE_URL=sqlite:///:memory:.
+
+1. Abrir http://127.0.0.1:5050/dev/qa/estados.
+2. Pulsar “Simular skeleton durante 12 segundos” para inspección visual sin navegar.
+   Aparece tras 300 ms, mensaje prolongado a los 8 s, finaliza a los 12 s; Escape limpia.
+3. Los enlaces “Navegar con espera de 3/10 segundos” producen esperas reales QA.
+   No abrir directamente la URL con demora para evaluar el skeleton: necesita partir
+   de una página ya cargada. Formulario QA permite validar envío y campo requerido.
+4. Errores: /dev/qa/estados/403, /404, /500 y /503 (todos bajo el mismo prefijo).
+   Son previews 200, no sustituyen pruebas de status HTTP real en Flask.
+
+## Evidencia ejecutada y límites
+
+- Primera focal: 18 Python PASS (errores + RuntimeHealthTest).
+- Primera regresión: 125 Python, 3 subcasos fallidos del mismo guard de orden CSS
+  del drawer. Causa: nueva hoja después de navbar-drawer.css. Solución: cargar
+  page-loading.css antes, conservando la última hoja del navbar. No se debilitó test.
+- Después: 143 Python PASS en 9.098 s, sin skips. Incluye focales, health, home,
+  Explorar, mercados, drawer/nav, identidad, DS, auth, footer, seguridad/config y
+  servicios de dashboard. Es una selección de módulos, NO la suite completa.
+- Última revisión de controlador/API y nueva comprobación de enlaces: 65 Python
+  PASS en 4.755 s (loading_error_states, RuntimeHealthTest, security_controls,
+  security_compliance_phase3, app_configuration, mercadopago_webhook_routes).
+  Las tandas se solapan: NO sumar como pruebas únicas.
+- Última tanda Node: 40 PASS, 0 skips, 119.4393 ms. Incluye 11 focales de carga,
+  drawer, home hero/FAQ, bandas y Explorar. Relojes simulados prueban lógica de
+  temporizadores, NO son mediciones simuladas de layout.
+- compileall app + test focal, sintaxis JS, UTF-8 estricto y git diff --check PASS.
+  Enlaces/recursos nuevos relativos y resolubles comprobados con Flask/HTMLParser.
+- Chrome real: 48 casos de error (4 códigos × 1440/1024/768/720/390/320 × 2 temas),
+  getBoundingClientRect: todos los objetivos >=44×44; mínimo 66.46×44 en claro y
+  79.84×44 en oscuro; acciones principales >=48 px alto. SVG cargado y dentro del
+  ancho; sin overflow horizontal. 720 CSS px representa reflow de 1440 al 200 %.
+- Skeleton: 12 combinaciones ancho/tema; sin overflow propio, foco conservado,
+  aria-busy y texto prolongado observados. Durante resize acelerado dos lecturas
+  iniciales de overflow del navbar fueron transitorias; remedir a 320 y 390 una vez
+  asentado el modo drawer dio cero overflow (evidencia guarda ambas lecturas).
+- Teclado real: cinco controles de preview 403, contorno sólido computado 2.4 px;
+  Escape limpia overlay/busy. Formulario vacío no navega y enfoca requerido;
+  válido realiza POST normal y vuelve con overlay oculto/busy retirado.
+- La herramienta espera el fin de la navegación y no captura el HTML saliente
+  mientras espera servidor; por eso las capturas del skeleton usan simulación QA.
+  Los enlaces lentos reales y el POST sí fueron recorridos en Chrome.
+- Consola consultada: sólo mensajes de extensión chrome-extension://mopn...;
+  no se atribuyen a la aplicación. Warnings Python heredados: Query.get y utcnow.
+- ResourceWarning de respuesta estática en prueba inicial corregido con close();
+  no aparece en la última tanda. No nuevo troubleshooting reutilizable pendiente.
+
+Evidencia fuera del repositorio:
+C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/
+- ux04bc-browser-measurements.json
+- ux04c-error-404-light-1440.png
+- ux04c-error-503-dark-320.png
+- ux04c-error-403-light-390-focus.png
+- ux04b-skeleton-light-1440.png
+- ux04b-skeleton-dark-320.png
+
+Limitación explícita: el skeleton funciona durante navegaciones iniciadas desde
+una página de MANDOBRA ya cargada. No puede mostrarse durante la primera descarga
+absoluta del HTML antes de que el servidor responda, salvo que en el futuro se
+incorpore un shell persistente, SPA o service worker. No se implementó ninguno.
+En navegadores sin Navigation API, cancelaciones no notificadas por el navegador
+usan Escape/pageshow o el límite de 30 s; no hay evento universal de cancelación.
+Reduced motion verificado en reglas CSS/tests, sin emulación real disponible en la
+herramienta. Pendientes de Testing: lectura con AT real, JS desactivado en navegador,
+bfcache efectivo/otros navegadores, preferencia de movimiento del SO y zoom real.
+No se afirma que tests unitarios certifiquen esos escenarios reales ni accesibilidad
+integral. La navegación sin JS queda nativa; skeleton oculto por HTML.
+
+## Cierre y continuidad
+
+16 paths locales (6 modificados, 10 nuevos), sin staging, commit, push, PR o merge.
+No merge por instrucción expresa; HEAD y rama conservados. Push a GitHub no ejecutado,
+sin sincronización remota ni afirmación de nuevos cambios publicados.
+Completado: implementación, focales/regresiones seleccionadas, revisión visual de
+agente, BACKLOG y handoff. Pendiente: aprobación visual de Producto y retest/suite
+completa por Testing independiente. No hay bloqueo técnico identificado.
+Riesgos restantes: limitaciones de cancelación legacy/primera carga y validación AT.
+Próximo paso: revisar URLs anteriores; sólo después autorizar Testing y eventual
+integración a develop. No ejecutar full suite ni integrar sin autorización.
+Para retomar: git status; git branch --show-current; git log -1 --oneline;
+leer esta entrada; comprobar los paths siguientes y staging vacío; conservar
+Compose descartable y no tocar recursos persistentes. No reset/clean/staging/commit.
+
+Archivos modificados y nuevos de esta sesión:
+- app/__init__.py
+- app/routes/dev_routes.py
+- app/templates/base.html
+- app/templates/dev_qa_panel.html
+- app/static/css/error-pages.css
+- app/static/css/page-loading.css
+- app/static/images/states/mandobra-repair.svg
+- app/static/js/page-loading.js
+- app/templates/dev_qa_states.html
+- app/templates/errors/base_error.html
+- app/templates/partials/page_loading.html
+- app/utils/error_pages.py
+- tests/js/page_loading.test.js
+- tests/test_loading_error_states.py
+- docs/BACKLOG.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+---
+
+# Correccion focal: retirar pausa visible de Precios de mercado
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:38:25-03:00
+Origen: Codex Desktop Windows; agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation; HEAD:85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Origin:https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Objetivo solicitado: eliminar Pausar imagenes de /mercados. Completado localmente.
+
+Retirados boton HTML, tres reglas CSS y estado/listeners JS exclusivos del boton.
+El inicializador ya no depende de encontrarlo. Conservados autoplay3000ms,
+pausas automaticas por interaccion/visibilidad y prefers-reduced-motion.
+Home y Explorar intactos,7 hashes antes/despues iguales. Sin cambios a assets.
+
+Archivos de esta sesion:
+- app/templates/mercados.html
+- app/static/css/markets-v2.css
+- app/static/js/markets-carousel.js
+- tests/test_markets_ux03.py
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+12 pruebas tests.test_markets_ux03 PASS,0.368s; SQLite en memoria, contenedor
+efimero sin red ni volumenes. Sintaxis JavaScript, UTF-8 y diff-check PASS.
+Chrome:/mercados sin boton, carrusel avanzando, sin overflow en escritorio.
+Captura externa: markets-without-pause.png en directorio de evidencia habitual.
+No suite completa ni matriz responsive completa repetida para este ajuste focal.
+Sin migraciones, nuevos errores conocidos ni bloqueo tecnico. Revision visual y
+Testing independiente pendientes; no implica aprobacion integral de UX05A.
+
+Git: trabajo previo preservado,30 paths locales acumulados,staging vacio.
+Sin commit/push/PR/merge: cambios pendientes de revision. Rama/HEAD conservados.
+Solo rebuild/recreate web del Compose descartable --no-deps,5050 disponible.
+No acceso a trax_db ni cambios a trax-postgres/recursos ajenos. No migraciones.
+Documentacion actualizada: esta posta, historial preservado.
+Retomar verificando identidad/staging, abrir /mercados en5050 y revisar ausencia
+del boton. No tocar Home ni Explorar, ni staging/commit/push/merge sin autorizacion.
+
+---
+
+# UX-05A: portada de Explorar azul, sin controles visibles
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:30:36-03:00
+Origen: Codex Desktop Windows, agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation; HEAD:85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Objetivo: reforzar la capa azul de Explorar, retirar flechas/pausa visible,
+no tocar Home mientras Producto lo revisa.
+
+Completado: overlay superior62%->72%, manteniendo94% detras del texto/buscador.
+Retirados HTML/CSS/listeners de anterior/siguiente. Ya no habia boton visible de
+pausa en Explorar. Unico boton de la portada: Buscar profesionales.
+Se mantienen siete escenas,8s,fade750ms, pausas automaticas hover/foco/visibilidad,
+reduced-motion y fallback sin JS. Titulo, buscador,20 rubros y rutas sin cambios.
+No se modificaron Home, bandas, Precios de mercado ni assets. Siete hashes de
+archivos home/template/CSS/JS/tests comparados antes/despues, iguales.
+
+Archivos cambiados en esta sesion:
+- app/templates/explorar_rubros.html
+- app/static/css/explore-motion.css
+- app/static/js/explore-motion.js
+- tests/js/explore_motion.test.js
+- tests/test_explore_motion_ux05a.py
+- docs/BACKLOG.md
+- docs/HANDOFFS/ACTIVE_HANDOFF.md
+
+Validacion:19 Python PASS (UX05A/UX02,1.024s),6 Node PASS; sintaxis JS,
+UTF-8 y git diff --check. Python en contenedor efimero sin red/volumenes y SQLite
+en memoria. ERROR del caso deliberado de UX02, sin fallos. Sin suite completa,
+gates PostgreSQL ni migraciones. Revision Chrome en pestaña nueva solo Explorar,
+portada azul y ausencia de controles verificadas. Captura ux05a-explore-blue-desktop.png
+en el directorio externo habitual. No se navego ni recargo Home en navegador.
+
+Se reconstruyo/recreo solo web del Compose descartable --no-deps;5050 disponible.
+No trax_db/trax-postgres ni recursos ajenos. Sin nuevos archivos de producto.
+26 paths locales acumulados (7 modificados/19 nuevos contra HEAD),staging vacio.
+No commit/push/PR/merge; se conserva rama y HEAD. No hubo merge porque quedan
+revision visual y Testing independiente. Cambios solo locales.
+
+Pendientes: aprobacion visual, Testing independiente y suite completa posterior;
+CLS instrumental/emulacion real sin JS/reduced-motion siguen pendientes como
+se indico antes. No declarar aprobacion por pruebas focales. Sin errores nuevos.
+Retomar verificando identidad/staging/26 paths, revisar /explorar en5050.
+No modificar Home mientras Producto lo revisa, ni realizar staging/commit/push/
+merge o reset/clean sin autorizacion. Historial preservado abajo.
+
+---
+
+# UX-05A: Oficios destacados solo con bandas grandes y enlaces
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:18:48-03:00
+Origen: Codex Desktop Windows, agente tecnico MANDOBRA.
+Rama: feature/ux-ui-foundation.
+HEAD: 85a7f22c50e07fcc37e2f6bacce866d920736c12.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+
+## Decision vigente
+Producto solicita retirar las seis tarjetas fijas, ampliar las dos bandas,
+reducir ligeramente su velocidad y agregar titulos para buscar profesionales.
+Esta instruccion reemplaza la preservacion de las seis tarjetas del pedido
+anterior. No modifica la aprobacion de los doce assets ni el carrusel de Explorar.
+Implementado localmente; nueva revision visual y Testing independiente pendientes.
+
+## Cambios completados
+- Retiradas las seis tarjetas y sus reglas CSS sin consumidores.
+- Bandas con tarjetas enlazadas de 376px escritorio / 248px movil, imagen 16:9
+  y titulo de 16px con flecha de enlace. Alto total medido: 592.4 / 448.4px.
+- Duracion132s escritorio /116s movil. Como el recorrido tambien crece, la
+  velocidad lineal baja aproximadamente12% respecto del componente pequeno
+  (17.82 frente20.20 px/s escritorio;13.66 frente15.40 px/s movil).
+- Doce originales accesibles; clones aria-hidden y tabindex=-1, sin duplicar
+  posiciones de Tab. Pausa por hover/foco, control manual, visibilidad y bfcache.
+- Al recorrer con teclado, filas estaticas desplazables y cada enlace se lleva
+  a la vista. Al salir se recupera el movimiento. Sin JS/movimiento reducido,
+  originales desplazables sin clones: los doce enlaces siguen disponibles.
+- Foco de color DS con especificidad local suficiente para superar el foco blanco
+  legacy .trax-home a:focus-visible; corregido tras medirlo en Chrome.
+- Los titulos son editoriales y servicio es el filtro libre real de /buscar:
+  Pintura en altura->Pintura; Revestimientos de PVC->PVC;
+  Automatizacion industrial->industrial; Construccion de pergolas->pergolas
+  (con acento en el parametro real); Pisos de madera->Pisos de madera;
+  ambas soldaduras->soldadura; Estuco veneciano->estuco; Limpieza de tanques->tanques;
+  Instalacion de ventanas->ventanas; Instalaciones solares->solar;
+  Tableros electricos->Electricidad. El filename historico 06 se conserva pero
+  su titulo describe correctamente el tablero, no electrodomesticos.
+  No nueva taxonomia, rutas ni filtros backend. Busqueda actual solo filtra
+  Professional.servicio por subcadena; puede no haber coincidencias. No se
+  afirma disponibilidad ni validacion de especialidades de los profesionales.
+
+## Validaciones de esta sesion
+64 unittest PASS en SQLite en memoria, contenedor --network none sin volumenes:
+UX05A/home/UX02/drawer/identidad/DSv2/footer. Tras correccion de foco, repetidos
+solo los16 focales UX05A+home: PASS. Node13 PASS: bandas5, Explorar6, hero y FAQ.
+Sintaxis JS, compileall app y tests afectados, UTF-8 y diff-check verificados.
+Warnings Query.get/datetime legacy y ERROR deliberado de UX02, sin fallos.
+No suite completa ni gates PostgreSQL/migraciones.
+
+Chrome: home en siete anchos1440/1280/1024/768/720/390/320, ambos temas.
+Sin overflow de documento, cero tarjetas antiguas, dos bandas.
+Claro medido en modo teclado desplazable (alto622.8/478.8 incluye scrollbars);
+oscuro en modo animacion (592.4/448.4). Doce enlaces alcanzados visibles por Tab,
+sin clones, tanto escritorio como320. Foco final computado rgb(11,135,153) solid.
+Enlace Tableros electricos abre /buscar?servicio=Electricidad con resultado real.
+Reanudacion confirmada con animationPlayState=running. Capturas inspeccionadas
+escritorio y movil. Assets originales y doce WebP no modificados.
+Evidencia externa en C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/:
+ux05a-bands-large-light.png, ux05a-bands-large-mobile-light.png,
+ux05a-bands-large-mobile-dark.png, ux05a-bands-large-evidence.json.
+
+## Git, alcance y continuidad
+Precheck:24 paths previos, staging vacio, rama/HEAD/origin correctos.
+Esta sesion modifica nueve archivos (respecto del estado local previo):
+- `app/templates/home.html`
+- `app/static/css/home-v1.css`
+- `app/static/css/featured-bands.css`
+- `app/static/js/featured-bands.js`
+- `tests/test_home_hero_carousel.py`
+- `tests/test_explore_motion_ux05a.py`
+- `tests/js/featured_bands.test.js`
+- `docs/BACKLOG.md`
+- `docs/HANDOFFS/ACTIVE_HANDOFF.md`
+
+Estado acumulado:26 paths locales,7 modificados contra HEAD y19 nuevos heredados.
+Staging vacio. Sin commit, push, PR ni merge; aprobacion visual y Testing pendientes.
+No se accedio a trax_db ni se modifico trax-postgres. Solo build/recreate web del
+Compose descartable con --no-deps, queda encendido en http://127.0.0.1:5050/.
+Sin migraciones ni nuevos assets, dependencias o archivos de producto.
+
+Pendientes: revision visual del responsable y retest independiente; suite completa
+posterior, CLS instrumental y emulacion visual sin JS/reduced-motion siguen
+pendientes (contratos y Node cubiertos). Sin nuevo bloqueo tecnico conocido.
+Retomar verificando rama85a7f22/staging/26 paths, revisar home y esta decision.
+No restore/reset/clean ni staging/commit/push/merge sin autorizacion. El historial
+siguiente describe disenos anteriores; la seccion superior es la decision vigente.
+
+---
+
+# UX-05A refinado: carrusel sereno en Explorar y bandas en Oficios destacados
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T14:00:27-03:00
+Dispositivo/origen: laptop, Codex Desktop Windows; agente tecnico MANDOBRA.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `85a7f22c50e07fcc37e2f6bacce866d920736c12`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+## Decision vigente y continuidad
+La aprobacion visual anterior queda retirada por decision expresa de Producto:
+las bandas continuas producen demasiado movimiento en Explorar. El registro
+anterior se conserva abajo como historia; no representa aprobacion del diseno
+vigente. Los doce assets y sus excepciones visuales siguen autorizados.
+NUEVA APROBACION VISUAL PENDIENTE; UX-05A no esta aprobada ni integrada.
+
+Precheck: identidad Git coincidente, staging vacio, exactamente veinte paths
+locales de UX-05A. Se refactorizo ese trabajo sin restore/reset/clean ni descartar
+cambios. Hashes iniciales de los veinte paths guardados fuera del repositorio en
+`C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux05a-refine-before.json`.
+
+## Trabajo completado
+- Explorar: siete escenas decorativas, una activa; fundido opacity 750ms,
+  intervalo 8000ms, anterior/siguiente laterales 44x44, sin contador ni pausa
+  visible. Pausa por hover/foco/documento oculto; controles manuales reinician
+  un unico temporizador. Sin autoplay/fundido con movimiento reducido.
+- Primera escena visible sin JavaScript, controles ocultos hasta inicializacion.
+  Degradado azul localizado: al comenzar el contenido la opacidad minima es 94%.
+  Titulo, texto, formulario GET servicio/zona, veinte tarjetas y enlaces originales
+  conservados exactamente contra HEAD al retirar las inserciones del componente.
+- Home: bandas entre texto de apoyo y seis tarjetas de Oficios destacados.
+  Doce WebP compartidos, seis por fila con copias decorativas, soldaduras en filas
+  distintas, 60s y sentidos opuestos, grupos identicos con gap incluido en el bucle.
+  Alto medido 226px escritorio / 172px movil. Fondo DS claro/oscuro, bordes
+  redondeados, degradados laterales, control iconico pausa/reanudacion 44x44.
+  Lazy loading, width/height y decoding async; no nuevas dependencias/CDN.
+- Root y listeners separados, init idempotente con WeakMap; dispose elimina
+  listeners/temporizador; pagehide/pageshow manejan salida y restauracion bfcache.
+  Documento oculto pausa bandas. Reducido/sin JS: bandas estaticas, sin boton inutil.
+- Hero principal, seis tarjetas (imagenes, textos, enlaces), FAQ y resto del home
+  identicos a HEAD al remover exclusivamente las tres inserciones del refinamiento.
+- 12/12 SHA-256 iguales al snapshot inicial; 1021870 bytes en total.
+  No conversion/reprocesamiento/copia/duplicacion de assets ni cambios a PNG origen.
+
+## Validacion ejecutada en esta sesion
+- 94 pruebas Python PASS, 6.095s, en contenedor efimero `--network none`, sin
+  volumenes, `DATABASE_URL=sqlite:///:memory:`. Modulos:
+  `tests.test_explore_motion_ux05a`, `tests.test_explore_rubros_ux02`,
+  `tests.test_home_hero_carousel`, `tests.test_navbar_drawer_ux04a`,
+  `tests.test_navbar_markets_ux03a`, `tests.test_platform_brand`,
+  `tests.test_design_system_v2`, `tests.test_auth_ux_redesign_v1`,
+  `tests.test_markets_ux03`, `tests.test_corporate_footer`.
+  Incluye GET/HEAD de los doce WebP: 200 y MIME image/webp; decodificacion y presupuesto.
+- Node: 28 PASS / 0 FAIL (10 focales nuevos/refinados, 16 drawer y dos archivos
+  de regresion hero/FAQ); temporizadores, bucle, foco/hover, visibilidad, reduccion,
+  manual, cleanup, idempotencia, bfcache y ausencia de root.
+- `node --check` de ambos componentes PASS; `compileall -q app` y los dos tests
+  Python focales PASS en contenedor efimero; UTF-8 estricto y assets relativos PASS;
+  `git diff --check` PASS. No suite completa ni gates PostgreSQL/migraciones.
+- Log ERROR durante test UX-02 corresponde al error deliberado del catalogo;
+  warnings legacy Query.get/datetime.utcnow preexistentes; ninguno fallo la suite.
+
+## Navegador real y evidencia
+Chrome, visitante. Matriz 28 combinaciones: / y /explorar; temas claro/oscuro;
+1440, 1280, 1024, 768, 390, 320 y 720px (reflow equivalente a 1440/200%).
+42 mediciones getBoundingClientRect >=44x44; cero overflow horizontal de documento
+una vez estabilizado el resize; una escena activa, veinte tarjetas en Explorar;
+dos bandas y seis tarjetas en home. Tema verificado por clase theme-light/dark y
+colores computados (el atributo data-theme legacy no refleja el tema efectivo).
+Se observo una medicion transitoria durante un resize adicional del home mientras
+el navbar recalculaba su modo; lectura siguiente scrollWidth=clientWidth=375 a
+viewport390, sin desbordamiento persistente. No se modifico el navbar aprobado.
+
+Capturas inspeccionadas escritorio/movil, ambos temas. Sin recortes de texto,
+controles ni formulario; bandas contenidas antes de las tarjetas. Foco visible
+por teclado; anterior/siguiente funcionales. Escena se mantiene con foco durante
+mas de ocho segundos. Altura de Explorar movil 630.237px estable entre cambios de
+escena observados. Bandas detenidas con transformaciones estables tras pausa;
+24/24 img (incluidos clones) cargadas, doce URLs compartidas. Sin descargas de
+assets duplicados a otra carpeta; no se hizo traza de red de bytes transferidos.
+Navbar movil abre/acordeon/cierra y devuelve foco. Busqueda real Plomeria/Palermo
+navega a /buscar con ambos parametros y muestra el estado vacio. Retorno funcional.
+Hero home responde a su control propio sin alterar bandas; FAQ filtra pagos y se
+restauro filtro vacio; un unico footer. Console: solo error de extension Chrome
+mopnmbcafieddcagagdcbnhejhlodfdd/content.js, sin errores de aplicacion observados.
+
+Contraste conservador calculado sobre fotografia blanca bajo overlay al inicio
+del contenido: titulo blanco 13.42:1; texto #e8edf3 11.40:1. Boton oscuro con
+colores computados rgb(53,59,71)/rgb(255,138,76): 4.81:1.
+
+Evidencia externa, mismo directorio del snapshot:
+- `ux05a-refine-matrix.json`: las 28 lecturas reales.
+- `ux05a-refine-explore-desktop-light.png`, `ux05a-refine-explore-desktop-dark.png`.
+- `ux05a-refine-explore-mobile-light.png`, `ux05a-refine-explore-mobile-dark.png`.
+- `ux05a-refine-home-desktop-light.png`, `ux05a-refine-home-dark.png`.
+- `ux05a-refine-home-mobile-light.png`, `ux05a-refine-home-mobile-dark.png`.
+
+## Pendientes, limites y riesgos
+- Nueva aprobacion visual del responsable. Testing independiente y suite completa
+  quedan pendientes para despues de esa aprobacion; no declarar retest aprobado.
+- Sin saltos visuales observados y dimensiones reservadas, pero CLS instrumental
+  no medido: la interfaz de navegador disponible no expone PerformanceObserver.
+  No afirmar CLS=0. Completar medicion formal en Testing.
+- Sin JS y prefers-reduced-motion comprobados con contratos HTML/CSS y Node;
+  sin emulacion visual real de esos modos ni print en esta sesion. Hover y
+  visibilitychange cubiertos en Node; no confundir con medicion fisica de pestaña
+  oculta (las lecturas del navegador activan la pestaña). No nueva matriz visual
+  autenticada; regresiones de roles/autenticacion incluidas en Python.
+- No se cambiaron rutas/backend/taxonomia ni base persistente. Sin migraciones.
+
+## Estado Git y archivos finales
+Cinco archivos modificados contra HEAD y diecinueve nuevos sin seguimiento.
+El test UX-02 conserva el cambio local previo, sin modificacion adicional en este
+refinamiento. Los doce WebP son nuevos para Git desde la implementacion anterior,
+pero no se alteraron en esta sesion. Nuevos en esta sesion: featured-bands.css,
+featured-bands.js y featured_bands.test.js; home.html se incorporo al alcance.
+
+```text
+ M app/templates/explorar_rubros.html
+ M app/templates/home.html
+ M docs/BACKLOG.md
+ M docs/HANDOFFS/ACTIVE_HANDOFF.md
+ M tests/test_explore_rubros_ux02.py
+?? app/static/css/explore-motion.css
+?? app/static/css/featured-bands.css
+?? app/static/images/explorar/carrusel/acabado-parquet.webp
+?? app/static/images/explorar/carrusel/automatizacion-industrial.webp
+?? app/static/images/explorar/carrusel/construccion-pergolas.webp
+?? app/static/images/explorar/carrusel/decoracion-pvc.webp
+?? app/static/images/explorar/carrusel/estuco-veneciano.webp
+?? app/static/images/explorar/carrusel/instalacion-solar.webp
+?? app/static/images/explorar/carrusel/instalacion-ventanas.webp
+?? app/static/images/explorar/carrusel/limpieza-tanques.webp
+?? app/static/images/explorar/carrusel/pintura-altura.webp
+?? app/static/images/explorar/carrusel/reparacion-electrodomesticos.webp
+?? app/static/images/explorar/carrusel/soldadura-estructuras.webp
+?? app/static/images/explorar/carrusel/soldadura-galpones.webp
+?? app/static/js/explore-motion.js
+?? app/static/js/featured-bands.js
+?? tests/js/explore_motion.test.js
+?? tests/js/featured_bands.test.js
+?? tests/test_explore_motion_ux05a.py
+```
+
+Documentacion actualizada: BACKLOG y esta posta, preservando historial.
+Sin staging, commit, push, PR ni merge. HEAD/rama conservados. No hubo merge porque
+el producto debe revisar el nuevo diseno y luego Testing debe validar el paquete.
+Estado remoto no actualizado ni nuevo push; esta version existe solo localmente.
+
+## Entorno y siguiente paso exacto
+Se reconstruyo y recreo SOLO web del Compose descartable:
+`docker compose -f docker-compose.stabilization.yml build web`
+`docker compose -f docker-compose.stabilization.yml up -d --no-deps web`
+Compose permanece encendido en http://127.0.0.1:5050/ y /explorar para revision.
+No se accedio a trax_db ni se altero trax-postgres ni recursos ajenos.
+No seed, migracion ni reinicio de postgres.
+
+Retomar: comprobar rama/SHA/origin/staging y estos 24 paths; revisar capturas y
+ambas paginas en 5050. Obtener nueva aprobacion visual, luego paquete de Testing
+independiente con suite completa y las limitaciones arriba. No integrar ni hacer
+staging/commit/push/merge, ni reabrir la seleccion de imagenes aprobada, sin nueva
+instruccion. No restore/reset/clean ni tocar recursos persistentes.
+
+---
+
+## Historial anterior preservado (diseno de bandas en Explorar supersedido)
+
+# UX-05A: doble carrusel decorativo en Explorar rubros
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-27T12:48:26-03:00
+Dispositivo/origen: laptop, Codex Desktop Windows.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `85a7f22c50e07fcc37e2f6bacce866d920736c12`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck limpio, staging vacio. git ls-remote confirmo la rama remota en el mismo
+SHA. El registro anterior de 263a158 queda preservado como historia.
+
+## Decision de producto y alcance
+El responsable autorizo expresamente las doce imagenes actuales, las actividades
+repetidas, el diptico, el cambio de actividad de 06 y textos incidentales de 07/11.
+No regenerar/reemplazar originales. Esta decision revoca el bloqueo de la auditoria
+anterior; no es aprobacion visual de la implementacion terminada.
+05 actual es una escena solar unica. 06 representa tablero industrial y conserva
+el filename solicitado reparacion-electrodomesticos.webp por el mapeo aprobado;
+no se usa ese nombre como texto, alt, taxonomia o informacion funcional.
+
+Solo cabecera de /explorar: dos filas decorativas de seis originales y una copia
+por fila. Sin cambios de rutas, permisos, backend, catalogo, busqueda o veinte
+cards. JS diferido y local solamente habilita movimiento y pausa. CSS nuevo
+separado para no afectar los contratos/layout de UX-02.
+
+## Assets y procesamiento reproducible
+Originales exclusivos: Downloads/MANDOBRA_EXPLORAR_CARRUSEL_ORIGINALES, exactamente
+01.png-12.png; PNG RGB 1448x1086 decodificados, sin duplicados SHA. pHash minimo
+20/64, sin duplicados perceptuales evidentes. Textos/composiciones aceptados por
+producto; ningun archivo corrupto ni marca de agua dominante observada.
+Herramienta: Pillow 12.3.0, libwebp 1.6.0.
+Para cada PNG: crop((4, y, 1444, y+810)), rectangulo exacto 1440x810 (16:9);
+resize((960,540), LANCZOS); pegar en Image.new('RGB',(960,540)); guardar WEBP
+quality=88, method=6. No deformacion, no alfa ni animacion. Imagen RGB nueva evita
+propagar EXIF/XMP/ICC/C2PA. Los doce recortes fueron inspeccionados individualmente.
+Peso total 1021870 bytes, menor que 1,3 MB; todos menores que 130000 bytes.
+No se fuerza peso minimo: PVC/estuco comprimen por debajo del objetivo orientativo.
+
+| Original | Derivado en app/static/images/explorar/carrusel/ | y del recorte | Bytes |
+| --- | --- | ---: | ---: |
+| 01.png | pintura-altura.webp | 40 | 87890 |
+| 02.png | limpieza-tanques.webp | 35 | 95752 |
+| 03.png | acabado-parquet.webp | 0 | 93328 |
+| 04.png | instalacion-ventanas.webp | 90 | 102210 |
+| 05.png | instalacion-solar.webp | 0 | 78428 |
+| 06.png | reparacion-electrodomesticos.webp | 90 | 75582 |
+| 07.png | automatizacion-industrial.webp | 45 | 99508 |
+| 08.png | soldadura-estructuras.webp | 90 | 82180 |
+| 09.png | soldadura-galpones.webp | 160 | 97918 |
+| 10.png | construccion-pergolas.webp | 100 | 82398 |
+| 11.png | decoracion-pvc.webp | 55 | 58996 |
+| 12.png | estuco-veneciano.webp | 80 | 67680 |
+
+SHA-256 de originales comprobados nuevamente al cierre, todos intactos:
+```
+01.png 5b56b8be345493013c13ec635467c5b698ae66f7760a26bfd63736a60111a6dc
+02.png c39000f1c80bed1947cbd24065b699c1b52dc3df7abc36bca3fa93f5e9a75a72
+03.png fff4beae4300b52e02d2d11a2271127238c6530eeca6729ff0d98975d88ab929
+04.png 6adf8c27a15667b3a68d26585f4b057968b85fb272777fb87a3701f4ef559ebb
+05.png c7be439af16cc02f6c586fe4f6ffaa8fce6c6f7d36f79fa6265e0dbe9106be67
+06.png fa9ac473941737cb5f1de3512db72a010c9fc2d7243553e664b50295239a1f3f
+07.png 203a5fe96d15d09a89b6f1bb06077ddea03e6c183a97bf46f2bc67d3a06a09b8
+08.png 97b7d3128c9a8b5d893589ae5bdaf69bb2f0e1396eede467ff9570c9bf7d528c
+09.png ac9ffc4a29063d7571447f740894ca1ae61b6c3596b7f5566bb78a4db000269b
+10.png 409cccee5a8ef40a61a881e6a2b55ee2d0670ef2d2986be3094a6fe321f48117
+11.png df46af7387ec4ef420fffdd8e5cacc52d10f7557be2b8f634034760e73453220
+12.png 2f42882f584b0d18c8c4860f7194379e796483590b09c1af74824396e8ed156d
+```
+
+## Distribucion y decisiones de UX
+Superior, izquierda: 01 pintura-altura, 11 decoracion-pvc, 07 automatizacion-industrial,
+10 construccion-pergolas, 03 acabado-parquet, 08 soldadura-estructuras.
+Inferior, derecha: 09 soldadura-galpones, 12 estuco-veneciano, 02 limpieza-tanques,
+04 instalacion-ventanas, 05 instalacion-solar, 06 reparacion-electrodomesticos.
+Soldaduras separadas; alternancia de interiores, exteriores y acabados calidos.
+
+60 s lineales, transform translateX(-50%), fila inferior reverse. Dos grupos
+iguales (1512px escritorio, 1032px movil), con padding final igual al gap de 12px:
+la copia ocupa exactamente la posicion del original al cerrar el periodo.
+Cada grupo mide al menos 100vw, sin huecos incluso en escritorios mas anchos.
+Ancho de foto 240/160px, alto 135/90px; object-fit cover. Los encuadres individuales
+estan incorporados en cada derivado. Resize conserva la animacion y la preferencia
+de pausa; cambia geometria responsive sin reinicializar el controlador.
+
+Franja visual dentro de la cabecera, por encima del texto, capa azul .18 y
+fundidos laterales/inferior. Zona de titulo y buscador sobre acero-950 opaco,
+para no depender del brillo de cada foto. Capas aisladas y contenido recortado.
+Control iconico unico 44x44, foco visible, aria-pressed y nombre accesible dinamico,
+fuera de aria-hidden. Fotos alt vacio, draggable false, sin links ni foco.
+Sin JS: ninguna animacion habilitada y boton hidden. Reduced motion: estatico,
+control oculto y preferencia de pausa del usuario conservada al cambiar el sistema.
+Print: animation none. Sin timers, librerias, CDN ni dependencias nuevas.
+Eager + fetchpriority low porque ambas filas aparecen arriba del fold y las
+fotos siguientes entran en movimiento; decoding async y dimensiones reservadas.
+Duplicados DOM usan las mismas URLs; no hay duplicados fisicos de archivos.
+
+## Validacion ejecutada
+- 77 unittest PASS, cero fallos/skips, 5,798 s: UX-05A (4), UX-02,
+  navbar drawer/markets, identidad, DS V2, hero home y autenticacion.
+  docker run --rm --network none, SQLite en memoria, sin volumenes.
+- 24 Node PASS: seis UX-05A, dieciseis drawer y archivos FAQ/hero.
+- Primera corrida Python: dos contratos antiguos fallaron por prohibir scripts
+  y absolute/nth-child en toda la pagina. CSS decorativo separado, prueba de
+  busqueda acotada a su formulario GET y ausencia de fetch; reejecucion verde.
+  El log ERROR de UX-02 es el RuntimeError deliberado del test de error de catalogo.
+  Warnings Query.get/datetime.utcnow preexistentes, sin errores de ejecucion final.
+- Assets: doce WebP unicos decodificables 960x540 RGB, presupuesto y ausencia de
+  metadatos verificados; 24 respuestas GET/HEAD 200 con image/webp.
+- Chrome real: 14 combinaciones (1440,1280,1024,768,720,390,320 x claro/oscuro).
+  720 es reflow equivalente de 1440 al 200%, no zoom nativo. Cero overflow
+  horizontal; titulo/formulario/control dentro de cabecera; boton 44x44;
+  veinte cards preservadas y 24 instancias decorativas cargadas correctamente.
+- Pausa/reanudacion por teclado real, nombre/estado actualizado, pausa estable
+  entre observaciones; preferencia preservada durante resize. Direcciones
+  opuestas, duracion computada 60s y grupos de identico ancho comprobados.
+- Contraste calculado con colores computados: titulo 18,72:1; descripcion
+  15,90:1 sobre rgb(11,18,32). Labels blancos sobre superficie aun mas oscura.
+- Logs web en carga 2026-09-27 15:33:53 UTC: doce solicitudes de carrusel,
+  una por asset, todas 304 (cache); no 404/500 de fotografias.
+- Consola inspeccionada: sin errores de app; dos errores de una extension
+  chrome-extension://.../content.js, ajenos a recursos de la plataforma.
+- Node --check, compileall, UTF-8, enlaces relativos y diff --check al cierre.
+
+## Limites y pendientes de revision independiente
+PENDIENTE: aprobacion visual del usuario, suite completa (no ejecutada por alcance),
+retest independiente, lector de pantalla y otros motores. Fallback sin JS,
+reduced-motion y print cubiertos por contratos/CSS y Node; no emulados visualmente
+con esta herramienta. No afirmar aprobacion integral de accesibilidad.
+CLS numerico PENDIENTE: el evaluador del navegador no expone Performance API.
+No se observaron desplazamientos por carga y las fotos tienen dimensiones/altura
+reservadas en una capa absoluta; esto no equivale a una medicion CLS=0.
+El cierre exacto del ciclo esta sustentado por geometria repetida, no por una
+captura instrumental frame a frame. Testing debe revisar continuidad prolongada.
+No hubo fallos de producto que exigieran un runbook nuevo.
+
+## Archivos y continuidad
+Modificados: app/templates/explorar_rubros.html, tests/test_explore_rubros_ux02.py,
+docs/BACKLOG.md y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Nuevos: app/static/css/explore-motion.css, app/static/js/explore-motion.js,
+tests/test_explore_motion_ux05a.py, tests/js/explore_motion.test.js y los doce
+WebP enumerados arriba. explore-rubros-v1.css queda sin diferencias contra HEAD.
+Sin migraciones, seed ni cambios a bases. Solo build web y up -d --no-deps web
+con docker-compose.stabilization.yml; web y postgres descartable disponibles.
+No se accedio a trax_db ni se modifico trax-postgres o volumenes ajenos.
+Revision: http://127.0.0.1:5050/explorar.
+Evidencia externa: carpeta .codex/visualizations/2026/09/21/
+01a0c628-6518-73a3-b7ca-d4ba209ac043, archivos ux05a-matrix.json,
+ux05a-desktop-dark.png y ux05a-mobile-dark.png.
+
+Estado final: implementacion local sin staging/commit/push/merge/PR. No hubo merge
+porque esta expresamente prohibido y falta aprobacion visual. Rama y HEAD intactos;
+20 paths locales pendientes. Retomar con git status --short -uall, git branch
+--show-current, git rev-parse HEAD y git diff --cached --name-only; confirmar
+85a7f22 y revisar 5050/explorar en ambos temas antes de autorizar integracion.
+No reset/clean ni modificar originales; no ejecutar suite completa hasta Testing.
+
+---
+
+# UX-04A P2: correccion focal de objetivos tactiles
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T23:22:32-03:00
+Dispositivo/origen: Codex Desktop, checkout local Windows.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `263a158dfec83d280e3686edd5ca34271992b3fc`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck y cierre: exactamente los mismos once paths UX-04A locales (siete
+modificados y cuatro nuevos), staging vacio. Trabajo anterior preservado.
+
+## Hallazgo, causa y correccion
+P2 confirmado: Inicio, Explorar rubros, Precios de mercado y Planes quedaban
+debajo de 44 px. La regla `.site-header--visitor .main-nav--visitor > a` de
+visitor-navbar-v1.css imponia min-height 36 px (token control-height-sm), por
+encima del selector generico con :is de navbar-drawer.css. El test textual
+anterior no verificaba esa competencia de especificidad.
+
+Se agrega exclusivamente `#navigation-drawer :is(a[href], button, summary)`:
+min-width/min-height 44px, border-box y flex-shrink 0. Su ID supera los selectores
+de clases existentes; sin !important, sin cambiar tokens, padding, line-height,
+tipografia, temas ni JS. No alcanza la fila horizontal ni el clon de medicion.
+Incluye enlaces directos, acordeones, opciones, cierre, tema, notificaciones,
+autenticacion y cuenta. No se modificaron rutas ni comportamiento aprobado.
+
+Archivos modificados en ESTA correccion (solo tres de los once preexistentes):
+- [navbar-drawer.css](../../app/static/css/navbar-drawer.css).
+- [test_navbar_drawer_ux04a.py](../../tests/test_navbar_drawer_ux04a.py).
+- [ACTIVE_HANDOFF.md](ACTIVE_HANDOFF.md), esta entrada; historial preservado debajo.
+
+## Evidencia ejecutada
+Antes, Chrome real a 320 px: los cuatro enlaces medidos en esta sesion dieron
+263,2 x 42,4 px con min-height computado 36px, sin acordeones abiertos. El hallazgo
+de Testing reportaba aproximadamente 248 x 42,4; el ancho varia con el scrollbar
+interno. Despues, con TODOS los acordeones abiertos: cuatro enlaces 248 x 44 px
+a 320; min-height computado 44px. Son getBoundingClientRect reales, no valores
+simulados en el DOM double.
+
+Matriz real: 320, 390 y 768 px x claro/oscuro x visitante/CLIENTE/PROFESIONAL,
+18 combinaciones, 312 controles medidos (13/21/18 por rol y combinacion).
+Todos >=44 x 44 px; minimo observado 44 x 44. Cero overflow horizontal de pagina
+y cuerpo del drawer, cero intersecciones entre controles del mismo contenedor.
+Scroll interno overflow-y:auto comprobado con contenido mayor que clientHeight;
+se midieron tambien opciones fuera del area visible del scroll. CLIENTE incluye
+notificaciones existentes; PROFESIONAL incluye estado vacio y Panel profesional.
+Se inspeccionaron capturas, alineacion y foco visible; apertura, cierre, Escape
+y retorno al disparador, reapertura y plegado/desplegado siguen operativos.
+Los cuatro enlaces horizontales a 1440, tema oscuro visitante, conservaron
+exactamente x/y/ancho/alto antes y despues (altura horizontal 36px).
+El tema efectivo se verifico por clase theme-dark y control visible, no por el
+atributo data-theme heredado que no refleja el estado efectivo de esta pagina.
+
+Regresion estructural reforzada: verifica ID del dialog, selector aplicable,
+minimos, border-box, no encogimiento, orden real de CSS en HTML renderizado,
+ausencia de sizing !important/IDs competidores e inline sizing para tres roles,
+y presencia de los cuatro destinos. Cubre las hojas de ambos temas; el layout
+a 320 en ambos temas se complementa con la matriz de navegador anterior.
+No se agrego infraestructura ni dependencias: el runner Node existente usa DOM
+double y no tiene motor de layout. Control negativo en contenedor, sustituyendo
+solo la lectura del CSS en memoria: retirar la regla nueva produce exactamente
+tres fallos esperados (uno por rol), cero errores; ningun archivo fue alterado.
+
+- Python: 63 tests PASS, cero errores/fallos, 7,366 s. Modulos:
+  tests.test_navbar_drawer_ux04a, tests.test_navbar_markets_ux03a,
+  tests.test_platform_brand, tests.test_home_hero_carousel,
+  tests.test_auth_ux_redesign_v1, tests.test_design_system_v2,
+  tests.test_corporate_footer. Contenedor --rm --network none, SQLite en memoria,
+  sin volumenes. Warnings existentes Query.get/datetime.utcnow, no errores.
+- Node --test: 18 PASS (16 drawer y archivos FAQ/hero), cero fallos/skips.
+- Node --check main.js y navbar-drawer.js; compileall app y tres tests Python
+  UX-04A/navbar/identidad; UTF-8 de once paths, enlaces relativos de esta entrada
+  y git diff --check: PASS. Avisos Git LF/CRLF sin errores de whitespace.
+- No ejecutados: suite completa por restriccion, gates PostgreSQL, migraciones,
+  seed ni retest independiente. NO constituye aprobacion de Testing.
+
+Evidencia fuera del repo: carpeta
+`C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/`:
+`ux04a-p2-matrix.json`, `ux04a-p2-320-light.png`, `ux04a-p2-320-dark.png`.
+
+## Continuidad y pendientes
+Solo build y up -d --no-deps web de docker-compose.stabilization.yml; Compose
+descartable disponible en http://127.0.0.1:5050/ para revision. Sin acceso a
+trax_db ni alteracion de trax-postgres. Sin migraciones ni cambios de backend.
+Sesion demo cerrada y viewport temporal restaurado al finalizar.
+Sin staging, commit, push, PR ni merge: expresamente prohibidos en esta tarea.
+HEAD y rama conservados; cambios locales sin publicar. Los otros ocho paths
+UX-04A no fueron editados en esta correccion.
+
+Pendiente: retest independiente P2 por Testing, incluyendo matriz de roles/temas
+y controles expandidos. No cerrar el hallazgo como aprobado. Riesgo restante:
+el guard estructural no reemplaza un motor CSS; futuros selectores con ID o
+!important necesitan revision y medicion real. Limitaciones historicas de QA
+de UX-04A siguen registradas debajo, sin atribuirles aprobacion nueva.
+Retomar: git status --short; git branch --show-current; git log -1 --oneline;
+git diff --cached --name-only. Confirmar SHA y once paths; abrir 5050 y repetir
+getBoundingClientRect con acordeones/cuenta abiertos. No ejecutar suite completa
+salvo decision explicita de Testing; no reset/clean ni integrar cambios sin
+autorizacion. Estado final: correccion implementada, validada focalmente,
+PENDIENTE DE RETEST independiente.
+
+---
+
+# UX-04A: navbar responsive con sidebar vertical (historico)
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T21:03:18-03:00
+Dispositivo/origen: laptop DESKTOP-5K3IE76, chassis 10 confirmado por CIM; Codex Desktop.
+Rama: `feature/ux-ui-foundation`.
+HEAD/base: `263a158dfec83d280e3686edd5ca34271992b3fc` (`docs: record global Mandobra identity`).
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck: working tree limpio, staging vacio; `git ls-remote` confirmo exactamente
+el mismo SHA remoto. Las restricciones iniciales de red/CIM se resolvieron con
+lectura autorizada. La identidad anterior esta guardada en HEAD; los registros
+historicos de ffbb967 ya no describen el estado pendiente de esta sesion.
+
+## Objetivo, implementacion y decisiones
+Conservar toda la fila horizontal mientras quepa y reubicar el mismo contenido
+en un drawer vertical derecho al reducirse el espacio. Implementacion local
+completa; aprobacion visual y ciertas verificaciones manuales PENDIENTES.
+
+Inventario preservado: Inicio, Explorar rubros, Precios de mercado, Operaciones
+(Contratacion, Presupuestos, Emergencias, Propuestas), Ecosistema (Academy/Tools
+como proximamente) y Planes. Tema e Iniciar para visitante; tema, notificaciones,
+Mi cuenta y logout POST con CSRF para cuentas. Panel profesional solo en las
+acciones existentes de PROFESIONAL; Admin existente preservado. Sin agregar
+Mi panel al navbar, rutas, permisos o cambios a dashboards.
+
+Antes: cortes 820/1080/1180 px, reduccion de tipografia a 13 px y ocultamiento de
+etiqueta de tema; cuentas pasaban al menu bajo 1180. A 1280 la suma de etiquetas
+principales medida fue aproximadamente 493 px, con controles de visitante de
+214 px y cuenta de 342 px. UX-04A usa la fila sin compresion a 14 px, gaps DS,
+logo aprobado 200x56 y resumen de cuenta con su limite de texto existente.
+Se retiraron los cortes de layout anteriores de visitor-navbar-v1.css.
+
+Breakpoint resultante medido, no hardcodeado: minimo util 1141 px claro / 1146 px
+oscuro para visitante; 1301 / 1306 px para ambos roles demo autenticados. Incluye
+padding horizontal, ambos gaps, wordmark y todos los controles. Se compara
+contra el ancho real del header; un scrollbar puede requerir mayor viewport.
+Los bordes inmediatamente inferiores/superiores quedaron verificados con anchos
+reales fraccionarios por la escala de Windows (por ejemplo 1305,6 / 1307,2).
+Medicion sincrona con clon temporal inert/aria-hidden, sin IDs/names, retirado
+antes de pintar; solo existe un nav accesible. ResizeObserver, resize agrupado
+con requestAnimationFrame y eventos de fuentes/texto recalculan el minimo.
+
+Dialog nativo en top layer: backdrop, fondo inert, Escape/cierre/enlace/backdrop,
+foco inicial y circular, retorno al disparador. Al volver a horizontal cierra,
+libera scroll y devuelve foco a un elemento visible. Compensacion del scrollbar
+sin desplazar el contenido (logo x=20 antes/despues comprobado). Drawer maximo
+24rem, margen lateral de 1rem a 320 px, 100dvh, scroll interno, cierre fijo en su
+fila y cuenta al final. Acordeones con botones reales, aria-expanded/controls y
+paneles hidden; escritorio conserva details/summary. Tokens DS V2, targets 44 px,
+foco visible, movimiento breve y desactivado por prefers-reduced-motion.
+Sin JS o sin showModal, se conserva el HTML inicial con links que envuelven y
+details nativos; no se oculta la navegacion esperando una inicializacion.
+
+## Archivos afectados
+- [app/templates/base.html](../../app/templates/base.html): contenedor unico, dialog y recursos locales.
+- [app/static/main.js](../../app/static/main.js): retirar toggle legacy; handlers ajenos al header preservados.
+- [app/static/css/visitor-navbar-v1.css](../../app/static/css/visitor-navbar-v1.css): retirar cortes legacy sustituidos.
+- [app/static/css/navbar-drawer.css](../../app/static/css/navbar-drawer.css): nuevo layout, fallback y drawer aislado.
+- [app/static/js/navbar-drawer.js](../../app/static/js/navbar-drawer.js): nuevo controlador idempotente.
+- [tests/test_navbar_drawer_ux04a.py](../../tests/test_navbar_drawer_ux04a.py): seis focales de render/contratos.
+- [tests/js/navbar_drawer.test.js](../../tests/js/navbar_drawer.test.js): 16 pruebas del controlador con DOM double, sin dependencias.
+- [tests/test_navbar_markets_ux03a.py](../../tests/test_navbar_markets_ux03a.py) y [tests/test_platform_brand.py](../../tests/test_platform_brand.py): adaptar contratos responsive, conservando identidad/orden/rutas.
+- [docs/BACKLOG.md](../BACKLOG.md) y este handoff: estado, evidencia y pendientes, sin borrar historia.
+
+## Validaciones ejecutadas
+- 62 unittest PASS, 0 fallos/errores, ejecucion final 6,698 s: tests.test_navbar_drawer_ux04a,
+  tests.test_navbar_markets_ux03a, tests.test_platform_brand, tests.test_home_hero_carousel,
+  tests.test_auth_ux_redesign_v1, tests.test_design_system_v2 y tests.test_corporate_footer.
+- `docker run --rm --network none`, DATABASE_URL=sqlite:///:memory:, sin volumenes.
+  La primera ejecucion encontro dos errores del nuevo fixture porque el context
+  processor de notificaciones requiere tablas; corregido creando/desechando el
+  esquema solo en SQLite en memoria. Reejecucion completa focal en verde. No se
+  tocaron bases existentes. Advertencias historicas Query.get/datetime.utcnow.
+- Node --test: 18/18 PASS (16 casos drawer + archivos FAQ y hero). Apertura/cierre,
+  Escape/backdrop/enlace, foco circular/retorno, scroll restaurado, resize abierto,
+  umbral exacto y re-medicion, idempotencia, acordeones, ruta activa, desktop y
+  fallback sin showModal. DOM double no sustituye layout/inert nativo del navegador.
+- Node --check de main.js y navbar-drawer.js PASS; compileall app y tres tests
+  Python afectados PASS en contenedor descartable. UTF-8, enlaces relativos de
+  esta entrada/Backlog y git diff --check comprobados al cierre.
+- Chrome: matriz base de 54 combinaciones (tres perfiles, dos temas, nueve anchos)
+  mas observaciones adicionales de limites. 1440, 1280, encima/debajo de minimo,
+  1024, 768, 390, 320, 720 CSS px. Sin overflow ni superposiciones observadas.
+  720 representa reflow de una ventana de 1440 al 200 %, no zoom nativo medido.
+  Wordmarks y temas preservados. Drawer oscuro abierto a 320x640: 304 px de ancho,
+  16 px de margen y scroll interno. Home con drawer claro capturado a 1024x900.
+- Interacciones reales de teclado: abrir, acordeon Operaciones, Shift+Tab desde
+  cierre al ultimo control y Tab de vuelta, Escape, retorno de foco; backdrop y
+  enlace cierran. PROFESIONAL conserva Panel profesional dentro de cuenta.
+  Redimensionar abierto a 1440 restauro horizontal, scroll/padding y foco visible.
+- Consola: sin errores de aplicacion observados. Se registraron errores de una
+  extension Chrome ajena (chrome-extension://.../content.js). No confundirlos
+  con recursos externos incorporados por este cambio.
+
+## Limitaciones, troubleshooting y riesgos
+No ejecutados: suite completa (prohibida por alcance), gates PostgreSQL, migraciones,
+seed, retest independiente, otros motores y prueba con lector de pantalla.
+Fallback sin JS y reduced-motion verificados mediante contratos/test, no mediante
+emulacion visual real. La politica de URL de la herramienta bloqueo file:// del
+fixture HTML real sin scripts; no se uso otro servidor/protocolo para eludirla.
+Completar ambos chequeos manuales antes de declarar QA exhaustivo aprobado.
+La herramienta de navegador tuvo capturas/viewport obsoletos y timeout de una
+matriz larga; se recupero con pestanas nuevas y tandas cortas, contrastando cada
+ancho real con el modo. No se atribuye ese fallo a la app sin evidencia.
+Dialog modal requiere navegador moderno; sin soporte queda fallback nativo.
+El detalle fino del logo raster conserva la limitacion ya aprobada en identidad.
+No hubo incidente de backend ni nueva causa raiz que requiriera runbook tecnico.
+
+## Docker, Git y continuidad
+Solo build web y up -d --no-deps web en docker-compose.stabilization.yml. Web y
+PostgreSQL descartable existentes se dejan encendidos para revision en
+http://127.0.0.1:5050/. Sin seed/migraciones, sin tocar trax_db o volumenes.
+Once paths locales (siete modificados y cuatro nuevos), sin staging. HEAD sin
+cambios. Sin commit, push, PR, merge ni deploy; remoto verificado en la base al
+inicio. No hubo merge porque esta tarea lo prohibe y requiere aprobacion visual.
+Estado final: implementacion y focales completadas; QA visual limitado segun lo
+anterior y aprobacion humana pendientes. No afirmar aprobacion global.
+
+Retomar: ejecutar git status, git branch --show-current, git log -1 --oneline;
+confirmar HEAD 263a158 y estos once paths; abrir home en ambos temas y mover el
+ancho sobre el minimo medido. Revisar sin JS/reduced-motion manualmente. Revisar
+diff y autorizar separadamente staging/commit/push o integracion posterior a develop.
+No reset/clean, no perder cambios locales, no modificar dashboards, rutas,
+permisos, logos originales, bases o migraciones. Mantener Compose encendido.
+Evidencia fuera del repo: `C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/ux04a-matrix.json`
+y `ux04a-sidebar-home.png`. Sesiones demo cerradas; viewport restaurado.
+
+---
+
+# Identidad MANDOBRA aprobada: navbar compartido de toda la plataforma (historico)
+
+Estado: COMPLETED
+Timestamp: 2026-09-26T14:13:29-03:00
+Origen: laptop DESKTOP-5K3IE76, Codex Desktop.
+Rama: `feature/ux-ui-foundation`; HEAD: `ffbb967275bc80460f88df0594f8f5e710f8b526`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Autorizacion: el usuario aprobo la colocacion del logo para toda la plataforma tras revisar el canario. Este registro sustituye su restriccion al home y su aprobacion pendiente; el registro anterior se conserva como historia.
+
+## Resultado y alcance
+Los dos PNG normalizados aprobados son ahora la identidad por defecto del navbar compartido en `base.html`, tanto para visitantes como para usuarios autenticados. Sin duplicar navbar, nuevas dependencias, JS, rutas, cambios de permisos ni autenticacion. Footer, favicon, manifest, assets legacy y originales del workbench preservados. Sin migraciones.
+Se retiro el opt-in canario y su CSS del home; ambos archivos vuelven al contenido de HEAD. El CSS compartido mantiene contain, dimensiones reservadas 1696x720, enlace accesible MANDOBRA inicio e imagenes decorativas. Claro/oscuro seleccionados por las clases de tema existentes. Hashes de ambos PNG iguales a los registrados en el canario.
+Cajas: 200x56 escritorio, 160x56 entre 821 y 1080 px, 144-180x44 movil. En cuentas autenticadas se usa el menu colapsable existente hasta 1180 px para evitar superposicion con controles de cuenta. Corregido el contraste del boton de menu oscuro con tokens existentes; sus dos trazos quedan visibles.
+
+## Archivos y estado Git
+Cambios efectivos respecto de HEAD: `app/templates/base.html`, `app/static/css/visitor-navbar-v1.css`, este handoff y tres nuevos archivos: ambos wordmarks y [tests/test_platform_brand.py](../../tests/test_platform_brand.py). El test canario sin commit fue sustituido por el test global.
+`git status --short` tambien enumera `app/templates/home.html` y `app/static/css/home-v1.css`, pero `git diff` confirma cero diferencias de contenido en ambos (working copy CRLF / index LF). Total observado: ocho paths, seis con cambios efectivos. Staging vacio. Trabajo previo del canario incorporado, sin cambios ajenos detectados.
+Sin commit, push, PR, merge ni despliegue de produccion. HEAD no cambio. No hubo merge porque la aprobacion de colocacion no autoriza operaciones de integracion Git. Los cambios solo estan locales; el push de esta implementacion esta PENDIENTE.
+
+## Validacion ejecutada
+- 83/83 unittest PASS en la ejecucion final (7,843 s), incluidos 11 tests de identidad global. Modulos: tests.test_platform_brand, tests.test_home_hero_carousel, tests.test_navbar_markets_ux03a, tests.test_design_system_v2, tests.test_corporate_footer, tests.test_auth_ux_redesign_v1, tests.test_markets_ux03 y tests.test_explore_rubros_ux02.
+- Contenedor descartable `docker run --rm --network none`, DATABASE_URL=sqlite:///:memory:, sin volumenes ni acceso a trax_db. Verificados GET/HEAD PNG, hashes, RGBA, alfa identico, seis paginas publicas, home y dashboards CLIENTE/PROFESIONAL/SUPER_ADMIN y notificaciones, accesibilidad del enlace y contrato de temas.
+- `compileall -q app tests/test_platform_brand.py`: PASS. `git diff --check`: PASS. Advertencias heredadas SQLAlchemy Query.get y datetime.utcnow; log ERROR esperado del escenario negativo de Explorar, sin fallos de pruebas.
+- Chrome: dashboard de cliente demo a 1440, 1024, 768, 390 y 320 CSS px en ambos temas. Diez casos sin overflow horizontal, recorte ni halos visibles; PNG correcto cargado y contain. Altura 84,8 px escritorio / 76 px movil. Menu de cuenta abierto a 1024 sin superposicion; dos trazos visibles, contraste oscuro corregido.
+- Pagina publica /mercados revisada a 1024 claro y 1440 oscuro con logo nuevo y navegacion sin superposicion. Sesion demo cerrada y viewport temporal restablecido al terminar. Captura local fuera del repositorio: `C:/Users/Cristhian/.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/mandobra-identidad-global.png`.
+- No ejecutados: suite completa, gates PostgreSQL, nueva ejecucion de tests JS (sin cambios JS), migraciones ni seed. Revision visual autenticada acotada a CLIENTE; PROFESIONAL/SUPER_ADMIN cubiertos por pruebas HTTP, no por navegador. No equivale a QA exhaustivo de toda ruta.
+
+## Entorno, riesgos y continuidad
+Reconstruido y recreado solo web con docker-compose.stabilization.yml. Web y PostgreSQL descartable existentes healthy al cierre, disponibles en http://127.0.0.1:5050/ y /mercados. Sin tocar volumenes ni trax_db. No hubo errores tecnicos bloqueantes; persiste la limitacion raster de detalle fino del maletin en tamanos pequenos. No se vectorizo ni transformo el master aprobado.
+Documentacion actualizada: este handoff. Sin nuevo troubleshooting: ajustes CSS localizados, sin incidente de plataforma.
+Proximo paso recomendado: revision del diff y autorizacion explicita para commit/push y posterior integracion a develop. Para retomar: ejecutar git status, git branch --show-current y git log -1 --oneline; verificar HEAD ffbb967, staging vacio y alcance aqui registrado; revisar el navbar en ambos temas. No reset/clean, no borrar originales o assets legacy, no migrar ni operar sobre trax_db. No hay implementacion parcial pendiente; quedan integracion Git y eventual QA independiente.
+
+---
+
+# Canario de identidad MANDOBRA: solo navbar del home publico (historico, sustituido)
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-26T14:01:21-03:00
+Origen: laptop DESKTOP-5K3IE76 (chassis 10), Codex Desktop.
+Rama: `feature/ux-ui-foundation`.
+HEAD: `ffbb967275bc80460f88df0594f8f5e710f8b526`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Precheck: working tree limpio, staging vacio; `git ls-remote` confirmo la rama remota en el mismo SHA.
+Los registros anteriores describen sesiones previas: sus cambios UX-03 ya estan guardados en HEAD; no representan cambios pendientes de esta sesion.
+
+## Objetivo y resultado
+Integrar los dos wordmarks normalizados exclusivamente en el navbar del home publico para aprobacion visual. Implementacion y verificacion focal COMPLETADAS; aprobacion visual del usuario y ampliacion global PENDIENTES.
+`home.html` activa `home_brand_canary = true`; `base.html` usa ese contexto con default false. No se compara URL para seleccionar la marca, no se duplico navbar ni se cambiaron rutas, permisos o autenticacion. Home autenticado, dashboards y demas templates conservan el default legacy. Footer, favicon, manifest y assets anteriores intactos.
+
+## Archivos y hashes
+Copiados sin transformar desde `C:/Users/Cristhian/Downloads/MANDOBRA_BRAND_WORKBENCH/`:
+- [Wordmark claro](../../app/static/img/branding/mandobra/mandobra-wordmark-light.png): SHA-256 `4d5e5b8738979d373ab5021f0ba89f15bd98d2ccd831fff47097025a6dfacb9e`.
+- [Wordmark oscuro](../../app/static/img/branding/mandobra/mandobra-wordmark-dark.png): SHA-256 `ca6933542a281720f24d5fc3e9c1be2a4c6f9ce21458a14da81f601694cf2f0f`.
+Ambos PNG RGBA 1696x720; origen y copia identicos; cero diferencias de alfa, IoU 100%. Texto MANDOBRA y maletin presentes; sin eslogan ni Casa. Masters del workbench intactos.
+Codigo modificado: `app/templates/base.html`, `app/templates/home.html`, `app/static/css/home-v1.css`.
+Nuevo en ese momento: `tests/test_home_brand_canary.py` (sustituido posteriormente por [tests/test_platform_brand.py](../../tests/test_platform_brand.py)).
+Documentacion actualizada: exclusivamente este handoff.
+Total: siete paths locales (cuatro modificados y tres nuevos), sin staging.
+
+## Comportamiento y revision visual
+CSS acotado a `.brand--home-canary` en home-v1.css; contain, dimensiones intrinsecas, sin recorte, fondo ni transformacion. Dos imagenes decorativas alt vacio/aria-hidden y enlace MANDOBRA inicio. El bootstrap de tema existente se ejecuta en head, antes del body; las clases theme-light/theme-dark seleccionan por CSS. No se incorporaron JS ni recursos externos.
+Caja 200x56 en escritorio; 160x56 entre 821 y 1080 px; 144-180x44 en movil. A 1024 px se redujo solo el espacio horizontal reservado: el dibujo sigue limitado por altura, sin reducirse. Esto evita el solapamiento heredado Planes/selector de tema en home; /mercados conserva el comportamiento anterior.
+Chrome: matriz de 1440, 1024, 768, 390 y 320 CSS px en ambos temas, diez casos revisados. Un solo navbar, PNG correcto y cargado, contain, sin overflow horizontal ni superposicion del wordmark con menu. Altura conservada: aproximadamente 84,8 px escritorio y 76 px movil. Cambiar tema conserva la caja, sin salto visible; persistencia al recargar verificada. Sin recorte ni halo visible. Wordmark viable hasta 320 px; no fue necesario fallback al simbolo compacto. Los detalles finos del maletin pierden nitidez al reducirse; aprobacion visual humana pendiente.
+Comparacion /mercados: conserva ambos wordmarks anteriores y simbolo compacto movil. /login tambien observado con marca anterior.
+Limitacion preexistente: menu hamburguesa movil en tema oscuro tiene lineas blancas sobre boton blanco; confirmado en /mercados a 320 px. No alterado por alcance. Solapamiento legacy a 1024 en /mercados tampoco modificado.
+El visor integrado tuvo inconsistencias de escala/captura; la matriz final se verifico en Chrome con innerWidth exacto. Consola Chrome: errores de una extension ajena a la aplicacion; sin errores de aplicacion observados. Recursos de marca locales; no confundir scripts inyectados por extensiones con recursos introducidos por este cambio.
+
+## Validaciones ejecutadas
+- Python unittest: 54/54 PASS (9 focales de identidad + 45 regresiones): tests.test_home_brand_canary, tests.test_home_hero_carousel, tests.test_navbar_markets_ux03a, tests.test_design_system_v2, tests.test_corporate_footer, tests.test_auth_ux_redesign_v1.
+- Ejecutadas en `docker run --rm --network none`, imagen mandobra_stabilization-app:local, DATABASE_URL=sqlite:///:memory:, sin volumenes. Sin acceso a trax_db ni a PostgreSQL para los tests.
+- Focales cubren recursos GET/HEAD 200 image/png, hashes, RGBA, dimensiones, alfa, accesibilidad, contain, contrato CSS de temas, opt-in unico, ausencia de texto/eslogan en marca, default base incluso en ruta / y aislamiento de seis paginas publicas mas home autenticado. Unico template opt-in confirma aislamiento de dashboards/operativas; no se navegaron exhaustivamente todas las rutas autenticadas.
+- Node: 2/2 archivos de regresion PASS, tests/js/home_hero_carousel.test.js y tests/js/home_faq.test.js.
+- compileall app y test focal: PASS en contenedor descartable. UTF-8, enlaces locales afectados, hashes de copias y git diff --check: verificados al cierre.
+- Advertencias historicas SQLAlchemy Query.get y datetime.utcnow; sin fallos. ResourceWarnings introducidos por respuestas de test se resolvieron cerrandolas; ejecucion final limpia de esas advertencias.
+- No ejecutados: suite completa, gates PostgreSQL, migraciones, seed, retest independiente. No se declara aprobacion global.
+
+## Docker y Git
+Solo `docker compose -f docker-compose.stabilization.yml build web` y `up -d --no-deps web`. PostgreSQL y volumenes descartables existentes preservados; no se ejecuto migrate ni seed. Web y PostgreSQL se dejan encendidos para aprobacion; salud comprobada al cierre.
+URLs: http://127.0.0.1:5050/ (canario) y http://127.0.0.1:5050/mercados (comparacion legacy).
+Sin commit, push, PR, merge ni deploy. Remoto sigue en ffbb967; los siete paths del canario solo existen localmente. NO hubo merge porque falta aprobacion visual y autorizacion de integracion.
+
+## Retomar y rollback
+1. Ejecutar git status, git branch --show-current y git log -1 --oneline; confirmar HEAD ffbb967 y exactamente los siete paths del canario.
+2. Abrir ambas URLs y revisar temas/escritorio/movil. Mantener el Compose encendido hasta aprobacion.
+3. Con aprobacion, preparar retest/integracion o ampliacion en un alcance nuevo; no hacer staging/commit/push/merge sin autorizacion explicita.
+Rollback funcional sencillo: retirar el opt-in de home.html devuelve ese navbar al bloque legacy. No eliminar assets anteriores ni masters. No tocar footer, favicon, autenticacion, DB o paginas fuera de alcance.
+Riesgos pendientes: decision visual sobre tamano/detalles raster y contraste del menu global preexistente. Ningun bloqueante tecnico del canario observado.
+
+---
+
+# Refinamiento UX-03: grilla 2×2 para demanda por rubro
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-25T23:43:16-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reorganizar exclusivamente las cuatro tarjetas de gráficos de
+`Demanda relativa por rubro` en dos filas de dos, con mayor presencia visual.
+
+La grilla presenta dos columnas desde 48 rem, por lo que escritorio y tablet
+muestran exactamente dos tarjetas por fila. Cada tarjeta aumenta su separación,
+padding y altura mínima para aprovechar el ancho disponible sin alterar los
+gráficos, rubros, textos, datos demostrativos ni accesibilidad. Por debajo de
+48 rem conserva una columna para evitar compresión en móvil.
+
+Inspección visual comprobada en 1440, 1024 y 768 CSS px: cuatro tarjetas en dos
+filas de dos, anchos y alturas alineados y sin overflow horizontal. En 390 y
+320 CSS px: cuatro filas de una tarjeta, sin recortes ni superposiciones. Tema
+claro y oscuro conservan contraste; la consola del navegador no presenta
+errores ni advertencias. La página queda abierta en
+`http://127.0.0.1:5050/mercados` y el Compose exclusivo
+`mandobra_stabilization` permanece encendido y saludable para revisión visual.
+
+Validación ejecutada: focales mercados/navbar 19/19; `compileall` y
+`git diff --check`, aprobados. La suite completa y PostgreSQL no se ejecutaron
+por alcance. Archivos afectados por este ajuste:
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+No hubo migraciones, cambios de backend, rutas, permisos, autenticación ni
+base de datos.
+
+Git conserva los once paths locales autorizados de UX-03, staging vacío y HEAD
+sin cambios. No hubo commit, push, PR, merge ni deploy porque resta la
+aprobación visual y el retest independiente. Próximo paso: revisar la nueva
+distribución 2×2 en la página abierta y, con aprobación expresa, preparar el
+paquete de Testing sin modificar el contenido de los gráficos.
+
+---
+
+# Refinamiento UX-03: gráficos de demanda por rubro
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-25T23:35:49-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reemplazar exclusivamente las barras de `Demanda relativa por rubro`
+por gráficos de línea demostrativos, preservando el resto de UX-03.
+
+Electricidad, Refrigeración, Plomería y Herrería conservan su identidad y ahora
+se presentan en cuatro tarjetas. Cada una contiene icono decorativo local, SVG
+semántico fluido, línea y puntos con el naranja corporativo, área tenue, seis
+períodos estáticos, etiqueta visible `Tendencia demostrativa`, cierre con flecha
+y texto explicativo. La sección declara que las series existen para mostrar la
+interfaz y no representan operaciones ni mediciones reales. No se atribuyeron
+fechas, fuentes o actividad real.
+
+Cada SVG tiene título y descripción accesibles específicos del rubro. Los seis
+valores también se exponen en una lista HTML visualmente oculta y el cierre se
+explica en texto, por lo que la lectura no depende del color o de interpretar la
+línea. Se eliminaron los cuatro elementos `progress`. No se incorporaron canvas,
+Chart.js, dependencias, CDN, APIs, rastreadores, animaciones ni JavaScript nuevo.
+
+La grilla usa cuatro columnas a partir de 64 rem, dos desde 48 rem y una en
+móvil. Las tarjetas mantienen ancho y altura alineados. Inspección visual en
+1440, 1024, 768, 390 y 320 CSS px: sin overflow, recortes o superposiciones;
+tema claro y oscuro aprobados localmente. En oscuro la línea conserva 3 px y el
+naranja corporativo `rgb(255, 138, 76)`. La estructura accesible expone cuatro
+gráficos, cuatro resúmenes y veinticuatro valores. Consola sin errores.
+
+Validación ejecutada: focales mercados/navbar 19/19; selección relacionada de
+autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 81/81. `compileall` y la sintaxis del
+JavaScript preexistente del carrusel: aprobados. La suite completa no se ejecutó
+por alcance y queda para Testing independiente.
+
+Archivos afectados por este refinamiento:
+`app/services/market_view_service.py`, `app/templates/mercados.html`,
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+`docs/BACKLOG.md` no requirió una nueva modificación. Sin migraciones, cambios
+de backend, base de datos, rutas, permisos o autenticación. El Compose exclusivo
+`mandobra_stabilization` queda encendido y saludable, con la página disponible
+en `http://127.0.0.1:5050/mercados` para aprobación visual.
+
+Git conserva los once paths locales autorizados de UX-03, staging vacío y HEAD
+sin cambios. No hubo commit, push, PR, merge ni deploy porque falta aprobación
+visual y retest independiente. Próximo paso: revisar la claridad de los cuatro
+gráficos en la página abierta; no sustituir las series demostrativas por datos
+reales sin la metodología y fuentes futuras ya registradas.
+
+---
+
+# Refinamiento visual UX-03: hero e importes desplegables
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T23:02:36-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: aplicar la revisión visual del usuario al hero y los rangos de
+`/mercados`, preservando navbar, tendencias y secciones inferiores de UX-03.
+
+Se retiraron el rótulo `Referencia pública de precios` y el cuadro `Datos
+demostrativos`. El hero conserva el tono verde con una capa más translúcida
+sobre cuatro pares de imágenes locales ya aprobadas. Cada escena muestra dos
+oficios en mitades iguales y cambia de derecha a izquierda cada 3 segundos. La
+primera pareja funciona sin JavaScript; las restantes cargan progresivamente.
+El control `Pausar imágenes`/`Reanudar imágenes`, la pausa durante interacción,
+la visibilidad de la página y `prefers-reduced-motion` evitan movimiento no
+controlado. No se agregaron assets, servicios externos ni dependencias.
+
+Los cuatro indicadores existentes ocupan ahora el panel derecho del hero en
+una grilla 2×2 y mantienen la indicación `Valores simulados`. Debajo comienza
+directamente `Rangos orientativos por servicio`. Los rubros Electricidad,
+Refrigeración y climatización, Plomería, Gas domiciliario, Construcción en seco,
+y Revestimientos y terminaciones usan desplegables semánticos. Cada uno contiene
+cinco trabajos frecuentes con unidad de referencia. Los treinta importes son
+marcadores explícitos `$0 – $0`, rotulados `Rango estimativo pendiente`; la
+introducción aclara que no son cotizaciones ni datos reales. No se inventaron
+precios, demanda adicional ni estadísticas.
+
+Validación ejecutada: focales UX-03/UX-03A 18/18; selección relacionada de
+autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 80/80. Sintaxis de
+`markets-carousel.js` aprobada. En Docker se verificó el avance automático,
+pausa manual y `aria-pressed`, los seis desplegables, treinta filas y enlaces de
+búsqueda; consola sin errores. Revisión visual en 1440, 1024, 768, 390 y 320 CSS
+px, temas claro/oscuro, dos imágenes visibles, indicadores, controles de 44 px
+y ausencia de overflow horizontal: aprobada localmente. La suite completa no se
+ejecutó porque queda reservada para el retest independiente.
+
+Archivo adicional de este refinamiento: nuevo
+`app/static/js/markets-carousel.js`; se ajustaron
+`app/services/market_view_service.py`, `app/templates/mercados.html`,
+`app/static/css/markets-v2.css`, `tests/test_markets_ux03.py` y este handoff.
+Sin migraciones, cambios de datos o backend productivo. El Compose descartable
+permanece saludable en `http://127.0.0.1:5050/mercados` y la pestaña queda
+abierta para aprobación visual. Git conserva todos los cambios UX-03 sin commit
+y staging vacío. No hubo push, PR, merge ni deploy porque el refinamiento aún
+requiere aprobación visual y retest independiente. Próximo paso: revisar hero,
+cambio de imágenes y desplegables; no completar los importes hasta definir una
+fuente y metodología de precios aprobadas.
+
+---
+
+# UX-03: navbar y rediseño público de Precios de mercado
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T22:38:56-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar UX-03 sobre la base local UX-03A, preservando el navbar
+público aprobado y rediseñando únicamente la página pública `/mercados`.
+
+El navbar mantiene una sola estructura para escritorio y móvil, en el orden
+`Inicio`, `Explorar rubros`, `Precios de mercado`, `Operaciones`, `Ecosistema`,
+`Planes`, igual para visitantes, clientes y profesionales. `/mercados` continúa
+siendo público, conserva `aria-current="page"` y no incorpora `Mi panel` ni
+modifica dashboards privados, autenticación, permisos o rutas de negocio.
+
+La página nueva presenta un hero de referencia pública, aviso visible de datos
+demostrativos, cuatro indicadores y cuatro rangos preexistentes, tendencias
+simuladas con `progress`, factores de interpretación, metodología desplegable y
+acciones hacia `/explorar`, `/buscar` y `/presupuestos/nuevo`. Los datos de
+presentación quedaron centralizados en `market_view_service.py`; son ficticios,
+estables y escapados por Jinja. No se agregaron estadísticas, controles falsos,
+CDN, dependencias, JavaScript, analítica ni persistencia. Los iconos son SVG
+inline decorativos y accesibles. `markets-v2.css` usa tokens del Design System
+V2, objetivos táctiles de 44 px y reflow sin estructura duplicada.
+
+Validación local ejecutada: focales UX-03/UX-03A 16/16; selección relacionada
+de autenticación, Design System V2, footer, Home UX-01, Explorar UX-02, navbar,
+mercados y controles de búsqueda/seguridad 78/78. `compileall`, UTF-8 estricto
+de diez archivos, enlaces de búsqueda y acciones, smoke HTTP 200 para `/` y
+`/mercados`, consola sin errores y `git diff --check`: aprobados. No se modificó
+JavaScript y no correspondió una validación nueva de sintaxis. La suite completa
+no se ejecutó porque queda reservada para el retest independiente.
+
+Inspección visual en `mandobra_stabilization`: imagen web reconstruida, servicio
+saludable y disponible en `http://127.0.0.1:5050/` y
+`http://127.0.0.1:5050/mercados`. Se verificaron 1440, 1024, 768, 390 y 320 CSS
+px, temas claro y oscuro, navegación móvil, foco visible por teclado, lectura de
+metodología, acciones de 44 px y ausencia de overflow horizontal o recorte. Las
+dos páginas quedan abiertas para aprobación visual. El PostgreSQL descartable
+permanece saludable. `trax-postgres` conservó el ID
+`8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154` y su
+estado previo `exited/unhealthy`; no fue iniciado, conectado ni modificado.
+
+Archivos del trabajo local: `app/templates/base.html`,
+`app/static/css/visitor-navbar-v1.css`, `tests/test_navbar_markets_ux03a.py`,
+`app/routes/main_routes.py`, nuevo `app/services/market_view_service.py`,
+`app/templates/mercados.html`, nuevo `app/static/css/markets-v2.css`, nuevo
+`tests/test_markets_ux03.py`, `docs/BACKLOG.md` y este handoff. Sin migraciones,
+cambios de esquema, datos o servicios externos. El backlog registra como futuro
+la fuente real, metodología versionada, umbrales de muestra, privacidad,
+retención y revisión administrativa; nada de eso se implementó aquí.
+
+Git queda con estos diez paths sin commit y staging vacío. No hubo push, PR,
+merge ni deploy porque falta la aprobación visual expresa y el retest
+independiente. Riesgo pendiente: los valores siguen siendo demostrativos y no
+deben presentarse como mediciones reales. Próximo paso: revisar visualmente las
+dos pestañas abiertas; con aprobación, entregar el paquete al agente de Testing.
+No incorporar dashboards privados, datos reales, migraciones ni analítica en
+este incremento.
+
+---
+
+# UX-03A: reordenamiento del navbar público
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T22:00:52-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `24bcb9412e182d5190ca4ceaf75de577b66f0a18`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reubicar el acceso público existente de mercados y presentarlo como
+`Precios de mercado`, sin rediseñar su página ni modificar los portales privados.
+
+El navbar compartido conserva una sola estructura para escritorio y móvil. Su
+orden público queda `Inicio`, `Explorar rubros`, `Precios de mercado`,
+`Operaciones`, `Ecosistema`, `Planes`, tanto para visitantes como para sesiones
+cliente o profesional. `Precios de mercado` reutiliza `/mercados`, permanece
+público y es el único enlace con esa etiqueta. Los enlaces directos principales
+incorporan `aria-current="page"`; el activo usa tokens del tema y mantiene el
+foco visible existente. No se agregó `Mi panel` ni se cambiaron menú de cuenta,
+sesión, roles, autenticación, rutas, lógica o JavaScript.
+
+`Precios de mercado` es el tablero público y demostrativo de precios: conserva
+íntegramente sus datos mock. Los dashboards privados de cliente y profesional
+son conceptos distintos y no fueron modificados. `Mi panel` se incorporará en
+un incremento posterior dentro de la navegación lateral izquierda de cada
+portal autenticado, no en el navbar superior.
+
+Validación local ejecutada: focales UX-03A 7/7; regresiones relacionadas de
+autenticación, Design System V2, footer, Home UX-01 y Explorar UX-02 53/53.
+`compileall`, UTF-8 estricto de los archivos técnicos, enlace `/mercados` y
+`git diff --check`: aprobados. No se modificó JavaScript, por lo que no aplicó
+una nueva validación de sintaxis JS. Suite completa no ejecutada por alcance.
+
+Inspección visual en el Compose exclusivo `mandobra_stabilization`: web
+reconstruida y saludable en `http://127.0.0.1:5050/`. A 1440 px y 390 px se
+confirmaron orden, un solo enlace, activo correcto en `/mercados`, temas claro
+y oscuro, menú móvil expandible y ausencia de overflow horizontal. La página
+queda disponible para aprobación visual. PostgreSQL descartable sigue saludable;
+`trax-postgres` conservó el ID `8d989fb2a948be425fb43d3992dc25fcaeae8f79dcb054b48c9d55cd89e18154`
+y su estado previo `exited/unhealthy`; no fue iniciado, conectado ni modificado.
+
+Archivos del incremento: `app/templates/base.html`,
+`app/static/css/visitor-navbar-v1.css`, nuevo
+`tests/test_navbar_markets_ux03a.py` y este handoff. Sin migraciones, cambios de
+datos, servicios externos ni bases reales. Git queda con estos cuatro cambios
+sin commit y staging vacío. Push, PR, merge y deploy no realizados por alcance
+y porque falta la aprobación visual expresa del usuario. Próximo paso: revisar
+Home y `/mercados` en escritorio y móvil; después de la aprobación corresponde
+el retest independiente, sin iniciar todavía el rediseño de mercados o de los
+dashboards privados.
+
+---
+
+# Corrección UX-02: contrato de tarjetas y aislamiento de logging
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-22T02:54:54-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: resolver los hallazgos P2/P3 de Testing sin alterar el diseño visual
+UX-02 aprobado ni debilitar la prueba de protección de secretos.
+
+P2 resuelto. El usuario aprobó visualmente la tarjeta compacta formada por
+imagen, título, etiquetas y acción `Explorar profesionales`; no lleva párrafo
+descriptivo. La prueba focal ahora expresa ese contrato mediante la estructura
+de las veinte tarjetas y los campos de `ExploreTrade`, en vez de depender solo
+de que una frase concreta no aparezca. `description` no tenía consumidores ni
+una utilidad documentada, por lo que se retiró del objeto de presentación y de
+las veinte entradas. HTML, CSS, alineación, imágenes, títulos, etiquetas,
+acciones, enlaces, términos de búsqueda y taxonomía permanecen intactos.
+
+P3 resuelto localmente. La reproducción determinista demostró que
+`logging.config.fileConfig("alembic.ini")`, usado por el entorno Alembic,
+deshabilita por defecto el logger existente `app`; antes estaba
+`disabled=False` y después `disabled=True`. Por eso el nodo aislado pasaba y
+podía fallar tras pruebas de migración. La captura de seguridad ahora conserva
+el nivel, handlers, filtros, `propagate`, `disabled` y el umbral global de
+logging; habilita y limpia filtros solo durante `assertLogs`, y restaura todo en
+`finally`. Una regresión contamina deliberadamente cada estado y acredita su
+restauración. La prueba sigue exigiendo el mensaje público, presencia real del
+log y ausencia de token, clave, teléfono y payload sensible. No se modificó
+producción ni `migrations/env.py`.
+
+Validación ejecutada: focales UX-02 15/15; nodo de seguridad aislado 1/1;
+módulo `test_security_compliance_phase3` 9/9; reproducción mínima
+`fileConfig -> seguridad` 2/2 y `seguridad -> fileConfig -> seguridad` 3/3;
+selección con parche de `logging.Logger._log` y estados contaminados 3/3;
+regresiones frontend relacionadas 38/38. `compileall`, UTF-8, enlaces relativos
+y `git diff --check`: aprobados. La
+suite completa no se ejecutó porque queda reservada para retest independiente.
+
+Archivos ajustados por esta corrección:
+`app/services/explore_catalog_service.py`,
+`tests/test_explore_rubros_ux02.py`,
+`tests/test_security_compliance_phase3.py` y este handoff. Los ocho cambios
+locales UX-02 preexistentes fueron preservados; `tests/test_security_compliance_phase3.py`
+es el único path adicional. Sin migraciones ni cambios de datos. Staging vacío;
+sin commit, push, PR, merge ni deploy porque P2/P3 quedan pendientes de retest
+independiente. Próximo paso: ejecutar el paquete de Testing sin incorporar
+descripciones ni modificar la presentación aprobada.
+
+---
+
+# Refinamiento visual UX-02: alineación interna de tarjetas
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T21:37:07-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: alinear títulos, etiquetas, acciones y bordes de las tarjetas de
+`/explorar` sin alterar contenido, imágenes, enlaces ni búsquedas de UX-02.
+
+La grilla exterior estira las tarjetas de cada fila. Cada tarjeta usa dos filas
+internas, imagen y cuerpo, con `height: 100%`; el cuerpo usa áreas CSS Grid
+compartidas para título, etiquetas y acción. El título conserva espacio mínimo
+para dos líneas, las etiquetas ocupan una zona flexible sin recorte y la acción
+queda al fondo. No se agregaron alturas rígidas de tarjeta, posiciones
+absolutas, selectores individuales, rellenos invisibles, estilos inline ni
+JavaScript. El template solo añadió la clase común `rubro-card__title`.
+
+Medición con `getBoundingClientRect()` en 1440, 1280, 1024, 768, 390 y 320 px:
+cuatro/dos/una columnas según breakpoint y diferencia máxima de `0 px` dentro
+de cada fila para altura y borde inferior de tarjetas, inicio de títulos, inicio
+de etiquetas y extremos superior/inferior de botones. No hubo overflow
+horizontal, superposición ni recorte de títulos, etiquetas o acciones. Se
+revisaron los temas claro y oscuro y el foco por teclado sobre `Explorar
+profesionales`; el contorno y anillo de foco permanecen visibles. El reflow
+equivalente a 200% se cubrió a 768 CSS px sobre el ancho de escritorio de 1536;
+el bridge automatizado no expuso un control nativo del zoom cromado, por lo que
+esa comprobación exacta queda incluida en la aprobación visual manual.
+
+Validación local: 15/15 focales UX-02 y 38/38 regresiones de home, footer,
+Design System y autenticación. `compileall`, UTF-8 y `git diff --check`
+aprobados. Suite completa no ejecutada por alcance. Compose exclusivo
+`mandobra_stabilization`: web reconstruida y saludable en
+`http://127.0.0.1:5050/explorar`; localhost queda disponible para revisión.
+`trax-postgres`, `trax_db`, imágenes, rutas, servicios, modelos y migraciones no
+fueron tocados.
+
+Archivos ajustados en este refinamiento:
+`app/static/css/explore-rubros-v1.css`,
+`app/templates/explorar_rubros.html`,
+`tests/test_explore_rubros_ux02.py` y este handoff. Se preservaron los ocho
+cambios locales UX-02 existentes. Staging vacío; sin commit, push, PR, merge ni
+deploy porque el refinamiento espera aprobación visual del usuario y Testing
+final. Próximo paso: revisar localhost, incluido zoom manual al 200%; si se
+aprueba, entregar el paquete UX-02 completo a Testing sin integrar todavía.
+
+---
+
+# Refinamiento visual UX-02: tarjetas compactas y acciones destacadas
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T21:15:23-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: simplificar las tarjetas de `/explorar` tras la revisión visual del
+usuario, conservando títulos, etiquetas, imágenes, búsqueda y estructura UX-02.
+
+Se retiraron de la vista los párrafos descriptivos de los veinte rubros. Las
+descripciones permanecen en el catálogo de presentación como datos internos,
+pero el template muestra únicamente título, etiquetas y acción. Las etiquetas
+ahora usan los tokens semánticos `primary`, `primary-soft` y `primary-border`
+del Design System, con contraste diferenciado en temas claro y oscuro. En
+Calderas y calefacción se ajustó la etiqueta a `Pisos radiantes`, junto con
+`Calderas` y `Controles de presión`. La acción por tarjeta pasó al estilo
+primario naranja y al texto `Explorar profesionales`; su destino GET y los
+términos de búsqueda no cambiaron.
+
+Validación local: 14/14 focales UX-02 y 38/38 regresiones de home, footer,
+Design System y autenticación; `compileall` aprobado. Inspección en el Compose
+exclusivo `mandobra_stabilization`: 1536 px y 390 px, temas claro/oscuro, una
+columna móvil, cero descripciones y cero overflow horizontal. Colores
+computados: etiquetas claras `rgb(185, 56, 10)` sobre `rgb(255, 244, 237)` y
+oscuras `rgb(255, 138, 76)` sobre fondo semitransparente del token; CTA claro
+`rgb(211, 68, 14)` con texto blanco y CTA oscuro `rgb(255, 138, 76)` con texto
+oscuro. Web reconstruida y saludable en `http://127.0.0.1:5050/explorar` para
+revisión. `trax-postgres` y `trax_db` no fueron tocados.
+
+Archivos ajustados en este refinamiento:
+`app/templates/explorar_rubros.html`,
+`app/static/css/explore-rubros-v1.css`,
+`app/services/explore_catalog_service.py`,
+`tests/test_explore_rubros_ux02.py` y este handoff. Se preservó el resto del
+trabajo UX-02 local. Staging vacío; sin commit, push, PR, merge ni deploy porque
+el conjunto continúa pendiente de revisión visual y Testing final. Próximo
+paso: revisar el catálogo abierto en localhost y, si se aprueba, entregar el
+paquete completo UX-02 a Testing sin modificar taxonomía ni lógica de búsqueda.
+
+---
+
+# UX-02: catálogo visual de Explorar rubros
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-21T20:35:06-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base y
+último commit: `f005b3ed2cef6d68d4f0de6b6303c622d88d69eb`; origin
+`https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: rediseñar `/explorar` como catálogo visual accesible de veinte rubros,
+sin modificar la taxonomía canónica, los WebP versionados ni lógica de negocio.
+
+Se incorporó un catálogo de presentación centralizado e inmutable con cinco
+categorías editoriales y veinte tarjetas. Cada entrada declara identificador,
+título, descripción, hasta tres ejemplos, WebP, alt ilustrativo y término de
+búsqueda. La pantalla usa un único `h1`, `h2` por categoría, `h3` por tarjeta,
+anclas nativas, buscador GET por servicio/zona, acción por rubro y acción general.
+No se agregó JavaScript. Las imágenes mantienen 1200 x 900, lazy loading,
+decodificación asíncrona y `object-fit: cover`.
+
+Correspondencias aprobadas: Electricidad domiciliaria -> `Electricista`,
+Plomería -> `Plomero` y Aire acondicionado ->
+`Técnico en Aire Acondicionado`. Los otros diecisiete rubros no tienen una
+equivalencia canónica exacta aprobada y envían su título editorial completo;
+pueden producir una búsqueda vacía antes que una coincidencia incorrecta.
+`resultados.html` conserva y muestra de forma escapada cualquier servicio que no
+pertenezca al selector cerrado. El catálogo vacío muestra un estado propio y un
+error inesperado conserva la respuesta genérica 500; ninguno se presenta como
+falta de profesionales.
+
+Responsive verificado en Docker a 1440, 1280, 768, 390 y 320 px: cuadrículas de
+4/4/2/1/1 columnas, buscador apilado bajo 48rem, categorías con wrap, targets de
+44 px y cero overflow horizontal. Se revisaron los veinte encuadres, navegación,
+foco por teclado, estado de búsqueda vacío y temas claro/oscuro. Durante la
+revisión se corrigió el contraste del título del hero en tema oscuro usando el
+blanco estable del Design System. El navbar compartido conserva una atenuación
+visual preexistente en el menú móvil oscuro; no fue modificado por estar fuera de
+alcance.
+
+Validación local: 13/13 focales UX-02; 38/38 regresiones de home, navbar, footer,
+Design System y autenticación; 17/17 regresiones relacionadas de búsqueda y
+seguridad. `compileall` focal, 31 enlaces internos/fragmentos, assets locales,
+UTF-8 estricto y ausencia de mojibake nuevo, y `git diff --check`: aprobados.
+Permanece una secuencia histórica de mojibake en una recomendación de reseñas de
+`main_routes.py`, fuera del diff y del alcance; no se amplió. Suite completa y
+Testing final no ejecutados por instrucción.
+
+Compose exclusivo `mandobra_stabilization`: web reconstruida y saludable en
+`http://127.0.0.1:5050/explorar`, con la pestaña abierta en tema claro para
+aprobación visual. PostgreSQL descartable permaneció saludable; `trax-postgres`
+conservó ID `8d989fb2a948`, detenido, y no se accedió a `trax_db`. No hubo
+migraciones ni cambios de datos.
+
+Archivos modificados: `app/routes/main_routes.py`,
+`app/templates/explorar_rubros.html`, `app/templates/resultados.html`,
+`app/static/css/explore-rubros-v1.css`, `docs/BACKLOG.md` y este handoff.
+Archivos nuevos: `app/services/explore_catalog_service.py` y
+`tests/test_explore_rubros_ux02.py`. Los veinte WebP y UX-01 permanecen intactos.
+Staging vacío; sin commit, push, PR, merge ni deploy porque falta aprobación
+visual del usuario y Testing final. Próximo paso: revisar `/explorar` en
+localhost; si la presentación se aprueba, entregar el paquete a Testing sin
+integrar ni modificar taxonomía, modelos o imágenes.
+
+---
+
+# Refinamiento footer corporativo UX-01: estructura demostrativa
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T16:31:28-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar el footer azul compartido, distinguiendo destinos funcionales de contenido futuro, sin modificar secciones anteriores del home ni lógica de negocio.
+
+`base.html` conserva un único footer global con identidad MANDOBRA, cobertura Capital Federal y AMBA, columnas Explorar/Para profesionales/Ayuda/Legal, tres SVG inline decorativos de Instagram, Facebook y LinkedIn sin enlaces ni red, y barra inferior 2026. Enlaces reales: `/buscar`, `/presupuestos/nuevo`, `/emergencias/nueva`, `/register`, `/propuestas`, `/planes` y anclas del home visitante `#featured-title`, `#faq-title`, `#trust-title`. Las anclas no se enlazan con sesión iniciada porque `/` muestra otro template; aparecen como texto inactivo. Herramientas, Cómo funciona, Contacto y todos los documentos legales son texto no interactivo con leyendas de preparación. No se afirman términos vigentes ni perfiles oficiales. Backlog registra titularidad/seguridad de cuentas, documentos, políticas, revisión legal/fiscal y habilitación gradual de rutas.
+
+Validación local: 38/38 pruebas focales/footer/home y regresiones frontend; pruebas JS de FAQ y carrusel aprobadas. Sintaxis JS, `compileall`, UTF-8, enlaces válidos/fragmentos y `git diff --check` aprobados. Inspección preliminar del Compose descartable a 1440, 768, 390 y 320 px: cinco columnas (marca + cuatro) en escritorio, dos en tablet, una en móvil, sin overflow horizontal; contraste, iconos, foco y contenido pendiente distinguible, barra inferior. Footer también renderizado en login, registro y planes. Suite completa, PostgreSQL y retest independiente no ejecutados por alcance. Aprobación visual del usuario pendiente.
+
+Archivos intervenidos en esta sesión: `app/templates/base.html`, `app/static/css/styles.css`, nuevo `tests/test_corporate_footer.py`, ajuste de expectativa en `tests/test_home_hero_carousel.py`, `docs/BACKLOG.md` y este handoff. Los refinamientos UX-01 previos permanecen íntegros. Web del proyecto exclusivo `mandobra_stabilization` disponible en `http://127.0.0.1:5050/`; no se tocó `trax_db`, base ni migraciones. Staging vacío; no hubo commit, push, PR, merge ni deploy porque está pendiente la revisión visual. Próximo paso: aprobación visual del usuario y luego retest final independiente. Conservar el entorno encendido hasta su inspección.
+
+---
+
+# Cuarto refinamiento visual UX-01: confianza, ayuda y cierre del home
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T16:08:46-03:00
+Origen: laptop; agente: Codex. Rama: `feature/ux-ui-foundation`; HEAD base `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: completar el home tras los seis oficios, con confianza compacta, FAQ local y llamado para ambos actores, conservando hero, carrusel, MIME, búsqueda y footer global.
+
+Se sustituyó la confianza anterior por los tres mensajes aprobados y se añadió un FAQ de seis `details`/`summary`, con filtro independiente que normaliza acentos y mayúsculas, estado vacío y anuncio accesible. Sin JavaScript permanecen las seis respuestas; el filtro no envía ni conserva consultas. El llamado final reutiliza `main.buscar` (`/buscar`) y `auth.register` (`/register`), ambos GET 200. Registro permite elegir rol profesional, pero no preselecciona el rol mediante un enlace aprobado; no se alteró autenticación. Footer global único sin cambios. Backlog registra el futuro asistente documentado y soporte humano, sin implementarlos. Persiste el desajuste previo del selector de Pintura descrito en el registro anterior.
+
+Validación local: 33/33 focales/regresiones frontend, pruebas JS de FAQ y carrusel, sintaxis JS, `compileall`, UTF-8, enlaces, y `git diff --check` aprobados. Inspección preliminar en `mandobra_stabilization` a 1440, 768, 390 y 320 px: tres elementos de confianza en escritorio/tablet y apilados en móvil, llamado doble en escritorio/tablet y apilado en móvil, FAQ expansible, filtro y estado vacío, footer único, sin overflow horizontal. Enlaces navegados hasta búsqueda y registro. Aprobación visual del usuario y retest final independiente pendientes; suite completa y PostgreSQL no ejecutados por alcance.
+
+Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, nuevo `app/static/js/home-faq.js`, `tests/test_home_hero_carousel.py`, nuevo `tests/js/home_faq.test.js`, `docs/BACKLOG.md` y este handoff. Se conservaron los cambios UX-01 anteriores, ocho WebP, carrusel, MIME y demás lógica. Web del Compose descartable reconstruida y recreada, disponible en `http://127.0.0.1:5050/`, sin tocar `trax_db` ni migraciones. Git: staging vacío, sin commit, push, PR, merge ni deploy porque continúa la revisión visual; próximo paso: aprobación visual del usuario, decisión posterior sobre catálogo Pintura y retest final independiente. No integrar antes de esa revisión.
+
+---
+
+# Tercer refinamiento visual UX-01: oficios destacados
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T15:46:12-03:00
+Origen: laptop; agente: Codex.
+Rama: `feature/ux-ui-foundation`; HEAD base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+Objetivo: reemplazar exclusivamente la sección de tres tarjetas numeradas por seis oficios editoriales, preservando hero, carrusel, mensajes, MIME y buscador.
+
+Nueva sección "Oficios destacados" con seis enlaces semánticos e imágenes WebP existentes, lazy, 16:9 y alt vacío; cuadrícula de 3 columnas en escritorio, 2 en tablet y 1 en móvil. Mapeo visible → `servicio` GET: Electricidad → Electricidad; Plomería → Plomeria; Refrigeración y climatización → Refrigeracion A/C; Cableado estructurado → Electricidad; Instalación de calderas → Gas domiciliario; Pintura → Pintura. Las tres primeras equivalencias y las dos familias amplias reutilizan opciones existentes. `Pintura` es un valor real de `Professional.servicio` aceptado por `/buscar` y mostrado en el encabezado de resultados, pero no está en el selector cerrado de resultados: éste muestra "Todos los servicios" aunque el filtro Pintura esté activo. No se alteró el buscador ni se inventó una equivalencia. Si se requiere selección visible en ese control, hace falta autorizar un incremento de catálogo fuera del alcance actual.
+
+Las tarjetas son selección editorial, no ranking respaldado por métricas. `docs/BACKLOG.md` registra diseño futuro de eventos anónimos, territorio CABA/AMBA, oferta/demanda, resultados vacíos, conversión, ventana y muestra, protección de manipulación, fallback editorial y privacidad/retención. No se implementó analítica ni persistencia.
+
+Validación local: 30/30 pruebas focales y frontend relacionadas; temporizadores JS, `compileall`, sintaxis JS, UTF-8, enlaces y `git diff --check` aprobados. Vista preliminar Docker a 1440, 768, 390 y 320 px: imágenes encuadradas, tres/dos/una columnas, foco/enlaces accesibles y sin overflow horizontal. El enlace Pintura respondió 200 y evidenció el desajuste del selector descrito. Suite completa, PostgreSQL y retest independiente no ejecutados por alcance. Aprobación visual definitiva pendiente del usuario.
+
+El Compose descartable `mandobra_stabilization` se reconstruyó solo para web y permanece disponible en `http://127.0.0.1:5050/`; no se tocó `trax_db`, volúmenes ni migraciones. Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `tests/test_home_hero_carousel.py`, `docs/BACKLOG.md` y este handoff. Los ocho WebP, el JS del carrusel y la corrección MIME no se modificaron. Git: 16 archivos con cambios locales, staging vacío, sin commit, push, PR, merge ni deploy. Próximo paso: inspección visual del usuario y decisión sobre Pintura en el selector; luego retest final independiente. No integrar ni desmontar el entorno antes de esa revisión.
+
+---
+
+# Segundo refinamiento visual UX-01: altura y mensajes dinámicos
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T15:17:41-03:00
+Origen: laptop; agente: Codex.
+Objetivo: ampliar el hero aprobado y rotar tres pares de título/subtítulo sin mover buscador, flechas ni otros contenidos.
+Rama: `feature/ux-ui-foundation`; HEAD base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`; origin `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+Se preservaron íntegros los 14 cambios UX-01/MIME/refinamiento previo. El hero crece 80 px efectivos en escritorio (496,24 → 576,24 px a 1440) y 48 px en móvil (1087,20 → 1135,20 px a 390), con padding repartido arriba y abajo, sin altura rígida. Tres mensajes exactos rotan cada 10.000 ms con fundido de 180 ms; el primero queda en HTML sin JavaScript. Tres copias invisibles y excluidas de accesibilidad reservan el alto máximo del bloque, por lo que el buscador no salta. Las ocho imágenes continúan cada 5.000 ms; navegación manual cambia solo la imagen. Temporizadores separados se cancelan/reprograman ante hover, tacto, foco, pestaña oculta o movimiento reducido. En reduced motion no hay autoplay ni transiciones. No se recuperaron los elementos visibles retirados en el refinamiento anterior.
+
+Validación: focales/regresiones frontend `tests.test_home_hero_carousel`, `tests.test_design_system_v2` y `tests.test_auth_ux_redesign_v1`: 28/28; nueva prueba de temporizadores con Node: aprobada. `compileall`, sintaxis JS, UTF-8 y `git diff --check`: aprobados. Inspección preliminar en Docker a 1440, 390 y 320 px: composición legible, flechas centradas, buscador completo, sin overflow horizontal ni errores de consola; la rotación hasta el tercer mensaje mantuvo altura y posición. GET/HEAD WebP y MIME de CSS/JS/PNG siguen cubiertos por la regresión focal. Suite completa, PostgreSQL y retest final no ejecutados por alcance.
+
+Entorno descartable `mandobra_stabilization`: se reconstruyó y recreó solo web, disponible en `http://127.0.0.1:5050/` para revisión del usuario. Se deja encendido; no se accedió a `trax_db`, no se hicieron migraciones ni seed. Archivos intervenidos en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`; nuevo `tests/js/home_hero_carousel.test.js`. Los ocho WebP y la corrección MIME de `app/__init__.py` permanecen sin cambios de esta sesión. Git: 15 archivos con cambios locales, staging vacío, sin commit, push, PR o merge porque falta aprobación visual. Sin bloqueantes técnicos conocidos; riesgo pendiente: valoración visual final del usuario. Próximo paso: el usuario revisa `5050` en escritorio y móvil; solo después corresponde retest independiente. No integrar ni desmontar el entorno antes de esa revisión.
+
+---
+
+# Refinamiento visual UX-01 pendiente de aprobación del usuario
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T14:33:37-03:00
+Origen: laptop; agente: Codex.
+Objetivo: simplificar el hero visitante y mejorar la visibilidad de las ocho escenas sin iniciar todavía el retest final independiente.
+Rama: `feature/ux-ui-foundation`; HEAD/base preservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`; staging vacío; 14 cambios locales UX-01/MIME/refinamiento, sin cambios adicionales.
+
+Se retiraron del hero la ceja, los tres beneficios, la nota de imágenes, el botón de pausa y el contador visible. Permanecen el título, párrafo y buscador. El overlay azul oscuro se redujo moderadamente; los ocho WebP originales y la corrección MIME se conservaron intactos. Las flechas laterales son cheurones sin caja, con área de 44×44 px y nombres accesibles. El carrusel conserva fundido, avance automático de 5000 ms y navegación manual; reinicia un único temporizador después de cada cambio, pausa durante hover, tacto, foco o pestaña oculta y desactiva autoplay/transiciones con movimiento reducido. La primera imagen permanece como fallback sin JavaScript; el anuncio de cambios manuales no es visible.
+
+Validación ejecutada: focal `tests.test_home_hero_carousel` y regresiones frontend `tests.test_design_system_v2`, `tests.test_auth_ux_redesign_v1`: **27/27**; `compileall`, `node --check`, UTF-8 y `git diff --check`: código 0. GET y HEAD reales desde el contenedor: ocho WebP `image/webp`, CSS `text/css`, JS `text/javascript` y PNG `image/png`, todos 200. Inspección de navegador: hero de escritorio, flechas funcionales, vista móvil sin overflow horizontal ni solapamiento horizontal con el buscador, consola sin errores. La suite completa y el retest final independiente **no se ejecutaron**, conforme al alcance solicitado. No se conocen bloqueantes técnicos; contraste y composición definitivos requieren aprobación visual del usuario.
+
+Entorno de revisión: `docker compose -p mandobra_stabilization -f docker-compose.stabilization.yml build web`, seguido de `up -d --no-deps --force-recreate web`. Web y PostgreSQL descartable del proyecto permanecen saludables; web disponible solo en `http://127.0.0.1:5050/`. No se inició ni conectó `trax_db`; `trax-postgres` conservó ID `8d989fb2a948` y estado `Exited (0)`. No se ejecutó seed ni se eliminó el entorno, para permitir inspección del usuario.
+
+Archivos editados en esta sesión: `app/templates/home.html`, `app/static/css/home-v1.css`, `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py` y este handoff. `app/__init__.py` y los ocho WebP preexistentes quedaron sin alteraciones de esta sesión. No hubo staging, commit, push, PR, merge ni deploy porque falta la aprobación visual. Próximo paso: usuario revisa en escritorio y móvil las ocho escenas, la legibilidad, las flechas, el buscador y el ritmo del carrusel; tras su aprobación, realizar retest independiente final. Para retomar: verificar rama, HEAD, staging y 14 cambios; consultar este registro; no integrar ni desmontar el Compose antes de la inspección del usuario.
+
+---
+
+# Corrección focal P2 UX-01: MIME WebP portable
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-20T13:34:59-03:00
+Origen: laptop; agente: Codex.
+Rama: `feature/ux-ui-foundation`; HEAD base conservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Hallazgo P2: la respuesta estática de los ocho `.webp` podía depender de la tabla MIME del host Windows y no anunciar `image/webp` de forma portable.
+Corrección: `create_app` registra explícitamente `.webp` como `image/webp` antes de construir Flask. La regresión HTTP consulta GET y HEAD de los ocho assets y comprueba `Content-Type`; también protege los tipos CSS, JavaScript y PNG. No se alteraron imágenes, carrusel, buscador, caché, rutas ni backend financiero.
+Validación focal y regresiones frontend relacionadas: 27/27; `compileall`, UTF-8 y `git diff --check` aprobados. Suite completa y PostgreSQL no ejecutados por alcance. No se conocen nuevos errores. Testing independiente debe revalidar el P2.
+Git: solo los 13 cambios UX-01 anteriores más `app/__init__.py` modificado; staging vacío, sin commit ni push. No hubo PR ni merge porque la corrección está pendiente de retest. Próximo paso: retest HTTP independiente y revisión de UX-01; no integrar ni desplegar antes de aprobación.
+
+---
+
+# Handoff vigente: UX-01 carrusel visual del home
+
+Estado: READY_TO_RESUME
+Timestamp: 2026-09-19T13:22:54-03:00
+Origen: laptop; agente: Codex.
+Objetivo: incorporar ocho escenas aprobadas como fondo del hero visitante, sin alterar textos, buscador, rutas ni lógica de negocio.
+Rama: `feature/ux-ui-foundation`; HEAD base conservado: `a65fe78e9a5a9f3a248a56383f5538d166c75ddd`.
+Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+Se convirtieron los ocho PNG aprobados de Downloads a WebP locales 1600×900, entre 53 y 98 KB cada uno; los originales no ingresaron al repositorio. El template muestra la primera imagen aun sin JavaScript. El carrusel carga las siguientes progresivamente, mantiene un overlay oscuro, ofrece controles anterior/siguiente y pausa, se detiene durante interacción y con movimiento reducido, y usa encuadre móvil. Las escenas se identifican como ilustrativas. No hay servicios externos, migraciones ni cambios financieros.
+
+Validación local: 26/26 pruebas focales y regresiones frontend relacionadas; `compileall`, sintaxis JS y `git diff --check` aprobados. Revisión visual en contenedor descartable separado, servido en `127.0.0.1:5051`: escritorio y móvil legibles, buscador intacto, control manual funcional. El contenedor temporal se detuvo; no se modificó `mandobra_stabilization` ni `trax_db`. Suite completa y migraciones no ejecutadas por alcance. No hay errores conocidos; Testing independiente queda pendiente.
+
+Archivos modificados: `app/templates/home.html`, `app/static/css/home-v1.css`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`. Nuevos: `app/static/js/home-hero-carousel.js`, `tests/test_home_hero_carousel.py` y ocho WebP en `app/static/images/home/hero/`.
+Git: cambios locales sin staging, commit ni push; no hubo PR ni merge porque UX-01 está pendiente de revisión. Riesgo restante: confirmar calidad y contraste en la matriz final de navegadores/dispositivos. Próximo paso: Testing visual/accesibilidad independiente, luego revisión para commit técnico. No hacer merge ni despliegue antes de esa revisión.
+
+---
+
 # Handoff vigente: demo E2E local aprobada por Testing
 
 Estado: COMPLETED
@@ -3974,3 +7155,152 @@ proveedores ni decisiones funcionales adicionales.
 - No seleccionar PSP, integracion fiscal o proveedor de IA sin evaluacion y
   aprobacion.
 - No realizar commit, push, PR o merge durante este cierre local.
+
+
+---
+
+## 2026-10-04T16:58:01-03:00 — Propuestas P1.1: carrusel fotográfico del encabezado
+
+Estado: READY_TO_RESUME — implementado, pendiente de Testing independiente.
+Origen: laptop; responsable: implementador local. Rama: feature/ux-ui-foundation.
+HEAD conservado: 557d4fca84ea7355f3832ebf14b8a3c6ab4eb020; staging vacío.
+Se preservaron los doce paths previos autorizados. No hubo commit, push, merge,
+PR ni despliegue: no están autorizados. No se actualizó el remoto.
+
+Se incorporaron 12 WebP en `app/static/images/proposals/hero/`, exclusivamente
+como fondo del encabezado. Los originales quedaron intactos (hash antes/después).
+Todos decodifican, sin archivos omitidos. Pillow 11.3.0: RGB, orientación EXIF,
+WebP quality=80/method=6, sin ampliar, sin metadatos EXIF/XMP/ICC copiados.
+Dimensiones comunes: 1448 × 1086. Orden determinista por nombre de fuente:
+
+| Fuente | Destino | Bytes |
+| --- | --- | ---: |
+| 03.png | proposal-hero-01.webp | 141558 |
+| 04.png | proposal-hero-02.webp | 165504 |
+| 05 (2).png | proposal-hero-03.webp | 122510 |
+| 05.png | proposal-hero-04.webp | 120998 |
+| 06.png | proposal-hero-05.webp | 111668 |
+| 07.png | proposal-hero-06.webp | 138952 |
+| 09.png | proposal-hero-07.webp | 140786 |
+| 10.png | proposal-hero-08.webp | 124142 |
+| 11.png | proposal-hero-09.webp | 135060 |
+| 13.png | proposal-hero-10.webp | 120942 |
+| 16.png | proposal-hero-11.webp | 87352 |
+| 20.png | proposal-hero-12.webp | 92420 |
+
+El controlador existente `emergency-hero-carousel-v1.js` admite un modo fade
+optativo: Propuestas usa 6000 ms / 700 ms, dos capas reutilizables, caché y carga
+progresiva. Urgencias conserva su desplazamiento de 6500 ms / 900 ms.
+Guardas de inicialización, visibilidad, pagehide/pageshow y BFCache preservadas.
+No hay controles, vínculos ni foco en la capa decorativa; alt vacío/aria-hidden.
+La primera imagen tiene src nativo, dimensiones y prioridad alta; permanece sin
+JavaScript. Reduced motion evita autoplay y muestra la primera fotografía.
+Las fallas de imágenes siguientes se omiten conservando el fondo válido.
+
+Overlay local azul noche RGB(7,18,32), opacidades .90 / .74 al 60% / .70 al 100%.
+Título blanco, subtítulo #e2e8f0 y encabezado pequeño #67e8f9; mismos colores sobre
+las fotografías en ambos temas. Se reforzó el extremo derecho desde .62 a .70
+para garantizar contraste incluso sobre blanco: mínimos calculados 7.08:1,
+5.74:1 y 4.89:1 respectivamente. Sin cambios de datos, permisos, modelos,
+migraciones, contratación, navbar ni estilos globales en este incremento.
+
+Validación ejecutada sobre SQLite en memoria (sin PostgreSQL ni Docker):
+- 54 pruebas OK: test_proposal_hero_carousel, test_proposal_portal_p1,
+  test_proposal_eligibility, test_emergency_hero_carousel, test_emergency_entry,
+  test_home_hero_carousel y test_navbar_drawer_ux04a.
+- Reejecución focal final: test_proposal_hero_carousel, 2/2 OK, sin advertencias
+  por respuestas de recursos abiertas.
+- Node tests/js/emergency_hero_carousel.test.js: OK, incluidos fade 6000/700,
+  inicialización única, reduced motion y BFCache; regresión Urgencias OK.
+- compileall app scripts y sintaxis del controlador JavaScript: OK.
+- Las doce imágenes responden HTTP 200 en el cliente Flask y decodifican.
+- Navegador real, preview aislado en puerto 54873: claro/oscuro en 1440, 1280,
+  1024, 770, 768, 390 y 320 px. Sin overflow horizontal; imagen cargada;
+  buscador fuera del hero. Altura 208 px en escritorio/tablet, 241.81 px a 390
+  y 301.33 px a 320; el texto puede crecer sin recorte. Rotación observada,
+  sin vacíos observados; consola sin advertencias ni errores registrados.
+- Evidencia de escritorio y móvil en ambos temas guardada fuera del repositorio.
+
+Limitación de evidencia: no se emuló reduced motion ni JavaScript deshabilitado
+visualmente en el navegador disponible; se verificaron mediante pruebas del
+controlador y contrato HTML/CSS. No se ejecutó suite completa ni auditoría AA
+integral; el cálculo anterior corresponde al texto del hero. Testing debe
+completar esas comprobaciones y revisar transiciones en su entorno.
+
+Archivos de este incremento: app/templates/listado_propuestas.html,
+app/static/css/proposals-portal-p1.css, app/static/js/emergency-hero-carousel-v1.js,
+tests/js/emergency_hero_carousel.test.js, tests/test_proposal_hero_carousel.py,
+los doce assets indicados, docs/REQUISITOS/PROPUESTAS_P1.md y este handoff.
+No hay fallas focales conocidas. Riesgo principal: controlador compartido,
+cubierto por regresión, pendiente de retest independiente. Próximo paso:
+revisar `/propuestas` en el preview aislado y ejecutar Testing del incremento;
+no integrar ni tocar bases compartidas. Las aprobaciones históricas de P1.1
+no aprueban automáticamente este carrusel. Estado final pendiente de Testing.
+
+---
+
+## 2026-10-04T17:14:45-03:00 — Gate final Propuestas P1.1 con carrusel
+
+Estado: COMPLETED. Estado funcional:
+`PROPUESTAS_P1_1_CARRUSEL_APROBADO_PARA_COMMIT`.
+Responsable: `03 — Testing - Test Executor` independiente. Dispositivo: laptop.
+Objetivo: validar integralmente el árbol final P1.1 y reemplazar los dictámenes
+anteriores después de la incorporación del carrusel fotográfico.
+
+Identidad final verificada:
+
+- repositorio: `C:\Users\Cristhian\Proyecto Mandobra`;
+- remoto: `https://github.com/cristhian-star/TRAX-PLATFORM.git`;
+- rama: `feature/ux-ui-foundation`;
+- HEAD: `557d4fca84ea7355f3832ebf14b8a3c6ab4eb020`;
+- staging: vacío;
+- 27 paths locales documentados, sin archivos ajenos;
+- no hubo commit, push, PR, merge, rebase, reset ni deploy porque no estaban
+  autorizados.
+
+Trabajo completado:
+
+- revisión de código, templates, estilos, controlador compartido, pruebas y 12
+  assets WebP;
+- focales P1/P1.1 17/17, regresiones compartidas 37/37 y navegación/frontend
+  relacionado 40/40;
+- Node aprobado para Propuestas 6000/700 e inicialización única, y para la
+  regresión Urgencias 6500/900;
+- suite completa final única: 896 ejecutadas, 889 aprobadas, siete omitidas,
+  cero fallos y cero errores en 229.359 segundos;
+- omisiones: cuatro gates PostgreSQL sin base exclusiva, una concurrencia
+  PostgreSQL, una prueba exclusiva de imagen Docker y una zona IANA no
+  disponible;
+- `compileall`, sintaxis JavaScript, UTF-8, enlaces relativos, whitespace,
+  salto final y `git diff --check`: aprobados;
+- PostgreSQL, Docker, Alembic operativo y `trax_db`: no utilizados.
+
+Evidencia de assets y rendimiento: exactamente 12 WebP locales, 1448 × 1086,
+1.501.892 bytes totales, sin EXIF/XMP/ICC, GET/HEAD 200 `image/webp`, recargas
+304 y cero 404. Primera imagen crítica: 141.558 bytes; segunda imagen cargada al
+inicializar y las siguientes progresivamente al rotar. El DOM permaneció en dos
+capas reutilizables y doce plantillas; no hubo crecimiento por transición ni
+doble inicialización.
+
+Evidencia manual: navegador real en claro/oscuro a 1440, 1280, 1024, 770, 768,
+390 y 320 px, sin overflow o superposición, con foco visible, controles mínimos
+de 44 px, contraste AA y consola limpia. El carrusel quedó limitado al hero,
+con centro como punto focal, altura estable a cada ancho y fundido de 700 ms.
+Reduced motion mantuvo la primera imagen inmóvil durante siete segundos. Con
+JavaScript retirado por el harness aislado permanecieron visibles la primera
+imagen, título y texto, y funcionó una búsqueda GET combinada por rubro y
+ubicación. La capa es decorativa y no entra al árbol accesible.
+
+Se revalidaron Operaciones → Propuestas, Home → Propuestas, anonimato y sesiones,
+menú activo, filtros, caracteres especiales, chips, limpieza, paginación, solo
+`PUBLICADA`, orden, ausencia de escrituras GET, errores 400, XSS, privacidad y
+elegibilidad centralizada. PROFESIONAL verificado mostró doce CTA en la página;
+CLIENTE no mostró CTA de postulación.
+
+Hallazgos: ninguno P0–P3. No hay bloqueantes conocidos. Riesgo residual: los
+gates PostgreSQL y Docker omitidos no se acreditan, pero no pertenecen al alcance
+frontend de este gate. Documentación actualizada únicamente en este handoff y
+`docs/REQUISITOS/PROPUESTAS_P1.md`; código, pruebas y assets permanecen intactos.
+Próximo paso recomendado: solicitar autorización para commit y luego continuar
+con el flujo de integración que corresponda. Acciones no autorizadas: modificar
+el árbol validado, usar bases compartidas o ejecutar integración Git sin permiso.

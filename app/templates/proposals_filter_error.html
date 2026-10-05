@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Revisá los filtros | MANDOBRA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-portal-p1.css') }}">{% endblock %}
+{% block content %}
+<main class="proposals-p1">
+  <section class="proposals-p1__empty trax-card" aria-labelledby="filter-error-title">
+    <p class="proposals-p1__eyebrow">PROPUESTAS DE TRABAJO</p>
+    <h1 id="filter-error-title">Revisá los filtros de búsqueda</h1>
+    <p>Algún filtro o número de página no es válido. Usá hasta 120 caracteres por campo y evitá parámetros repetidos.</p>
+    <a class="trax-button trax-button--primary" href="{{ url_for('operations.marketplace_propuestas') }}">Limpiar filtros y volver</a>
+  </section>
+</main>
+{% endblock %}
