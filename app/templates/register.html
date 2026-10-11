@@ -1,29 +1,15 @@
-{% extends "base.html" %}
+{% extends "auth_base.html" %}
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-ux-v1.css') }}">
-{% endblock %}
+
 
 {% block content %}
 
 <main class="trax-page auth-page auth-page--register">
     <section class="trax-container auth-shell" aria-labelledby="register-title">
-        <div class="trax-card trax-card--elevated auth-panel auth-panel--story">
-            <p class="auth-eyebrow">Nueva cuenta MANDOBRA</p>
-            <h1 id="register-title">Empezá simple. Completá lo importante después.</h1>
-            <p class="auth-lead" data-role-copy>
-                Creá tu cuenta para publicar solicitudes, comparar profesionales y operar con más orden.
-            </p>
-            <div class="auth-flow">
-                <span>1</span>
-                <p><strong>Cuenta segura</strong> Nombre, email y contraseña.</p>
-                <span>2</span>
-                <p><strong>Rol inicial</strong> Cliente o profesional.</p>
-                <span>3</span>
-                <p><strong>Perfil progresivo</strong> Rubro, cobertura y portfolio se completan luego.</p>
-            </div>
-        </div>
-
+<a class="auth-brand" href="/" aria-label="MANDOBRA inicio">
+<img class="auth-logo-light" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-light.png') }}" width="1696" height="720" alt="">
+<img class="auth-logo-dark" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-dark.png') }}" width="1696" height="720" alt="">
+</a>
         <form action="/register" method="POST" class="trax-card auth-card" data-auth-form novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if next_url %}
@@ -31,8 +17,8 @@
             {% endif %}
 
             <div class="trax-card__header auth-card__head">
-                <p>Crear cuenta</p>
-                <h2>Sumate a MANDOBRA</h2>
+                <h1 id="register-title">Creá tu cuenta como {{ 'profesional' if form_values.rol == 'PROFESIONAL' else 'cliente' }}</h1>
+                <p>{{ 'Primero creá tu cuenta. Después completá tu perfil y oficio' if form_values.rol == 'PROFESIONAL' else 'Completá tus datos para empezar.' }}</p>
             </div>
 
             {% if error %}
@@ -121,40 +107,8 @@
                 {% endif %}
             </div>
 
-            <fieldset class="trax-field auth-role-group" aria-describedby="register-role-help{% if errors and errors.rol %} register-role-error{% endif %}">
-                <legend>Tipo de cuenta</legend>
-                <label class="auth-role-option">
-                    <input
-                        class="trax-radio"
-                        type="radio"
-                        name="rol"
-                        value="CLIENTE"
-                        data-role-option
-                        {{ 'checked' if not form_values or form_values.rol != 'PROFESIONAL' else '' }}>
-                    <span>
-                        <strong>Cliente</strong>
-                        <small>Publicar solicitudes y contratar profesionales.</small>
-                    </span>
-                </label>
-                <label class="auth-role-option">
-                    <input
-                        class="trax-radio"
-                        type="radio"
-                        name="rol"
-                        value="PROFESIONAL"
-                        data-role-option
-                        {{ 'checked' if form_values and form_values.rol == 'PROFESIONAL' else '' }}>
-                    <span>
-                        <strong>Profesional</strong>
-                        <small>Completar perfil, cobertura y portfolio después.</small>
-                    </span>
-                </label>
-                <small class="trax-field__help" id="register-role-help">Podés operar sólo con los permisos de tu tipo de cuenta.</small>
-                {% if errors and errors.rol %}
-                    <p class="trax-field__error auth-field-error" id="register-role-error">{{ errors.rol }}</p>
-                {% endif %}
-            </fieldset>
-
+            <input type="hidden" name="rol" value="{{ form_values.rol if form_values.rol in ['CLIENTE','PROFESIONAL'] else 'CLIENTE' }}">
+            {% if errors and errors.rol %}<p class="trax-field__error" role="alert">{{ errors.rol }}</p>{% endif %}
             <label class="auth-terms">
                 <input
                     class="trax-checkbox"
@@ -183,8 +137,4 @@
     </section>
 </main>
 
-{% endblock %}
-
-{% block extra_scripts %}
-    <script src="{{ url_for('static', filename='js/auth-ux-v1.js') }}"></script>
 {% endblock %}

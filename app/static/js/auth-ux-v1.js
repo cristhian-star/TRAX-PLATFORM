@@ -1,4 +1,6 @@
 (function () {
+    var themeSwitch = document.querySelector('[data-theme-switch]');
+    if (themeSwitch) themeSwitch.hidden = false;
     function togglePassword(button) {
         var targetId = button.getAttribute("aria-controls");
         var input = targetId ? document.getElementById(targetId) : null;
@@ -70,15 +72,40 @@
     });
     updateRoleCopy();
 
-    document.querySelectorAll("[data-auth-form]").forEach(function (form) {
-        form.addEventListener("submit", function () {
-            var button = form.querySelector("[data-auth-submit]");
-            if (!button || button.disabled) {
+    document.querySelectorAll('[data-auth-form]').forEach(function (form) {
+        var button = form.querySelector('[data-auth-submit]');
+        var login = form.hasAttribute('data-login-form');
+        var email = form.querySelector('[name="email"]');
+        var passwordPanel = form.querySelector('[data-login-password]');
+        var password = form.querySelector('[name="password"]');
+        var label = form.querySelector('[data-submit-label]');
+        var expanded = !login || form.dataset.expanded === 'true' || Boolean(password.value);
+        function render() {
+            if (!login) return;
+            passwordPanel.hidden = !expanded;
+            password.required = expanded;
+            label.textContent = expanded ? 'Ingresar' : 'Continuar';
+        }
+        render();
+        form.addEventListener('submit', function (event) {
+            if (login && !expanded) {
+                event.preventDefault();
+                // Format only: no network call and no account existence check.
+                if (!email.reportValidity()) return;
+                expanded = true;
+                render();
+                password.focus();
                 return;
             }
-
-            button.classList.add("is-loading");
+            if (!form.reportValidity()) { event.preventDefault(); return; }
+            button.classList.add('is-loading');
             button.disabled = true;
+        });
+        window.addEventListener('pageshow', function () {
+            button.disabled = false;
+            button.classList.remove('is-loading');
+            if (login && password.value) expanded = true;
+            render();
         });
     });
 })();
