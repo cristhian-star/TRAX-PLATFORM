@@ -71,7 +71,7 @@ def register():
         "register.html",
         next_url=next_url,
         errors={},
-        form_values={"rol": "CLIENTE"},
+        form_values={"rol": "PROFESIONAL" if request.args.get("rol") == "PROFESIONAL" else "CLIENTE"},
     )
 
 

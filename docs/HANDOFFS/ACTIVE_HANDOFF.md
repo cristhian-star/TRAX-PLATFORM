@@ -7304,3 +7304,120 @@ frontend de este gate. Documentación actualizada únicamente en este handoff y
 Próximo paso recomendado: solicitar autorización para commit y luego continuar
 con el flujo de integración que corresponda. Acciones no autorizadas: modificar
 el árbol validado, usar bases compartidas o ejecutar integración Git sin permiso.
+
+
+---
+
+# 2026-10-09T22:26:04-03:00 — AUTH-UX-001
+
+Estado: READY_TO_RESUME. Origen: laptop. Implementación local de acceso/registro
+según bocetos aprobados; pendiente de revisión y testing independiente.
+Rama feature/auth-onboarding-foundation; HEAD b20f41adef46b51bf423b03b4d971072d251b9c7.
+Preflight limpio; sin cambios previos ni staging. La entrada histórica de Propuestas
+precede al merge PR #24 que ya figura en este HEAD local; no acredita sync remota.
+
+Completado: tarjeta única sin navbar, logo oficial, login progresivo y registro por
+rol, conservación de seguridad y fallback nativo. Detalle, archivos y evidencia en
+[AUTH_UX_001](../REQUISITOS/AUTH_UX_001.md). No se alteraron modelos, dominio,
+versión legal, migraciones ni datos persistentes.
+Pruebas: primera tanda 29/29; focal final 13/13 (incluye repeticiones), Node OK;
+sintaxis JS y diff check OK. Navegador aislado: capturas de ocho estados y móvil;
+se corrigieron ancho móvil del control Mostrar y bootstrap de tema compatible CSP.
+No ejecutados: suite completa, bases PostgreSQL, Docker, auditoría AA integral,
+no-JS/reduced-motion emulados y BFCache real. Riesgos/pendientes detallados en spec.
+
+Sin fallas focales conocidas; Google/username/recuperación no implementados.
+Próximo paso: Testing independiente sobre esta rama y árbol, usando solo SQLite
+temporal y fixtures sintéticas; preview aislado disponible en puerto 54902.
+HEAD conservado y staging vacío; archivos sin commit enumerados en spec.
+Sin commit, push, PR, merge ni deploy, porque no están autorizados. No usar trax_db
+ni bases compartidas. No se solicita integración antes de la revisión independiente.
+
+
+## 2026-10-09T23:23:38-03:00 - AUTH-UX-001: selector de tema
+
+Estado: READY_TO_RESUME. Laptop, implementación local solicitada por el usuario.
+Rama: feature/auth-onboarding-foundation. HEAD: b20f41adef46b51bf423b03b4d971072d251b9c7.
+Se agregó el selector claro/oscuro a login y ambos registros reutilizando el
+controlador de plataforma. Ubicación superior derecha sin superposición;
+108 x 44 px medidos a 320 px, sin overflow. Clic, teclado y persistencia comprobados.
+Archivos de este ajuste: auth_base.html, auth-ux-v1.css, auth-ux-v1.js y
+[AUTH_UX_001](../REQUISITOS/AUTH_UX_001.md), además de este handoff.
+Pruebas: Node auth_ux y sintaxis JS OK; revisión visual 1280/320, ambos temas.
+No se repitieron Python, suite completa, AA integral ni emulación sin JS.
+Sin cambios de dominio, datos, migraciones ni dependencias; trabajo AUTH-UX previo
+preservado. Árbol pendiente de commit, staging vacío y HEAD conservado.
+No hubo commit, push, PR, merge ni despliegue: fuera de autorización.
+Pendientes/riesgos: revisión independiente y pendientes funcionales de AUTH_UX_001.
+Retomar sobre esta rama y árbol; revisar diff y probar en SQLite aislado.
+No usar trax_db, bases compartidas ni sobrescribir trabajo pendiente.
+Preview aislado en puerto 54902. Próximo paso: revisión visual del usuario y Testing.
+
+
+## 2026-10-09T23:48:48-03:00 - AUTH-UX-001-FIX-01
+
+Estado: READY_TO_RESUME. Laptop; corrección focal P2/P3 solicitada por producto.
+Rama feature/auth-onboarding-foundation; HEAD b20f41adef46b51bf423b03b4d971072d251b9c7.
+Preflight y cierre conservan los diez paths AUTH pendientes y staging vacío.
+Se corrigió contraste del selector sólo en AUTH y ocultación [hidden]. Se agregó
+cobertura de integración con controlador real, estado accesible, persistencia y
+preservación del formulario. Claro círculo/pista 1.24 -> 7.56:1; oscuro 4.56:1.
+Archivos de este fix: auth-ux-v1.css, tests/js/auth_ux.test.js,
+tests/test_auth_ux_redesign_v1.py, AUTH_UX_001.md y este handoff.
+Resultados: 14/14 Python en SQLite memoria, Node OK, sintaxis JS OK, diff check OK.
+QA aislada: claro/oscuro, hover/foco/teclado, capturas 320/390. No emulados sin JS
+y reduced-motion; inspección estática solamente. Sin suite completa ni AA integral.
+Detalle y ratios en [AUTH_UX_001](../REQUISITOS/AUTH_UX_001.md).
+Riesgo residual: retest independiente y esos modos de navegador pendientes.
+Sin migraciones, Docker, bases compartidas ni cambios de dominio/seguridad.
+No hubo commit, push, PR, merge ni deploy: no autorizados. Sync remota no consultada.
+Próximo paso: retest sobre este árbol y HEAD, con SQLite aislado; revisar especialmente
+sin JavaScript y movimiento reducido. No sobrescribir pendientes ni usar trax_db.
+Estado final local: CORREGIDO SEGÚN INFORME LOCAL; PENDIENTE DE RETEST INDEPENDIENTE.
+
+
+## Cierre documental AUTH-UX-001
+
+Timestamp: 2026-10-10T21:35:01-03:00. Dispositivo: laptop. Responsable: implementador local.
+Estado: COMPLETED (cierre documental en la rama; integración pendiente).
+Esta entrada sustituye el estado pendiente de retest de las entradas AUTH anteriores,
+sin borrar ni modificar su evidencia histórica.
+
+Rama: feature/auth-onboarding-foundation.
+HEAD base: b20f41adef46b51bf423b03b4d971072d251b9c7.
+Origin verificado: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+Árbol: exactamente diez paths AUTH pendientes (siete modificados, tres nuevos);
+staging vacío. Referencias remotas no sincronizadas ni consultadas en este cierre.
+
+Completado: login progresivo, registros Cliente/Profesional y selector de tema;
+email únicamente, nombre completo y confirmación de contraseña preservados.
+Google y acceso por usuario fuera del incremento; sin cambios de dominio,
+dependencias, modelos, migraciones ni datos en este cierre.
+
+Retest independiente final del 2026-10-10T20:36:20-03:00:
+P2 y P3 cerrados; 15/15 Python aprobadas, Node aprobado, sintaxis JavaScript
+y git diff --check correctos. QA sin JavaScript satisfactorio. Movimiento reducido
+comprobado estáticamente; sin emulación disponible. Estos resultados corresponden
+a Testing, no a nuevas ejecuciones de esta sesión; no se suman tandas históricas.
+Aprobación visual de Cristian Sánchez en Docker: 2026-10-10T21:11:03-03:00,
+comunicada por el responsable en la solicitud de cierre.
+
+Los diez hashes iniciales coinciden con el último retest. Código y pruebas
+permanecen idénticos; manifiesto SHA-256 y alcance en
+[AUTH_UX_001](../REQUISITOS/AUTH_UX_001.md).
+Únicos documentos actualizados por esta tarea:
+docs/REQUISITOS/AUTH_UX_001.md y docs/HANDOFFS/ACTIVE_HANDOFF.md.
+Validaciones de cierre: comparación de hashes, revisión documental/diff y
+git diff --check. No se repitieron pruebas por tratarse sólo de documentación.
+No se ejecutaron Docker, bases de datos, migraciones ni seeds.
+Riesgo residual: emulación de movimiento reducido no acreditada, sin bloquear
+el cierre del alcance aprobado; Google/username siguen pendientes.
+
+Commit preparado: `feat(auth): refine login and registration UX`.
+Commit, push, PR y merge NO ejecutados: requieren autorización explícita.
+No hay merge a develop ni deploy. No se afirma sincronización actual con GitHub.
+Próximo paso: revisión del paquete de diez paths y autorización del commit.
+Para retomar: comprobar rama/HEAD, staging vacío e inventario de la especificación;
+comparar hashes de código/pruebas antes de integrar. No usar add indiscriminado,
+sobrescribir pendientes, cambiar de rama ni integrar sin autorización.
+Estado final: CIERRE DOCUMENTAL COMPLETADO; COMMIT PREPARADO, PENDIENTE DE AUTORIZACIÓN.

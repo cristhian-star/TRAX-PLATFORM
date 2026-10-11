@@ -1,5 +1,6 @@
 import os
 import unittest
+from html.parser import HTMLParser
 from unittest.mock import patch
 
 
@@ -21,6 +22,40 @@ from app.services.auth_service import (
 
 
 class AuthUxRedesignTest(unittest.TestCase):
+    def test_theme_switch_is_progressive_non_submit_on_all_auth_screens(self):
+        class Controls(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.in_form = False
+                self.switches = []
+
+            def handle_starttag(self, tag, attrs):
+                if tag == 'form':
+                    self.in_form = True
+                attrs = dict(attrs)
+                if 'data-theme-switch' in attrs:
+                    self.switches.append((tag, attrs, self.in_form))
+
+            def handle_endtag(self, tag):
+                if tag == 'form':
+                    self.in_form = False
+
+        for url in ('/login', '/register?rol=CLIENTE', '/register?rol=PROFESIONAL'):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                parser = Controls()
+                parser.feed(html)
+                self.assertEqual(len(parser.switches), 1)
+                tag, attrs, in_form = parser.switches[0]
+                self.assertEqual(tag, 'button')
+                self.assertEqual(attrs['type'], 'button')
+                self.assertIn('hidden', attrs)
+                self.assertFalse(in_form)
+                self.assertIn('js/theme-switch-v1.js', html)
+                self.assertIn('js/auth-ux-v1.js', html)
+
     def setUp(self):
         self.app = create_app(config_class=TestingConfig, initialize_schema=False)
         self.app.config.update(
@@ -199,6 +234,30 @@ class AuthUxRedesignTest(unittest.TestCase):
 
             self.assertIsNone(User.query.filter_by(email="rollback@trax.test").first())
 
+    def test_auth_layout_and_role_selection_are_public_and_read_only(self):
+        with self.app.app_context():
+            before = User.query.count()
+        for role, title in (("CLIENTE", "cliente"), ("PROFESIONAL", "profesional"), ("SUPER_ADMIN", "cliente")):
+            html = self.client.get("/register", query_string={"rol": role, "next": "/propuestas"}).get_data(as_text=True)
+            self.assertIn("Creá tu cuenta como " + title, html)
+            self.assertNotIn('class="site-header', html)
+            self.assertNotIn("Continuar con Google", html)
+            self.assertIn('name="password_confirm"', html)
+            self.assertIn('name="next" value="/propuestas"', html)
+        with self.app.app_context():
+            self.assertEqual(User.query.count(), before)
+
+    def test_login_native_fallback_and_error_keep_password_available(self):
+        html = self.client.get("/login?next=/propuestas").get_data(as_text=True)
+        self.assertIn('name="password"', html)
+        self.assertIn('data-login-password>', html)
+        self.assertIn('data-submit-label>Ingresar', html)
+        self.assertIn('rol=PROFESIONAL', html)
+        self.assertNotIn('class="site-header', html)
+        response = self.client.post("/login", data={"email": "unknown@example.test", "password": "wrong"})
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('data-expanded="true"', response.get_data(as_text=True))
+
     def test_templates_include_accessible_labels_and_auth_assets(self):
         login = self.client.get("/login").get_data(as_text=True)
         register = self.client.get("/register").get_data(as_text=True)
@@ -210,7 +269,7 @@ class AuthUxRedesignTest(unittest.TestCase):
         self.assertIn("auth-ux-v1.js", login)
 
         self.assertIn('for="register-name"', register)
-        self.assertIn("<legend>Tipo de cuenta</legend>", register)
+        self.assertIn('name="rol" value="CLIENTE"', register)
         self.assertIn('name="terms_accepted"', register)
         self.assertIn('data-password-strength', register)
 
