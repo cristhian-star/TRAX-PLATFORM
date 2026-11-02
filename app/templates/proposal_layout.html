@@ -1,0 +1,4 @@
+{% extends 'professional_workspace_base.html' if proposal_workspace else 'base.html' %}
+{% block content %}{% if proposal_workspace %}{{ super() }}{% else %}{{ self.proposal_content() }}{% endif %}{% endblock %}
+{% block workspace_content %}{{ self.proposal_content() }}{% endblock %}
+{% block proposal_content %}{% endblock %}

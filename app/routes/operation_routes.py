@@ -7,6 +7,7 @@ from app import db, limiter
 from app.services.proposal_portal_service import build_proposal_portal
 from app.services.proposal_eligibility_service import proposal_application_eligibility
 from app.models.user import User
+from app.models.contract_request import ContractRequest
 from app.services.emergency_entry_service import entry_context, entry_errors
 from app.services.budget_service import (
     BudgetCreationConflict,
@@ -418,6 +419,9 @@ def contract_detail(id):
     except PermissionError:
         abort(403)
 
+    if contract.source_type in (ContractRequest.SOURCE_BUDGET, ContractRequest.SOURCE_PROPOSAL):
+        from app.services.operation_view_service import budget_layout_context
+        context.update(budget_layout_context(session["user_id"]))
     return render_template(
         "contract_detail.html",
         **context,
@@ -688,6 +692,11 @@ def recuperar_borrador_presupuesto():
     return _budget_form(actor.id, draft["data"], key=issue_budget_key(actor.id, draft["nonce"]), restored=True)
 
 
+def _render_budget(template, **context):
+    from app.services.operation_view_service import budget_layout_context
+    return render_template(template, **budget_layout_context(session["user_id"]), **context)
+
+
 @operations.route("/presupuestos/mis-solicitudes", methods=["GET"])
 @login_required
 @role_required("CLIENTE")
@@ -697,7 +706,7 @@ def mis_solicitudes_presupuesto():
         empty_to_none(request.args.get("estado")) or "activas",
     )
 
-    return render_template(
+    return _render_budget(
         "mis_solicitudes_presupuesto.html",
         request_rows=request_rows,
         max_offers=MAX_OFFERS_PER_REQUEST,
@@ -709,7 +718,7 @@ def mis_solicitudes_presupuesto():
 @login_required
 @role_required("PROFESIONAL")
 def mis_presupuestos_enviados():
-    return render_template(
+    return _render_budget(
         "mis_presupuestos_enviados.html",
         offer_rows=build_professional_budget_offer_rows(session["user_id"]),
         max_offers=MAX_OFFERS_PER_REQUEST,
@@ -720,14 +729,21 @@ def mis_presupuestos_enviados():
 @login_required
 @role_required("PROFESIONAL")
 def marketplace_presupuestos():
+    from app.services.operation_view_service import budget_publication_age
     categoria = normalize_limited_text(request.args.get("categoria", ""))
     zona = normalize_limited_text(request.args.get("zona", ""))
     budget_requests = get_open_budget_requests(categoria, zona)
-    budget_requests = paginate_items(budget_requests)
+    from app.utils.security import get_pagination_params
+    page, per_page = get_pagination_params()
+    total = len(budget_requests)
+    budget_requests = paginate_items(budget_requests, page, per_page)
 
-    return render_template(
+    return _render_budget(
         "listado_presupuestos.html",
         budget_requests=budget_requests,
+        publication_ages={item.id: budget_publication_age(item.fecha_creacion) for item in budget_requests},
+        max_offers=MAX_OFFERS_PER_REQUEST,
+        page=page, per_page=per_page, total=total, has_next=page * per_page < total,
         categoria=categoria,
         zona=zona,
         offer_allowance=get_offer_allowance(session["user_id"]),
@@ -748,7 +764,7 @@ def confirmacion_presupuesto(id):
 
     offer_count = len(get_budget_offers(id))
 
-    return render_template(
+    return _render_budget(
         "confirmacion_presupuesto.html",
         budget_request=budget_request,
         offer_count=offer_count,
@@ -771,10 +787,27 @@ def detalle_presupuesto(id):
     if current_user.rol == "CLIENTE" and budget_request.cliente_id != current_user_id:
         abort(403)
 
-    return render_template(
+    return _render_budget(
         "detalle_presupuesto.html",
         **build_budget_detail_context(budget_request, current_user_id, request.args),
     )
+
+
+def _budget_offer_error(budget_request_id, error):
+    try:
+        budget_request = get_budget_request_or_error(budget_request_id)
+    except LookupError:
+        abort(404)
+    if budget_request.cliente_id == session["user_id"]:
+        abort(403)
+    context = build_budget_detail_context(budget_request, session["user_id"], {})
+    context["offer_error"] = error
+    context["form_values"] = {
+        field: request.form.get(field, "")
+        for field in ("cobra_visita", "precio_visita", "monto_desde", "monto_hasta",
+                      "plazo_estimado", "condiciones")
+    }
+    return _render_budget("detalle_presupuesto.html", **context), 400
 
 
 @operations.route("/presupuestos/<int:id>/ofertar", methods=["POST"])
@@ -790,11 +823,7 @@ def ofertar_presupuesto(id):
     condiciones = empty_to_none(request.form.get("condiciones"))
 
     if not monto_desde or not monto_hasta or not plazo_estimado:
-        return redirect(url_for(
-            "operations.detalle_presupuesto",
-            id=id,
-            error="Completa monto desde, monto hasta y plazo estimado.",
-        ))
+        return _budget_offer_error(id, "Completa monto desde, monto hasta y plazo estimado.")
 
     try:
         offer = create_budget_offer(
@@ -809,11 +838,7 @@ def ofertar_presupuesto(id):
         )
         notify_budget_offer_created(offer)
     except ValueError as error:
-        return redirect(url_for(
-            "operations.detalle_presupuesto",
-            id=id,
-            error=str(error),
-        ))
+        return _budget_offer_error(id, str(error))
 
     return redirect(url_for("operations.detalle_presupuesto", id=id, enviado="1"))
 
@@ -930,11 +955,32 @@ def nueva_emergencia():
 
 @operations.route("/urgencias/directorio", methods=["GET"])
 def directorio_emergencias():
+    from app.models.emergency_request import EmergencyRequest
+    from app.utils.security import get_pagination_params
+    emergency_request_id = None
+    if "solicitud" in request.args:
+        if len(request.args.getlist("solicitud")) != 1:
+            abort(400)
+        try:
+            requested_id = int(request.args["solicitud"])
+        except ValueError:
+            abort(404)
+        if not 0 < requested_id < 2**63:
+            abort(404)
+        actor = db.session.get(User, session["user_id"]) if session.get("user_id") else None
+        if not is_user_active(actor) or actor.rol != "CLIENTE":
+            abort(404)
+        owned_request = EmergencyRequest.query.filter_by(id=requested_id, cliente_id=actor.id).first()
+        if owned_request is None:
+            abort(404)
+        emergency_request_id = owned_request.id
     categoria = normalize_limited_text(request.args.get("categoria", ""))
     zona = normalize_limited_text(request.args.get("zona", ""))
     coordinates = get_request_coordinates(request.args)
     professional_rows = build_emergency_directory_rows(categoria, zona, coordinates)
-    professional_rows = paginate_items(professional_rows)
+    total = len(professional_rows)
+    page, per_page = get_pagination_params()
+    professional_rows = paginate_items(professional_rows, page, per_page)
 
     return render_template(
         "directorio_emergencias.html",
@@ -942,10 +988,38 @@ def directorio_emergencias():
         categoria=categoria,
         zona=zona,
         has_geographic_context=coordinates is not None,
-        emergency_request_id=request.args.get("solicitud"),
-        request_created=bool(request.args.get("solicitud")),
+        total=total, page=page, per_page=per_page, has_next=page * per_page < total,
+        emergency_request_id=emergency_request_id,
+        request_created=emergency_request_id is not None,
         anonymous_search=request.args.get("consulta_anonima") == "1",
     )
+
+
+def _proposal_render(template, **context):
+    from app.services.proposal_service import PROPOSAL_MODALITIES
+    context["proposal_modalities"] = PROPOSAL_MODALITIES
+    from app.services.professional_proposals_service import proposal_navigation
+    return render_template(template, **proposal_navigation(), **context)
+
+
+def _proposal_redirect(id, **values):
+    from app.services.professional_proposals_service import proposal_navigation
+    navigation = proposal_navigation()
+    if navigation["proposal_workspace"]:
+        values["vista"] = navigation["proposal_view"]
+    return redirect(url_for("operations.detalle_propuesta", id=id, **values))
+
+
+def _proposal_application_error(id, message):
+    db.session.rollback()
+    try:
+        proposal = get_proposal_or_error(id)
+    except LookupError:
+        abort(404)
+    context = build_proposal_detail_context(proposal, session.get("user_id"), request.args)
+    context.update(error=message, form_data={name: request.form.get(name, "") for name in
+        ("mensaje", "experiencia_relevante", "disponibilidad", "pretension_economica")})
+    return _proposal_render("detalle_propuesta.html", **context), 400
 
 
 @operations.route("/propuestas/nueva", methods=["GET", "POST"])
@@ -958,7 +1032,7 @@ def nueva_propuesta():
         form_data = build_proposal_form_data(request.form)
         form_error = validate_proposal_form_data(form_data)
         if form_error:
-            return render_template(
+            return _proposal_render(
                 "nueva_propuesta.html",
                 form_data=form_data,
                 taxonomy=taxonomy_options,
@@ -976,23 +1050,23 @@ def nueva_propuesta():
                 descripcion=form_data["descripcion"],
                 ubicacion=form_data["ubicacion"],
                 modalidad=form_data["modalidad"],
-                cantidad_profesionales=int(form_data["cantidad_profesionales"] or 1),
+                cantidad_profesionales=form_data["cantidad_profesionales"],
                 presupuesto_estimado=form_data["presupuesto_estimado"],
                 fecha_inicio_estimada=parse_date(form_data["fecha_inicio_estimada"]),
                 fecha_limite_postulacion=parse_date(form_data["fecha_limite_postulacion"]),
             )
             notify_proposal_created(proposal_request)
         except ValueError as error:
-            return render_template(
+            return _proposal_render(
                 "nueva_propuesta.html",
                 form_data=form_data,
                 taxonomy=taxonomy_options,
                 error=str(error),
             ), 400
 
-        return redirect(url_for("operations.detalle_propuesta", id=proposal_request.id, publicada="1"))
+        return _proposal_redirect(proposal_request.id, publicada="1")
 
-    return render_template(
+    return _proposal_render(
         "nueva_propuesta.html",
         form_data=get_query_prefill(request.args, "categoria", "ubicacion"),
         taxonomy=taxonomy_options,
@@ -1015,7 +1089,7 @@ def detalle_propuesta(id):
     except LookupError:
         abort(404)
 
-    return render_template(
+    return _proposal_render(
         "detalle_propuesta.html",
         **build_proposal_detail_context(proposal, session.get("user_id"), request.args),
     )
@@ -1035,7 +1109,7 @@ def postular_propuesta(id):
     pretension_economica = empty_to_none(request.form.get("pretension_economica"))
 
     if not mensaje:
-        return redirect(url_for("operations.detalle_propuesta", id=id, error="Completa un mensaje para postularte."))
+        return _proposal_application_error(id, "Completa un mensaje para postularte.")
 
     try:
         application = apply_to_proposal(
@@ -1050,9 +1124,9 @@ def postular_propuesta(id):
     except PermissionError:
         abort(403)
     except ValueError as error:
-        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+        return _proposal_application_error(id, str(error))
 
-    return redirect(url_for("operations.detalle_propuesta", id=id, postulada="1"))
+    return _proposal_redirect(id, postulada="1")
 
 
 @operations.route("/propuestas/<int:id>/aceptar/<int:application_id>", methods=["POST"])
@@ -1063,9 +1137,9 @@ def aceptar_postulacion(id, application_id):
     except PermissionError:
         abort(403)
     except ValueError as error:
-        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+        return _proposal_redirect(id, error=str(error))
 
-    return redirect(url_for("operations.detalle_propuesta", id=id))
+    return _proposal_redirect(id)
 
 
 @operations.route("/propuestas/<int:id>/descartar/<int:application_id>", methods=["POST"])
@@ -1077,9 +1151,9 @@ def descartar_postulacion(id, application_id):
     except PermissionError:
         abort(403)
     except ValueError as error:
-        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+        return _proposal_redirect(id, error=str(error))
 
-    return redirect(url_for("operations.detalle_propuesta", id=id))
+    return _proposal_redirect(id)
 
 
 @operations.route("/propuestas/<int:id>/cancelar", methods=["POST"])
@@ -1091,6 +1165,6 @@ def cancelar_propuesta(id):
     except PermissionError:
         abort(403)
     except ValueError as error:
-        return redirect(url_for("operations.detalle_propuesta", id=id, error=str(error)))
+        return _proposal_redirect(id, error=str(error))
 
-    return redirect(url_for("operations.detalle_propuesta", id=id))
+    return _proposal_redirect(id)

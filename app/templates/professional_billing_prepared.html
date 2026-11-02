@@ -1,0 +1,6 @@
+{% extends 'professional_billing.html' %}
+{% block title %}{{ page.title }} | MANDOBRA{% endblock %}
+{% block workspace_content %}
+<main class="pw-billing"><header class="billing-heading"><div><h1>{{ page.title }}</h1><p>Disponible próximamente</p></div></header>
+<section class="trax-card billing-prepared"><span class="billing-icon">{{ icon('document') }}</span><h2>Este espacio está en preparación</h2><p>{{ page.description }}</p><p>{{ page.detail }}</p><a class="trax-button trax-button--secondary" href="{{ url_for('main.profesional_facturacion') }}">Volver a Facturación y cobros</a></section></main>
+{% endblock %}

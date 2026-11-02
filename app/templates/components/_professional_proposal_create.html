@@ -1,0 +1,114 @@
+<section class="pc-create" aria-labelledby="pc-title">
+ <a class="pc-back" href="{{ proposal_back }}">← Volver a Propuestas</a>
+ <header class="pc-heading"><div><h1 id="pc-title">Crear propuesta</h1><p>Contá qué necesitás y recibí postulaciones.</p></div><p>Los campos con * son obligatorios.</p></header>
+ {% if error %}<div class="proposal-alert proposal-alert--error" role="alert">{{ error }}</div>{% endif %}
+ <form action="/propuestas/nueva" method="POST">
+ <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+ <input type="hidden" name="vista" value="{{ proposal_view }}">
+ <div class="pc-columns">
+  <section class="trax-card pc-card" aria-labelledby="pc-project"><h2 id="pc-project">Datos del proyecto</h2>
+<label>
+                <span>Titulo *</span>
+                <input
+                    type="text"
+                    name="titulo"
+                    maxlength="160"
+                    value="{{ entry_data.get('titulo', '') }}"
+                    placeholder="Ej: Equipo para mantenimiento electrico industrial"
+                    required>
+            </label>
+<label>
+                <span>Descripcion *</span>
+                <textarea
+                    name="descripcion"
+                    maxlength="1800"
+                    placeholder="Contanos alcance, contexto, objetivos, requisitos y condiciones relevantes."
+                    required>{{ entry_data.get('descripcion', '') }}</textarea>
+            </label>
+ <h2 class="pc-taxonomy-title" id="pc-professional">Profesional que buscás</h2>
+ <div class="pc-pair" aria-labelledby="pc-professional">
+<label>
+                <span>Industria *</span>
+                <select name="industria" required>
+                    <option value="">Seleccionar industria</option>
+                    {% for item in taxonomy.industrias %}
+                        <option value="{{ item.nombre }}" {% if entry_data.get('industria') == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+<label>
+                <span>Categoria *</span>
+                <select name="categoria" required>
+                    <option value="">Seleccionar categoria</option>
+                    {% for item in taxonomy.categorias %}
+                        <option value="{{ item.nombre }}" {% if entry_data.get('categoria') == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+<label>
+                <span>Rubro *</span>
+                <select name="rubro" required>
+                    <option value="">Seleccionar rubro</option>
+                    {% for item in taxonomy.rubros %}
+                        <option value="{{ item.nombre }}" {% if entry_data.get('rubro') == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+<label>
+                <span>Especialidad</span>
+                <select name="especialidad">
+                    <option value="">Sin especialidad especifica</option>
+                    {% for item in taxonomy.especialidades %}
+                        <option value="{{ item.nombre }}" {% if entry_data.get('especialidad') == item.nombre %}selected{% endif %}>{{ item.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+ </div></section>
+ <section class="trax-card pc-card" aria-labelledby="pc-conditions"><h2 id="pc-conditions">Ubicación y condiciones</h2>
+<label>
+                <span>Ubicacion *</span>
+                <input
+                    type="text"
+                    name="ubicacion"
+                    value="{{ entry_data.get('ubicacion', '') }}"
+                    placeholder="Ciudad, zona o remoto"
+                    required>
+            </label>
+<label>
+                <span>Modalidad *</span>
+                <select name="modalidad" required>
+                    {% if error and entry_data.get('modalidad') not in proposal_modalities %}
+                    <option value="" selected>Seleccionar modalidad válida</option>
+                    {% endif %}
+                    {% for option in proposal_modalities %}
+                        <option value="{{ option }}" {% if entry_data.get('modalidad') == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+                {% if error and entry_data.get('modalidad') not in proposal_modalities %}
+                <span>Modalidad ingresada no válida: {{ entry_data.get('modalidad', '') }}. Seleccioná una opción del catálogo.</span>
+                {% endif %}
+            </label>
+<div class="pc-pair"><label>
+                <span>Cantidad de profesionales</span>
+                <input type="{{ 'text' if error else 'number' }}" inputmode="numeric" name="cantidad_profesionales" min="1" max="50" value="{{ entry_data.get('cantidad_profesionales', '1') }}">
+            </label>
+<label>
+                <span>Presupuesto estimado</span>
+                <input type="{{ 'text' if error else 'number' }}" inputmode="decimal" step="0.01" min="0" name="presupuesto_estimado" value="{{ entry_data.get('presupuesto_estimado', '') }}" placeholder="Opcional">
+            </label></div>
+<label>
+                <span>Fecha estimada de inicio</span>
+                <input type="date" name="fecha_inicio_estimada" value="{{ entry_data.get('fecha_inicio_estimada', '') }}">
+            </label>
+<label>
+                <span>Fecha limite para postularse</span>
+                <input type="date" name="fecha_limite_postulacion" value="{{ entry_data.get('fecha_limite_postulacion', '') }}">
+            </label>
+ <p class="pc-help">El presupuesto y las fechas son opcionales.</p>
+ </section>
+ </div>
+ <footer class="trax-card pc-actions"><p>Publicar una propuesta no confirma una contratación.</p>
+ <a class="trax-button trax-button--secondary" href="{{ proposal_back }}">Cancelar</a>
+ <button class="trax-button trax-button--primary" type="submit">Publicar propuesta</button></footer>
+ </form>
+</section>

@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "budget_layout.html" if budget_workspace else "base.html" %}
 
-{% block content %}
+{% block content %}{% if budget_workspace %}{{ super() }}{% else %}{{ self.budget_content() }}{% endif %}{% endblock %}
+{% block budget_content %}
 
 <section class="section-container contract-detail-screen">
     <span class="kicker">Contratacion</span>

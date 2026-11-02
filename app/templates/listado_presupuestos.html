@@ -1,105 +1,36 @@
-{% extends "base.html" %}
-
-{% block extra_css %}
+{% extends "budget_layout.html" %}
+{% block extra_css %}{{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-workflow.css') }}">
 {% endblock %}
-
-{% block content %}
-<main class="budget-page">
-    <section class="budget-detail-hero">
-        <div class="budget-shell budget-detail-hero__heading">
-            <div>
-                <span class="budget-eyebrow">Marketplace profesional</span>
-                <h1>Oportunidades de presupuesto</h1>
-                <p>Explora necesidades publicadas y elegi aquellas que coincidan con tu especialidad y zona.</p>
-            </div>
-            <div class="budget-counter">
-                {% if offer_allowance.is_pro %}
-                    <strong>PRO</strong>
-                    <span>Presupuestos mensuales ilimitados</span>
-                {% else %}
-                    <strong>{{ offer_allowance.remaining }}/{{ offer_allowance.limit }}</strong>
-                    <span>presupuestos WORK disponibles este mes</span>
-                {% endif %}
-            </div>
-        </div>
-    </section>
-
+{% block budget_content %}
+<main class="budget-page budget-compact" aria-labelledby="budget-page-title">
+    <h1 id="budget-page-title" class="budget-compact__sr">Presupuestos: solicitudes disponibles</h1>
     <section class="budget-shell budget-marketplace">
-        <div class="budget-estimate-note" role="note">
-            Los presupuestos enviados son estimaciones preliminares y podran ajustarse luego de la inspeccion tecnica o de recibir informacion adicional del trabajo.
-        </div>
-
-        <form action="/presupuestos" method="GET" class="budget-filter" aria-label="Filtrar oportunidades">
-            <label class="budget-field">
-                <span>Categoria</span>
-                <input type="search" name="categoria" value="{{ categoria }}" placeholder="Ej. Electricidad">
-            </label>
-            <label class="budget-field">
-                <span>Zona</span>
-                <input type="search" name="zona" value="{{ zona }}" placeholder="Ej. CABA">
-            </label>
-            <button class="budget-button budget-button--primary" type="submit">Filtrar</button>
-        </form>
-
-        <div class="budget-marketplace__heading">
-            <div>
-                <span class="budget-eyebrow">Solicitudes activas</span>
-                <h2>{{ budget_requests|length }} oportunidades encontradas</h2>
-            </div>
-            {% if categoria or zona %}
-                <a class="budget-button budget-button--secondary" href="/presupuestos">Limpiar filtros</a>
-            {% endif %}
-        </div>
-
+        {% set budget_tab = 'available' %}{% include 'components/_budget_tabs.html' %}
+        {% if categoria or zona %}<p class="budget-compact__filter-note">Búsqueda acotada por el enlace recibido. <a href="/profesional/presupuestos">Ver todas las solicitudes</a></p>{% endif %}
         {% if budget_requests %}
-            <div class="budget-request-grid">
-                {% for item in budget_requests %}
-                    <article class="budget-request-card">
-                        <header>
-                            <span class="budget-status budget-status--{{ item.estado|lower }}">{{ item.estado }}</span>
-                            <span>{{ item.offers|length }}/6 recibidos</span>
-                        </header>
-                        <div class="budget-request-card__body">
-                            <span class="budget-eyebrow budget-text-break">{{ item.categoria }}</span>
-                            <h2 class="budget-request-card__title">{{ item.titulo }}</h2>
-                            <p class="budget-request-card__description">{{ item.descripcion|truncate(220) }}</p>
-                        </div>
-                        <dl class="budget-facts">
-                            <div>
-                                <dt>Zona</dt>
-                                <dd>{{ item.zona }}</dd>
-                            </div>
-                            <div>
-                                <dt>Urgencia</dt>
-                                <dd>{{ item.urgencia|capitalize }}</dd>
-                            </div>
-                            <div>
-                                <dt>Fecha estimada</dt>
-                                <dd>
-                                    {% if item.fecha_estimada %}
-                                        {{ item.fecha_estimada.strftime('%d/%m/%Y') }}
-                                    {% else %}
-                                        A coordinar
-                                    {% endif %}
-                                </dd>
-                            </div>
-                        </dl>
-                        <div class="budget-request-card__actions">
-                            <a class="budget-button budget-button--primary budget-card__cta" href="/presupuestos/{{ item.id }}">
-                                Ver detalle y ofertar
-                            </a>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
+        <div class="budget-compact__list">
+            {% for item in budget_requests %}
+            <article class="budget-compact__card">
+                <div class="budget-compact__content">
+                    <div class="budget-compact__meta"><span class="budget-compact__category">{{ item.categoria }}</span><span>Zona: {{ item.zona }}</span></div>
+                    <h2>{{ item.titulo }}</h2>
+                    <p>{{ item.descripcion|truncate(220) }}</p>
+                    <div class="budget-compact__meta budget-compact__secondary"><time datetime="{{ item.fecha_creacion.isoformat() }}Z">{{ publication_ages[item.id] }}</time><span>{{ item.offers|length }} de {{ max_offers }} presupuestos recibidos</span></div>
+                </div>
+                <a class="budget-button budget-button--primary budget-compact__cta" href="/presupuestos/{{ item.id }}">Ver solicitud<span class="budget-compact__sr">: {{ item.titulo }}</span></a>
+            </article>
+            {% endfor %}
+        </div>
         {% else %}
-            <div class="budget-empty">
-                <h2>No encontramos oportunidades con esos filtros</h2>
-                <p>Proba otra categoria o zona para ampliar la busqueda.</p>
-                <a class="budget-button budget-button--secondary" href="/presupuestos">Ver todas</a>
-            </div>
+        <div class="budget-empty"><h2>No hay solicitudes disponibles{% if categoria or zona %} para esta búsqueda{% endif %}</h2><p>Cuando haya nuevas solicitudes, podrás consultarlas acá.</p>{% if categoria or zona %}<a class="budget-button budget-button--secondary" href="/profesional/presupuestos">Ver todas</a>{% endif %}</div>
         {% endif %}
+        <nav class="budget-workflow-nav" aria-label="Páginas de solicitudes">
+            {% if page > 1 %}<a href="{{ url_for('operations.marketplace_presupuestos', page=page-1, per_page=per_page, categoria=categoria, zona=zona) }}">Anterior</a>{% endif %}
+            <span>Página {{ page }}</span>
+            {% if has_next %}<a href="{{ url_for('operations.marketplace_presupuestos', page=page+1, per_page=per_page, categoria=categoria, zona=zona) }}">Siguiente</a>{% endif %}
+        </nav>
     </section>
 </main>
 {% endblock %}

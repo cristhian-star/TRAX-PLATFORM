@@ -1,0 +1,51 @@
+.pp-workspace { color: var(--trax-ds-text); min-width: 0; }
+.pp-workspace *, .pp-workspace *::before, .pp-workspace *::after { box-sizing: border-box; }
+.pp-workspace h1 { font-size: var(--trax-ds-font-size-3xl); margin: 0 0 .5rem; }
+.pp-workspace h2 { font-size: var(--trax-ds-font-size-xl); margin: .75rem 0 .4rem; overflow-wrap: anywhere; }
+.pp-workspace p { margin: .4rem 0; overflow-wrap: anywhere; }
+.pp-heading, .pp-order, .pp-meta, .pp-card footer, .pp-pagination { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.pp-heading, .pp-order { justify-content: space-between; }
+.pp-heading { margin-bottom: 1.5rem; }
+.pp-tabs { display: flex; gap: 1.5rem; border-bottom: 1px solid var(--trax-ds-border); margin-bottom: 1.5rem; flex-wrap: wrap; }
+.pp-tabs a { padding: .75rem .5rem; min-height: 44px; color: var(--trax-ds-text-secondary); text-decoration: none; border-bottom: 3px solid transparent; }
+.pp-tabs a[aria-current] { color: var(--trax-ds-primary); border-color: var(--trax-ds-primary); font-weight: 700; }
+.pp-search { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: .75rem; align-items: end; }
+.pp-query span { display: block; margin-bottom: .5rem; }
+.pp-filters { align-self: end; }
+.pp-filters[open] { grid-column: 1/-1; }
+.pp-filters summary { width: fit-content; min-height: 44px; padding: .65rem 1rem; cursor: pointer; border: 1px solid var(--trax-ds-border-strong); border-radius: var(--trax-ds-radius-md); }
+.pp-filter-fields { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; padding: 1rem 0; }
+.pp-filter-fields label { flex: 1 1 180px; min-width: 0; }
+.pp-workspace input, .pp-workspace select { width: 100%; min-width: 0; min-height: 44px; }
+.pp-active a { display: inline-block; padding: .75rem; }
+.pp-order { margin: 1rem 0; color: var(--trax-ds-text-secondary); }
+.pp-list { display: grid; gap: 1rem; }
+.pp-card { border-left: 5px solid var(--trax-ds-primary); padding: 1.25rem; background: var(--trax-ds-surface); overflow-wrap: anywhere; }
+.pp-meta { color: var(--trax-ds-text-secondary); }
+.pp-category { color: var(--trax-ds-primary); background: var(--trax-ds-primary-soft); padding: .3rem .8rem; border-radius: var(--trax-ds-radius-pill); font-weight: 700; }
+.pp-card footer { border-top: 1px solid var(--trax-ds-border); margin-top: .8rem; padding-top: .8rem; }
+.pp-card footer > .pp-secondary { margin-right: auto; }
+.pp-secondary { color: var(--trax-ds-text-secondary); font-size: .9rem; }
+.pp-budget { display: grid; gap: .2rem; }
+.pp-budget strong { font-size: 1.2rem; }
+.pp-disabled { display: inline-flex; align-items: center; min-height: 44px; padding: .6rem 1rem; color: var(--trax-ds-text-secondary); background: var(--trax-ds-surface-muted); border: 1px solid var(--trax-ds-border); border-radius: var(--trax-ds-radius-md); }
+.pp-pagination { justify-content: center; margin-top: 1.25rem; }
+.pp-workspace a:focus-visible, .pp-workspace summary:focus-visible, .pp-workspace button:focus-visible { outline: 3px solid var(--trax-ds-focus-ring, var(--trax-ds-secondary)); outline-offset: 3px; }
+.pp-workspace .trax-button { min-height: 44px; white-space: normal; text-align: center; }
+@media (max-width: 640px) {
+ .pp-heading, .pp-card footer { align-items: stretch; flex-direction: column; }
+ .pp-search { grid-template-columns: minmax(0,1fr); }
+ .pp-tabs { gap: .25rem; }
+ .pp-tabs a { flex: 1 1 100%; }
+ .pp-card { padding: 1rem; }
+ .pp-card footer > .pp-secondary { margin-right: 0; }
+ .pp-pagination { gap: .5rem; }
+}
+
+.pp-workspace a.trax-button--primary { color: var(--trax-ds-text-inverse); }
+.pp-workspace a.trax-button--secondary { color: var(--trax-ds-text-strong); }
+@media (prefers-reduced-motion: reduce) { .pp-workspace .trax-button { transition: none; transform: none; } }
+
+.pp-workspace .pp-filter-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.pp-workspace .pp-filter-actions .trax-button { min-width: 7rem; font-weight: var(--trax-ds-font-weight-extrabold); text-decoration: none; }
+.pp-workspace .pp-empty { text-align: center; }

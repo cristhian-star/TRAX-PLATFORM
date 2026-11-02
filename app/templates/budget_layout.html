@@ -1,0 +1,5 @@
+{% extends 'professional_workspace_base.html' if budget_workspace else 'base.html' %}
+{% block extra_css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-workflow.css') }}">{% endblock %}
+{% block content %}{% if budget_workspace %}{{ super() }}{% else %}{{ self.budget_content() }}{% endif %}{% endblock %}
+{% block workspace_content %}{{ self.budget_content() }}{% endblock %}
+{% block budget_content %}{% endblock %}

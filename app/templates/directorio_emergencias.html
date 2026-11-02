@@ -15,11 +15,11 @@
                 <p>
                     Categoria buscada: <strong>{{ categoria or "todas" }}</strong>.
                     Zona buscada: <strong>{{ zona or "sin zona especifica" }}</strong>.
-                    Encontramos <strong>{{ professional_rows|length }}</strong> perfiles compatibles.
+                    Encontramos <strong>{{ total }}</strong> perfiles compatibles.
                 </p>
             </div>
             <div class="emergency-directory__count">
-                <strong>{{ professional_rows|length }}</strong>
+                <strong>{{ total }}</strong>
                 <span>profesionales encontrados</span>
             </div>
         </div>
@@ -35,12 +35,12 @@
         </div>
 
         <p class="emergency-directory__availability-note">
-            La disponibilidad es informada por cada profesional y debe confirmarse al contactar.
+            La disponibilidad todavía no está acreditada. Confirmala directamente antes de coordinar una visita.
         </p>
 
         {% if request_created %}
             <p class="emergency-directory__notice">
-                Solicitud registrada. Ahora podes contactar profesionales compatibles.
+                Solicitud #{{ emergency_request_id }} registrada. Podés consultar perfiles y confirmar disponibilidad; no se asignó ni convocó automáticamente a un profesional.
             </p>
         {% elif anonymous_search %}
             <p class="emergency-directory__notice">
@@ -97,17 +97,13 @@
             <p>En esta version, la disponibilidad se confirma manualmente al contactar.</p>
         </section>
 
-        <section class="emergency-membership-note" aria-label="Informacion de membresias">
-            <article>
-                <strong>WORK</strong>
-                <p>Oportunidades mensuales limitadas proximamente.</p>
-            </article>
-            <article>
-                <strong>PRO</strong>
-                <p>Urgencias ilimitadas proximamente.</p>
-            </article>
-        </section>
+        <nav class="emergency-pagination" aria-label="Páginas de profesionales">
+            {% if page > 1 %}<a href="{{ url_for('operations.directorio_emergencias', categoria=categoria, zona=zona, solicitud=emergency_request_id, page=page-1, per_page=per_page) }}">Anterior</a>{% endif %}
+            <span>Página {{ page }}</span>
+            {% if has_next %}<a href="{{ url_for('operations.directorio_emergencias', categoria=categoria, zona=zona, solicitud=emergency_request_id, page=page+1, per_page=per_page) }}">Siguiente</a>{% endif %}
+        </nav>
+        {% if session.get('user_role') == 'PROFESIONAL' %}<a href="{{ url_for('main.profesional_urgencias') }}">Volver a mi espacio de Urgencias</a>{% endif %}
     </section>
 </main>
-{% include "components/_whatsapp_consent_modal.html" %}
+
 {% endblock %}

@@ -1,0 +1,95 @@
+/* PROF-URGENCIAS-UX-001: presentation scoped to the private workspace. */
+.professional-workspace .pw-opportunity-nav { display:flex; flex-wrap:wrap; gap:8px 24px; border-bottom:1px solid var(--pw-line); margin-bottom:28px; }
+.professional-workspace .pw-opportunity-nav a { display:flex; align-items:center; min-height:52px; padding:8px 0; color:var(--pw-muted); border-bottom:3px solid transparent; }
+.professional-workspace .pw-opportunity-nav a[aria-current] { color:var(--pw-accent); border-color:var(--pw-accent); }
+.pu-urgencies .pu-heading { display:flex; justify-content:space-between; gap:24px; align-items:center; margin-bottom:22px; }
+.pu-urgencies a { display:inline-flex; align-items:center; min-height:44px; }
+.pu-urgencies .pu-status { display:flex; gap:16px; align-items:center; }
+.pu-urgencies .pu-status h2 { font-size:1rem; }
+.pu-urgencies .pu-status p { margin-bottom:0; }
+.pu-urgencies .pu-status > a { margin-left:auto; flex-shrink:0; }
+.pu-urgencies .pu-symbol { display:grid; place-items:center; width:46px; height:46px; background:var(--pw-soft); color:var(--pw-accent); border-radius:12px; flex-shrink:0; }
+.pu-urgencies .pu-symbol svg { width:24px; height:24px; }
+.pu-urgencies .pu-toolbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin:26px 0; }
+.pu-urgencies .pu-toolbar nav { display:flex; gap:4px; background:var(--pw-bg); padding:4px; border:1px solid var(--pw-line); border-radius:12px; }
+.pu-urgencies .pu-toolbar a { padding:10px 18px; color:var(--pw-muted); border-radius:8px; }
+.pu-urgencies .pu-toolbar a[aria-current] { background:var(--pw-card); color:var(--pw-text); box-shadow:0 2px 6px #0001; }
+.pu-urgencies .pu-toolbar time { font-size:.85rem; color:var(--pw-muted); }
+.pu-urgencies .pu-columns { display:grid; grid-template-columns:1.05fr 1fr; gap:24px; align-items:start; }
+.pu-urgencies .pu-columns > * { min-width:0; }
+.pu-urgencies .pu-pending { margin-top:20px; border-color:var(--pw-accent); }
+.pu-urgencies .pu-label { display:inline-block; background:var(--pw-soft); color:var(--pw-accent); padding:6px 9px; border-radius:6px; font-size:.85rem; margin-bottom:12px; }
+.pu-urgencies .pu-process ol { padding-left:24px; }
+.pu-urgencies .pu-process li { padding:12px 0; border-bottom:1px solid var(--pw-line); }
+.pu-urgencies .pu-process li:last-child { border:0; }
+.pu-urgencies .pu-process p { font-size:.95rem; }
+.pu-urgencies .pu-date-form { display:flex; flex-wrap:wrap; align-items:end; gap:16px; margin:24px 0; }
+.pu-urgencies label { display:block; margin-bottom:8px; font-weight:700; }
+.pu-urgencies input, .pu-urgencies button:not(.trax-button) { min-height:44px; max-width:100%; background:var(--pw-card); color:var(--pw-text); border:1px solid var(--pw-muted); padding:10px 12px; border-radius:10px; font:inherit; }
+.theme-dark .pu-urgencies input { color-scheme:dark; }
+.pu-urgencies .pu-shifts { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.pu-urgencies .pu-shifts article { border:1px solid var(--pw-line); border-radius:12px; padding:20px; min-width:0; }
+.pu-urgencies summary { min-height:44px; cursor:pointer; padding:12px 0; font-weight:700; }
+.pu-urgencies .pu-followup { margin-top:24px; }
+.pu-urgencies .pu-note { border-top:1px solid var(--pw-line); margin-top:30px; padding-top:14px; font-size:.85rem; }
+.pu-urgencies .pu-mobile-back { display:none; }
+@media(max-width:1024px) { .pu-urgencies .pu-heading, .pu-urgencies .pu-status { flex-wrap:wrap; } .pu-urgencies .pu-status > a { margin-left:0; } }
+@media(max-width:768px) { .pu-urgencies .pu-columns, .pu-urgencies .pu-shifts { grid-template-columns:1fr; } .pu-urgencies .pu-mobile-back { display:inline-flex; } .professional-workspace .pw-opportunity-nav { gap:14px; } .pu-urgencies .pw-card-heading { flex-wrap:wrap; } }
+@media(prefers-reduced-motion:reduce) { .pu-urgencies *, .professional-workspace .pw-opportunity-nav * { scroll-behavior:auto; animation:none; transition:none; } }
+
+/* Weekly planner and honest pending inbox, selected 2026-10-25. */
+.pu-urgencies .pu-columns { grid-template-columns:minmax(0, 2.4fr) minmax(245px, 1fr); }
+.pu-urgencies .pu-toolbar { border-bottom:1px solid var(--pw-line); }
+.pu-urgencies .pu-toolbar nav { background:none; border:0; padding:0; border-radius:0; }
+.pu-urgencies .pu-toolbar a { border-radius:0; border-bottom:3px solid transparent; }
+.pu-urgencies .pu-toolbar a[aria-current] { color:var(--pw-accent); border-color:var(--pw-accent); background:none; box-shadow:none; }
+.pu-urgencies .pu-request { border:1px solid var(--pw-line); border-left:5px solid var(--pw-accent); border-radius:12px; padding:24px; background:var(--pw-bg); }
+.pu-urgencies .pu-week-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+.pu-urgencies .pu-week-heading nav { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.pu-urgencies .pu-week-heading a { min-width:44px; justify-content:center; border:1px solid var(--pw-line); border-radius:8px; }
+.pu-urgencies .pu-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); border:1px solid var(--pw-line); border-radius:12px; margin:20px 0; overflow:hidden; }
+.pu-urgencies .pu-day { min-width:0; border-right:1px solid var(--pw-line); padding:8px; }
+.pu-urgencies .pu-day:last-child { border-right:0; }
+.pu-urgencies .pu-day h3 { text-align:center; font-size:.9rem; margin:8px 0 16px; }
+.pu-urgencies .pu-day time { display:block; }
+.pu-urgencies .pu-slot { position:relative; display:flex; flex-direction:column; gap:8px; min-height:165px; padding:10px 5px; border:1px solid var(--pw-muted); border-radius:8px; text-align:center; font-size:.8rem; cursor:pointer; overflow-wrap:anywhere; }
+.pu-urgencies .pu-slot input, .pu-urgencies .pu-consent input { min-height:24px; width:24px; height:24px; padding:0; accent-color:var(--pw-accent); flex-shrink:0; }
+.pu-urgencies .pu-slot input { margin:0 auto; }
+.pu-urgencies .pu-slot small, .pu-urgencies .pu-slot-off { display:block; font-weight:400; margin-top:8px; }
+.pu-urgencies .pu-slot-on { display:none; }
+.pu-urgencies .pu-slot:has(input:checked) { border-color:var(--pw-accent); background:var(--pw-soft); }
+.pu-urgencies .pu-slot input:checked + span .pu-slot-on { display:block; margin-top:8px; color:var(--pw-accent); }
+.pu-urgencies .pu-slot input:checked + span .pu-slot-off { display:none; }
+.pu-urgencies .pu-slot:has(input:disabled) { color:var(--pw-muted); border-style:dashed; cursor:default; }
+.pu-urgencies .pu-consent { display:flex; align-items:start; gap:12px; font-weight:400; }
+.pu-urgencies [data-selection-list] { padding-left:20px; }
+.pu-urgencies [data-selection-list] li { padding:12px 0; border-bottom:1px solid var(--pw-line); }
+.pu-urgencies .pu-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.pu-urgencies :focus-visible { outline:3px solid var(--pw-accent); outline-offset:3px; }
+.pu-urgencies { overflow-wrap:anywhere; }
+@media(max-width:1279px) { .pu-urgencies .pu-planner { grid-template-columns:1fr; } }
+@media(max-width:767px) {
+ .pu-urgencies .pu-columns { grid-template-columns:1fr; }
+ .pu-urgencies .pu-calendar { grid-template-columns:1fr; }
+ .pu-urgencies .pu-day { display:grid; grid-template-columns:1fr 1fr; gap:12px; border-right:0; border-bottom:1px solid var(--pw-line); padding:16px; }
+ .pu-urgencies .pu-day h3 { grid-column:1/-1; text-align:left; margin:0; }
+ .pu-urgencies .pu-day time { display:inline; }
+ .pu-urgencies .pu-slot { min-height:140px; }
+ .pu-urgencies .pu-toolbar a { padding:10px; }
+ .pu-urgencies { padding-bottom:40px; }
+}
+
+.pu-urgencies .pu-week-heading nav button:disabled { min-width:44px; cursor:not-allowed; color:var(--pw-muted); background:var(--pw-bg); box-shadow:none; }
+
+.pu-urgencies .pu-settings { gap:var(--trax-ds-space-2); }
+.pu-urgencies .pu-settings svg { width:20px; height:20px; flex-shrink:0; }
+.pu-urgencies .trax-button--primary:disabled { background:var(--trax-ds-surface); border-color:var(--pw-muted); color:var(--pw-muted); opacity:1; }
+
+.pu-urgencies .pu-scheduled-list { list-style:none; padding:0; margin:16px 0 0; max-height:28rem; overflow-y:auto; }
+.pu-urgencies .pu-scheduled-list li { padding:16px 0; border-top:1px solid var(--pw-line); }
+.pu-urgencies .pu-scheduled-list li > div { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:8px; }
+.pu-urgencies .pu-scheduled-list .pu-label { margin:0; }
+
+.pu-urgencies #pu-reservation-form { display: none; }
+.pu-urgencies .pu-release { margin-top: 1rem; }
+.pu-urgencies .pu-release p { font-size: .875rem; }

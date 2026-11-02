@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "professional_workspace_base.html" %}
 
 {% block extra_css %}
+    {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/professional-media-form.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block workspace_content %}
 {% set gallery_entries = professional.gallery_urls.splitlines() if professional and professional.gallery_urls else [] %}
 {% set portfolio_entries = professional.portfolio_urls.splitlines() if professional and professional.portfolio_urls else [] %}
 {% set other_link_entries = professional.other_links.splitlines() if professional and professional.other_links else [] %}
@@ -16,6 +17,7 @@
 {% set private_media_items = private_media_items if private_media_items is defined else [] %}
 
 <main class="private-profile" data-private-profile>
+    <a class="trax-button" href="{{ url_for('emergency_configuration.configure') }}">Configuración de urgencias</a>
     <section class="private-profile__hero">
         <div class="private-profile__cover">
             {% if professional_media.cover_url %}
@@ -30,7 +32,7 @@
                 {% if professional_media.avatar_url %}
                     <img src="{{ professional_media.avatar_url }}" alt="{{ professional_media.avatar_alt }}">
                 {% else %}
-                    <span>{{ profile_name[:1] }}</span>
+                    <span>{{ workspace.initials }}</span>
                 {% endif %}
             </div>
 
@@ -39,15 +41,15 @@
                 <h1>{{ profile_name }}</h1>
                 <p>{{ profile_specialty }} / {{ profile_zone }}</p>
                 <div class="private-profile__badges" aria-label="Estado profesional">
-                    <span class="private-profile__badge {{ 'private-profile__badge--pro' if is_pro else '' }}">{{ "PRO" if is_pro else "WORK" }}</span>
+                    <span class="private-profile__badge {{ 'private-profile__badge--pro' if is_pro else '' }}">{{ "PRO" if is_pro else "FREE" }}</span>
                     <span class="private-profile__badge {{ 'private-profile__badge--verified' if is_verified else '' }}">{{ "Verificado" if is_verified else "Verificacion pendiente" }}</span>
                     <span class="private-profile__badge">{{ "%.1f"|format(average_rating) if average_rating else "Sin rating" }}{% if average_rating %} / {{ review_count }} resenas{% endif %}</span>
                 </div>
             </div>
 
-            <div class="private-profile__completion" aria-label="Perfil completo {{ profile_completion }}%">
+            <div class="private-profile__completion" aria-label="Presentación del perfil {{ profile_completion }}%">
                 <strong>{{ profile_completion }}%</strong>
-                <span>perfil completo</span>
+                <span>presentación del perfil</span>
                 <div class="private-profile__progress">
                     <span style="width: {{ profile_completion }}%"></span>
                 </div>
@@ -79,7 +81,7 @@
         </aside>
 
         <section class="private-profile__workspace" aria-live="polite">
-            <section class="private-profile__panel is-active" data-profile-panel="general">
+            <section class="private-profile__panel is-active" id="perfil-general" data-profile-panel="general">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Base profesional</span>
@@ -107,7 +109,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="media">
+            <section class="private-profile__panel" id="perfil-media" data-profile-panel="media">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Visual</span>
@@ -240,7 +242,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="coverage">
+            <section class="private-profile__panel" id="perfil-coverage" data-profile-panel="coverage">
                 {% set selected_radius = professional.coverage_radius_km if professional and professional.coverage_radius_km is not none else none %}
                 {% set selected_radius_value = selected_radius if selected_radius in coverage_radius_options else "PERSONALIZADO" %}
                 {% set selected_mode = professional.coverage_mode if professional and professional.coverage_mode else "RADIO" %}
@@ -373,7 +375,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="services">
+            <section class="private-profile__panel" id="perfil-services" data-profile-panel="services">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Oferta</span>
@@ -389,7 +391,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="social">
+            <section class="private-profile__panel" id="perfil-social" data-profile-panel="social">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Canales</span>
@@ -466,7 +468,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="certifications">
+            <section class="private-profile__panel" id="perfil-certifications" data-profile-panel="certifications">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Confianza</span>
@@ -517,7 +519,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="experience">
+            <section class="private-profile__panel" id="perfil-experience" data-profile-panel="experience">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Trayectoria</span>
@@ -542,7 +544,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="availability">
+            <section class="private-profile__panel" id="perfil-availability" data-profile-panel="availability">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Operacion</span>
@@ -567,7 +569,7 @@
                 </div>
             </section>
 
-            <section class="private-profile__panel" data-profile-panel="settings">
+            <section class="private-profile__panel" id="perfil-settings" data-profile-panel="settings">
                 <div class="private-profile__panel-head">
                     <div>
                         <span class="private-profile__eyebrow">Control</span>
@@ -587,7 +589,7 @@
                     </article>
                     <article>
                         <strong>Plan actual</strong>
-                        <span>{{ "PRO" if is_pro else "WORK" }}</span>
+                        <span>{{ "PRO" if is_pro else "FREE" }}</span>
                     </article>
                 </div>
             </section>
@@ -626,6 +628,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+    {{ super() }}
     <script src="{{ url_for('static', filename='js/profile-private-ux-a.js') }}"></script>
     <script src="{{ url_for('static', filename='js/professional-coverage-map.js') }}"></script>
     {% if google_maps_api_key %}

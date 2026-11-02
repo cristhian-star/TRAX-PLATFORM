@@ -1,0 +1,4 @@
+<nav class="budget-compact__tabs" aria-label="Secciones de Presupuestos">
+    <a href="/profesional/presupuestos"{% if budget_tab == 'available' %} aria-current="page"{% endif %}>Solicitudes disponibles</a>
+    <a href="/presupuestos/mis-enviados"{% if budget_tab == 'sent' %} aria-current="page"{% endif %}>Presupuestos enviados</a>
+</nav>

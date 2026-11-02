@@ -1,6 +1,8 @@
 from urllib.parse import urlsplit
+from app import limiter as _shift_limiter
+from app.utils.security import user_rate_limit_key as _shift_actor_key
 
-from flask import Blueprint, abort, render_template, request, redirect, session
+from flask import Blueprint, abort, render_template, request, redirect, session, url_for
 from app.services.audit_service import _add_audit_log, create_audit_log, get_recent_audit_logs
 from app.services.abuse_report_service import (
     create_abuse_report,
@@ -266,7 +268,16 @@ def _update_admin_user_role(user_id, new_role):
 @main.route("/")
 def home():
     if session.get("user_id"):
-        return render_template("home_logged.html")
+        from app.services.user_service import is_user_active
+        user = User.query.get(session["user_id"])
+        if not is_user_active(user):
+            session.clear()
+            return redirect("/login")
+        session["user_role"] = user.rol
+        if user.rol == "PROFESIONAL":
+            return redirect("/profesional/dashboard")
+        if user.rol == "SUPER_ADMIN":
+            return render_template("home_logged.html")
 
     return render_template("home.html")
 
@@ -509,23 +520,23 @@ def completar_perfil_profesional():
 
         return redirect("/profesional/dashboard?profile_completed=1")
 
+    from app.services.professional_workspace_service import build_workspace
+    workspace = build_workspace(user_id)
     return render_template(
         "completar_perfil_profesional.html",
+        workspace=workspace,
         professional=professional,
         evidence_options=EVIDENCE_OPTIONS,
-        is_pro=has_pro_access(user_id),
-        is_verified=has_approved_verification(user_id),
-        average_rating=get_professional_average_rating(professional.id) if professional else None,
-        review_count=len(get_professional_reviews(professional.id)) if professional else 0,
-        coverage=obtener_cobertura_profesional(professional),
+        is_pro=workspace["plan"] == "PRO",
+        is_verified=workspace["verified"],
+        average_rating=workspace["rating"]["average"],
+        review_count=workspace["rating"]["count"],
+        coverage=workspace["coverage"],
         coverage_radius_options=obtener_opciones_radio(),
         google_maps_api_key=obtener_google_maps_api_key(),
-        professional_media=build_professional_media_context(professional),
+        professional_media=workspace["media"],
         private_media_items=get_private_media_items(professional),
-        profile_completion=calculate_private_profile_completion(
-            professional,
-            has_approved_verification(user_id),
-        ),
+        profile_completion=workspace["completion"],
     )
 
 
@@ -703,66 +714,123 @@ def solicitar_verificacion():
 @main.route("/profesional/dashboard")
 @role_required("PROFESIONAL")
 def profesional_dashboard():
-    user_id = session.get("user_id")
-    professional = get_professional_by_user_id(user_id)
-    reviews = get_professional_reviews(professional.id) if professional else []
-    average_rating = get_professional_average_rating(professional.id) if professional else None
-    budget_offers = get_professional_budget_offers(user_id) if user_id else []
-    awarded_budget_offers = [
-        offer for offer in budget_offers if offer.estado == "ADJUDICADO"
-    ]
-    proposal_applications = (
-        ProposalApplication.query
-        .filter_by(professional_user_id=user_id)
-        .order_by(ProposalApplication.created_at.desc(), ProposalApplication.id.desc())
-        .all()
-        if user_id else []
-    )
-    accepted_proposal_applications = [
-        application for application in proposal_applications if application.estado == "ACEPTADA"
-    ]
-    coverage = obtener_cobertura_profesional(professional)
+    from app.services.professional_workspace_service import build_workspace, workspace_home
+    return render_template("profesional_dashboard.html", workspace=build_workspace(session["user_id"]),
+                           **workspace_home(session["user_id"]))
 
-    recommendations = []
-    if not professional:
-        recommendations.append("Completa tu perfil profesional para aparecer en el marketplace.")
-    else:
-        if not professional.perfil_completo:
-            recommendations.append("Completa datos clave de tu oficio y experiencia.")
-        if not professional.descripcion:
-            recommendations.append("Agrega una descripcion clara de tus servicios.")
-        if not professional.perfil_completo:
-            recommendations.append("Revisa que tu perfil publico este completo antes de competir por mas oportunidades.")
-        if not has_approved_verification(user_id):
-            recommendations.append("Solicita verificacion para reforzar confianza en contrataciones.")
-        if not reviews:
-            recommendations.append("Impulsa tus primeras reseÃ±as cerrando trabajos dentro de MANDOBRA.")
-        if not coverage["configured"]:
-            recommendations.append("Configura tu zona de cobertura para que los clientes entiendan donde trabajas.")
 
-    return render_template(
-        "profesional_dashboard.html",
-        verification_requested=request.args.get("verification_requested") == "1",
-        profile_completed=request.args.get("profile_completed") == "1",
-        professional=professional,
-        is_profile_complete=bool(professional and professional.perfil_completo),
-        is_verified=has_approved_verification(session.get("user_id")),
-        is_pro=has_pro_access(session.get("user_id")),
-        pro_upgraded=request.args.get("pro_upgraded") == "1",
-        average_rating=average_rating,
-        review_count=len(reviews),
-        budget_offers_count=len(budget_offers),
-        awarded_budget_offers_count=len(awarded_budget_offers),
-        proposal_applications_count=len(proposal_applications),
-        accepted_proposal_applications_count=len(accepted_proposal_applications),
-        offer_allowance=get_offer_allowance(user_id) if user_id else None,
-        coverage=coverage,
-        recommendations=recommendations,
-        whatsapp_contact_sessions=obtener_contactos_profesional(professional.id, limit=5)
-        if professional else [],
-        recent_activity=obtener_notificaciones_usuario(user_id, limit=5) if user_id else [],
-        format_notification_date=formatear_fecha_notificacion,
-    )
+@main.route("/profesional/oportunidades")
+@role_required("PROFESIONAL")
+def profesional_oportunidades():
+    from app.services.professional_workspace_service import build_workspace, workspace_opportunities
+    return render_template("professional_opportunities.html", workspace=build_workspace(session["user_id"]),
+                           **workspace_opportunities(session["user_id"], request.args))
+
+
+@main.route("/profesional/oportunidades/urgencias", methods=["GET"])
+@role_required("PROFESIONAL")
+def profesional_urgencias():
+    from app.services.professional_workspace_service import build_workspace
+    from app.services.professional_urgencies_view_service import urgency_context, reservation_context
+    context = urgency_context(request.args)
+    if context.get('redirect_date'):
+        return redirect(url_for('main.profesional_urgencias', vista=context['urgency_view'], fecha=context['redirect_date']))
+    return render_template("professional_urgencies.html",
+                           workspace=build_workspace(session["user_id"]),
+                           **context, **reservation_context(session["user_id"], context))
+
+
+@main.route("/profesional/trabajos")
+@main.route("/profesional/trabajos/contratados")
+@role_required("PROFESIONAL")
+def profesional_trabajos():
+    if request.path == "/profesional/trabajos":
+        from app.routes.work_record_routes import list_view
+        return list_view()
+    from app.services.professional_workspace_service import build_workspace, workspace_jobs
+    return render_template("professional_jobs.html", workspace=build_workspace(session["user_id"]),
+                           **workspace_jobs(session["user_id"], request.args))
+
+
+@main.route("/profesional/presupuestos")
+@main.route("/profesional/propuestas")
+@role_required("PROFESIONAL")
+def profesional_marketplace():
+    if request.path.endswith("presupuestos"):
+        from app.routes.operation_routes import marketplace_presupuestos
+        return marketplace_presupuestos()
+    from app.services.professional_workspace_service import build_workspace
+    from app.services.professional_proposals_service import build_professional_proposals
+    from werkzeug.exceptions import BadRequest
+    from sqlalchemy.exc import SQLAlchemyError
+    context = dict(workspace=build_workspace(session["user_id"]), view="disponibles")
+    try:
+        context.update(build_professional_proposals(request.args, session["user_id"]))
+    except BadRequest:
+        return render_template("professional_proposals.html", **context, filter_error=True), 400
+    except SQLAlchemyError:
+        db.session.rollback()
+        return render_template("professional_proposals.html", **context, load_error=True), 503
+    return render_template("professional_proposals.html", **context)
+
+
+@main.route("/profesional/estadisticas")
+@role_required("PROFESIONAL")
+def profesional_estadisticas():
+    from app.services.professional_workspace_service import build_workspace
+    from app.services.professional_statistics_service import statistics_context
+    return render_template("professional_statistics.html", workspace=build_workspace(session["user_id"]),
+                           **statistics_context(session["user_id"], request.args))
+
+
+@main.route("/profesional/facturacion")
+@role_required("PROFESIONAL")
+def profesional_facturacion():
+    from app.services.professional_workspace_service import build_workspace
+    return render_template("professional_billing.html", workspace=build_workspace(session["user_id"]))
+
+
+@main.route("/profesional/facturacion/factura", defaults={"section": "factura"})
+@main.route("/profesional/facturacion/cobro", defaults={"section": "cobro"})
+@main.route("/profesional/facturacion/configuracion", defaults={"section": "configuracion"})
+@role_required("PROFESIONAL")
+def profesional_facturacion_preparacion(section):
+    from app.services.professional_collection_service import simulation_available, selector
+    if section == "cobro" and simulation_available():
+        from app.services.professional_workspace_service import build_workspace
+        return render_template("professional_collection.html", mode="selector",
+                               workspace=build_workspace(session["user_id"]),
+                               listing=selector(session["user_id"], request.args))
+    from app.services.professional_workspace_service import build_workspace
+    from app.services.professional_billing_view_service import prepared_page
+    return render_template("professional_billing_prepared.html",
+                           workspace=build_workspace(session["user_id"]),
+                           page=prepared_page(section))
+
+
+@main.route("/profesional/facturacion/cobro/<int:contract_id>")
+@role_required("PROFESIONAL")
+def profesional_cobro_revision(contract_id):
+    from app.services.professional_collection_service import simulation_available, review, review_token
+    from app.services.professional_workspace_service import build_workspace
+    if not simulation_available():
+        return redirect(url_for("main.profesional_facturacion_preparacion", section="cobro"))
+    card = review(session["user_id"], contract_id)
+    return render_template("professional_collection.html", mode="review", card=card,
+                           review_token=review_token(session["user_id"], card),
+                           workspace=build_workspace(session["user_id"]))
+
+
+@main.route("/profesional/facturacion/ordenes")
+@role_required("PROFESIONAL")
+def profesional_cobro_historial():
+    from app.services.professional_collection_service import simulation_available, history
+    from app.services.professional_workspace_service import build_workspace
+    if not simulation_available():
+        return redirect(url_for("main.profesional_facturacion_preparacion", section="cobro"))
+    return render_template("professional_collection.html", mode="history",
+                           listing=history(session["user_id"], request.args),
+                           workspace=build_workspace(session["user_id"]))
 
 
 @main.route("/cliente/dashboard")
@@ -1210,3 +1278,76 @@ def admin_rubros():
 def admin_aprobar_rubro(nombre_rubro):
     approve_category(nombre_rubro)
     return redirect("/admin/rubros")
+
+
+@main.route('/profesional/guardias/reservar', methods=['POST'])
+@role_required('PROFESIONAL')
+@_shift_limiter.limit('10 per minute;30 per day', key_func=_shift_actor_key)
+def reservar_guardias():
+    from app import db
+    from app.services.emergency_reservation_service import reserve, ReservationConflict
+    from app.services.professional_urgencies_view_service import urgency_context, reservation_context
+    from app.services.professional_workspace_service import build_workspace
+    from sqlalchemy.exc import SQLAlchemyError
+    from zoneinfo import ZoneInfoNotFoundError
+    actor = session['user_id']
+    values = request.form.getlist('blocks')
+    key = request.form.get('reservation_key', '')
+    context = urgency_context(request.form)
+    context['urgency_view'] = 'guardias'
+    error = None
+    status = 200
+    result = None
+    try:
+        if any(len(request.form.getlist(name)) != 1 for name in ('reservation_key','accepted')):
+            raise ValueError('Aceptá las condiciones y enviá un único formulario.')
+        result = reserve(actor, values, request.form.get('accepted') == 'yes', key)
+    except PermissionError as exc:
+        error, status = str(exc), 403
+    except ReservationConflict as exc:
+        error, status = str(exc), 409
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except (SQLAlchemyError, ZoneInfoNotFoundError):
+        db.session.rollback()
+        error, status = 'No pudimos confirmar la selección. Reintentá con este formulario.', 503
+    context = urgency_context(request.form)
+    context['urgency_view'] = 'guardias'
+    view = reservation_context(actor, context, values)
+    if error:
+        view.update(reservation_error=error, reservation_key=key)
+    else:
+        view.update(reservation_success=True, reservation_result=result)
+    return render_template('professional_urgencies.html', workspace=build_workspace(actor), **context, **view), status
+
+
+@main.route('/profesional/guardias/<int:shift_id>/liberar', methods=['POST'])
+@role_required('PROFESIONAL')
+@_shift_limiter.limit('10 per minute;30 per day', key_func=_shift_actor_key)
+def liberar_guardia(shift_id):
+    from app import db
+    from app.services.emergency_release_service import release
+    from app.services.emergency_reservation_service import ReservationConflict
+    from app.services.professional_urgencies_view_service import urgency_context, reservation_context
+    from app.services.professional_workspace_service import build_workspace
+    from sqlalchemy.exc import SQLAlchemyError
+    actor = session['user_id']
+    context = urgency_context(request.form)
+    context['urgency_view'] = 'guardias'
+    error, status = None, 200
+    try:
+        if len(request.form.getlist('release_key')) != 1:
+            raise ValueError('Enviá un único formulario de liberación.')
+        release(actor, shift_id, request.form['release_key'])
+    except PermissionError as exc:
+        error, status = str(exc), 403
+    except ReservationConflict as exc:
+        error, status = str(exc), 409
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except SQLAlchemyError:
+        db.session.rollback()
+        error, status = 'No pudimos liberar el turno. Reintentá con el mismo formulario.', 503
+    view = reservation_context(actor, context)
+    view.update(reservation_error=error, release_success=error is None)
+    return render_template('professional_urgencies.html', workspace=build_workspace(actor), **context, **view), status

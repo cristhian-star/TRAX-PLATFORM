@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, current_app, redirect, render_template, session, url_for
+from flask import Blueprint, Response, current_app, redirect, render_template, session, url_for, request, g
 
 from app import db
 
@@ -14,7 +14,20 @@ from app.utils.decorators import login_required, role_required
 payment_order_delivery = Blueprint("payment_order_delivery", __name__)
 
 
+def _render_checkout(**context):
+    from app.services.professional_collection_service import simulation_available
+    if simulation_available():
+        from app.services.professional_workspace_service import build_workspace
+        return render_template("professional_collection.html", mode="checkout",
+                               workspace=build_workspace(session["user_id"]), **context)
+    return render_template("payment_order_checkout.html", **context)
+
+
 def _service():
+    if "isolated_collection_runtime" in current_app.extensions:
+        from app.services.professional_collection_service import simulation_available
+        if not simulation_available():
+            raise PaymentOrderUnavailableError
     if current_app.config.get("CHECKOUT_PRO_DELIVERY_ENABLED") is not True:
         raise PaymentOrderUnavailableError
     service = current_app.extensions.get("payment_order_delivery_service")
@@ -41,13 +54,21 @@ def _execute(operation):
     except Exception:
         failure = ("Error interno", 500)
     message, status = failure
-    return render_template("payment_order_checkout.html", checkout=None, error_message=message), status
+    return _render_checkout(checkout=None, error_message=message), status
 
 
 @payment_order_delivery.route("/contratacion/<int:id>/orden-de-cobro", methods=["POST"])
 @login_required
 @role_required("PROFESIONAL")
 def create_order(id):
+    from app.services.professional_collection_service import simulation_available, check_review
+    if simulation_available():
+        from werkzeug.exceptions import HTTPException
+        try:
+            card = check_review(session["user_id"], id, request.form.get("review_token"))
+            g.collection_review_amount = card["amount"]
+        except HTTPException as error:
+            return _render_checkout(checkout=None, error_message=error.description), error.code
     def operation():
         # Session decorators queried through the request-scoped ORM session.
         # Release it before 4B commits its claim and performs the external call.
@@ -64,7 +85,7 @@ def checkout(id):
     def operation():
         service = _service()
         result = service.get_checkout(actor_user_id=session["user_id"], contract_request_id=id)
-        page = render_template("payment_order_checkout.html", checkout=result, contract_id=id)
+        page = _render_checkout(checkout=result, contract_id=id)
         service.ensure_unexpired(result)
         return page
     return _execute(operation)

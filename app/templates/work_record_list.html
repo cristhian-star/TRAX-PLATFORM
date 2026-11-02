@@ -1,0 +1,17 @@
+{% extends 'professional_workspace_base.html' %}
+{% block extra_css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static',filename='css/work-records.css') }}">{% endblock %}
+{% block workspace_content %}<section class="wr" aria-labelledby="wr-title">
+<header class="wr-heading"><div><h1 id="wr-title">Mis trabajos</h1><p>Consultá tus registros y próximos seguimientos.</p><a href="/profesional/trabajos/contratados">Trabajos contratados en MANDOBRA →</a></div><a class="trax-button trax-button--primary" href="{{ url_for('work_records.edit') }}">+ Registrar trabajo</a></header>
+<form method="GET" class="trax-card wr-filters">
+<label>Buscar<input name="q" value="{{ filters.get('q','') }}" maxlength="160" placeholder="Título o palabras del registro"></label>
+<label>Cliente<input name="client" value="{{ filters.get('client','') }}" maxlength="160" placeholder="Nombre del cliente"></label>
+<label>Fecha del trabajo: desde<input type="date" name="from" value="{{ filters.get('from','') }}"></label>
+<label>Hasta<input type="date" name="to" value="{{ filters.get('to','') }}"></label>
+<label>Seguimiento<select name="follow">{% for value,label in [('', 'Todos'),('with','Con seguimiento'),('without','Sin seguimiento')] %}<option value="{{ value }}" {% if filters.get('follow','')==value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+<div class="wr-actions"><button class="trax-button trax-button--primary">Aplicar</button><a class="trax-button trax-button--secondary" href="/profesional/trabajos">Limpiar</a></div></form>
+{% if error %}<p class="wr-error" role="alert">{{ error }}</p>{% endif %}
+<div class="wr-heading"><p>{{ total }} registros</p><p>Más recientes primero</p></div>
+{% for row in rows %}<article class="trax-card wr-row"><div><time>{{ row.work_date.strftime('%d/%m/%Y') }}</time><h2>{{ row.title }}</h2><p>{{ row.client_name }}{% if row.client_name and row.location %} · {% endif %}{{ row.location }}</p><p>{{ row.notes|truncate(200) }}</p>{% if row.followup.enabled %}<span class="wr-badge">Seguimiento: {{ row.followup.tentative_date.strftime('%d/%m/%Y') }}</span> <span>Por coordinar</span>{% else %}<span class="wr-badge">Sin seguimiento</span>{% endif %}</div><a class="trax-button trax-button--secondary" href="{{ url_for('work_records.detail',record_id=row.id,ret=return_token) }}">Ver registro</a></article>
+{% else %}<section class="trax-card wr-empty"><h2>{{ 'No encontramos registros para estos filtros' if request.args else 'Todavía no registraste trabajos' }}</h2>{% if request.args %}<a href="/profesional/trabajos">Limpiar filtros</a>{% else %}<a class="trax-button trax-button--primary" href="{{ url_for('work_records.edit') }}">Registrar el primero</a>{% endif %}</section>{% endfor %}
+<nav class="wr-actions" aria-label="Páginas de registros">{% if page>1 %}<a class="trax-button trax-button--secondary" href="{{ page_url(page-1) }}">Anterior</a>{% endif %}<span>Página {{ page }}</span>{% if has_next %}<a class="trax-button trax-button--secondary" href="{{ page_url(page+1) }}">Siguiente</a>{% endif %}</nav>
+</section>{% endblock %}

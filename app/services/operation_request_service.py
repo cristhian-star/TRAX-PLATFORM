@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from app.services.proposal_service import validate_proposal_creation
+
 from app.services.geographic_matching_service import normalizar_coordenadas
 
 
@@ -97,6 +99,11 @@ def build_proposal_form_data(form):
 
 
 def validate_proposal_form_data(form_data):
+    try:
+        validate_proposal_creation(form_data["titulo"], form_data["descripcion"],
+                                   form_data["modalidad"], form_data["cantidad_profesionales"])
+    except ValueError as error:
+        return str(error)
     required_fields = ("industria", "categoria", "rubro", "titulo", "descripcion", "ubicacion", "modalidad")
     if any(not form_data[field] for field in required_fields):
         return "Completa industria, categoria, rubro, titulo, descripcion, ubicacion y modalidad."

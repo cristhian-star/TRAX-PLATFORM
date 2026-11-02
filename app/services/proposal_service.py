@@ -29,7 +29,7 @@ class ProposalAcceptanceResult:
     state_changed: bool
 
 
-def _parse_decimal(value, field_label, required=False):
+def _parse_decimal(value, field_label, required=False, maximum="9999999999.99"):
     if value is None or str(value).strip() == "":
         if required:
             raise ValueError(f"{field_label} es requerido")
@@ -40,10 +40,50 @@ def _parse_decimal(value, field_label, required=False):
     except (InvalidOperation, TypeError, ValueError):
         raise ValueError(f"{field_label} no es valido") from None
 
+    if not parsed.is_finite():
+        raise ValueError(f"{field_label} no es valido")
     if parsed < 0:
         raise ValueError(f"{field_label} no puede ser negativo")
 
+    if parsed > Decimal(maximum):
+        raise ValueError(f"{field_label} excede el importe permitido")
+
     return parsed
+
+
+PROPOSAL_MODALITIES = ("Presencial", "Remoto", "Hibrido", "A coordinar")
+
+
+def validate_proposal_creation(titulo, descripcion, modalidad, cantidad_profesionales):
+    """Normalize and validate the values that will be persisted, before any effects."""
+    values = {}
+    for name, value, label, limit in (
+        ("titulo", titulo, "Título", 160),
+        ("descripcion", descripcion, "Descripción", 1800),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{label}: completá este campo obligatorio.")
+        value = value.strip()
+        if len(value) > limit:
+            raise ValueError(f"{label}: usá hasta {limit} caracteres.")
+        values[name] = value
+    mode = modalidad.strip() if isinstance(modalidad, str) else None
+    if mode not in PROPOSAL_MODALITIES:
+        raise ValueError("Modalidad: seleccioná una opción válida del catálogo.")
+    values["modalidad"] = mode
+    if cantidad_profesionales is None or (isinstance(cantidad_profesionales, str) and not cantidad_profesionales.strip()):
+        quantity = 1
+    elif type(cantidad_profesionales) is int:
+        quantity = cantidad_profesionales
+    elif isinstance(cantidad_profesionales, str) and cantidad_profesionales.strip().isascii() and cantidad_profesionales.strip().isdigit():
+        raw = cantidad_profesionales.strip().lstrip('0') or '0'
+        quantity = int(raw) if len(raw) <= 2 else 51
+    else:
+        raise ValueError("Cantidad de profesionales: ingresá un entero entre 1 y 50.")
+    if not 1 <= quantity <= 50:
+        raise ValueError("Cantidad de profesionales: ingresá un entero entre 1 y 50.")
+    values["cantidad_profesionales"] = quantity
+    return values
 
 
 def create_proposal_request(
@@ -61,6 +101,7 @@ def create_proposal_request(
     fecha_inicio_estimada=None,
     fecha_limite_postulacion=None,
 ):
+    validated = validate_proposal_creation(titulo, descripcion, modalidad, cantidad_profesionales)
     proposal_request = ProposalRequest(
         cliente_id=owner_user_id,
         owner_user_id=owner_user_id,
@@ -68,12 +109,12 @@ def create_proposal_request(
         categoria=categoria,
         rubro=rubro,
         especialidad=especialidad,
-        titulo=titulo,
-        descripcion=descripcion,
+        titulo=validated["titulo"],
+        descripcion=validated["descripcion"],
         ubicacion=ubicacion,
-        modalidad=modalidad,
-        cantidad_profesionales=cantidad_profesionales or 1,
-        presupuesto_estimado=_parse_decimal(presupuesto_estimado, "El presupuesto estimado"),
+        modalidad=validated["modalidad"],
+        cantidad_profesionales=validated["cantidad_profesionales"],
+        presupuesto_estimado=_parse_decimal(presupuesto_estimado, "El presupuesto estimado", maximum="99999999.99"),
         fecha_inicio_estimada=fecha_inicio_estimada,
         fecha_limite_postulacion=fecha_limite_postulacion,
         estado="PUBLICADA",

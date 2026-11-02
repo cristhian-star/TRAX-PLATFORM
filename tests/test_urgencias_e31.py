@@ -132,12 +132,17 @@ class UrgenciasE31Test(unittest.TestCase):
             for path in paths:
                 with self.subTest(actor=actor, path=path):
                     response = self.client.get(path)
+                    if actor == 3 and path == '/':
+                        self.assertEqual(response.status_code, 302)
+                        self.assertEqual(response.location, '/profesional/dashboard')
+                        response = self.client.get(response.location)
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     parser = PublicContent()
                     parser.feed(html)
                     self.assertNotRegex(' '.join(parser.text).lower(), r'emergencias?')
-                    self.assertIn('/urgencias/nueva', html)
+                    expected = '/profesional/oportunidades/urgencias' if actor == 3 else '/urgencias/nueva'
+                    self.assertIn(expected, html)
 
     def test_legacy_notification_presentation_does_not_rewrite_history(self):
         with self.app.app_context():

@@ -1,0 +1,4 @@
+.professional-workspace [data-theme-switch],
+.professional-workspace [data-profile-panel-trigger],
+.professional-workspace [data-share-private-profile] { display:none !important; }
+.professional-workspace .private-profile__panel { display:grid !important; }

@@ -1,0 +1,3 @@
+{% extends 'professional_workspace_base.html' %}
+{% from 'components/_workspace_cards.html' import jobs_list %}
+{% block workspace_content %}<main><div class="pw-intro"><p class="pw-eyebrow">Tu trabajo en MANDOBRA</p><a href="/profesional/trabajos">Volver a Mis trabajos</a><h1>Trabajos contratados</h1><p>Contrataciones de todos los orígenes. Revisá los detalles y las acciones disponibles.</p></div><section class="pw-card">{{ jobs_list(jobs) }}</section><nav class="pw-pagination" aria-label="Páginas de trabajos">{% if page > 1 %}<a href="?page={{ page-1 }}">Anterior</a>{% endif %}<span>Página {{ page }}</span>{% if has_next %}<a href="?page={{ page+1 }}">Siguiente</a>{% endif %}</nav></main>{% endblock %}

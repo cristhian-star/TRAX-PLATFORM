@@ -1,3 +1,1764 @@
+## Checkpoint local autorizado — 2026-11-01T22:47:25-03:00
+
+Estado: COMPLETED (preparación del checkpoint local; no aprobación funcional).
+Responsable: integrador local único, laptop. Facturación, IA y Testing confirmaron
+explícitamente pausa y ausencia de procesos escritores antes del respaldo.
+Rama: feature/professional-workspace-ux. HEAD base: 2e552f2fdc57c152c97f0486050574696f6b250e.
+Inventario inicial actual: 160 paths pendientes, staging vacío. Se conserva el trabajo
+acumulado de todos los incrementos sin correcciones funcionales ni normalización masiva.
+
+Respaldo privado externo: checkpoint-20261101-224352/repository-complete.zip, en la
+carpeta de evidencias local de esta sesión; ubicación absoluta e inventarios en la entrega.
+Incluye .git completo, árbol de trabajo, archivos nuevos, .env, entorno virtual y locales
+ignorados. 6690 archivos, 128505664 bytes originales; SHA-256 individual cotejado contra
+ZIP y una segunda lectura estable del origen. La copia previa repository-full es parcial
+por límites de rutas/atributos Windows y NO debe usarse para recuperar.
+
+El commit autorizado guarda exclusivamente código, pruebas, documentación y recursos
+legítimos revisados mediante lista explícita. .env, bases, caches y configuración local
+ignorada permanecen sólo locales y en respaldo privado; no se publican secretos.
+INDEX y demás contenidos previos se preservan por hash, excepto esta entrada añadida.
+El SHA definitivo y el inventario preparado/final se entregan fuera del repositorio para
+no generar un ciclo de modificación documental después del commit.
+
+Pendientes conservados: retest independiente del P3 de prueba de Presupuestos;
+P3 visual y cierre de QA de Mis trabajos; aprobación visual de incrementos;
+scheduler periódico y recepción/recorrido completo de Urgencias, Google Maps real;
+formulario fiscal, decisiones fiscales e integración ARCA; corpus IA editorial todavía
+no aprobado, sin asistente web/WhatsApp/proveedor/MCP habilitados. Cobros simulados no
+habilitan pagos productivos. Ver requisitos y entradas anteriores para límites exactos.
+
+Validaciones de esta sesión: inventario actual, respaldo completo verificado, revisión
+focal de secretos/archivos locales, contenido preparado e integridad posterior al commit.
+Control preparado: git diff --cached --check señala líneas vacías finales ya presentes
+en PROF_UX_001.md:221, postgresql_contracting_fixture.py:163 y
+test_professional_workspace_ux_002.py:102. Se conservan, sin corregirlas en el checkpoint.
+158 archivos con cambios de contenido; INDEX y el documento de sprint mantienen contenido
+Git idéntico y bytes locales intactos.
+No se ejecutan pruebas funcionales nuevas ni se suman evidencias históricas. Checkpoint
+no certifica AA, preparación productiva, QA integral ni integración a develop.
+Sin push, merge, rebase, worktrees, Docker, bases ni migraciones. No hubo merge porque
+la autorización se limita al commit local; sincronización con remoto no comprobada.
+Retomar desde git status, git log -1 y los requisitos; no activar proveedores ni migrar
+la base habitual por este checkpoint. Siguiente paso: revisión independiente y decisiones
+pendientes de Producto, antes de solicitar una autorización separada de integración.
+
+## IA-READ-001 — borradores editoriales de ayuda — 2026-11-01T22:16:59-03:00
+
+Estado: COMPLETED (preparación local de cinco borradores; aprobación editorial pendiente).
+Origen: Windows local; responsable: agente Integración IA. Objetivo: redactar los cinco
+artículos propuestos con audiencia y fuentes explícitas, sin poblar corpus ni habilitar.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Preflight/final: 160 paths pendientes, staging vacío; sin archivos nuevos de esta sesión.
+
+Completado: sección «Borradores de ayuda para revisión editorial» de
+[IA_READ_001](../REQUISITOS/IA_READ_001.md), versiones 0.1, IDs editoriales ED-IA-01..05:
+registro privado, búsqueda, detalle/privacidad, seguimiento por fecha tentativa y errores.
+Cada artículo identifica audiencia, preguntas, texto propuesto y fuentes de requisito;
+referencias internas sólo para revisión, sin indexación ni publicación automática.
+Estado BORRADOR / NO APROBADO / NO PUBLICABLE; sin aprobador, fecha de publicación ni
+vigencia otorgados. No se añadieron entradas al manifest; corpus productivo sigue vacío.
+
+Pendientes: revisión y aprobación individual de textos/audiencias/versiones por Producto;
+posterior decisión de publicación. Usuarios pendientes de cierre de QA de Mis trabajos,
+incluido su P3 visual. No se habilitan interfaz, proveedor generativo, WhatsApp, MCP,
+búsqueda pública por IA ni herramientas fiscales/financieras. Dictamen local de IA
+51/51 histórico preservado: no se reejecutó ni amplió; no acredita PostgreSQL/producción.
+
+Archivos modificados: docs/REQUISITOS/IA_READ_001.md y este handoff únicamente.
+CHANGELOG, aplicación, tests, configuración, dependencias y migraciones sin cambios.
+Facturación y Presupuestos confirmaron ausencia de edición concurrente del handoff;
+entradas previas preservadas. Integridad: 661 archivos cotejados; 659 idénticos por
+SHA-256, dos documentos modificados; contenido previo conservado, sin archivos nuevos.
+Validación documental: UTF-8, cinco artículos, enlaces y diff focal. Sin pruebas nuevas,
+Docker, bases ni proveedores; no aplican pruebas funcionales a la redacción editorial.
+Sin nuevos errores conocidos. Riesgo: confundir borradores con contenido aprobado o
+con interfaz disponible; se rotulan y separan explícitamente para evitarlo.
+Sin commit/push/PR/merge/deploy ni sync remota; no hubo merge por falta de autorización.
+Trabajo documental sin commit en rama; no se declara integración a develop.
+Retomar: git status; git branch --show-current; git log -1 --oneline; leer esta entrada
+y revisar los cinco textos del requisito con Producto. No copiar al manifest, completar
+aprobaciones ficticias, habilitar usuarios ni modificar código/Git desde este encargo.
+Próximo paso recomendado: revisión editorial artículo por artículo; el cierre técnico
+anterior y las dependencias de Mis trabajos permanecen vigentes sin cambios.
+
+## IA-READ-001 — cierre técnico documental — 2026-11-01T22:12:27-03:00
+
+Estado: COMPLETED (cierre local en la rama, sin activación). Responsable: Integración IA;
+origen Windows local. Objetivo: registrar dictamen independiente del
+2026-11-01T21:49:11-03:00: **VERIFICADO EN EL ALCANCE EVALUADO**, sin hallazgos P0–P3.
+Núcleo local de ayuda y lectura privada verificado. Resultados separados:
+**46/46 del paquete declarado**, **5/5 adversariales independientes**; **51/51 únicos**.
+No se suman repeticiones ni tandas fallidas del harness; no se ejecutaron pruebas nuevas.
+
+Evidencia durable, inventario y límites en
+[IA_READ_001](../REQUISITOS/IA_READ_001.md), cierre de 2026-11-01T22:12:27-03:00:
+[46/46](<C:/Users/Cristhian/.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/ia-read-independent-20261101/declared-46-tests.log>) y
+[5/5](<C:/Users/Cristhian/.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/ia-read-independent-20261101/adversarial-tests-final.log>), con manifiestos y comparación Git final.
+Corpus productivo vacío, aprobación editorial pendiente. Habilitación para usuarios
+pendiente del cierre de QA de Mis trabajos, **incluido su P3 visual del enlace secundario**;
+no se confunde con el P3 separado de Presupuestos ni se cierra por este dictamen.
+Sin interfaz de asistente, proveedor generativo, WhatsApp, MCP remoto, búsqueda pública
+por IA ni herramientas fiscales/financieras habilitadas. PostgreSQL y producción no
+quedan acreditados. Sin suite completa, navegador/Node o AA nuevos; sin Docker/bases.
+
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Preflight/final: 160 paths pendientes, staging vacío; sin archivos nuevos de esta sesión.
+Únicos modificados: IA_READ_001.md, este handoff y CHANGELOG.md. SHA-256: 658 de 661
+archivos preservados; contenido previo de los tres documentos conservado. Código,
+pruebas y corpus IA coinciden con ocho hashes del dictamen. UTF-8/enlaces/diff focal OK.
+Facturación y Presupuestos confirmaron fin de sus ediciones; entradas ajenas preservadas.
+Sin migraciones, cambios productivos, configuración o dependencias. No hay nuevos
+bloqueantes del núcleo; pendientes operativos: corpus editorial y QA/retest de Mis trabajos.
+Sin commit/push/PR/merge/deploy, por falta de autorización de integración; no hubo merge.
+Push/sync remota no verificados. Estado final: cierre técnico registrado en rama;
+cambios documentales sin commit. No se declara asistente generativo ni activación.
+Retomar: git status; git branch --show-current; git log -1 --oneline; leer el cierre
+vigente en IA_READ_001.md y dictamen de Mis trabajos; preservar árbol mixto. No ejecutar
+pruebas, corregir P3, poblar corpus, habilitar usuarios ni integrar Git desde este cierre.
+Próximo paso recomendado: revisión editorial y cierre de QA de Mis trabajos; cualquier
+integración posterior requiere autorización y coordinación de archivos compartidos.
+
+## PRESUPUESTOS — corrección focal P3 de prueba de actor contratante — 2026-11-01T22:04:08-03:00
+
+Estado: READY_TO_RESUME. **P3 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`;
+staging vacío; 160 paths pendientes preexistentes. Responsable: Codex local, laptop.
+
+Se reprodujo antes de editar el fallo de `test_professional_never_has_client_contract_capabilities`
+(1 caso, AssertionError: PermissionError not raised). La aserción universal estaba desactualizada:
+la autoridad CLIENT de un contrato PROPOSAL admite al profesional publicador propietario.
+No se identificó un defecto productivo que requiriera ampliar el alcance.
+
+Se conserva el caso como `test_professional_client_capabilities_are_scoped_to_own_proposal`:
+permite exclusivamente al propietario profesional de PROPOSAL; rechaza al profesional ajeno,
+al propietario como prestador y al prestador como contratante. DIRECT y BUDGET siguen rechazando
+al profesional contratante. No se eliminan casos ni se agregan omisiones. La cobertura positiva
+real existente en `tests/test_professional_proposals.py` y los módulos sprint7 comprueba aceptación,
+propiedad persistida, contrato canónico, SINGLE, transiciones e idempotencia, sin duplicarla.
+
+Resultados nuevos, separados:
+- Caso corregido: 1/1, repetido dentro de la selección siguiente; no suma cobertura adicional.
+- Misma selección proporcional que históricamente dio 122/123: **123/123**, 54.798 s.
+  Se conciliaron los identificadores completos con el log anterior, salvo el nombre corregido.
+- Regresiones adicionales de permisos y contratación: **25/25**, 5.970 s.
+- Total de esta ejecución satisfactoria: **148 casos únicos**; no es la suite completa del proyecto.
+
+Comandos reproducibles (PowerShell, entorno virtual existente):
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+$env:DATABASE_URL='sqlite:///:memory:'
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_budget_request_ux06a.BudgetRequestUX06ATest.test_professional_client_capabilities_are_scoped_to_own_proposal
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_billing_preparation tests.test_billing_access_policy tests.test_billing_preparation_service tests.test_professional_billing_ux tests.test_work_records tests.test_budget_request_ux06a tests.test_payment_order_application tests.test_payment_effect_credits
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_professional_proposals tests.test_sprint7_proposal_to_contract tests.test_sprint7_budget_to_contract tests.test_sprint7_contracting_core
+```
+
+Evidencia fuera del repositorio: `budget-p3-20261101`, bajo la carpeta de evidencias de esta sesión
+(`.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/`).
+Contiene `before.log`, `after.log`, `proportional.log`, `contract-regression.log`,
+`selection-before.json`, `selection-final.json` y manifiestos de integridad.
+
+Inventario focal: `tests/test_budget_request_ux06a.py`, `docs/REQUISITOS/PRESUPUESTOS_UX_001.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`. Sin cambios productivos.
+El registro se añade después del cierre documental fiscal de 2026-11-01T21:57:16-03:00,
+comprobado en modo lectura; conserva ese cierre, su 122/123 histórico y el trabajo de IA.
+Sintaxis Python, UTF-8 y git diff --check comprobados. Los demás archivos se cotejan por SHA-256.
+No se ejecutaron PostgreSQL, navegador ni Node: no cambiaron producción, interfaces o controladores.
+No se valida concurrencia nueva, AA, aprobación visual ni habilitación productiva.
+Sin Docker, bases compartidas, migraciones, commit, push, PR, merge o despliegue; sin sincronización
+remota nueva. No hubo merge porque no está autorizado. Próximo paso: retest independiente del P3
+sobre estos comandos, preservando el árbol mixto y sin ampliar permisos ni modificar producción.
+
+## FACTURACION_INTERNA_001 — cierre técnico independiente — 2026-11-01T21:57:16-03:00
+
+Estado: COMPLETED (cierre documental local). Estado técnico:
+**BACKEND INTERNO VERIFICADO EN EL ALCANCE EVALUADO**.
+Dictamen independiente: **2026-11-01T21:42:54-03:00**.
+Origen: Windows local; responsable: agente técnico de Facturación MANDOBRA.
+Objetivo: registrar dictamen, evidencia durable, límites y P3 externo pendiente.
+Rama `feature/professional-workspace-ux`;
+HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`; staging vacío.
+Árbol mixto preexistente conservado; sin sincronización remota nueva.
+
+Resultados separados del QA independiente: **19/19 focales**, **9/9 PostgreSQL**,
+**cuatro reproducciones adversariales**, **regresión 122/123**. No sumar categorías
+ni repeticiones. Las adversariales tuvieron errores iniciales de fixture FK;
+la repetición dejó tres OK y un error de captura de BillingConflict en el harness;
+el nodo restante pasó después (1/1), sin cambios productivos. No fue una corrida
+única limpia de 4/4. Detalle y enlaces en
+[FACTURACION_INTERNA_001](../REQUISITOS/FACTURACION_INTERNA_001.md).
+P3 externo PENDIENTE: aserción desactualizada de
+`test_budget_request_ux06a.py:310`, test_professional_never_has_client_contract_capabilities.
+Reproducida también en estado exacto anterior al incremento fiscal; baseline SHA
+verificado y escenario de autoridad propia de Propuestas aprobado. No se corrige
+esa prueba ni se declara regresión global verde.
+
+Migración `20261101_01`, padre `20261030_01`, validada exclusivamente en PostgreSQL
+16 descartable, con downgrade/upgrade y preservación de usuarios preexistentes.
+El downgrade destruye la preparación fiscal. **Base habitual no migrada**.
+El QA retiró su contenedor/volumen y listener exclusivo; solo se leyó ese registro.
+Evidencia durable:
+[QA independiente](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/facturacion-interna-independent-20261101/), con focal-tests.log, postgres-gate.log,
+postgres-adversarial-retry.log, postgres-adversarial-failed-node-retry.log,
+proportional-regression.log, comparaciones del baseline, migración y manifiestos.
+Identidad de los archivos fiscales cotejada por SHA-256 antes de este cierre.
+
+Completado: cierre técnico del backend dentro del alcance evaluado y actualización
+exclusiva de requisito, ACTIVE_HANDOFF y CHANGELOG. Entrada IA-READ-001 y antecedentes
+preservados íntegros; el pendiente histórico de QA del backend queda sustituido por
+este dictamen. Inventario inicial de cierre: 663 archivos, otros 660 preservados por
+hash. Controles documentales/UTF-8/enlaces/diff; no nuevas pruebas funcionales.
+Pendientes: formulario operativo, decisiones fiscales restantes, integración ARCA,
+referencia canónica de auditoría 30/10 y P3 externo. No se habilitan usuarios ni servicios.
+Límites: sin evidencia de UI nueva/AA, snapshot confirmado, homologación, emisión,
+certificados, numeración, PDF/QR, recuperación fiscal externa ni producción/suite completa.
+Decisiones de Producto: receptor, moneda/límites, consentimiento/retención,
+canal/representación, punto de venta, inscripción, certificados y contingencia.
+Riesgos: no confundir declaraciones/borradores con comprobantes; no desplegar por
+este cierre; mantener la transacción/rollback del caller y los controles de ownership.
+
+Sin cambios productivos, pruebas nuevas, Docker, migraciones ni Git mutable durante
+esta sesión. Sin commit/push/PR/merge/deploy; la tarea termina documentalmente en su
+rama. No hubo merge porque no está autorizado en el encargo; no hay integración a
+develop ni push a GitHub acreditados. Próximo paso: definir formulario y políticas;
+eventual integración selectiva del backend solo con autorización expresa.
+Retomar: git status; git branch --show-current; git log -1 --oneline; leer requisito
+y este cierre; cotejar evidencia/manifiestos y preservar cambios de IA. No repetir
+pruebas ni migrar base habitual bajo esta autorización documental. P3 en tarea separada.
+
+## IA-READ-001 — núcleo local — 2026-11-01T21:31:53-03:00
+
+Estado: READY_TO_RESUME. Origen: Windows local; responsable: Integración IA.
+Objetivo autorizado: ayuda, lectura de registros propios y seguimientos por fecha.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Preflight: 152 paths pendientes; staging vacío. Sin sincronización remota nueva.
+Completado: cuatro herramientas locales, schemas entrada/salida, DTO acotados,
+autorización persistida, ownership, paginación y enlaces canónicos sin proveedor.
+Inventario de diez archivos, decisiones, operación, límites y evidencia en
+[IA_READ_001](../REQUISITOS/IA_READ_001.md).
+Nuevos: cinco assistant_*.py en services, manifest vacío y dos módulos de tests.
+Documentos modificados: requisito IA y esta entrada; entradas previas preservadas.
+Facturación confirmó que terminó su edición del handoff; compartidos de aplicación
+no intervenidos. Sin migraciones, dependencias, pantallas ni registro de endpoints.
+Tests finales: 46/46 (33 nuevos + 13 regresión Mis trabajos), SQLite en memoria;
+no sumar las tandas anteriores. Integridad SHA-256 y controles AST/UTF-8/diff focal.
+No ejecutados: PostgreSQL, Docker, navegador/AA, suite completa ni QA independiente.
+Errores iniciales de acentos/enlaces y expectativa literal corregidos; detalles en
+requisito. Advertencias legacy SQLAlchemy/datetime. Sin fallas focales conocidas.
+Parcial/pendiente: corpus editorial sin artículos aprobados; dictamen vigente de
+Mis trabajos y Testing/QA independiente antes de habilitar lecturas reales.
+Riesgos: esta evidencia no prueba PostgreSQL/concurrencia ni activación; contexto
+ActorContext sólo servidor; caller debe usar sesión DB limpia y recuperar errores SQL.
+No cachés/conversaciones privadas nuevas. Corpus y pruebas sintéticas separados.
+Git: sin commit/push/PR/merge/deploy; no hubo merge por QA pendiente y falta de
+ autorización explícita de integración. No se afirma push ni sync con GitHub.
+Retomar: comprobar git status, rama y HEAD; leer requisito y este handoff; ejecutar
+.venv/Scripts/python.exe -m unittest tests.test_assistant_read_tools tests.test_assistant_help tests.test_work_records -v
+sólo con fixtures sintéticas como están definidas. Próximo paso: Testing independiente.
+No tocar bases habituales, activar usuarios/proveedores, enviar avisos, modificar
+Facturación ni integrar Git sin autorización. Estado final: implementación local
+validada por implementador; sin asistente generativo operativo, QA independiente pendiente.
+## FACTURACION-INTERNA-001 — 2026-11-01T21:15:58-03:00
+
+Estado: READY_TO_RESUME. Origen: Windows local; responsable técnico Facturación.
+Objetivo: revalidar REQ-002 y preparar perfil fiscal/borradores internos.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Preflight: 140 paths pendientes, staging vacío. Cierre: 152 paths, incluye el nuevo
+IA_READ_001 externo. Sin commit/push/PR/merge/deploy; no hubo merge por QA y
+coordinación pendientes y falta de autorización de integración. Sync remota no verificada.
+
+Completado: validaciones comunes, declaraciones sin verificar, política PRO reutilizada,
+modelos y servicios internos con ownership, idempotencia local, versión optimista y
+auditoría atómica sin payload fiscal. Solo registro de modelos en app/__init__.py;
+sin nuevos endpoints, templates, flags, dependencias ni proveedores externos.
+Propuesta de formulario/decisiones, inventario, operación y recuperación en
+[FACTURACION_INTERNA_001](../REQUISITOS/FACTURACION_INTERNA_001.md).
+[ADR-005](../ADR/ADR-005-preparacion-fiscal-interna.md) separa preparación de autorización.
+REQ-002 sigue limitado a persona humana monotributista, PRO vigente, Factura C opcional.
+La auditoría original del 30/10 no fue localizada; se pidió ubicación, sin asumir su contenido.
+
+Migración nueva 20261101_01, padre 20261030_01; head único confirmado por Alembic.
+Aplicada solo en PostgreSQL 16 exclusivo billing_qa, puerto 55591, contenedor
+mandobra-billing-20261101-01a19993; upgrade completo y downgrade/upgrade satisfactorios.
+Gate PG 9/9, incluidas carreras de perfil y alta de borrador. Contenedor y volúmenes retirados.
+Base habitual, Docker compartido, ARCA y pagos reales no utilizados.
+Final focal/regresiones: 123 ejecutadas, 122 aprobadas, una falla preexistente reproducida
+con inicialización anterior exacta (SHA verificado en memoria):
+test_budget_request_ux06a.test_professional_never_has_client_contract_capabilities, línea 310.
+Esperaba PermissionError; no se diagnostica causa ni corrige Presupuestos en este paquete.
+Las 19 pruebas nuevas y 11 de UI fiscal previa pasaron dentro de esa tanda.
+Tandas iniciales 24/24 y 6/6 no se suman a la final. Diff check y head Alembic OK.
+No ejecutados: suite completa, UI nueva/navegador/AA, QA independiente, homologación,
+snapshot confirmado, timeout/reconciliación fiscal, PDF/QR y operación productiva.
+Advertencias legacy SQLAlchemy/datetime observadas. Intentos PG iniciales sin driver psycopg
+ y TCP sandbox denegado se resolvieron usando psycopg2 existente y ejecución autorizada.
+
+Cambios propios: 11 nuevos archivos enumerados en el requisito, app/__init__.py y este
+handoff. Los 625 archivos iniciales se cotejaron: 621 idénticos; dos Obsidian externos,
+este handoff compartido y el registro de modelos son las diferencias. Se preserva
+íntegra la entrada IA-READ-001 concurrente. No se modificó código de cobros/contratos/trabajos.
+Evidencia externa: C:\Users\Cristhian\.codex\visualizations\2026\11\02\01a19993-4bcb-7750-b189-6d7ae9319569
+(baseline, integridad, pruebas finales y reproducción previa).
+
+Parcial: backend preparado, formulario solo propuesto. Pendientes: auditoría original,
+receptor/catálogos, consentimiento/retención, UI con CSRF y recuperación, revisión
+independiente y coordinación con IA. Mensaje a ese chat rechazado por revisión automática:
+no enviado; falta autorización explícita para mensajear ese hilo. IA_READ_001 leído,
+sin acuerdo bilateral. No tocar config/rutas/base.html/requirements sin coordinar.
+Riesgos: declaraciones no acreditan inscripción; borrador no es snapshot confirmado;
+downgrade destruye preparación; caller debe gestionar commit/rollback y errores concurrentes.
+Próximo paso: resolver dependencias del formulario y QA independiente del backend.
+Retomar: git status; git branch --show-current; git log -1 --oneline; leer este requisito
+y ADR-005; cotejar manifiesto y cambios concurrentes. Pruebas solo en recursos descartables.
+No migrar base habitual, emitir, conectar certificados, activar cobros ni integrar Git.
+Continuidad: preparar commit/push selectivo tras revisión y autorización; nunca publicar
+el árbol mixto completo. Estado final: implementación interna parcial; producción deshabilitada.
+
+## IA-READ-001 — 2026-11-01T21:12:40-03:00
+
+Estado: READY_TO_RESUME. Responsable: agente Integración IA; origen: Windows local.
+Objetivo: revalidar auditoría 30/10 y preparar primer incremento de lectura/ayuda.
+Rama feature/professional-workspace-ux; HEAD 2e552f2. Preflight: 149 paths pendientes,
+staging vacío. Trabajo previo de Facturación/Mis trabajos y otros módulos preservado.
+Completado: inspección estática y paquete [IA_READ_001](../REQUISITOS/IA_READ_001.md),
+con contratos, brechas, corpus, coordinación propuesta y criterios de aceptación.
+Parcial: coordinación de responsables compartidos aún no confirmada.
+Pendientes: definición de visibilidad pública, autorización del núcleo y aprobación
+editorial del corpus; implementación, QA independiente y piloto posteriores.
+Archivos de esta sesión: nuevo docs/REQUISITOS/IA_READ_001.md y este handoff.
+Sin migraciones ni cambios de aplicación/dependencias. Tests funcionales, PostgreSQL,
+navegador y suite no ejecutados: alcance documental. Validación: integridad SHA-256
+contra inventario previo a la escritura, revisión de enlaces y git diff --check focal.
+Error de entorno: alias python.exe de WindowsApps no ejecutable; inventario realizado
+con PowerShell sin instalar ni alterar runtime. No requiere troubleshooting de dominio.
+Decisiones/riesgos: no exponer ORM; ownership del servicio; corpus explícito;
+cuotas memory:// no acreditan multiproceso. Diferencia 149 paths actuales frente a
+140 del handoff histórico documentada, sin sobrescribir pendientes.
+Push/sincronización remota no verificados. No commit/push/PR/merge/deploy: no autorizados;
+no hubo merge por alcance documental y ausencia de autorización de integración.
+Retomar: git status; git branch --show-current; git log -1 --oneline; leer este paquete;
+confirmar inventario y acordar propiedad de archivos con Facturación antes del piloto.
+No usar bases compartidas, activar proveedores, enviar mensajes ni modificar Git.
+Estado final: paquete preparado; implementación pendiente. Próximo paso: resolver
+visibilidad pública y autorizar núcleo local aislado antes de implementar.
+## MIS-TRABAJOS-UX-001 — 2026-10-30T15:48:41-03:00
+
+Estado: READY_TO_RESUME. Laptop; responsable: agente implementador local.
+Registro privado, listado/alta/detalle/edición, seguimiento opcional y recordatorios internos
+persistentes implementados. Bocetos aprobados; implementación pendiente de revisión visual
+e independiente. [Especificación, inventario y operación](../REQUISITOS/MIS_TRABAJOS_UX_001.md).
+[Decisión de separación](../ADR/ADR-004-registro-privado-trabajos.md).
+
+Rama `feature/professional-workspace-ux`, HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Baseline 127 paths/628 archivos; final 140 paths; staging vacío. 20 archivos intervenidos,
+621 restantes conservados por hash, incluidos INDEX y módulos previos. Sin Git mutable:
+no commit/push/PR/merge; no hubo merge por alcance autorizado exclusivamente local.
+Sin comprobación de sincronización remota actual.
+
+Resultados separados: Python 46/46; PostgreSQL descartable 6/6; ejecutor en procesos separados
+1 aviso y 0 al repetir; navegador 30 combinaciones + 4 recorridos + 2 revisiones focales.
+Node no ejecutado: ningún controlador nuevo. No suite completa, AA integral ni móvil físico.
+AST, UTF-8 y diff check comprobados. Evidencia externa `mis-trabajos-20261030`, enlazada
+en el requisito. Repeticiones y problemas de fixtures/automatización allí distinguidos.
+Migración nueva `20261030_01` → padre `20261028_01`, validada solo en PostgreSQL descartable.
+No se migró base habitual ni se instaló ejecutor; no se modificó cuenta QA ni Docker habitual.
+Preview/PG exclusivos retirados. Antecedentes de Propuestas, Presupuestos y Urgencias preservados.
+
+Próximo paso: QA independiente y aprobación visual, después preparar operación autorizada.
+Para retomar: verificar rama/HEAD/inventario, leer requisito y ADR; usar comandos de pruebas
+solo en la base descartable identificada. No ejecutar seeds/reset/migraciones sobre la base
+habitual ni instalar scheduler sin autorización. Riesgos: downgrade destruye los nuevos
+registros y su programación; notificaciones emitidas permanecen. Automatización requiere
+mantener el ejecutor periódico activo. No hay bloqueante conocido; no habilitado productivamente.
+
+## Cierre técnico del formulario Crear propuesta — 2026-10-30T14:03:45-03:00
+
+Estado: COMPLETED (cierre documental). Laptop; responsable: agente local MANDOBRA.
+Dictamen independiente del **2026-10-30T13:52:08-03:00**:
+**P2 CERRADO; SIN NUEVOS HALLAZGOS P0–P3 EN EL ALCANCE EVALUADO.**
+Este registro sustituye el pendiente de retest del P2, conservando el hallazgo,
+su corrección, el cierre del P3, los resultados históricos y sus limitaciones.
+
+Resultados del retest independiente, con conteos separados:
+
+- Pruebas: **34/34 aprobadas**.
+- Reproducciones HTTP: **12/12**, rechazo correcto y sin escrituras.
+- Llamadas directas al servicio: **12/12**, rechazo correcto y sin escrituras.
+- Recorridos de navegador: **8/8 satisfactorios**.
+
+No se suman estas categorías como una única suite ni se agregan las ejecuciones
+anteriores a la cobertura nueva. El dictamen acredita fronteras válidas, recuperación
+del formulario, ambos roles (CLIENTE y PROFESIONAL) y contratación SINGLE preservados.
+Estos resultados pertenecen al retest independiente; no se ejecutaron pruebas nuevas
+durante esta sesión documental.
+
+Evidencia durable existente:
+[proposal-validation-p2-independent-20261030](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/proposal-validation-p2-independent-20261030/).
+Incluye `tests.log`, `retest-output.json`, `browser-results-independent.json`, capturas,
+controles estáticos e integridad. Se referencia sin recrear evidencias.
+
+La aprobación del boceto por Cristian permanece registrada. **La aprobación visual
+de la implementación sigue pendiente.** Esta corrección no fue validada en PostgreSQL;
+no acredita AA integral, móvil físico, producción ni habilitación productiva.
+Se conservan las demás limitaciones anteriores, avisos CSP y capacidades pendientes.
+
+Integridad inicial/final: rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, 127 paths pendientes y staging vacío.
+Únicos archivos modificados: `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Los otros 625 archivos del inventario de 628 mantienen SHA-256, incluidos INDEX,
+Presupuestos, Urgencias, código, pruebas, templates, CSS y JavaScript.
+UTF-8 y git diff --check correctos. Sin nuevas pruebas, Docker, migraciones,
+operaciones Git mutables ni acceso a bases compartidas. Commit/push/PR/merge no
+realizados por estar fuera del alcance; sincronización remota no comprobada.
+Próximo paso: revisión visual de Cristian. Para retomar, reconfirmar rama/HEAD,
+staging e inventario y preservar antecedentes; este cierre no autoriza integración.
+
+---
+
+## Corrección focal P2 de validación de creación — 2026-10-30T13:32:34-03:00
+
+Estado: READY_TO_RESUME. Hallazgo independiente del 2026-10-30T13:14:23-03:00.
+**P2 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Se conserva el dictamen previo, el cierre del P3 y la aprobación del boceto; no se
+sustituyen por una aprobación propia de esta corrección ni de su implementación visual.
+
+Causa: los límites HTML no estaban garantizados por el backend; el servicio aceptaba
+valores inválidos y `cantidad_profesionales or 1` transformaba cero en uno.
+Reproducción previa en SQLite sintético: seis casos (cantidad 0/-1/51, título 161,
+descripción 1801 y modalidad Teleport), para CLIENTE y PROFESIONAL: **12 respuestas
+302 y 12 publicaciones indebidas**. Tras corregir: mismos doce intentos, **400 y cero
+publicaciones**. Evidencia antes/después conservada fuera del repositorio.
+
+`validate_proposal_creation()` normaliza y valida los valores que se guardarían;
+la ruta y el servicio directo reutilizan esa función. Cantidad entera 1–50 inclusive,
+por defecto 1 sólo ante ausencia/None o cadena vacía tras strip. Cero, negativos,
+fracciones, inválidos y fuera de rango se rechazan; no hay truncamiento de textos.
+Título requerido hasta 160 y descripción requerida hasta 1800 tras normalización
+strip existente. Catálogo único: Presencial, Remoto, Hibrido y A coordinar, sin
+alterar los valores vigentes. Servicio valida antes de add/commit; HTTP antes de
+persistencia/notificación y mantiene defensa adicional del servicio.
+
+Errores 400 con nombre del campo, valores escapados en el cuerpo y sin llevarlos a
+la URL. Cantidad usa entrada de texto en error para no perder valores inválidos.
+Modalidad inválida muestra el valor escapado fuera del selector, cuya opción vacía
+exige elegir una modalidad canónica; no agrega Teleport al catálogo ni elige
+Presencial silenciosamente. CSRF, actor, permisos, CLIENTE, contexto profesional,
+SINGLE, fechas y dinero conservados. Sin cambios de CSS, composición, históricos,
+contratos, modelos, migraciones ni dependencias.
+
+Inventario focal (9 archivos):
+- `app/services/proposal_service.py`: validador común, catálogo y uso defensivo.
+- `app/services/operation_request_service.py`: reutilización en validación HTTP.
+- `app/routes/operation_routes.py`: pasa cantidad sin conversión previa y catálogo a la vista.
+- `app/templates/nueva_propuesta.html` y
+  `app/templates/components/_professional_proposal_create.html`: recuperación del campo
+  cantidad y selección explícita de modalidad ante error, sin rediseño.
+- Nuevo `tests/test_proposal_creation_validation.py`: siete casos de prueba con subcasos.
+- `docs/REQUISITOS/PROPUESTAS_P1.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`.
+
+Resultados nuevos:
+- **34/34 pruebas únicas**, SQLite en memoria, ejecución final:
+  `python -B -m unittest -q tests.test_proposal_creation_validation tests.test_professional_proposals tests.test_proposal_portal_p1 tests.test_sprint7_proposal_to_contract`.
+  Cubre ambos roles, acceso directo, cantidades inválidas/default/límites, textos
+  normalizados, modalidades canónicas, ausencia de escrituras SQL y de llamada de
+  éxito en rechazos, un guardado y una llamada de notificación al corregir, fechas,
+  importes no finitos, CSRF y derivación contractual existente.
+- **8 recorridos focales Chrome**: CLIENTE/PROFESIONAL × 390/1440 px × JS/sin JS.
+  Cada recorrido comprueba modalidad inválida, cantidad inválida y posterior envío
+  corregido (400/400/302), preservación escapada y catálogo intacto. JS en oscuro;
+  sin JS respeta el claro predeterminado. CSRF activo y datos sintéticos en preview.
+- Sintaxis Python, UTF-8 y git diff --check correctos. No PostgreSQL ejecutado:
+  reglas de entrada previas a persistencia, sin cambios de locks, transacciones,
+  idempotencia, esquema o derivación contractual. No Node ni matriz visual completa.
+- Corridas de desarrollo no se suman: la primera descubrió accidentalmente casos
+  importados de la fixture; se corrigió el import a módulo. Una corrida intermedia
+  detectó cuatro fallos de aserción por codificación del texto del test; corregidos
+  antes de la ejecución final. No se eliminaron comprobaciones ni agregaron omisiones.
+
+Evidencia durable:
+[proposal-validation-p2-20261030](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposal-validation-p2-20261030/),
+`before.json`, `after.json`, `tests-verified.log`, `browser-results.json`, capturas de
+recuperación de ambos roles e inventarios SHA-256. Preview 127.0.0.1:54967 detenido;
+sin listeners al cierre. Sin Docker habitual, bases compartidas ni cuenta QA.
+
+Integridad inicial/final: laptop, rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; baseline 125 paths pendientes, 627 archivos;
+final 127 paths pendientes, staging vacío. Otros 619 archivos conservados por hash,
+incluidos INDEX, Presupuestos, Urgencias, estilos y ajustes de las tres pestañas.
+No hubo commit, push, PR, merge ni otras operaciones Git mutables: no autorizadas.
+No se consultó sincronización remota ni se migró ninguna base.
+Próximo paso: retest independiente del P2 y revisión visual del usuario, aún pendiente.
+Para retomar: verificar identidad e inventario y ejecutar las focales en entorno
+sintético; no usar bases compartidas ni interpretar este informe como habilitación
+productiva. Se conservan limitaciones anteriores: AA integral, dispositivo físico,
+CSP heredada y capacidades futuras no habilitadas.
+
+---
+
+## Formulario Crear propuesta profesional — 2026-10-30T12:53:38-03:00
+
+Estado: READY_TO_RESUME. Boceto aprobado por Cristian el 2026-10-30;
+**FORMULARIO REDISEÑADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.**
+La aprobación del boceto no constituye aprobación visual de esta implementación.
+
+Se conserva el shell profesional, marca oficial, notificaciones, tema y Propuestas
+activo. Encabezado compacto con Volver a Propuestas, Crear propuesta y
+«Contá qué necesitás y recibí postulaciones.». Dos tarjetas alineadas arriba:
+Datos del proyecto/Profesional que buscás y Ubicación y condiciones. Hasta 1024 px
+se apilan en ese orden. Pie con aviso de no contratación, Cancelar y Publicar propuesta.
+Volver y Cancelar conservan el regreso privado y su vista. CSS bajo `.pc-create`;
+componentes y tokens DS v2, botón primario naranja, sin dependencias ni nuevo JS.
+Se prioriza el contrato local: los doce campos conservan definiciones exactas,
+incluidos límites, opciones, nombres, valores y recuperación escapada. El campo
+cantidad no cambia la contratación SINGLE. El bloque CLIENTE anterior permanece
+textualmente idéntico; sólo se selecciona el componente nuevo para el profesional.
+Sin cambios de rutas, servicios, permisos, guardado, CSRF, modelos ni migraciones.
+
+Inventario de este incremento (7 archivos):
+- `app/templates/nueva_propuesta.html`: selección de presentación y CSS profesional.
+- Nuevo `app/templates/components/_professional_proposal_create.html`: composición.
+- Nuevo `app/static/css/professional-proposal-create.css`: estilo encapsulado responsive.
+- `tests/test_professional_proposals.py`: una regresión de equivalencia de campos,
+  separación CLIENTE/profesional, enlaces y GET sin escrituras.
+- `docs/REQUISITOS/PROPUESTAS_P1.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`.
+
+Validación nueva, separada de los cierres anteriores:
+- `python -B -m unittest -q tests.test_professional_proposals tests.test_proposal_portal_p1`:
+  **22/22 casos únicos aprobados**, SQLite en memoria. Incluye creación, permisos,
+  CSRF, importes no finitos, errores repoblados, publicación y regresiones existentes.
+- Comparación estructural adicional: doce bloques de campos idénticos; contenido
+  CLIENTE idéntico al baseline. Sintaxis Python y UTF-8 correctos; git diff --check OK.
+- Navegador Chrome real: **12 recorridos de creación**, cada uno con inicial,
+  error monetario repoblado y publicación corregida (36 estados). Diez combinaciones
+  con JS: 320/390/768/1024/1440 px, claro/oscuro; dos sin JS: 390/1440 px con el
+  tema claro predeterminado real. CSRF activo, fábrica normal y datos sintéticos.
+  Propuesta publicada visible en Mis publicaciones; fechas, selección, descripción
+  escapada y cantidad recuperadas. Sin overflow; sin excepciones de página registradas.
+- Comprobaciones adicionales, no sumadas a los 12 recorridos: Cancelar mediante
+  puntero sin JS en móvil/escritorio, teclado y foco, movimiento reducido emulado,
+  contraste computado en claro/oscuro. Botones/campos 48 px. Primario:
+  blanco sobre #d3440e = 4,56:1; #0b1220 sobre #ff8a4c = 8,02:1.
+  Texto del campo: 17,74:1 claro y 18,08:1 oscuro. Foco visible; transición 0 s
+  con movimiento reducido. Esto no constituye auditoría AA integral.
+- En automatización sin JS hubo timeout de espera de estabilidad; el envío se
+  comprobó con teclado nativo, incluidos segmentos de fecha, y Cancelar con puntero
+  tras desplazamiento instantáneo. No se alteró el producto para forzar la prueba.
+- No se repitieron PostgreSQL ni Node: cambios de presentación y prueba HTML,
+  sin cambios transaccionales ni controladores. El P3 y su cierre permanecen intactos.
+
+Evidencia y capturas nuevas:
+[proposal-create-20261030](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposal-create-20261030/).
+`tests.log`, `browser-results.json`, `accessibility-focal.json`, baseline/integridad;
+capturas `1440-light-js-initial.png`, `1440-dark-js-initial.png`,
+`390-light-js-initial.png`, `390-dark-js-initial.png` y estados de error/publicación.
+Preview aislado en 127.0.0.1:54966 detenido; sin listeners al cierre. Sin Docker,
+base compartida, cuenta QA habitual, migraciones ni operaciones Git mutables.
+
+Integridad: laptop, rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; baseline 123 paths pendientes y 625
+archivos; final 125 paths pendientes, staging vacío. Los otros 620 archivos del
+baseline conservan hash, incluidos INDEX, Presupuestos, Urgencias y las tres pestañas
+de Propuestas. Se conservan antecedentes, dictámenes y omisiones históricas.
+Sin commit/push/PR/merge: fuera de autorización. No se consultó sincronización remota.
+Ruta de revisión tras actualización manual del entorno por Cristian:
+`http://127.0.0.1:5050/propuestas/nueva?vista=publicaciones` (profesional autenticado).
+Próximo paso: revisión visual y testing independiente; no actualizar Docker ni integrar
+sin autorización. Pendientes: dispositivo físico, AA integral y límites previos del
+módulo; no se declara habilitación productiva ni aprobación visual del usuario.
+
+---
+
+## Cierre técnico de Propuestas: retest P3 y ajustes visuales — 2026-10-30T12:22:37-03:00
+
+Estado: COMPLETED (registro documental). Laptop; responsable: agente local MANDOBRA.
+Dictamen independiente del **2026-10-30T12:16:21-03:00**:
+**P3 CERRADO; SIN NUEVOS HALLAZGOS P0–P3 EN EL ALCANCE EVALUADO.**
+Este dictamen sustituye el estado pendiente de retest de la corrección P3,
+sin borrar sus antecedentes ni extender el alcance evaluado.
+
+Resultados del retest independiente, no de una nueva ejecución en este cierre:
+
+- PostgreSQL descartable: módulo profesional completo, **4/4 PROFESIONAL**;
+  módulo original completo, **8/8 CLIENTE**. Doce casos únicos satisfactorios,
+  sin selección manual de nodos ni omisiones en estos dos módulos.
+- Navegador: **18 escenarios visuales nuevos**, doce con JavaScript y seis
+  realmente sin JavaScript. Se acreditan los últimos cambios autorizados de las
+  tres pestañas, no por continuidad de la evidencia visual anterior.
+- Mensajes vacíos centrados y CTA redundantes retirados en Mis postulaciones y
+  Mis publicaciones. Los filtros permanecen exclusivamente en Propuestas disponibles;
+  Aplicar/Limpiar mantienen presentación consistente y navegación GET.
+- El informe registra cero overflow, recortes o fallos de objetivos interactivos,
+  foco visible y conservación de integridad. Se conserva el aviso CSP heredado.
+
+Evidencia durable existente, sin recrearla:
+[proposals-p3-visual-retest-20261030](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/proposals-p3-visual-retest-20261030/),
+con `execution-summary.json`, `postgres-professional.log`, `postgres-original.log`,
+`browser-results.json`, capturas e informes de integridad. Sus timestamps de archivo
+preceden al timestamp del dictamen comunicado por el responsable.
+
+Los resultados y omisiones anteriores permanecen históricos, incluido el caso
+omitido de la tanda Python inicial. No se suman repeticiones como cobertura adicional
+ni se presenta este retest focal como suite integral. No se ejecutaron pruebas,
+Node, navegador, Docker ni migraciones durante este registro documental.
+Se conservan los límites funcionales y pendientes anteriores, accesibilidad integral,
+dispositivo móvil físico y CSP heredada. **La aprobación visual del usuario permanece
+pendiente.** No se declara certificación AA, integración ni habilitación productiva.
+
+Integridad inicial/final: rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, 123 paths pendientes y staging vacío.
+Únicos archivos modificados en este cierre: `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Los otros 622 archivos del inventario de 625 conservan SHA-256, incluidos INDEX,
+Presupuestos, Urgencias, código, pruebas y ajustes visuales autorizados.
+UTF-8 y git diff --check verificados. Sin operaciones Git mutables; commit, push,
+PR y merge no realizados por estar fuera del alcance. Sin comprobación remota nueva.
+Próximo paso: revisión visual de Cristian. Para retomar, reconfirmar identidad e
+inventario y conservar el paquete pendiente; no asumir autorización de integración.
+
+---
+
+## Corrección focal P3 del gate PostgreSQL — 2026-10-30T11:38:15-03:00
+
+Estado: READY_TO_RESUME. **P3 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Laptop; rama `feature/professional-workspace-ux`, HEAD base conservado
+`2e552f2fdc57c152c97f0486050574696f6b250e`. Staging vacío.
+
+El hallazgo de QA identificó herencia de casos CLIENTE con un propietario convertido
+a PROFESIONAL. Se extrajo la preparación a `tests/postgresql_contracting_fixture.py`,
+un mixin sin casos ni herencia de TestCase. Cada suite declara su OWNER_ROLE:
+PROFESIONAL para el gate especializado y CLIENTE para la suite original.
+Cada caso comprueba el rol persistido. No se agregaron omisiones ni expectedFailure.
+Los cuerpos AST de las cuatro pruebas especializadas y las ocho originales se
+conservaron íntegros. El descubrimiento del módulo especializado pasó de 20 casos
+(incluida la clase importada) a sus cuatro casos propios; el original conserva ocho.
+
+Validación nueva: ejecución completa conjunta sobre PostgreSQL 16 descartable,
+**12/12 aprobadas en 20.720 s**, sin omisiones: 4 PROFESIONAL y 8 CLIENTE.
+No se seleccionaron nodos individuales. Se conservaron las comprobaciones de
+concurrencia, rollback y restricciones de dominio. La preparación migró únicamente
+la base descartable; no hubo cambios de migraciones ni acceso a la base habitual.
+El contenedor exclusivo `mandobra-proposals-p3-20261030` fue retirado al terminar.
+Docker habitual y cuenta QA permanecieron sin modificaciones.
+
+Comando reproducible del gate completo, exclusivamente con una instancia descartable
+`proposals_qa` en `127.0.0.1:55481` y credenciales de esa instancia:
+
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+$env:TRAX_POSTGRES_TEST_URL='postgresql+psycopg2://USUARIO:CLAVE@127.0.0.1:55481/proposals_qa'
+$env:TRAX_POSTGRES_TEST_ALLOW_RESET='1'
+$env:DATABASE_URL=$env:TRAX_POSTGRES_TEST_URL
+.\.venv\Scripts\python.exe -B -m unittest -v tests.postgresql_professional_proposals
+```
+
+Comando efectivamente ejecutado para ambos conjuntos completos, con las variables
+anteriores configuradas para la instancia sintética exclusiva:
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest -v tests.postgresql_professional_proposals tests.postgresql_contracting_concurrency_e2e
+```
+
+Estos comandos truncan la base de pruebas: nunca apuntarlos a bases compartidas.
+Evidencia nueva: `proposals-p3-gate-20261030/gates-complete.log`, baseline SHA-256,
+comparación de cuerpos de pruebas e integridad final. Ubicación durable:
+[carpeta de evidencia](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposals-p3-gate-20261030/).
+Los resultados anteriores de PostgreSQL seleccionados, Python, navegador y Node
+permanecen históricos y no se contabilizan como ejecuciones nuevas. No se repitieron
+navegador ni Node: interfaces y controladores no cambiaron.
+
+Inventario focal: `tests/postgresql_professional_proposals.py`,
+`tests/postgresql_contracting_concurrency_e2e.py`, nuevo
+`tests/postgresql_contracting_fixture.py`, `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Baseline: 121 paths pendientes y 624 archivos; cierre: 123 paths pendientes,
+staging vacío. Los otros 619 archivos del baseline conservan SHA-256, incluidos
+INDEX, Presupuestos, Urgencias y los ajustes autorizados de botones y estados vacíos
+en las tres pestañas de Propuestas. Sintaxis Python, UTF-8 y git diff --check correctos.
+
+Sin cambios productivos, permisos, interfaces, modelos ni dependencias. No hubo
+commit, push, PR ni merge porque no están autorizados; no se consultó sincronización
+remota. Próximo paso: retest independiente del gate completo y su suite original
+con los comandos anteriores en PostgreSQL descartable. Preservar el trabajo previo;
+no ejecutar estos gates contra la base habitual. No se declara aprobación visual,
+integración ni habilitación productiva.
+
+---
+
+## Estados vacíos de vistas propias de Propuestas — 2026-10-30T11:16:53-03:00
+
+Estado: COMPLETED localmente, pendiente de revisión visual. Laptop.
+Rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; 121 paths pendientes y staging vacío.
+Se confirmó que el agente de testing había finalizado antes de editar. Este ajuste
+es posterior a su dictamen; no se presenta como cubierto por aquella ejecución.
+
+En Mis postulaciones y Mis publicaciones se centran los mensajes vacíos mediante
+la clase existente `pp-empty` y se eliminan los enlaces Explorar propuestas/Crear
+propuesta de esos bloques. El CTA del encabezado permanece. Sin cambios de lógica,
+CSS, permisos ni pruebas. Archivos modificados: `app/templates/professional_proposals.html`
+y este handoff; todos los restantes preservados por SHA-256.
+Prueba existente de filtros/paginación/vacíos: 1/1 aprobada en SQLite aislado.
+UTF-8 y git diff --check correctos; navegador, Node y PostgreSQL no repetidos para
+este ajuste mínimo. Se conserva sin modificar el P3 informado del gate PostgreSQL,
+fuera de este encargo. Sin Docker, migraciones ni operaciones Git mutables.
+No hubo commit/push/PR/merge: no autorizados. Próximo paso: revisar visualmente las
+dos pestañas vacías; no se declara integración ni despliegue. Antecedentes conservados.
+
+---
+
+## Ajuste visual menor de Propuestas — 2026-10-30T10:35:49-03:00
+
+Estado: COMPLETED localmente; pendiente de revisión visual de Cristian.
+Laptop; rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, conservados. 121 paths pendientes,
+staging vacío. Sin commit/push/PR/merge: no autorizados; remoto no comprobado.
+
+Filtros privados: textos Aplicar/Limpiar con el mismo componente primario naranja,
+ancho mínimo y peso tipográfico. Estado sin propuestas centrado, sin CTA Crear
+propuesta en ese bloque; el acceso del encabezado permanece. Sin cambios de lógica.
+Archivos: `app/templates/professional_proposals.html`,
+`app/static/css/professional-proposals.css` y este handoff. Antecedentes conservados.
+Validación: prueba existente `ProfessionalProposalsTest.test_filters_pagination_invalid_and_empty`
+1/1 aprobada en SQLite aislado; UTF-8 y git diff --check correctos. No se repitieron
+matrices de navegador, PostgreSQL ni Node para este ajuste menor de presentación.
+Sin Docker, migraciones, dependencias ni operaciones Git mutables. Los restantes
+archivos preservados por SHA-256. Próximo paso: revisar visualmente el ajuste en
+`/profesional/propuestas`; no considerar la tarea una integración ni despliegue.
+
+---
+
+## Propuestas privadas profesionales — 2026-10-30T10:23:56-03:00
+
+Estado: READY_TO_RESUME. Implementación local lista para revisión visual y testing
+independiente. Agente local, laptop. Boceto aprobado por Cristian como referencia;
+la aprobación visual de la implementación de Propuestas continúa pendiente.
+Cristian aprobó visualmente Configuración de urgencias según el encargo actual;
+se registra sin reabrir su implementación ni modificar su requisito.
+
+Rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, conservados; staging vacío.
+Baseline 108 paths/618 hashes; final 121 paths. Incremento: 18 archivos (6 nuevos),
+606 restantes del baseline preservados por SHA-256, incluidos INDEX/Presupuestos/Urgencias.
+Sin commit, push, PR ni merge: no autorizados. Sin sincronización remota comprobada.
+
+Completado: tres vistas privadas reales en `/profesional/propuestas`, filtros GET,
+contadores/paginación, gestión canónica, detalle/creación dentro del shell profesional,
+postulación con error repoblado, importes finitos/acotados y permiso del propietario
+profesional exclusivamente para derivación y lado contratante de PROPOSAL.
+Sin esquema/migración nueva; continúa head declarado `20261028_01`, aplicado sólo
+a PostgreSQL descartable durante pruebas. Presupuestos/DIRECT conservan sus reglas.
+
+Validación: paquete Python 86 (85 aprobadas/1 omitida); focal final 10/10, con nueve
+solapadas y un nuevo caso; PostgreSQL descartable 4/4; Chrome 30 combinaciones de
+pestañas/anchos/temas, dos recorridos con/sin JS y cuatro revisiones focales extra.
+No sumar repeticiones. Foco/reduced-motion reales, sin overflow, contraste primario
+4.56:1/8.02:1. CSP inline existente observado; sin certificación AA. No Node nuevo
+(sin controladores modificados), suite completa no ejecutada. Preview y PostgreSQL
+propios retirados; Docker habitual, su base y cuenta QA intactos.
+
+Inventario completo, comandos, fuentes y límites en
+[Propuestas P1, incremento privado](../REQUISITOS/PROPUESTAS_P1.md).
+[Evidencia](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/professional-proposals-20261030/). Documentación actualizada: ese requisito, este handoff y changelog.
+Próximo paso: Cristian actualiza sólo web con los comandos documentados y revisa
+`http://127.0.0.1:5050/profesional/propuestas`; después testing independiente del
+permiso acotado, ownership, formularios y regresión pública. No activar capacidades
+futuras ni migrar/modificar Docker habitual automáticamente. No se declara despliegue.
+
+---
+
+## Cierre técnico del P2 de Configuración de urgencias — 2026-10-30T09:06:28-03:00
+
+Dictamen independiente del **2026-10-30T08:47:41-03:00**:
+**P2 CERRADO — VERIFICADO EN EL ALCANCE EVALUADO.**
+
+- Confirmación válida entre 0 y 900 segundos inclusive; rechazo desde 901 segundos.
+  Se revalida después de adquirir los locks pertinentes, antes de una mutación nueva.
+- Recuperación del formulario con campos conservados y escapados, nueva revisión y
+  aceptación inicialmente desmarcada. Replay completado idempotente y atomicidad preservada.
+- Resultados del retest independiente: Python **41/41**, PostgreSQL **6/6** y
+  **ocho recorridos funcionales de navegador**. Son ejecuciones del dictamen citado;
+  este cierre documental no repite pruebas ni suma resultados históricos.
+- Evidencia durable existente: [config-impact-expiry-retest-20261030](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/config-impact-expiry-retest-20261030/).
+  No se recrearon evidencias.
+
+Se conservan los antecedentes de implementación, hallazgo y corrección. Continúan
+pendientes Google Maps real, recepción profesional (no habilitada) y aprobación
+visual de Cristian. Permanecen documentados los P3 heredados, la observación del
+tema oscuro forzado sin JavaScript y los avisos CSP existentes. Este cierre no
+declara habilitación productiva ni certificación AA.
+
+Rama `feature/professional-workspace-ux`; HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; 108 paths pendientes y staging vacío.
+Alcance exclusivo: este requisito, `docs/HANDOFFS/ACTIVE_HANDOFF.md` y
+`docs/CHANGELOG.md`. Los otros 615 archivos del inventario inicial se preservan por
+SHA-256, incluidos INDEX y Presupuestos. Controles del cierre: UTF-8 y
+`git diff --check`; sin cambios productivos, nuevas pruebas, migraciones, Docker
+ni operaciones Git mutables.
+
+Estado de esta sesión: **COMPLETED**, exclusivamente cierre documental técnico.
+Responsable: agente local MANDOBRA, laptop. Documentación actualizada: requisito,
+handoff y changelog. Sin commit, push, PR ni merge; no autorizados en este encargo.
+Sin cambios de migraciones. No se consultó ni modificó la base habitual.
+Próximo paso: revisión visual de Cristian y tratamiento separado de los pendientes.
+Para retomar, verificar identidad/inventario y leer este cierre junto con sus
+antecedentes; no interpretar el dictamen focal como autorización de producción.
+
+---
+
+## P2 — Vencimiento de revisión de impacto — 2026-10-30T08:21:08-03:00
+
+Estado: READY_TO_RESUME. P2 corregido localmente; pendiente de retest independiente.
+Codex local, laptop. Rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; staging vacío. Baseline: 107 paths,
+Alembic `20261028_01`. Sin cambios de rama, commit/push/PR/merge: no autorizados.
+Sincronización remota no comprobada.
+
+Reproducción previa: 901 segundos y 306 días aceptados indebidamente. Ahora revisión
+con URLSafeTimedSerializer/max_age=900, validación tras locks: edad entera 0..900
+válida, 901/futuro/formato anterior rechazados. Vencimiento 409, impacto actualizado,
+formulario conservado y aceptación desmarcada. Replay autorizado completado intacto.
+Sólo servicio/ruta productivos; pruebas nuevas/extendidas y tres documentos.
+[Inventario y evidencia antes/después](../REQUISITOS/PROF_URGENCIAS_UX_001.md).
+
+Resultados de esta corrección: Python 41/41; PostgreSQL exclusivo 6/6, incluyendo
+espera de lock observada realmente; Chrome 8/8 con/sin JS, móvil/escritorio y ambos
+temas. UTF-8/sintaxis/diff check.
+Integridad final del P2: 7 archivos intervenidos (6 existentes y 1 prueba nueva),
+108 paths pendientes totales, staging vacío, rama/HEAD conservados. Los otros 611
+archivos del baseline mantienen SHA-256, incluidos INDEX, Presupuestos y todos los
+templates/P3 heredados. UTF-8/sintaxis y git diff --check correctos. Preview detenido
+y PostgreSQL descartable retirado; Docker habitual conserva sus contenedores.
+Sin operaciones Git mutables, migración nueva ni modificación de cuenta QA habitual.
+ Node y matrices ajenas no repetidos. P3 heredados
+sin corregir. Sin nueva migración, cambios de modelos, CSS, JS o templates.
+
+Próximo paso: retest independiente focal del vencimiento, recuperación y replay.
+No sustituir el hallazgo independiente del 2026-10-29 por aprobación propia.
+No administrar Docker/base habitual ni cuenta QA; no integrar sin autorización.
+No AA integral, móvil físico ni Google real reevaluados. Scheduler, recepción,
+recorrido completo y revisión visual siguen pendientes. Antecedentes a continuación.
+
+## Configuración de urgencias — 2026-10-28T23:38:49-03:00
+
+Estado: READY_TO_RESUME. Implementación local terminada; revisión visual y testing
+independiente pendientes. Codex local, laptop. Rama `feature/professional-workspace-ux`,
+HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`; staging vacío. Base 95 paths pendientes.
+Sin commit, push, PR ni merge: no autorizados; sincronización remota no comprobada.
+
+Pantalla única `/profesional/urgencias/configuracion`, desde Mi perfil y ambas pestañas
+Urgencias; cobertura canónica y tarifas persistentes, consentimiento explícito,
+revisión/versionado de impacto y guardado atómico. Sin cambios en elegibilidad ni
+acuerdos. Modelo mínimo y Alembic `20261028_01` sobre `20261026_01`, probado sólo en
+PostgreSQL descartable. Base habitual/cuenta QA/Docker de revisión intactos.
+
+[Inventario, decisiones, pruebas y procedimiento manual](../REQUISITOS/PROF_URGENCIAS_UX_001.md).
+Suite seleccionada 104/104 + focal final 8/8 (106 únicos); PG 5/5; Node 10/10;
+Chrome 20 combinaciones con/sin JS y movimiento reducido real. Reinicio/login nuevo
+conservan datos. Google real no verificado; adapter no equivale a API real.
+No AA integral, suite completa ni dispositivo físico. Revisión visual y QA independiente
+requeridos antes del cierre; scheduler/recepción/recorrido urgente siguen pendientes.
+
+Próximo paso: revisar capturas y probar independientemente la migración, configuración,
+impacto y concurrencia. Para revisión habitual, Cristian debe migrar conscientemente y
+actualizar web con el procedimiento del requisito; esta sesión no lo ejecutó.
+No ejecutar seed general ni modificar cuentas personales, base o Docker habitual.
+No integrar sin autorización. Antecedentes a continuación, sin sustituir sus dictámenes.
+Integridad final: 107 paths pendientes (11 archivos nuevos y el controlador de mapa,
+antes limpio, ahora modificado); staging vacío, rama/HEAD conservados. Inventario del
+incremento: 19 archivos (8 existentes, 11 nuevos); 598 archivos previos restantes
+idénticos por SHA-256, incluidos INDEX y Presupuestos. UTF-8/sintaxis/diff check correctos.
+Preview detenido y PostgreSQL exclusivo retirado; Docker habitual intacto. Sin tests
+sobre base habitual. Evidencia externa en urgencias-configuracion, enlazada en requisito.
+
+
+
+## Cierre técnico independiente de guardias y liberación — 2026-10-28T14:37:23-03:00
+
+Dictamen independiente del **2026-10-28T14:29:40-03:00**:
+
+**GUARDIAS, LIBERACIÓN Y AJUSTES ACUMULADOS — VERIFICADOS EN EL ALCANCE EVALUADO.**
+
+- Sin defectos funcionales P0–P2.
+- P3 heredado: tres templates sin salto final, fuera del incremento. Se conserva la
+  observación; no se corrigen esos archivos en este cierre documental.
+- Python **74/74**, PostgreSQL **9/9** y Node **4/4**.
+- **40 combinaciones de navegador** y liberación adicional sin JavaScript.
+- Liberación propia programada únicamente cuando faltan **más de 12 horas**;
+  a las 12 horas exactas queda bloqueada en interfaz y servidor.
+- Los bloques liberados no son reservables nuevamente en este incremento.
+- Historial, atomicidad, idempotencia y recordatorios verificados.
+- Sin migración adicional: continúa el head **20261026_01**. Este cierre no afirma
+  una migración de la base habitual.
+
+[Evidencia independiente existente](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/guardias-release-independent-qa-20261028/):
+python-focal.log, postgres-gate.log, node-tests.log, browser-results.json,
+browser.log, capturas e inventarios de integridad. No se recrearon evidencias ni se
+repitieron pruebas. Los resultados anteriores permanecen como antecedentes y no
+se suman como cobertura adicional. No se declara consola limpia ni certificación AA.
+
+Pendientes: revisión visual de Cristian, scheduler periódico, recepción profesional
+y recorrido completo de Urgencias. No habilitación productiva, integración ni despliegue.
+La aprobación visual sigue pendiente; este dictamen cierra únicamente el alcance técnico evaluado.
+
+Registro documental: Codex local, laptop. Rama `feature/professional-workspace-ux`,
+HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`, 95 paths pendientes y staging vacío.
+Únicamente se actualizan `docs/REQUISITOS/PROF_URGENCIAS_UX_001.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`, conservando antecedentes.
+Control de cierre: UTF-8 y `git diff --check`; integridad SHA-256 del resto del
+inventario, incluidos INDEX y Presupuestos. Sin cambios productivos, pruebas nuevas,
+Docker, bases, migraciones ni operaciones Git mutables. Commit/push/PR/merge no
+realizados: fuera de autorización; sincronización remota no comprobada.
+
+Estado de la posta: READY_TO_RESUME. Cierre documental completado.
+Próximo paso: revisión visual de Cristian y planificación de los pendientes.
+Para retomar: reconfirmar identidad, staging e inventario; consultar esta entrada
+y la evidencia independiente. No modificar el Docker habitual ni integrar sin
+autorización. No hubo merge.
+
+---
+
+# Liberación de guardias — 2026-10-26T22:41:47-03:00
+
+Estado: READY_TO_RESUME. Codex local, laptop.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Base de esta tarea: 90 paths pendientes; cierre: 95 paths pendientes, staging vacío. No commit/push/PR/merge:
+no autorizados. No sincronización remota ni despliegue. Trabajo previo preservado.
+
+Liberación implementada exclusivamente para guardia propia programada antes de T−12;
+a T−12 exacto bloqueada. Re-reserva excluida por instrucción posterior de Cristian.
+T−2 y cuatro semanas conservados. Aviso previo de no liberación para reservas tardías.
+No efectos sobre acuerdos con clientes. Invalidación por pérdida de habilitación vigente.
+
+Archivos existentes intervenidos: main_routes.py, professional_urgencies_view_service.py,
+professional_urgencies.html, professional-urgencies.css, PROF_URGENCIAS_UX_001.md,
+REQ-004, ADR-002, CHANGELOG y este handoff.
+Nuevos: emergency_release_service.py, professional-shift-release.js,
+test_emergency_release.py, test_emergency_release_postgres.py,
+tests/js/professional_shift_release.test.js.
+Servicio de reserva original conservado por hash; INDEX, Presupuestos y resto ajeno
+preservados. Sin modelos, migraciones ni dependencias nuevas; head Alembic 20261026_01.
+
+Pruebas ejecutadas: 29/29 Python, 9/9 PostgreSQL descartable, dos controladores Node,
+sintaxis, UTF-8 y diff check. Chrome 20 combinaciones con/sin JS, ambos temas y cinco
+anchos; liberación nativa sin JS/CSRF. No suite completa, AA integral ni móvil físico.
+[Evidencia y capturas](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/guardias-liberacion/).
+
+Preview aislado y PostgreSQL descartable detenidos. Docker habitual conservado.
+
+Retomar: verificar rama/HEAD/staging, revisar diff limitado y ejecutar retest independiente.
+No administrar Docker habitual, migrar su base, modificar cuenta QA ni integrar sin autorización.
+Pendientes: revisión visual del usuario, testing independiente, scheduler y recepción profesional.
+Estado final: IMPLEMENTADO LOCALMENTE; PENDIENTE DE TESTING INDEPENDIENTE.
+
+---
+
+# Urgencias — lista de guardias programadas
+
+Timestamp: 2026-10-26T22:19:03-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+90 paths pendientes y staging vacío conservados. A pedido de Cristian, la tarjeta muestra
+reservas reales futuras y en curso del profesional habilitado, ordenadas por inicio, con fecha,
+diurna/nocturna, horario Buenos Aires y fecha final de nocturnas. Excluye finalizadas/invalidadas;
+estado vacío explícito. Incluye reservas futuras fuera de la semana visible, sin ampliar navegación.
+No cambia persistencia, confirmación, elegibilidad ni regla de cuatro semanas; GET sin escrituras.
+
+Archivos: professional_urgencies_view_service.py, professional_urgencies.html,
+professional-urgencies.css, test_emergency_reservations.py y este handoff.
+Pruebas: 23/23 (reservas, interfaz y ventana); nueva regresión de fechas, exclusión, en curso,
+aislamiento entre usuarios y lectura sin commit. Chrome: 12 vistas en 390/1440, claro/oscuro,
+lista con dos guardias y estado vacío; sin overflow. Datos sintéticos en SQLite en memoria.
+[Capturas y evidencia](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/guardias-lista-programadas/).
+Preview detenido; Docker habitual y cuenta QA sin tocar. Resto de archivos preservado por hash,
+incluidos INDEX y Presupuestos. UTF-8 y diff check correctos. Sin cambios de esquema o dependencias.
+No pruebas PostgreSQL ni auditoría AA integral en este ajuste de consulta/presentación.
+Pendiente revisión visual; actualizar web manualmente según los comandos anteriores para verlo
+en el Docker de revisión. No Git mutable, commit/push/PR/merge ni despliegue por esta tarea.
+
+---
+
+# Urgencias — botón primario y acceso Configuraciones
+
+Timestamp: 2026-10-26T22:11:05-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+90 paths pendientes y staging vacío, conservados. Ajuste exclusivamente de presentación.
+Confirmar turnos reutiliza trax-button/trax-button--primary; se evita la sobrescritura por
+el estilo genérico local y se distingue disabled con tokens neutros. Configuraciones mantiene
+el endpoint y permisos de actividad, sin flecha; engranaje incorporado al macro SVG existente
+con la misma convención, sin bibliotecas ni dependencias. Lógica de reservas intacta.
+
+Archivos de esta sesión: professional_urgencies.html, professional_workspace_base.html,
+professional-urgencies.css, test_professional_urgencies_ux.py (expectativa del texto) y este handoff.
+Python focal 8/8. Chrome aislado SQLite en memoria: 12 vistas, ambas pestañas en 390/1440,
+claro/oscuro y guardias deshabilitadas; foco visible y sin overflow. Contraste texto/botón
+primario medido tras terminar transiciones: claro 4.56:1, oscuro 8.02:1. No auditoría AA
+integral, pruebas PostgreSQL ni nuevas reservas: no impacto de dominio identificado.
+[Evidencia y capturas](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/urgencias-boton-config/).
+Preview detenido. Docker/base habitual/cuenta QA sin tocar. Sin migraciones ni Git mutable.
+UTF-8/diff check correctos; resto de archivos, INDEX y Presupuestos preservados por hash.
+Próximo paso: revisión visual del usuario; actualizar web manualmente si corresponde usando
+los comandos del incremento anterior. No commit/push/PR/merge por falta de autorización;
+no integración ni despliegue. Antecedentes conservados.
+
+---
+
+# Urgencias — cuatro semanas y simplificación de pestañas
+
+Timestamp: 2026-10-26T21:37:42-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin cristhian-star/TRAX-PLATFORM confirmado. 88 paths iniciales, 90 finales; staging vacío.
+Sin sincronización remota ni operaciones Git mutables.
+
+Implementados intervalo compartido de cuatro semanas locales, GET canónico en extremos,
+POST validado después de locks y replay autorizado conservado. No se borran/invalida guardias
+por salir de la ventana. Eliminada tarjeta de presencia manual; Tu guardia y recepción pendiente
+conservadas. Sin nuevas migraciones/dependencias; head Alembic de archivos 20261026_01.
+[Inventario de 15 archivos, evidencia y comandos web](../REQUISITOS/PROF_URGENCIAS_UX_001.md#cuatro-semanas-de-guardias-y-simplificación-de-pestañas).
+
+Python 67/67 y repetición final 14/14 ya incluidos; PostgreSQL descartable 6/6; Node calendario
+aprobado y notificaciones 2/2. Navegador final: 20 recorridos / 40 combinaciones de pestaña,
+ambos temas y con/sin JS, cinco anchos, teclado/foco, extremos y última nocturna persistida.
+Driver corregido para esperar carga completa antes de verificar tema; matriz repetida y capturas
+finales vigentes. No suite completa, AA integral ni móvil físico. UTF-8/sintaxis/diff check correctos.
+
+Documentados decisión REQ-004, especificación, handoff y changelog; antecedentes preservados.
+INDEX, Presupuestos y archivos ajenos intactos por hash. Preview detenido y contenedor PostgreSQL
+exclusivo retirado; Docker de revisión permanece funcionando, sin tocar base habitual o cuenta QA.
+No scheduler instalado, ni recepción profesional, pagos o nuevas operaciones de Urgencias.
+
+Próximo paso: Cristian actualiza únicamente web con los comandos documentados y revisa ambas
+pestañas; luego testing independiente. Para retomar, verificar Git y leer este incremento junto
+al cierre anterior. No ejecutar migraciones, seed general o Git mutable sin autorización.
+Commit, push, PR y merge NO ejecutados: prohibidos por el encargo. No integración ni despliegue.
+AJUSTES IMPLEMENTADOS LOCALMENTE; PENDIENTES DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# Guardias persistentes — cierre técnico independiente
+
+Timestamp: 2026-10-26T20:57:14-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin confirmado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+88 paths pendientes iniciales/finales; staging vacío. Sin sincronización remota.
+
+Dictamen independiente **2026-10-26T20:51:36-03:00**:
+**GUARDIAS PERSISTENTES — VERIFICADO EN EL ALCANCE EVALUADO.** Sin hallazgos P0–P3.
+Python 61/61; PostgreSQL 5/5, incluyendo migración y concurrencia; controlador Node aprobado y
+notificaciones 2/2; navegador 20/20. Verificadas persistencia tras reinicio, atomicidad,
+idempotencia, invalidación y recordatorios. Alembic head `20261026_01`, padre `20260917_03`.
+[Registro y evidencia independiente existente](../REQUISITOS/PROF_URGENCIAS_UX_001.md#cierre-técnico-independiente--guardias-persistentes).
+
+Cierre exclusivamente documental; no se repitieron pruebas ni recrearon evidencias. Antecedentes
+locales y cierres anteriores preservados. Actualizados solamente PROF_URGENCIAS_UX_001,
+ACTIVE_HANDOFF y CHANGELOG. Resto del inventario, incluido INDEX y Presupuestos, intacto por hash.
+UTF-8 y diff check verificados. Sin cambios productivos, Docker, dependencias, bases o migraciones.
+
+Pendientes: instalación/programación del scheduler, recepción profesional, recorrido completo
+de Urgencias y revisión visual del usuario. Sin certificación AA integral ni móvil físico;
+CSP heredada no certificada. QA PostgreSQL aislado no acredita migración de la base habitual:
+no existe evidencia de esa operación en este cierre. No habilitación productiva ni despliegue.
+
+Próximo paso: revisión visual del usuario. Para retomar, verificar identidad/estado Git, leer
+este cierre y la especificación; tratar scheduler y migración habitual como operaciones futuras
+sujetas a autorización y comprobación. No activar recepción, pagos o contratación urgente.
+Commit, push, PR y merge NO ejecutados: excluidos por el encargo. No integración a develop.
+Cierre técnico documental completado; continuidad funcional y visual pendiente según alcance.
+
+---
+
+# Guardias persistentes — primera entrega operativa
+
+Timestamp: 2026-10-26T20:26:49-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin verificado: cristhian-star/TRAX-PLATFORM. 77 paths iniciales, 88 finales; staging vacío.
+Sin sincronización remota ni operaciones Git mutables.
+
+Autorización de Cristian del 2026-10-26 amplía el alcance visual anterior. Implementados modelos,
+migración 20261026_01, confirmación múltiple atómica/idempotente, consulta real, invalidación
+por escritores de habilitación y recordatorios internos persistentes. Factory ordinaria,
+formulario nativo con CSRF, claro/oscuro y móvil. IANA instalada en el Python del proyecto.
+
+[Inventario de 19 archivos, evidencia, comandos y límites](../REQUISITOS/PROF_URGENCIAS_UX_001.md#guardias-persistentes--primera-entrega-operativa).
+Python focal 61/61; repetición de 23 casos tras ajuste de fechas extremas sin sumarlos.
+PostgreSQL exclusivo 5/5, migración upgrade/reversión/upgrade y concurrencia real; Node calendario
+aprobado y notificaciones 2/2. Chrome 20 recorridos con/sin JS en cinco anchos y ambos temas,
+movimiento reducido emulado; dos errores/reenvíos adicionales; persistencia tras reinicio real.
+No suite completa, certificación AA ni móvil físico; CSP heredada fuera de esta revisión.
+
+Documentados REQ-004, ADR-002, spec, handoff y changelog, conservando antecedentes. INDEX,
+Presupuestos y archivos ajenos preservados por hash. Sin migración de la plataforma habitual.
+Recursos nuevos descartables de QA separados de los existentes; preview y PostgreSQL exclusivo
+detenidos al cierre. Dependencia autorizada: tzdata==2025.2; sin proveedor o cola adicional.
+
+Pendiente: revisión visual, retest independiente y posterior autorización para migrar el destino
+habitual/configurar ejecución del despachador cada minuto. Para retomar: verificar Git, leer
+especificación y comandos; revisar `/profesional/oportunidades/urgencias?vista=guardias` sobre
+base migrada y profesional elegible. No ejecutar migraciones compartidas ni Git mutable sin
+autorización. Solicitudes sigue sin recepción profesional; no activar distribución, bot o pagos.
+
+Commit, push, PR y merge NO realizados: excluidos por el encargo. No integración ni despliegue.
+GUARDIAS PERSISTENTES IMPLEMENTADAS LOCALMENTE; PENDIENTES DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# PROF-URGENCIAS-UX-001 — Cierre técnico independiente
+
+Timestamp: 2026-10-25T15:46:39-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin confirmado; 77 paths pendientes iniciales/finales y staging vacío. Sin sincronización remota.
+
+Dictamen independiente **2026-10-25T15:40:22-03:00**: **VERIFICADO EN EL ALCANCE EVALUADO**.
+Ningún hallazgo P0–P3. Python: primera corrida 35 aprobadas/una omitida por falta de IANA;
+caso omitido aprobado después con IANA real en otro runtime: **36 casos únicos satisfactorios
+entre ambos entornos**. Controlador JavaScript aprobado; navegador **40/40**. Sin escrituras ni
+efectos operativos. Resultados del QA independiente, sin nuevas pruebas en este cierre.
+La ejecución alternativa resuelve la cobertura IANA, **no modifica el Python del proyecto**.
+[Registro completo y evidencia](../REQUISITOS/PROF_URGENCIAS_UX_001.md#cierre-técnico-independiente--solicitudes-y-mis-guardias).
+
+Interfaces informativas, selección provisional y reservas deshabilitadas. No recepción
+profesional ni backend de reservas habilitados. No PostgreSQL, certificación AA ni habilitación
+productiva acreditados. CSP heredada y móvil físico pendientes. **Aprobación visual de Cristian
+pendiente**: próximo paso, revisar ambas interfaces; no activar capacidades de dominio.
+Antecedentes de Urgencias y Presupuestos conservados; este cierre no cambia sus decisiones visuales.
+
+Sesión exclusivamente documental: PROF_URGENCIAS_UX_001, este handoff y CHANGELOG. Resto de archivos,
+incluido INDEX, preservado por hash; UTF-8 y diff check verificados. Sin cambios productivos,
+modelos, migraciones, dependencias, Docker, bases ni nuevas pruebas. Commit, push, PR y merge no
+realizados por quedar fuera del alcance autorizado; no integración ni despliegue.
+Para retomar: verificar identidad Git, leer el cierre y realizar la revisión visual pendiente.
+
+---
+
+# Urgencias — Solicitudes y calendario semanal A
+
+Timestamp: 2026-10-25T15:10:43-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin confirmado. 75 paths iniciales, 77 finales; staging vacío. Sin sincronización remota.
+
+Implementadas composición de Solicitudes y selección semanal provisoria, temas y móvil.
+Sin reservas persistidas ni bandeja profesional autorizada: ambas capacidades están pendientes,
+claramente identificadas. Calendario requiere IANA; fallback recuperable si falta.
+[Inventario de nueve archivos, alcance y resultados](../REQUISITOS/PROF_URGENCIAS_UX_001.md#solicitudes-y-calendario-semanal-a--2026-10-25).
+
+Python 35 aprobados/uno omitido (IANA), Node productivo aprobado; Chrome 40 combinaciones de
+página y cuatro controles de texto largo/foco/movimiento reducido. No nuevas pruebas PostgreSQL,
+AA integral ni móvil físico. Preview SQLite aislado con zona sintética UTC−03:00, detenido al cierre.
+No Docker, modelos, migraciones, dependencias, bases compartidas ni operaciones Git mutables.
+Presupuestos, INDEX y archivos ajenos preservados por hash; UTF-8 y diff check correctos.
+Antecedentes de Presupuestos conservados; aprobación visual de su detalle sigue pendiente.
+
+Próximo paso: revisión visual y testing independiente de ambas interfaces. Retomar verificando
+Git y leyendo la matriz de capacidades; no activar reservas/recepción sin backend autorizado.
+Commit, push, PR y merge no realizados: fuera de alcance. No integración ni despliegue.
+
+INTERFACES IMPLEMENTADAS LOCALMENTE; PENDIENTES DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# Presupuestos — Cierre técnico de Ver solicitud
+
+Timestamp: 2026-10-25T14:00:38-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin confirmado; 75 paths pendientes iniciales/finales, staging vacío. Sin sincronización remota.
+
+Dictamen independiente **2026-10-25T13:50:29-03:00**: **VERIFICADO EN EL ALCANCE EVALUADO.**
+Sin hallazgos P0–P3. **62/62 pruebas; 20/20 combinaciones de navegador**, con estados inicial,
+error repoblado y envío corregido. Ambos P2 anteriores permanecen corregidos.
+Son resultados históricos del QA independiente; no se ejecutaron nuevas pruebas funcionales.
+[Registro y evidencia existente](../REQUISITOS/PRESUPUESTOS_UX_001.md#cierre-técnico-independiente-de-ver-solicitud).
+
+Aprobación visual del listado A por Cristian del 2026-10-25 conservada. Boceto del detalle aprobado
+el 2026-10-25; aprobación visual de su implementación todavía pendiente. Próximo paso: revisión
+visual de Cristian del detalle. Urgencias espera también la revisión visual solicitada.
+Persisten PostgreSQL, AA integral, móvil físico, CSP heredada y decisión sobre profesionales
+solicitantes. No se declara integración ni preparación productiva.
+
+Sesión exclusivamente documental: especificación PRESUPUESTOS_UX_001, este handoff y CHANGELOG.
+Antecedentes preservados; demás archivos e INDEX conservados por hash. UTF-8 y diff check verificados.
+Sin cambios de código, pruebas, modelos o migraciones. Sin Docker, bases compartidas ni Git mutable.
+Commit, push, PR y merge no realizados: fuera del alcance autorizado. Para retomar, comprobar
+identidad e integridad, leer el cierre enlazado y obtener la revisión visual pendiente; no repetir
+QA ni iniciar Urgencias como parte de este registro documental.
+
+---
+
+# Presupuestos — Rediseño de Ver solicitud
+
+Timestamp: 2026-10-25T13:36:39-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e` conservados.
+Origin confirmado; 75 paths pendientes iniciales/finales, staging vacío. Sin fetch; sincronización
+remota no comprobada. INDEX/listado A/archivos ajenos conservados por hash.
+
+Cristian aprobó visualmente el listado A el 2026-10-25; queda registrado sin borrar sus cierres
+anteriores. Boceto del detalle aprobado la misma fecha; implementación final aún pendiente de
+revisión visual y testing independiente. Urgencias espera la revisión visual de Cristian.
+
+Detalle: navegación separada, encabezado compacto sin repeticiones, columnas profesionales de
+descripción y oferta, apilado móvil, cupo/aviso preliminar/regla de una oferta conservados.
+Campos, POST, CSRF, P2 y recorrido CLIENTE intactos. Sin modelos, migraciones, dependencias ni JS nuevo.
+[Inventario de seis archivos, resultados y evidencia](../REQUISITOS/PRESUPUESTOS_UX_001.md#ver-solicitud--rediseño-del-detalle-aprobado-el-2026-10-25).
+
+61/61 regresiones; luego 14/14 del módulo con un caso nuevo: 62 casos únicos aprobados.
+20 recorridos Chrome (cinco anchos × dos temas × JS activo/deshabilitado), cada uno con inicial,
+error y envío corregido. Textos largos, foco y botón accesible comprobados. 60 capturas finales.
+UTF-8 y diff --check correctos. No suite completa, PostgreSQL, AA integral ni móvil físico.
+CSP heredada y profesionales solicitantes siguen pendientes. Preview aislado detenido.
+
+Próximo paso: revisión visual final y testing independiente del detalle; verificar especialmente
+estados alternativos y recorrido del cliente. Retomar leyendo la última entrada de la spec,
+reconfirmando Git/inventario. No alterar listado A, reglas ni administrar Docker compartido.
+No hubo commit, push, PR o merge por prohibición expresa. No integración ni despliegue.
+IMPLEMENTADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# Presupuestos — Cierre técnico independiente del diseño A
+
+Timestamp documental: 2026-10-23T22:36:39-03:00. Responsable: Codex local, laptop.
+Estado: READY_TO_RESUME — cierre técnico registrado; aprobación visual final pendiente.
+Dictamen independiente del **2026-10-23T21:31:20-03:00**:
+**VERIFICADO EN EL ALCANCE EVALUADO.** Sin hallazgos P0–P3.
+61/61 pruebas y 20 combinaciones de navegador; ambos P2 anteriores conservados como corregidos.
+Resultados del QA independiente, sin reejecuciones funcionales en esta sesión documental.
+[Evidencia independiente durable](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/presupuestos-diseno-a-independent-qa/) y
+[registro de cierre](../REQUISITOS/PRESUPUESTOS_UX_001.md#cierre-técnico-independiente-del-diseño-a).
+
+Boceto A seleccionado por Producto; aprobación visual final de su implementación por Cristian
+**todavía pendiente**. Antecedentes y cierre P2 preservados. Se mantienen CSP heredada,
+profesionales solicitantes, PostgreSQL, certificación AA y móvil físico como pendientes.
+Urgencias espera la revisión visual solicitada por Cristian; no se modifica su alcance ni estado técnico.
+
+Identidad inicial/final: `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, origin esperado confirmado; 75 paths pendientes,
+staging vacío. No se comprobó sincronización remota. Cambios sólo en PRESUPUESTOS_UX_001.md,
+este handoff y CHANGELOG.md. Los demás archivos versionados/no ignorados e INDEX conservados
+por SHA-256; índice Git conservado. UTF-8 y diff --check comprobados.
+No hubo código, pruebas funcionales nuevas, modelos/migraciones, Docker ni bases compartidas.
+Sin commit, push, PR ni merge por restricción expresa; no constituye integración o aprobación productiva.
+
+Próximo paso: revisión visual de la implementación A y de Urgencias por Cristian.
+Retomar leyendo esta entrada y el requisito, verificando identidad Git e inventario.
+No repetir pruebas por este cierre documental ni mutar Git/Docker compartido.
+La tarea documental está completada; los pendientes visuales permanecen abiertos.
+
+---
+
+# Presupuestos — Diseño A, lista compacta
+
+Timestamp: 2026-10-23T21:20:50-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e` conservados.
+Origin confirmado. Staging vacío; 74 paths iniciales y 75 finales. Sin fetch/sin comprobar sincronización remota.
+INDEX y trabajo ajeno conservados por hash. No commit, push, PR ni merge: prohibidos en el encargo.
+
+Aplicado boceto A en solicitudes disponibles, con pestañas al inicio de ambos listados,
+tarjetas horizontales/apiladas, fechas y conteos reales, máximo canónico y CSS encapsulado.
+Aviso preliminar conservado en oferta. Filtros antiguos siguen operativos por URL, sin controles
+visibles. Sin cambios de reglas, modelos, migraciones o dependencias. Cierre P2 anterior preservado.
+[Inventario de 11 archivos, decisiones, comandos y evidencia](../REQUISITOS/PRESUPUESTOS_UX_001.md#diseño-a--lista-compacta-de-presupuestos).
+
+61/61 regresiones aprobadas; 20 combinaciones Chrome, textos largos, dos vacíos y navegación
+por teclado sin JavaScript. AST/UTF-8/diff --check correctos. No se ejecutó suite completa,
+PostgreSQL, AA integral ni dispositivo móvil físico. Preview SQLite descartable detenido.
+Sin Docker ni bases compartidas. No se repitió la evidencia histórica como cobertura nueva.
+
+Próximo paso: revisión visual de A y testing independiente de ambas pestañas/P2.
+Retomar verificando identidad e inventario, leyendo la última entrada de PRESUPUESTOS_UX_001.
+No mutar Git, Docker compartido ni reglas comerciales. Pendientes heredados: profesionales
+como solicitantes y validaciones de entorno señaladas; no se resuelven con este diseño.
+IMPLEMENTADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# URGENCIAS-UX-002 — Recorrido manual y contacto protegido
+
+Timestamp: 2026-10-20T19:57:49-03:00. Responsable: Codex local, laptop. Estado: READY_TO_RESUME.
+Rama inicial/final `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin confirmado; 67 paths iniciales, 74 finales; staging vacío. INDEX/trabajo ajeno preservados por hash.
+Sin fetch: sincronización remota no comprobada. No hubo commit, push, PR ni merge por restricción expresa.
+
+Cierre de Presupuestos incorporado debajo y en su spec/CHANGELOG: dictamen independiente
+2026-10-20T14:09:02-03:00, P2 cerrados, 36/36 y evidencias históricas; no reejecutadas por documentación.
+
+Urgencias: búsqueda manual, confirmación propia, disponibilidad por confirmar, paginación y contacto
+nativo con consentimiento/CSRF/ownership; CSP permite wa.me sólo desde el directorio. Shell profesional
+con acceso a perfil y directorio público. Guardias, bandeja, difusión y acuerdos siguen pendientes.
+[Inventario de catorce archivos, evidencia durable, límites y comandos](../REQUISITOS/URGENCIAS_UX_002.md).
+Sin modelos, migraciones ni dependencias. Sin Docker/bases compartidas ni capacidades financieras.
+
+Validación: selección de 58 (57 aprobados, 1 omitido por IANA), seguridad 9/9; reejecución de los
+seis nuevos 6/6 sin sumar duplicados. Catorce combinaciones visuales, dos contactos anónimos JS/no-JS
+con destino externo interceptado y un humo profesional. Movimiento reducido emulado en directorio.
+AST, UTF-8 y diff --check correctos. No suite completa, PostgreSQL, AA integral ni móvil físico.
+Aviso CSP inline de base.html pendiente; no consola limpia. Preview descartable detenido al cierre.
+
+Próximo paso: revisión visual y retest independiente de URGENCIAS-UX-002, incluyendo privacidad,
+contacto, CSP acotada, estados y accesos. Retomar leyendo su spec y esta entrada; comprobar identidad
+Git e inventario antes de editar. No habilitar reservas/bandeja/bot ni mutar Git o Docker compartido.
+Trabajo terminado dentro del recorrido manual; capacidades profesionales operativas pendientes.
+IMPLEMENTADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.
+
+---
+
+# Cierre técnico de Presupuestos e inicio de Urgencias
+
+Timestamp: 2026-10-20T19:35:42-03:00. Responsable: Codex local, laptop. Estado: ACTIVE.
+P2 CERRADOS — PRESUPUESTOS-UX-001 VERIFICADO EN EL ALCANCE EVALUADO.
+Dictamen independiente 2026-10-20T14:09:02-03:00: 36/36 pruebas, diez combinaciones
+adversariales, ocho de navegador y tap móvil sin JavaScript aprobados.
+[Registro y evidencia durable](../REQUISITOS/PRESUPUESTOS_UX_001.md). Sin repetir pruebas
+por el cierre. Pendientes preservados: solicitantes profesionales, PostgreSQL, AA y móvil físico.
+Inicio de Urgencias: recorrido manual y contacto existente; sin habilitar capacidades propuestas.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e;
+67 paths y staging vacío al inicio. Antecedentes conservados debajo.
+
+---
+
+# PRESUPUESTOS-UX-001 — Corrección focal de dos P2
+
+Timestamp: 2026-10-19T22:02:37-03:00. Responsable: Codex local, laptop.
+Estado: READY_TO_RESUME — P2 corregidos localmente; pendientes de retest independiente.
+Solicitud: 2026-10-19T21:40:29-03:00. Exclusivamente finitud monetaria y conservación del formulario.
+Rama inicial/final `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin esperado confirmado; staging vacío; 67 paths pendientes antes/después. Sin consulta de sincronización remota.
+
+Reproducidos antes: NaN 500; rango inválido 302 seguido de detalle sin entradas.
+Corregidos: parser Decimal rechaza no finitos antes de comparar; error 400 renderiza detalle
+con campos escapados, CSRF y contexto autorizado. Éxito/duplicados/contratos preservados.
+Siete archivos: budget_service.py, operation_routes.py, detalle_presupuesto.html,
+test_budget_workflow_ux.py, PRESUPUESTOS_UX_001.md, este handoff y CHANGELOG.
+[Detalle, inventario y evidencia durable](../REQUISITOS/PRESUPUESTOS_UX_001.md).
+
+Validación nueva: 36/36 focales y regresiones aprobadas, tres métodos nuevos (incluye 15 subcasos
+monetarios), AST/UTF-8 y git diff --check. Chrome: ocho recorridos de error y reenvío, sin overflow;
+sin JS se envió por Enter. El clic automatizado móvil sin JS agotó una espera inicial; pendiente
+comprobarlo en retest. Temas sin JS aplicados por el harness CSS, no por una función del producto.
+No repetir resultados históricos como cobertura nueva. No Node/suite completa/PostgreSQL/AA integral.
+
+INDEX y trabajo ajeno preservados por SHA-256. Sin modelos/migraciones/dependencias/CSS/JS nuevos.
+Sin Docker ni bases compartidas. Preview en memoria detenida. Sin commit, push, PR ni merge;
+no hay autorización de integración. Contradicción documental de solicitantes continúa pendiente
+exclusivamente de Producto; no se amplían roles.
+Retomar: verificar identidad y hashes, leer spec y carpeta durable PRESUPUESTOS-UX-001-P2,
+ejecutar retest independiente de NaN/rango/datos/CSRF/duplicados; no descartar trabajo previo.
+
+---
+
+# PRESUPUESTOS-UX-001 — Recorrido profesional y cliente
+
+Timestamp: 2026-10-19T21:11:34-03:00. Responsable: Codex local; laptop.
+Estado: READY_TO_RESUME — implementación local terminada; revisión visual y testing independiente pendientes.
+Prioridad: Presupuestos → Urgencias → Propuestas → Estadísticas → Mi perfil → Inicio → Facturación ARCA;
+pagos/cobros postergados. Este incremento modifica exclusivamente Presupuestos.
+Rama inicial/final `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin esperado confirmado; staging vacío. Base: 55 paths previos; 67 paths pendientes finales, staging vacío; sprint adicional sin
+cambio textual frente a HEAD, preservado. Inventario exacto final en evidencia externa `integrity.json`.
+
+Completado: listado privado canónico con filtros/paginación, detalle/oferta/enviados en shell,
+confirmaciones sin JS de adjudicación/cancelación, estado real de seguimiento y acceso de ambos
+actores al contrato BUDGET. Contrato, idempotencia, permisos y operaciones vigentes reutilizados.
+[Spec e inventario de 16 archivos](../REQUISITOS/PRESUPUESTOS_UX_001.md).
+Validación nueva: 55 focales + 34 regresiones = 89 aprobadas; siete pruebas nuevas.
+Chrome: 30 combinaciones sin overflow + seis controles del ajuste CSS final; envío/adjudicación real,
+sin JS, foco y reduced motion emulado. Capturas y logs durables enlazados desde el requisito.
+Sin Node/suite completa/PostgreSQL/certificación AA. CSP bloquea un script inline existente;
+se conserva la política global y se documenta el mensaje. Preview en memoria detenida al finalizar.
+Controles: AST, UTF-8, git diff --check y comparación de hashes; INDEX y resto ajeno conservados.
+
+Pendiente: dictamen independiente, revisión visual y resolver documentalmente el profesional como
+solicitante (UX-06A difiere de rutas/tests CLIENTE). No ampliar permisos silenciosamente.
+No hay migraciones ni dependencias nuevas. No se tocaron Docker, bases/perfiles compartidos.
+No hubo Git mutable, commit, push, PR ni merge: falta revisión y autorización; remoto no consultado.
+Retomar: verificar identidad/estado, leer requisito y evidencia, revisar rutas con cuentas sintéticas;
+no reiniciar Docker compartido ni descartar cambios anteriores. Antecedentes completos debajo.
+
+---
+
+# Cobros — Feature Spec y ADR propuestos
+
+Timestamp: 2026-10-18T19:42:23-03:00. Responsable: Codex local; laptop confirmada.
+Estado: COMPLETED — entrega documental propuesta, pendiente de revisión/aprobación.
+Encargo: 2026-10-18T19:30:09-03:00. Objetivo: anticipos, parciales y trabajos externos.
+Rama inicial/final `feature/professional-workspace-ux`; HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; origin esperado confirmado.
+
+Nuevos documentos (identificadores disponibles verificados):
+- [REQ-005 — Feature Spec](../REQUISITOS/REQ-005-cobros-anticipos-parciales-externos.md), BORRADOR.
+- [ADR-003 — Contexto y obligaciones](../ADR/ADR-003-contexto-comercial-obligaciones-cobro.md), PROPUESTO.
+
+Recomendación no aprobada: contexto comercial común con origen explícito, múltiples
+obligaciones y una reserva durable por obligación inicialmente; legado preservado.
+Spec distingue total, solicitado, exposición, acreditado, devuelto, imputado y saldo;
+propone estados internos sin redefinir CONFIRMADA, externos sin contrato ficticio,
+aceptación del acuerdo y ausencia de saldo calculable cuando faltan datos. Incluye D1–D10,
+22 escenarios de aceptación, independencia fiscal, PRO vigente y plan incremental.
+ADR compara cuatro alternativas y precisa constraints, migración expand/backfill,
+compatibilidad legacy/v2, riesgo de escritores viejos y downgrade sin pérdida de datos.
+No se confunde contracting_mode EXTERNAL con canal comercial.
+
+Fuentes revisadas: código/modelos/servicios/pruebas por lectura, Master Spec, REQ-001/002/003,
+ADR-001, decisiones pertinentes, estándares, guía, auditoría y PROF-UX-004/anexo.
+Los cierres de PROF-UX-004 y el dictamen independiente P2 se conservan íntegros debajo;
+no se extiende su aprobación a esta propuesta. Se enumeran cambios normativos futuros,
+sin editar documentos aprobados, INDEX ni CHANGELOG.
+
+Integridad: 52 paths iniciales; 54 finales por dos documentos nuevos. Staging vacío;
+único archivo previo editado: este handoff (entrada agregada). Resto del árbol conservado
+por hashes, incluidos código, tests, configuración, migraciones, templates/CSS/JS e INDEX.
+Controles documentales: UTF-8, referencias y git diff --check. Ninguna prueba de aplicación,
+Docker, DB, migración, Git mutable, commit/push/PR/merge/deploy. Sin merge porque no autorizado;
+no se verificó sincronización remota. No hay procesos propios ni bases creadas que limpiar.
+
+Pendientes: revisión de Producto/Arquitectura/Seguridad y fiscal/legal de D1–D10 y ADR;
+aceptación explícita, actualización normativa y paquete futuro acotado. PostgreSQL real
+exclusivo será gate de concurrencia/migración; no validado aquí. OAuth, custodia, worker,
+recovery, retornos, políticas económicas y activación real mantienen sus dependencias.
+CSP heredada y proveedor simulado no cambian. Ninguna aprobación fiscal/productiva implícita.
+
+Para retomar: verificar rama/HEAD, 54 paths y staging; leer REQ-005/ADR-003 y fuentes;
+resolver decisiones antes de implementar. No modificar reglas aprobadas silenciosamente,
+crear contratos ficticios, liberar incertidumbre por timeout ni administrar recursos compartidos.
+Próximo paso recomendado: revisión documental con opciones/recomendaciones ya identificadas.
+
+---
+
+# PROF-UX-004 — Cierre documental de QA
+
+Timestamp del registro: 2026-10-18T19:18:45-03:00. Responsable: Codex local; laptop.
+Estado: COMPLETED — únicamente cierre documental, sin integración.
+Dictamen independiente del 2026-10-18T19:03:49-03:00:
+**P2 CERRADO — PROF-UX-004 VERIFICADO EN EL ALCANCE EVALUADO.**
+Fuente: [INFORME_RETEST_P2_PROF_UX_004.md](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/prof-ux-004-p2-retest/INFORME_RETEST_P2_PROF_UX_004.md).
+
+Corrección productiva limitada al import de url_for. Retest independiente: cinco
+regresiones nuevas 5/5 y focales seleccionadas 8/8 aprobadas. Cuatro rutas normales
+(incluidas variantes de query) con 302 a /profesional/facturacion/cobro y preparado 200.
+Permisos, ausencia de escrituras financieras/DML y llamadas financieras comprobados.
+Recorrido simulado idempotente verificado: dos POST, una orden/reserva y una llamada
+al adaptador. Sin hallazgos nuevos P0–P3. Evidencia visual y Node anterior vigente por
+continuidad de hashes, sin contarla como nueva ejecución. Se preservan debajo el hallazgo
+original del 2026-10-18T17:06:18-03:00, la corrección y resultados históricos.
+
+Rama inicial/final: feature/professional-workspace-ux; HEAD
+2e552f2fdc57c152c97f0486050574696f6b250e; origin esperado confirmado.
+52 paths pendientes iniciales/finales, staging vacío. Esta sesión sólo cambia
+PROF_UX_004.md, ACTIVE_HANDOFF.md y CHANGELOG.md. Resto preservado por hashes,
+incluidos código, pruebas, templates, CSS, JavaScript e docs/INDEX.md.
+Control documental git diff --check; ninguna prueba nueva, Docker ni base compartida.
+Sin migraciones, commit, push, PR o merge; no autorizados. No se consultó sincronización remota.
+
+Limitaciones/riesgos: PostgreSQL no validado, CSP heredada, proveedor simulado,
+activación productiva y dependencias previas pendientes. No es certificación AA,
+integración ni preparación productiva. Objetivo documental completo; próximo paso:
+decisión humana sobre continuidad/integración del alcance verificado, sin ejecutarla aquí.
+Para retomar: confirmar identidad, staging y trabajo pendiente, leer el informe durable
+más [requisito](../REQUISITOS/PROF_UX_004.md); no activar pagos ni descartar trabajo anterior.
+
+---
+
+# PROF-UX-004 — Corrección focal P2
+
+Timestamp: 2026-10-18T18:52:15-03:00. Responsable: Codex local; laptop confirmada.
+Estado: READY_TO_RESUME — pendiente de retest independiente.
+Encargo 2026-10-18T18:42:34-03:00; hallazgo independiente 2026-10-18T17:06:18-03:00.
+Objetivo completado: import faltante de url_for en los dos fallbacks sin simulador.
+No se sustituye el dictamen independiente por una aprobación propia.
+
+Rama inicial/final `feature/professional-workspace-ux`; HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; origin esperado confirmado.
+52 paths pendientes iniciales/finales, staging vacío; trabajo anterior e INDEX preservados.
+Cinco archivos afectados: app/routes/main_routes.py (sólo import),
+tests/test_professional_billing_ux.py (5 regresiones), docs/REQUISITOS/PROF_UX_004.md,
+docs/HANDOFFS/ACTIVE_HANDOFF.md y docs/CHANGELOG.md. Sin nuevos paths ni migraciones.
+
+Antes: 4 solicitudes reproducen 500, prueba de permisos pasa (5 ejecutadas).
+Después: 50/50 Python aprobadas (5 nuevas + 45 existentes) en SQLite descartable.
+Incluye comprobación del recorrido aislado por cliente Flask, creación/replay/QR e historial.
+Sin nueva matriz de navegador ni Node: sus resultados anteriores son históricos.
+Sintaxis, UTF-8 y diff --check correctos. Sin PostgreSQL, suite completa ni certificación AA.
+Limitaciones CSP y dependencias productivas sin cambios; no se habilita ningún cobro real.
+[Detalle y comandos](../REQUISITOS/PROF_UX_004.md), con evidencia externa permanente P2.
+
+No se administró Docker/base/perfil compartido ni se levantó un servidor persistente.
+No commit/push/PR/merge: no autorizados; sincronización remota no consultada.
+Para retomar: verificar identidad, 52 paths/staging y manifiesto P2; repetir retest
+independiente de fallbacks normales. No revertir trabajo previo ni activar simulación en
+la aplicación habitual. Próximo paso: retest independiente, sin integración autorizada.
+
+---
+
+# PROF-UX-004 — Conexión interna de cobros simulados
+
+Timestamp: 2026-10-18T15:32:40-03:00. Responsable: Codex implementador local; laptop.
+Estado: READY_TO_RESUME — revisión visual y testing independiente pendientes.
+Objetivo: conectar Crear cobro con 4B/4D exclusivamente en una aplicación aislada.
+Rama inicial/final: `feature/professional-workspace-ux`.
+HEAD inicial/final: `2e552f2fdc57c152c97f0486050574696f6b250e`; origin esperado confirmado.
+
+Completado: selector propio, revisión firmada, POST canónico con CSRF y replay,
+resultado enlace/QR/copia/descarga e historial de órdenes propias. Composición explícita
+con proveedor fake y SQLite temporal nuevo; aplicación habitual conserva disponibilidad
+preparada de PROF-UX-003. Banner permanente de simulación; no procesa dinero.
+Sin modelos, migraciones, dependencias, cambios de locks ni reglas comerciales.
+
+Validación actual: 68/68 Python (13 nuevas + 55 regresiones focales), 6/6 Node
+(2 nuevas + 4 existentes). Matriz real Chrome: 40 combinaciones de cuatro pantallas,
+cinco anchos y dos temas, sin overflow. Copia real, teclado/campana/menú, sin JavaScript
+y movimiento reducido comprobados. Sin JS usa fallback claro. Sin solicitudes externas.
+45 avisos CSP del script inline heredado de tema registrados; no se declara consola limpia.
+Sin gate PostgreSQL, suite integral ni certificación AA. Las 246 pruebas de auditoría
+son antecedentes recibidos, no ejecuciones repetidas. Primer intento restringido de
+fixtures falló por permisos del temporal; ejecución aislada autorizada posterior aprobada.
+
+Inventario: 41 paths pendientes iniciales; 52 finales, staging vacío. Este incremento
+interviene 18 archivos (9 modificaciones + 9 nuevos), inventariados en
+[PROF_UX_004](../REQUISITOS/PROF_UX_004.md). INDEX y requisitos PROF-UX-002/003 preservados
+por hash; antecedentes de este handoff conservados debajo. Anexo de anticipos/parciales/
+externos [BORRADOR PROPUESTO](../REQUISITOS/PROF_UX_004_AMPLIACION_PROPUESTA.md), sin aprobación.
+Evidencia permanente: [PROF-UX-004](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-004/).
+Incluye baseline, inventario final, logs, script de QA y capturas sintéticas.
+
+Previews propios detenidos, puerto 54954 sin listener y tres directorios temporales
+exactos retirados; ningún Docker, proceso ni base compartida administrados. No hay
+credenciales reales ni proveedor remoto. La URL reservada del QR no es checkout navegable.
+Pendientes: revisión visual/testing, OAuth real, conciliación, retornos, recuperación de
+incertidumbre y activación productiva. Anticipos/parciales/externos requieren decisiones
+y migraciones independientes; ARCA/efectos PRO no se habilitan.
+
+Para retomar: verificar identidad/staging y manifiesto, leer requisito y anexo; ejecutar
+el lanzador documentado sólo para preview sintético. No activar flags productivos ni
+usar bases compartidas. No hubo commit, push, PR, merge o deploy; merge no autorizado.
+Sin comprobación de sincronización remota. Próximo paso: revisión independiente del
+incremento en esta rama antes de considerar integración manual.
+
+---
+
+# PROF-UX-003 — Facturación y cobros: implementación local
+
+Timestamp: 2026-10-18T13:56:00-03:00. Responsable: implementador local Codex; laptop confirmada.
+Estado: READY_TO_RESUME — pendiente de revisión visual y testing independiente.
+Objetivo: pantalla fiel al boceto, con dos accesos preparados y sin activar facturación/cobros.
+Rama: `feature/professional-workspace-ux`; HEAD inicial/final:
+`2e552f2fdc57c152c97f0486050574696f6b250e`. Origin esperado confirmado.
+
+Completado: pantalla principal, tres destinos GET privados, selección del menú,
+marca neutral, historial no disponible, responsive y ambos temas. Backend de órdenes
+inspeccionado y no invocado; no datos ilustrativos ni QR ficticios en producción.
+No implementación fiscal/financiera, modelos, migraciones, dependencias o cambios de permisos.
+
+35/35 pruebas Python y 4/4 Node aprobadas; 10 combinaciones principales de navegador
+más seis destinos móvil/escritorio. No-JS real funcional en fallback claro; movimiento
+reducido realmente emulado. Contraste focal medido, no certificación AA. Detalle de comandos,
+resultados, capturas, advertencias y límites en [PROF_UX_003](../REQUISITOS/PROF_UX_003.md).
+Las 75 pruebas históricas no se cuentan como ejecución del incremento nuevo.
+
+Línea base: 35 paths previos; cierre: 41 paths pendientes, staging vacío. Once archivos
+intervenidos detallados en el requisito: cinco previos modificados, cinco nuevos y CHANGELOG
+antes limpio. Código anterior fuera de ese inventario y `docs/INDEX.md` preservados por hash.
+Antecedentes de QA PROF-UX-002 conservados debajo. Evidencia duradera fuera del repositorio:
+[PROF-UX-003](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-003/), con baseline, resultados y capturas sintéticas.
+
+Preview propio de loopback con SQLite en memoria detenido al cierre. No Docker compartido,
+bases compartidas ni procesos ajenos administrados. Controles de sintaxis, UTF-8 y diff
+realizados; sin nuevas garantías PostgreSQL ni suite completa. Fallo inicial de conexión
+del sandbox al preview resuelto ejecutando ambos procesos aislados con permiso local;
+no se recurrió a infraestructura compartida.
+
+Pendientes: revisión visual de Cristian y testing independiente; luego decisión manual
+de integración. Futuro: ARCA, marca, activación de cobros, historial y definición de trabajos
+externos. Limitación: sin JavaScript, tema claro por el mecanismo actual de inicialización.
+No hubo commit/push/PR/merge/deploy; no merge por no estar autorizado. Sin sincronización
+remota comprobada. Para retomar: verificar rama/HEAD/staging, comparar inventario y hashes,
+leer requisito y evidencia; no descartar los 35 paths de trabajo previo ni activar pagos.
+
+---
+
+# PROF-UX-002 — Cierre documental de QA
+
+## Cierre documental de QA — 2026-10-17T05:22:46-03:00
+
+Estado: COMPLETED, limitado al cierre documental de QA. Responsable: agente local; dispositivo: laptop.
+
+Se incorpora el dictamen independiente del **2026-10-16T22:41:51-03:00**, comunicado por el responsable del proyecto: **VERIFICADO EN EL ALCANCE EVALUADO**.
+
+- **75 pruebas anteriores vigentes por continuidad de hashes**; no constituyen nuevas ejecuciones ni se suman repeticiones como cobertura adicional.
+- Matriz de navegador: **20 combinaciones verificadas**, Inicio y Estadísticas en 320, 390, 768, 1024 y 1440 px, en claro y oscuro.
+- **JavaScript deshabilitado y movimiento reducido comprobados realmente** en el retest independiente, superando las limitaciones de la revisión local histórica.
+- Inventario conciliado: **17 archivos intervenidos por PROF-UX-002 y 35 paths pendientes totales**; el total incluye trabajo anterior preservado.
+- **Sin hallazgos P0–P3** en el alcance evaluado.
+
+Esta entrada actualiza los pendientes de QA del registro anterior sin borrar sus antecedentes ni convertir sus comprobaciones estáticas o simuladas en ejecuciones reales. La vigencia de las 75 pruebas se atribuye al dictamen independiente; esta sesión no ejecuta pruebas. No se declara certificación AA, integración ni preparación productiva.
+
+### Evidencias permanentes
+
+Las evidencias se conservaron fuera del repositorio en [QA-20261016T224151-0300](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/). Se copiaron los **12 archivos originales (10 capturas y 2 JSON; 416851 bytes)** desde la carpeta temporal, sin borrar ni modificar los originales. Se verificó igualdad SHA-256 de cada copia.
+
+- [Índice de navegador portable](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/browser-evidence-portable.json): referencias relativas a las capturas preservadas; incluye las comprobaciones sin JavaScript y con movimiento reducido.
+- [Matriz de viewports exactos](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/exact-viewports.json): completa la matriz de 20 combinaciones junto con el índice anterior.
+- [Captura sin JavaScript](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/inicio-390-nojs.png) y [captura con movimiento reducido](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/estadisticas-390-reduced-motion.png).
+- [Manifiesto de preservación](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/evidencias-permanentes/PROF-UX-002/QA-20261016T224151-0300/preservation-manifest.json): inventario, pesos y SHA-256.
+
+El JSON original de navegador se conserva íntegro como antecedente, incluidas sus rutas temporales históricas. El índice portable derivado es la referencia vigente para abrir las capturas; no representa una nueva ejecución. La línea base de integridad de esta sesión se conserva en `repository-before.json`, en la misma ubicación externa.
+
+### Integridad y continuidad
+
+Rama inicial/final: `feature/professional-workspace-ux`. HEAD conservado: `2e552f2fdc57c152c97f0486050574696f6b250e`. Origin: `https://github.com/cristhian-star/TRAX-PLATFORM.git`. Staging vacío; 35 paths pendientes totales, con trabajo previo sin commit.
+
+Únicamente se actualizan `docs/REQUISITOS/PROF_UX_002.md` y `docs/HANDOFFS/ACTIVE_HANDOFF.md`. Código, pruebas y modificación previa de `docs/INDEX.md` se preservan por comparación SHA-256 contra la línea base de esta sesión. Control documental: `git diff --check`, sin nuevas pruebas ni Docker. Sin migraciones ni acceso a bases.
+
+No se ejecutaron commit, push, PR ni merge; la integración no está autorizada por este cierre y permanece pendiente de decisión del responsable. No se verificó sincronización remota. Las capacidades futuras de instrumentación, metodología de mercado y facturación conservan sus dependencias y restricciones originales.
+
+Próximo paso: revisión del cierre documental y decisión separada sobre integración. Para retomar, verificar identidad Git, staging y los 35 paths pendientes; consultar este cierre y las evidencias permanentes. No descartar trabajo previo ni interpretar este dictamen como habilitación de capacidades futuras.
+
+---
+
+# PROF-UX-002 — Navegación directa, Inicio y Estadísticas
+
+Timestamp: 2026-10-16T21:18:44-03:00. Estado: READY_TO_RESUME. Dispositivo: laptop.
+Rama inicial/final: feature/professional-workspace-ux.
+HEAD: 2e552f2fdc57c152c97f0486050574696f6b250e.
+Origin: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+
+Implementados navegación directa con ocho destinos, menú móvil nativo,
+Inicio operativo, Estadísticas con cuatro secciones y períodos 7/30/90,
+agregaciones propias verificables y Facturación preparada sin efectos.
+Notificaciones, tema, contratos, elegibilidad y compatibilidad del antiguo
+contenedor preservados. Ninguna capacidad futura activada.
+
+Detalle, inventario diferencial, fuentes/definiciones, decisiones, riesgos,
+comandos exactos y URLs de revisión: [PROF_UX_002](../REQUISITOS/PROF_UX_002.md).
+25 paths previos preservados, incluido INDEX (hash sin cambio). Esta sesión
+modifica siete paths previos y un JS antes limpio; añade nueve archivos.
+Staging vacío, sin commit/push/PR/merge; GitHub no sincronizado ni comprobado.
+Sin merge porque no está autorizado. No Docker compartido ni acceso a sus bases.
+Sin dependencias o migraciones. Preview aislado detenido al cierre.
+
+Validación: 59 pruebas Python aprobadas; última repetición focal 7/7 tras añadir
+la evolución (no cobertura adicional). Node 5 OK. AST/sintaxis/UTF-8/diff-check
+correctos. Navegador: Inicio/Resumen sin overflow en cinco anchos ambos temas,
+menú, Escape/foco, filtro, Facturación y notificaciones. Capturas finales de
+escritorio claro/oscuro; capturas móviles fallaron por timeout. Colores focales
+medidos; no auditoría AA integral. No-JS simulado sin scripts de aplicación;
+no-JS real y reduced-motion emulado pendientes. Logs de extensión y /meta.json
+404 observados; no se declara red integralmente limpia. Revisión visual y testing
+independiente pendientes; resultados anteriores conservados debajo.
+
+Próximo paso: revisar /profesional/dashboard y /profesional/estadisticas en QA
+tras reconstruir sólo web manualmente con los comandos del requisito. Ejecutar
+retest independiente, completar capturas móviles y emulaciones pendientes.
+No usar cifras de bocetos, no activar analítica/pagos/guardias ni modificar INDEX.
+
+---
+
+# PROF-URGENCIAS-UX-001 — Presentación privada de Urgencias
+
+Timestamp: 2026-10-14T19:05:14-03:00. Estado: READY_TO_RESUME. Dispositivo: laptop.
+Rama: feature/professional-workspace-ux.
+HEAD: 2e552f2fdc57c152c97f0486050574696f6b250e.
+Origin conservado: https://github.com/cristhian-star/TRAX-PLATFORM.git.
+
+Implementado: ruta privada /profesional/oportunidades/urgencias, secciones
+Solicitudes/Mis guardias/Actividad, claro/oscuro y responsive siguiendo el boceto.
+Recepción, reservas e historial se presentan como pendientes; no se exponen
+solicitudes legacy sin destinatario. Consulta de fechas sin persistencia cuando
+hay IANA; error recuperable si falta (caso local Windows comprobado).
+
+Detalle completo, decisiones de Producto nuevas, matriz de capacidades,
+pendientes jurídicos e inventario: [PROF_URGENCIAS_UX_001](../REQUISITOS/PROF_URGENCIAS_UX_001.md).
+Preexistentes preservados: espacio profesional y campanita. Solo tres archivos de
+app previos adaptados (rutas, shell activo, navegación Oportunidades), más esta
+entrada. Seis paths nuevos; 24 acumulados más INDEX previo. Staging vacío.
+INDEX intacto: 46400cbd6de53ddabc3f535fec46cc1d901f17a1ed2001c6c5e1916041acd7a0.
+
+Validación actual: 65 tests Python, 64 aprobados/1 omitido por IANA; Node 3 OK.
+AST Python, UTF-8 y diff-check correctos. QA Solicitudes cinco anchos ambos temas
+sin overflow, tema y panel operativos; Guardias error recuperable. Capturas
+viewport aisladas. Reduced motion solo estático; no-JS/foco final interrumpido por
+desconexión navegador; matriz completa de otras vistas y retest pendientes.
+Sin migraciones, dependencias, bases compartidas ni Docker. Preview propio detenido.
+
+Próximo paso: Cristian revisa http://127.0.0.1:5050/profesional/oportunidades/urgencias
+tras reconstruir solo web, luego testing independiente. No activar guardias/bot/
+llamadas/contratación/pagos/sanciones con este código. Pendientes normativos están
+en requisito, sin decisiones silenciosas. Sin commit/push/PR/merge ni operaciones
+Git mutables; integración no autorizada. Preservar INDEX y cambios anteriores.
+
+---
+
+# PROF-UX-001 — Corrección focal de notificaciones
+
+Timestamp: 2026-10-14T13:22:50-03:00. Estado: READY_TO_RESUME. Origen: laptop.
+Rama: feature/professional-workspace-ux.
+HEAD: 2e552f2fdc57c152c97f0486050574696f6b250e. Staging vacío.
+
+Panel desplegable implementado en las cuatro vistas profesionales. Renderizado
+síncrono con datos propios, lectura individual por POST existente, contador real,
+foco/teclado, viewport móvil y ambos temas. Sin cambios de dominio o base.
+Detalle, inventario y comandos: [PROF_UX_001](../REQUISITOS/PROF_UX_001.md),
+entrada Corrección focal — panel de notificaciones.
+
+40 tests Python y 2 Node aprobados; sintaxis JS y diff-check correctos.
+QA aislado 1440/320, capturas en ambos temas; lectura 3→2 y cierre comprobados.
+No se repitió suite completa ni auditoría AA; testing independiente pendiente.
+Sin carga asíncrona: no corresponden estados async. Se conserva manejo de errores
+HTTP general. Limitación: historial completo aumenta el HTML inicial; sin JS el
+botón permanece oculto. Preview propio detenido; no se administró Docker QA.
+
+18 paths del incremento total pendientes más INDEX previo. INDEX preservado:
+46400cbd6de53ddabc3f535fec46cc1d901f17a1ed2001c6c5e1916041acd7a0.
+No commit, push, PR, merge ni sincronización remota; no autorización de integración.
+Próximo paso: revisar capturas y diff, retest focal independiente. Preservar INDEX,
+no reset/clean/stash ni bases compartidas; conservar la rama existente.
+
+---
+
+# PROF-UX-001 — Espacio profesional implementado para revisión
+
+Timestamp: 2026-10-14T12:15:05-03:00. Dispositivo: laptop. Responsable: implementador local.
+Estado: READY_TO_RESUME. Implementación local terminada; revisión visual y testing independiente pendientes.
+Rama: `feature/professional-workspace-ux`; HEAD: `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Origin comprobado: `https://github.com/cristhian-star/TRAX-PLATFORM.git`.
+
+Objetivo: aplicar los cuatro bocetos al espacio profesional y conservar dominio,
+seguridad y formularios actuales. Completado: shell responsive, inicio operativo,
+oportunidades, trabajos propios paginados y perfil integrado; entrada por rol,
+cliente en home público autenticado, iniciales y acceso a Mis operaciones.
+Valores centrales compartidos: verificación, PRO efectivo, rating, presentación,
+media y cobertura. Contactos WhatsApp en Oportunidades, sin confundir con contratos.
+
+Inventario, rutas, diferencias, comandos y evidencia detallados en
+[PROF_UX_001](../REQUISITOS/PROF_UX_001.md). Son 16 paths del incremento sin commit
+(7 modificados y 9 nuevos), más `docs/INDEX.md` previo, preservado byte por byte.
+SHA-256 INDEX: `46400cbd6de53ddabc3f535fec46cc1d901f17a1ed2001c6c5e1916041acd7a0`.
+Staging vacío. HEAD conservado. No commit, push, PR ni merge: reservados al usuario.
+No sincronización remota en esta sesión; no se afirma igualdad actual con GitHub.
+
+Pruebas finales: 89/89 Python (13 focales dentro del total), Node AUTH 1/1 archivo,
+compileall y diff-check correctos. UTF-8 sin BOM/NUL/U+FFFD en archivos del incremento.
+DS/footer adicional: 15 tests con 4 fallos de assertions y 1 error, reproducidos
+con base.html de HEAD; expectativas antiguas de AUTH, detalle en requisito.
+No se repitieron ni modificaron reglas de AUTH para acomodar esos tests.
+
+QA: preview aislado en memoria en 54931; inicio en cinco anchos y ambos temas sin
+overflow; perfil cinco anchos claro, teclado/foco, fallback sin scripts; resto
+focal. Limitaciones: desconexiones de extensión, matriz completa de otras vistas,
+captura móvil clara final, emulación reduced motion, lector de pantalla/axe y
+retest independiente pendientes. No aprobación integral de accesibilidad.
+No ejecución sobre Docker QA 5050, trax_db, PostgreSQL, producción ni datos compartidos.
+Sin migraciones, seeds, dependencias, modelo o nuevas reglas contractuales.
+
+Troubleshooting local: TEMP/TMP del sandbox produjo WinError 5 en test de media;
+usar temporal autorizado para pruebas aisladas resolvió el problema. Preview
+inicial restringido no era alcanzable; se detuvieron ambas instancias propias y
+se inició una única instancia local autorizada. No se cambió firewall ni Docker.
+
+Próximo paso exacto: leer requisito y diff, verificar rama/HEAD/staging e INDEX;
+Cristian reconstruye únicamente web con los dos comandos documentados, revisa
+los bocetos en 5050 y solicita testing independiente. No integrar a develop hasta
+resolver revisión y autorizar expresamente Git. No reset/clean/stash, no tocar
+INDEX ni bases compartidas. Ningún merge realizado; trabajo permanece en su rama.
+
+---
+
 # Propuestas — Ajuste visual de acciones y encabezado
 
 Timestamp: 2026-10-04T16:23:51-03:00. Origen: Laptop. Responsable: implementador local.

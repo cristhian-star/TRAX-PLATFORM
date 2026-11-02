@@ -58,124 +58,12 @@ from app.services.contracting_core_service import (
 from tests.alembic_head_validation import assert_database_at_repository_head
 
 
-class Sprint7ContractingPostgreSQLConcurrencyE2E(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        if not POSTGRES_URL:
-            raise RuntimeError(
-                "TRAX_POSTGRES_TEST_URL es obligatorio para la suite PostgreSQL E2E"
-            )
-        url = make_url(POSTGRES_URL)
-        if url.get_backend_name() not in ("postgresql", "postgres"):
-            raise RuntimeError("TRAX_POSTGRES_TEST_URL debe apuntar a PostgreSQL")
-        if not ALLOW_RESET:
-            raise RuntimeError(
-                "TRAX_POSTGRES_TEST_ALLOW_RESET=1 es obligatorio: la base sera truncada"
-            )
+from tests.postgresql_contracting_fixture import PostgreSQLContractingFixture
 
-        config = Config(str(PROJECT_ROOT / "alembic.ini"))
-        command.upgrade(config, "head")
-        cls.app = create_app(initialize_schema=False)
-        cls.app.config.update(TESTING=True)
-        with cls.app.app_context():
-            revisions = db.session.execute(
-                sa.text("SELECT version_num FROM alembic_version")
-            ).scalars().all()
-            assert_database_at_repository_head(config, revisions)
-            if db.engine.dialect.name != "postgresql":
-                raise RuntimeError("La suite E2E no esta ejecutando PostgreSQL")
 
-    def _truncate_database(self):
-        with self.app.app_context():
-            table_names = [
-                table.name
-                for table in reversed(db.metadata.sorted_tables)
-                if table.name != "alembic_version"
-            ]
-            quoted = ", ".join(
-                db.engine.dialect.identifier_preparer.quote(table)
-                for table in table_names
-            )
-            db.session.execute(
-                sa.text(f"TRUNCATE TABLE {quoted} RESTART IDENTITY CASCADE")
-            )
-            db.session.commit()
+class Sprint7ContractingPostgreSQLConcurrencyE2E(PostgreSQLContractingFixture, unittest.TestCase):
+    OWNER_ROLE = "CLIENTE"
 
-    def setUp(self):
-        self._truncate_database()
-        with self.app.app_context():
-            suffix = uuid4().hex
-            owner = User(
-                nombre="PG Owner",
-                email=f"pg-owner-{suffix}@test.local",
-                password="hash",
-                rol="CLIENTE",
-                estado="ACTIVO",
-            )
-            professional_user = User(
-                nombre="PG Professional",
-                email=f"pg-professional-{suffix}@test.local",
-                password="hash",
-                rol="PROFESIONAL",
-                estado="ACTIVO",
-            )
-            db.session.add_all([owner, professional_user])
-            db.session.flush()
-            professional = Professional(
-                user_id=professional_user.id,
-                nombre="PG Professional",
-                servicio="Electricidad",
-                zona="CABA",
-                perfil_completo=True,
-            )
-            db.session.add(professional)
-            db.session.flush()
-            budget = BudgetRequest(
-                cliente_id=owner.id,
-                categoria="Electricidad",
-                titulo="PG Budget",
-                descripcion="PG budget source",
-                zona="CABA",
-                estado="ADJUDICADA",
-            )
-            proposal = ProposalRequest(
-                cliente_id=owner.id,
-                owner_user_id=owner.id,
-                categoria="Construccion",
-                titulo="PG Proposal",
-                descripcion="PG proposal source",
-                estado="CERRADA",
-                hiring_mode="SINGLE",
-            )
-            db.session.add_all([budget, proposal])
-            db.session.flush()
-            offer = BudgetOffer(
-                budget_request_id=budget.id,
-                professional_id=professional.id,
-                professional_user_id=professional_user.id,
-                monto=100,
-                mensaje="Oferta PG",
-                plazo_estimado="1 dia",
-                estado="ADJUDICADO",
-            )
-            application = ProposalApplication(
-                proposal_id=proposal.id,
-                professional_id=professional.id,
-                professional_user_id=professional_user.id,
-                mensaje="Postulacion PG",
-                pretension_economica=200,
-                estado="ACEPTADA",
-            )
-            db.session.add_all([offer, application])
-            db.session.commit()
-            self.owner_id = owner.id
-            self.professional_user_id = professional_user.id
-            self.professional_id = professional.id
-            self.offer_id = offer.id
-            self.application_id = application.id
-
-    def tearDown(self):
-        self._truncate_database()
 
     def _direct_kwargs(self, key, **overrides):
         values = {
@@ -247,14 +135,6 @@ class Sprint7ContractingPostgreSQLConcurrencyE2E(unittest.TestCase):
         )
         return results, errors
 
-    def _counts(self):
-        return {
-            "contracts": ContractRequest.query.count(),
-            "commands": OperationCommand.query.count(),
-            "events": ContractEvent.query.count(),
-            "audits": AuditLog.query.count(),
-            "notifications": ActivityNotification.query.count(),
-        }
 
     def test_double_direct_create_same_key_and_payload_recovers_unique_race(self):
         key = "pg-direct-same-key-0001"

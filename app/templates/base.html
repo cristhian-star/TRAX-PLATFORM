@@ -26,7 +26,9 @@
     </script>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
+{% if collection_simulation %}<aside class="trax-alert trax-alert--warning" role="status">SIMULACIÓN — no procesa dinero. Datos sintéticos; no hay una cuenta Mercado Pago conectada.</aside>{% endif %}
+    {% block site_header %}
     <header class="site-header site-header--visitor{% if session.get('user_id') %} site-header--authenticated{% endif %}">
         <a class="brand" href="/" aria-label="MANDOBRA inicio">
             <img class="brand-logo brand-logo--light" src="{{ url_for('static', filename='img/branding/mandobra/mandobra-wordmark-light.png') }}" width="1696" height="720" alt="" aria-hidden="true">
@@ -144,16 +146,17 @@
                 <details class="nav-dropdown account-dropdown">
                     <summary class="account-summary">
                         <div class="account-summary__text">
-                            <strong>Mi cuenta</strong>
+                            {% if session.get("user_role") == "CLIENTE" %}<strong aria-label="Mi cuenta">{% for word in session.get("user_name", "Cliente").split()[:2] %}{{ word[0]|upper }}{% endfor %}</strong>{% else %}<strong>Mi cuenta</strong>{% endif %}
                             <small>{{ session.get("user_name") }} · {{ session.get("user_role") }}</small>
                         </div>
                         <span aria-hidden="true"></span>
                     </summary>
                     <div class="nav-dropdown__menu nav-dropdown__menu--account" aria-label="Opciones de cuenta">
                         <a class="nav-dropdown__item nav-dropdown__item--link" href="/">
-                            <strong>Dashboard general</strong>
+                            <strong>Inicio</strong>
                             <small>Volver al inicio de tu cuenta.</small>
                         </a>
+                        {% if session.get("user_role") == "CLIENTE" %}<a class="nav-dropdown__item nav-dropdown__item--link" href="/cliente/dashboard"><strong>Mis operaciones</strong></a>{% endif %}
                         {% if session.get("user_role") == "PROFESIONAL" %}
                             <a class="nav-dropdown__item nav-dropdown__item--link" href="/profesional/dashboard">
                                 <strong>Panel profesional</strong>
@@ -195,6 +198,7 @@
             <div class="nav-drawer__body"></div>
         </dialog>
     </header>
+    {% endblock %}
 
     {% set flash_messages = get_flashed_messages(with_categories=true) %}
     {% if flash_messages %}
@@ -224,6 +228,7 @@
 
     {% block content %}{% endblock %}
 
+    {% block site_footer %}
     <footer class="footer" aria-label="Pie de página de MANDOBRA">
         <div class="footer__inner">
             <div class="footer__main">
@@ -300,6 +305,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     {% include 'partials/page_loading.html' %}
     <script src="{{ url_for('static', filename='js/page-loading.js') }}"></script>

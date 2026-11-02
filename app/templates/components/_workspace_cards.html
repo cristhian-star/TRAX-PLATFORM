@@ -1,0 +1,8 @@
+{% macro jobs_list(jobs) %}
+{% for job in jobs %}<article class="pw-row"><div><h3>{{ job.title }}</h3><p>Origen: {{ job.origin }}</p><span class="pw-badge">{{ job.state }}</span></div><a class="pw-button" href="{{ job.url }}">{{ job.action }} ↗</a></article>
+{% else %}<p>No tenés trabajos en esta lista. Tus contrataciones aparecerán aquí.</p>{% endfor %}
+{% endmacro %}
+{% macro opportunities_list(items) %}
+{% for item in items %}<article class="pw-row"><div><h3>{{ item.title }}</h3><p>{{ item.kind }}{% if item.zone %} · {{ item.zone }}{% endif %}</p>{% if item.tag %}<span class="pw-badge pw-badge--neutral">{{ item.tag }}</span>{% endif %}</div><a href="{{ item.url }}">{{ item.action }} →</a></article>
+{% else %}<p>Todavía no hay oportunidades publicadas. Podés volver a consultar los listados.</p>{% endfor %}
+{% endmacro %}

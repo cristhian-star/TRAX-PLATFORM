@@ -68,27 +68,22 @@
 
     <div class="emergency-card__actions">
         {% if phone.whatsapp %}
-            <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="professional_id" value="{{ professional.id }}">
-                <input type="hidden" name="operation_type" value="EMERGENCIA">
-                <input type="hidden" name="entity_type" value="EmergencyRequest">
-                <input type="hidden" name="entity_id" value="{{ emergency_request_id or '' }}">
-                <input type="hidden" name="whatsapp_consent" value="">
-                <button class="emergency-action emergency-action--whatsapp" type="submit">
-                    WhatsApp
-                </button>
-            </form>
+            <details class="emergency-contact">
+                <summary>Contactar por WhatsApp</summary>
+                <p>Estás por comunicarte directamente con un profesional mediante WhatsApp. La conversación se realizará fuera de MANDOBRA.</p>
+                <p>No compartas datos bancarios sensibles.</p>
+                <form action="/whatsapp/iniciar" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="professional_id" value="{{ professional.id }}">
+                    <input type="hidden" name="operation_type" value="EMERGENCIA">
+                    <input type="hidden" name="entity_type" value="EmergencyRequest">
+                    <input type="hidden" name="entity_id" value="{{ emergency_request_id or '' }}">
+                    <label><input type="checkbox" name="whatsapp_consent" value="on" required> Acepto continuar.</label>
+                    <button class="emergency-action emergency-action--whatsapp" type="submit">Continuar a WhatsApp</button>
+                </form>
+            </details>
         {% else %}
-            <span class="emergency-action is-disabled" aria-disabled="true">WhatsApp</span>
-        {% endif %}
-
-        {% if phone.call %}
-            <a class="emergency-action emergency-action--call" href="tel:{{ phone.call }}">
-                Llamar
-            </a>
-        {% else %}
-            <span class="emergency-action is-disabled" aria-disabled="true">Llamar</span>
+            <span>Contacto por WhatsApp no configurado</span>
         {% endif %}
 
         <a class="emergency-action emergency-action--profile" href="/profesional/{{ professional.id }}">

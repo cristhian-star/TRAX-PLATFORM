@@ -30,6 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const activateHash = () => {
+        const name = window.location.hash.replace("#perfil-", "");
+        if (Array.from(panels).some(panel => panel.dataset.profilePanel === name)) {
+            activatePanel(name);
+        }
+    };
+    activateHash();
+    window.addEventListener("hashchange", activateHash);
+
     const shareButton = root.querySelector("[data-share-private-profile]");
     const shareStatus = root.querySelector("[data-share-private-status]");
     const publicProfileLink = root.querySelector(".private-profile__actions a");

@@ -55,13 +55,13 @@ def build_emergency_professional_data(professional, coordinates=None):
             "count": len(reviews),
         },
         "phone": {
-            "whatsapp": phone_digits or None,
-            "call": f"+{phone_digits}" if phone_digits else None,
+            "whatsapp": bool(phone_digits),
+            "call": None,
         },
         "availability": {
-            "primary": "Disponible segun perfil",
-            "secondary": "Guardia no configurada",
-            "priority": "Prioridad PRO" if is_pro else None,
+            "primary": "Disponibilidad por confirmar",
+            "secondary": "Consultá antes de coordinar una visita",
+            "priority": None,
         },
         "coverage_match": coverage_match,
         "sort": {
@@ -80,7 +80,6 @@ def build_emergency_directory_rows(categoria, zona, coordinates):
         (build_emergency_professional_data(professional, coordinates) for professional in professionals),
         key=lambda row: (
             row["sort"]["coverage"] if coordinates is not None else 0,
-            -row["sort"]["pro"],
             -row["sort"]["verified"],
             -row["sort"]["rating"],
             row["sort"]["distance"]
@@ -110,7 +109,7 @@ def build_budget_offer_data(offer):
             "count": len(reviews),
         },
         "phone": {
-            "whatsapp": phone_digits or None,
+            "whatsapp": bool(phone_digits),
         },
     }
 
@@ -137,6 +136,22 @@ def build_client_budget_request_rows(user_id, status_filter):
     return request_rows, normalized_filter
 
 
+def budget_layout_context(user_id):
+    user = db.session.get(User, user_id)
+    professional_layout = bool(user and user.rol == "PROFESIONAL")
+    if professional_layout:
+        from app.services.professional_workspace_service import build_workspace
+        return {"budget_workspace": True, "workspace": build_workspace(user_id)}
+    return {"budget_workspace": False}
+
+
+def budget_offer_status(offer, budget_request):
+    if offer.estado == "ADJUDICADO":
+        return "Adjudicado"
+    return {"ADJUDICADA": "Otra oferta fue adjudicada", "CANCELADA": "Solicitud cancelada",
+            "CERRADA": "Solicitud cerrada"}.get(budget_request.estado, "En espera de decisión")
+
+
 def build_professional_budget_offer_rows(user_id):
     offer_rows = []
 
@@ -147,6 +162,7 @@ def build_professional_budget_offer_rows(user_id):
             "offer": offer,
             "budget_request": budget_request,
             "client": client,
+            "status_label": budget_offer_status(offer, budget_request),
             "offer_count": len(budget_request.offers),
         })
 
@@ -188,14 +204,23 @@ def build_budget_detail_context(budget_request, current_user_id, query_args):
                 ContractRequest.cliente_id == current_user_id,
                 ContractRequest.source_type == ContractRequest.SOURCE_BUDGET,
                 ContractRequest.budget_offer_id.in_([offer.id for offer in offers]),
-            ).first() if is_owner else None
+            ).first() if is_owner else (
+                ContractRequest.query.filter_by(
+                    source_type=ContractRequest.SOURCE_BUDGET,
+                    budget_offer_id=own_offer.id,
+                    professional_user_id=current_user_id,
+                    professional_id=current_professional.id,
+                ).first() if own_offer and is_professional and own_offer.estado == "ADJUDICADO" else None
+            )
         ),
         "is_professional": is_professional,
         "own_offer": own_offer,
+        "own_offer_status": budget_offer_status(own_offer, budget_request) if own_offer else None,
+        "profile_ready": bool(current_professional and current_professional.perfil_completo),
         "offer_allowance": get_offer_allowance(current_user_id) if is_professional else None,
         "offer_error": query_args.get("error"),
-        "offer_sent": query_args.get("enviado") == "1",
-        "awarded": query_args.get("adjudicado") == "1",
+        "offer_sent": query_args.get("enviado") == "1" and own_offer is not None,
+        "awarded": query_args.get("adjudicado") == "1" and is_owner and budget_request.estado == "ADJUDICADA",
     }
 
 
@@ -237,3 +262,15 @@ def build_proposal_detail_context(proposal, current_user_id, query_args):
         "applied": query_args.get("postulada") == "1",
         "published": query_args.get("publicada") == "1",
     }
+def budget_publication_age(created_at, now=None):
+    """Relative age of the existing naive-UTC publication timestamp."""
+    from datetime import datetime
+    elapsed = max(0, int(((now or datetime.utcnow()) - created_at).total_seconds()))
+    if elapsed >= 86400:
+        days = elapsed // 86400
+        return f"Hace {days} {'día' if days == 1 else 'días'}"
+    if elapsed >= 3600:
+        return f"Hace {elapsed // 3600} h"
+    if elapsed >= 60:
+        return f"Hace {elapsed // 60} min"
+    return "Recién publicada"

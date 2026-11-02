@@ -39,7 +39,7 @@ class BrandParser(HTMLParser):
         attrs = dict(attrs)
         if tag == "nav" and attrs.get("id") == "primary-navigation":
             self.nav_count += 1
-        if tag == "a" and "brand" in attrs.get("class", "").split():
+        if tag == "a" and set(attrs.get("class", "").split()) & {"brand", "auth-brand", "pw-brand"}:
             self.brand = attrs
             self.inside = True
         if self.inside and tag == "img":
@@ -108,7 +108,14 @@ class PlatformBrandTest(unittest.TestCase):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
-                self.assert_shared_brand(response.get_data(as_text=True))
+                html = response.get_data(as_text=True)
+                if path in ("/login", "/register"):
+                    brand = BrandParser(html)
+                    self.assertEqual([i["src"] for i in brand.images], [PREFIX + f"mandobra-wordmark-{v}.png" for v in HASHES])
+                    self.assertEqual(brand.nav_count, 0)
+                    self.assertEqual(brand.text, [])
+                else:
+                    self.assert_shared_brand(html)
 
     def test_authenticated_home_uses_shared_brand(self):
         with self.client.session_transaction() as session:
@@ -127,10 +134,17 @@ class PlatformBrandTest(unittest.TestCase):
                 session.update(user_id=self.user_ids[role], user_name=f"Brand {role}", user_role=role)
             for path in ("/", dashboard, "/notificaciones"):
                 with self.subTest(role=role, path=path):
-                    response = self.client.get(path)
+                    response = self.client.get(path, follow_redirects=True)
                     self.assertEqual(response.status_code, 200)
-                    self.assert_shared_brand(response.get_data(as_text=True))
-                    self.assertIn("site-header--authenticated", response.get_data(as_text=True))
+                    html = response.get_data(as_text=True)
+                    if role == "PROFESIONAL" and path in ("/", dashboard):
+                        brand = BrandParser(html)
+                        self.assertEqual([i["src"] for i in brand.images], [PREFIX + f"mandobra-wordmark-{v}.png" for v in HASHES])
+                        self.assertIn('aria-label="Espacio profesional"', html)
+                        self.assertEqual(brand.text, [])
+                    else:
+                        self.assert_shared_brand(html)
+                        self.assertIn("site-header--authenticated", html)
 
     def test_no_template_retains_canary_opt_in(self):
         for p in (ROOT / "app/templates").rglob("*.html"):
@@ -172,7 +186,7 @@ class PlatformBrandTest(unittest.TestCase):
         self.assertIn("display: none", css.split(dark_hide, 1)[1].split("}", 1)[0])
         self.assertIn("display: block", css.split(dark_show, 1)[1].split("}", 1)[0])
         html = self.home()
-        self.assertLess(html.index('document.documentElement.classList.add("theme-" + theme)'), html.index("<body>"))
+        self.assertLess(html.index('document.documentElement.classList.add("theme-" + theme)'), html.index("<body"))
         self.assertIn('classList.add("theme-light")', html)
 
     def test_authenticated_layout_and_menu_use_shared_responsive_controls(self):

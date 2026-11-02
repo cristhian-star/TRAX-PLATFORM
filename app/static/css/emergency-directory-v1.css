@@ -668,3 +668,28 @@
         align-items: start;
     }
 }
+
+/* URGENCIAS-UX-002: scoped DSv2 surfaces and native protected contact. */
+.emergency-directory { background:var(--trax-ds-bg); color:var(--trax-ds-text); overflow-wrap:anywhere; }
+.emergency-directory .emergency-directory__hero { background:var(--trax-ds-surface); color:var(--trax-ds-text); border-bottom:1px solid var(--trax-ds-border); }
+.emergency-directory .emergency-directory__hero p { color:var(--trax-ds-text-secondary); }
+.emergency-directory :is(.emergency-card,.emergency-directory__toolbar,.emergency-directory__count,.emergency-empty,.emergency-guard-note) { background:var(--trax-ds-card); color:var(--trax-ds-text); border-color:var(--trax-ds-border); }
+.emergency-directory :is(.emergency-card p,.emergency-card small,.emergency-card dd,.emergency-directory__count span,.emergency-guard-note p) { color:var(--trax-ds-text-secondary); }
+.emergency-directory .emergency-status { color:var(--trax-ds-text-secondary); background:var(--trax-ds-bg-muted); }
+.emergency-directory .emergency-status i { display:none; }
+.emergency-directory .emergency-card__avatar { background:var(--trax-ds-bg-muted); color:var(--trax-ds-text); }
+.emergency-directory .emergency-guard-note > span { color:var(--trax-ds-danger); }
+.emergency-directory .emergency-contact { width:100%; padding:1rem; border:1px solid var(--trax-ds-border-strong); border-radius:var(--trax-ds-radius-md); }
+.emergency-directory .emergency-card__actions { grid-template-columns:minmax(0,2fr) minmax(10rem,1fr); align-items:start; }
+.emergency-directory .emergency-contact summary { cursor:pointer; min-height:44px; padding:.75rem; color:var(--trax-ds-text); font-weight:700; }
+.emergency-directory .emergency-contact form { display:grid; gap:1rem; }
+.emergency-directory .emergency-contact label { display:flex; align-items:center; gap:.75rem; min-height:44px; }
+.emergency-directory .emergency-contact input { width:24px; height:24px; flex-shrink:0; }
+.emergency-directory .emergency-action--whatsapp { background:var(--trax-ds-danger); color:var(--trax-ds-text-inverse); border:1px solid var(--trax-ds-danger); }
+.emergency-directory .emergency-action--profile { color:var(--trax-ds-text); background:var(--trax-ds-surface); }
+.emergency-directory :is(a,button,summary):focus-visible { outline:3px solid var(--trax-ds-primary); outline-offset:3px; }
+.emergency-directory :is(a,button) { min-height:44px; }
+.emergency-pagination { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center; margin-block:1.5rem; }
+.emergency-pagination a { display:inline-flex; align-items:center; color:var(--trax-ds-text); }
+@media(max-width:48rem) { .emergency-directory .emergency-card__actions { display:flex; flex-direction:column; align-items:stretch; } }
+@media(prefers-reduced-motion:reduce) { .emergency-directory * { transition:none !important; animation:none !important; } }

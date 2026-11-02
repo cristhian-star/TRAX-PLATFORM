@@ -1,0 +1,5 @@
+<nav class="pw-opportunity-nav" aria-label="Tipos de oportunidades">
+ <a href="/profesional/presupuestos">Presupuestos</a>
+ <a href="{{ url_for('main.profesional_urgencias') }}"{% if request.endpoint == 'main.profesional_urgencias' %} aria-current="page"{% endif %}>Urgencias</a>
+ <a href="/profesional/propuestas">Propuestas</a>
+</nav>

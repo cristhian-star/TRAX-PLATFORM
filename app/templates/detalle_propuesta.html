@@ -1,15 +1,16 @@
-{% extends "base.html" %}
+{% extends "proposal_layout.html" %}
 
-{% block extra_css %}
+{% block extra_css %}{{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/proposals-marketplace-v1.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block proposal_content %}
+{% set entry_data = form_data|default({}) %}
 <main class="proposal-page">
     <section class="proposal-hero">
         <div class="shell proposal-hero__layout">
             <div>
-                <a class="proposal-back" href="/propuestas">&larr; Volver a propuestas</a>
+                <a class="proposal-back" href="{{ proposal_back }}">&larr; Volver a propuestas</a>
                 <span class="proposal-status proposal-status--{{ proposal.estado|lower }}">{{ proposal.estado }}</span>
                 <h1>{{ proposal.titulo or proposal.categoria }}</h1>
                 <p>{{ proposal.industria or "Industria" }} / {{ proposal.categoria }} / {{ proposal.rubro or "Rubro" }}</p>
@@ -48,7 +49,7 @@
                     <div>
                         <dt>Presupuesto estimado</dt>
                         <dd>
-                            {% if proposal.presupuesto_estimado %}
+                            {% if proposal.presupuesto_estimado is not none %}
                                 ${{ "{:,.2f}".format(proposal.presupuesto_estimado) }}
                             {% else %}
                                 No informado
@@ -93,6 +94,7 @@
                                         {% if application.estado == "ACEPTADA" and phone_digits %}
                                             <form action="/whatsapp/iniciar" method="POST" data-whatsapp-contact-form>
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="vista" value="{{ proposal_view }}">
                                                 <input type="hidden" name="professional_id" value="{{ professional.id }}">
                                                 <input type="hidden" name="operation_type" value="PROPUESTA_ACEPTADA">
                                                 <input type="hidden" name="entity_type" value="ProposalApplication">
@@ -106,10 +108,12 @@
                                         {% if application.estado == "POSTULADA" and proposal.estado == "PUBLICADA" %}
                                             <form action="/propuestas/{{ proposal.id }}/aceptar/{{ application.id }}" method="POST">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="vista" value="{{ proposal_view }}">
                                                 <button class="proposal-button proposal-button--primary" type="submit">Aceptar</button>
                                             </form>
                                             <form action="/propuestas/{{ proposal.id }}/descartar/{{ application.id }}" method="POST">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="vista" value="{{ proposal_view }}">
                                                 <button class="proposal-button proposal-button--secondary" type="submit">Descartar</button>
                                             </form>
                                         {% endif %}
@@ -131,6 +135,7 @@
                     {% if proposal.estado == "PUBLICADA" %}
                         <form action="/propuestas/{{ proposal.id }}/cancelar" method="POST" onsubmit="return confirm('Seguro que queres cancelar esta propuesta?');">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="vista" value="{{ proposal_view }}">
                             <button class="proposal-button proposal-button--secondary" type="submit">Cancelar propuesta</button>
                         </form>
                     {% else %}
@@ -139,16 +144,17 @@
                 </section>
             {% elif application_eligibility.eligible %}
                 <section class="proposal-panel">
-                    <h2>Postularme</h2>
+                    <h2 id="postularme">Postularme</h2>
                     {% if own_application %}
                         <p>Ya te postulaste. Estado: <strong>{{ own_application.estado }}</strong></p>
                     {% elif proposal.estado == "PUBLICADA" %}
                         <form action="/propuestas/{{ proposal.id }}/postular" method="POST" class="proposal-apply-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <label><span>Mensaje *</span><textarea name="mensaje" required></textarea></label>
-                            <label><span>Experiencia relevante</span><textarea name="experiencia_relevante"></textarea></label>
-                            <label><span>Disponibilidad</span><input name="disponibilidad" placeholder="Ej: inmediata, 20 hs semanales"></label>
-                            <label><span>Pretension economica</span><input type="number" step="0.01" min="0" name="pretension_economica"></label>
+                            <input type="hidden" name="vista" value="{{ proposal_view }}">
+                            <label><span>Mensaje *</span><textarea name="mensaje" required>{{ entry_data.get("mensaje", "") }}</textarea></label>
+                            <label><span>Experiencia relevante</span><textarea name="experiencia_relevante">{{ entry_data.get("experiencia_relevante", "") }}</textarea></label>
+                            <label><span>Disponibilidad</span><input name="disponibilidad" value="{{ entry_data.get('disponibilidad', '') }}" placeholder="Ej: inmediata, 20 hs semanales"></label>
+                            <label><span>Pretension economica</span><input type="{{ 'text' if error else 'number' }}" inputmode="decimal" step="0.01" min="0" name="pretension_economica" value="{{ entry_data.get('pretension_economica', '') }}"></label>
                             <button class="proposal-button proposal-button--primary" type="submit">Enviar postulacion</button>
                         </form>
                     {% else %}
