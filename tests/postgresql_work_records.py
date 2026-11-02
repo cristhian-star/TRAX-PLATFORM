@@ -1,4 +1,5 @@
 """Explicit destructive gate: only disposable work_records_qa on 55482."""
+from tests.migration_assertions import assert_database_at_head
 import os
 import unittest
 import uuid
@@ -125,4 +126,10 @@ class WorkRecordsPostgresTest(unittest.TestCase):
         command.upgrade(self.config,'head')
         with self.app.app_context():
             self.assertEqual(User.query.count(),2);self.assertEqual(WorkRecord.query.count(),0)
-            self.assertEqual(db.session.execute(sa.text('SELECT version_num FROM alembic_version')).scalar(),'20261030_01')
+            assert_database_at_head(self, self.config, db.engine)
+            inspector = sa.inspect(db.engine)
+            self.assertTrue({'work_records', 'work_followups', 'work_reminders'}.issubset(inspector.get_table_names()))
+            self.assertIn('ck_work_record_version', {c['name'] for c in inspector.get_check_constraints('work_records')})
+            self.assertIn('uq_work_reminder_generation', {c['name'] for c in inspector.get_unique_constraints('work_reminders')})
+            self.assertTrue(any(fk['referred_table'] == 'users' and fk['constrained_columns'] == ['owner_user_id']
+                                for fk in inspector.get_foreign_keys('work_records')))

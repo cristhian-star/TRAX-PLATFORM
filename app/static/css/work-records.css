@@ -26,3 +26,5 @@
 @media(max-width:1024px) { .wr-filters { grid-template-columns:repeat(2,minmax(0,1fr)); } .wr-filters .wr-actions { grid-column:span 2; } .wr-columns { grid-template-columns:1fr; } }
 @media(max-width:540px) { .wr-grid,.wr-filters,.wr-client { grid-template-columns:1fr; } .wr-filters .wr-actions { grid-column:auto; } .wr-row { flex-direction:column; align-items:stretch; } .wr .trax-card { padding:1rem; } .wr-follow { padding:.8rem; } }
 @media(prefers-reduced-motion:reduce) { .wr * { animation:none; transition:none; } }
+
+.wr .wr-contract-link { display:inline-flex; align-items:center; min-width:44px; min-height:44px; max-width:100%; padding:.5rem 0; box-sizing:border-box; }

@@ -103,9 +103,16 @@ class DesignSystemV2Test(unittest.TestCase):
         self.assertIn("data-password-toggle", login)
 
         self.assertIn('class="trax-page auth-page auth-page--register"', register)
-        self.assertIn("trax-radio", register)
+        self.assertIn('type="hidden" name="rol" value="CLIENTE"', register)
+        professional = self.client.get("/register?rol=PROFESIONAL").get_data(as_text=True)
+        self.assertIn('type="hidden" name="rol" value="PROFESIONAL"', professional)
+        self.assertIn("Creá tu cuenta como profesional", professional)
         self.assertIn("trax-checkbox", register)
-        self.assertIn("<legend>Tipo de cuenta</legend>", register)
+        self.assertIn("Creá tu cuenta como cliente", register)
+        for page in (register, professional):
+            self.assertIn('name="csrf_token"', page)
+            self.assertIn('name="terms_accepted"', page)
+            self.assertIn('name="password_confirm"', page)
         self.assertIn('aria-describedby="register-password-help register-password-strength', register)
 
         register_template = Path("app/templates/register.html").read_text(encoding="utf-8")
@@ -127,9 +134,13 @@ class DesignSystemV2Test(unittest.TestCase):
         css = Path("app/static/css/auth-ux-v1.css").read_text(encoding="utf-8")
 
         self.assertNotIn(".auth-field input,\n.auth-password input", css)
-        self.assertNotIn(".auth-password button {", css)
-        self.assertIn(".auth-password .trax-button", css)
-        self.assertIn(".auth-field-error", css)
+        # Layout-only specialization is allowed; core visuals remain DS tokens.
+        self.assertIn(".auth-layout .auth-password button { flex: 0 0 auto; width: auto; }", css)
+        self.assertIn(".auth-layout .trax-button { min-height: 48px; min-width: 48px; }", css)
+        self.assertNotRegex(css, r"(?m)^\.auth-password button\s*\{")
+        self.assertIn("var(--trax-ds-", css)
+        ds = Path("app/static/css/design-system-v2.css").read_text(encoding="utf-8")
+        self.assertIn(".trax-field__error", ds)
 
     def test_pro_upgrade_and_admin_users_surfaces_use_theme_tokens(self):
         css = Path("app/static/css/styles.css").read_text(encoding="utf-8")

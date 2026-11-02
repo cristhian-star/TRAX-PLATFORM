@@ -99,4 +99,3 @@ class Workspace002Test(unittest.TestCase):
         self.assertIn('data-notification-toggle hidden',r.text)
         self.assertIn('js/professional-notifications.js',r.text)
         self.assertNotIn('Emitir factura',r.text)
-

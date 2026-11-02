@@ -58,10 +58,14 @@ class OperationRequestServiceTest(unittest.TestCase):
             "categoria": "Electricidad",
         })
 
-        self.assertEqual(
-            validate_proposal_form_data(form_data),
-            "Completa industria, categoria, rubro, titulo, descripcion, ubicacion y modalidad.",
-        )
+        self.assertEqual(validate_proposal_form_data(form_data), "Título: completá este campo obligatorio.")
+        valid = dict(industria="Construccion", categoria="Electricidad", rubro="Electricista",
+                     titulo="Tablero", descripcion="Revisar instalación", ubicacion="CABA", modalidad="Presencial")
+        self.assertIsNone(validate_proposal_form_data(build_proposal_form_data(valid)))
+        for field in valid:
+            with self.subTest(required_field=field):
+                invalid = dict(valid, **{field: ""})
+                self.assertTrue(validate_proposal_form_data(build_proposal_form_data(invalid)))
 
 
 class OperationRouteAndOwnershipTest(unittest.TestCase):
@@ -246,7 +250,12 @@ class OperationViewServiceTest(unittest.TestCase):
 
         row = build_budget_offer_data(offer)
 
-        self.assertEqual(row["phone"]["whatsapp"], "5491100001001")
+        self.assertEqual(row["phone"], {"whatsapp": True})
+        self.assertIs(row["phone"]["whatsapp"], True)
+        self.assertNotIn("5491100001001", str(row["phone"]))
+        self.assertNotIn(professional.telefono, str(row["phone"]))
+        professional.telefono = ""
+        self.assertEqual(build_budget_offer_data(offer)["phone"], {"whatsapp": False})
         self.assertEqual(row["badges"]["work"], True)
 
 

@@ -160,4 +160,3 @@ class PostgreSQLContractingFixture:
             "audits": AuditLog.query.count(),
             "notifications": ActivityNotification.query.count(),
         }
-

@@ -1,7 +1,7 @@
 {% extends 'professional_workspace_base.html' %}
 {% block extra_css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static',filename='css/work-records.css') }}">{% endblock %}
 {% block workspace_content %}<section class="wr" aria-labelledby="wr-title">
-<header class="wr-heading"><div><h1 id="wr-title">Mis trabajos</h1><p>Consultá tus registros y próximos seguimientos.</p><a href="/profesional/trabajos/contratados">Trabajos contratados en MANDOBRA →</a></div><a class="trax-button trax-button--primary" href="{{ url_for('work_records.edit') }}">+ Registrar trabajo</a></header>
+<header class="wr-heading"><div><h1 id="wr-title">Mis trabajos</h1><p>Consultá tus registros y próximos seguimientos.</p><a class="wr-contract-link" href="/profesional/trabajos/contratados">Trabajos contratados en MANDOBRA →</a></div><a class="trax-button trax-button--primary" href="{{ url_for('work_records.edit') }}">+ Registrar trabajo</a></header>
 <form method="GET" class="trax-card wr-filters">
 <label>Buscar<input name="q" value="{{ filters.get('q','') }}" maxlength="160" placeholder="Título o palabras del registro"></label>
 <label>Cliente<input name="client" value="{{ filters.get('client','') }}" maxlength="160" placeholder="Nombre del cliente"></label>

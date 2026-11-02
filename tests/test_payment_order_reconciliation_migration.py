@@ -1,3 +1,4 @@
+from tests.migration_assertions import assert_database_at_head
 import os
 from pathlib import Path
 import tempfile
@@ -26,12 +27,13 @@ class ReconciliationMigrationTest(unittest.TestCase):
             try:
                 with patch.dict(os.environ, {"DATABASE_URL": url}):
                     scripts = ScriptDirectory.from_config(config)
-                    self.assertEqual(scripts.get_heads(), ["20260917_03"])
+                    self.assertEqual(len(scripts.get_heads()), 1)
                     self.assertEqual(scripts.get_revision("20260917_02").down_revision, "20260917_01")
                     command.upgrade(config, "20260917_01")
                     with engine.begin() as connection:
                         connection.execute(sa.text("INSERT INTO psp_event_inbox (provider,external_event_id,topic,action,external_resource_id,test_mode,occurred_at,received_at,payload_hash) VALUES ('mercadopago','historical','payment','payment.updated','123',1,NULL,'2026-09-17 20:00:00',:digest)"), {"digest": "a" * 64})
                     command.upgrade(config, "head")
+                    assert_database_at_head(self, config, engine)
                     self.assertTrue(TABLES.issubset(sa.inspect(engine).get_table_names()))
                     with engine.begin() as connection:
                         connection.execute(sa.text("INSERT INTO payment_order_reconciliation_work (event_id,status,attempt_count,next_attempt_at,created_at) VALUES (1,'QUEUED',0,'2026-09-17 20:00:00','2026-09-17 20:00:00')"))
@@ -47,6 +49,7 @@ class ReconciliationMigrationTest(unittest.TestCase):
                     with engine.connect() as connection:
                         self.assertEqual(connection.execute(sa.text("SELECT external_event_id FROM psp_event_inbox")).scalar_one(), "historical")
                     command.upgrade(config, "head")
+                    assert_database_at_head(self, config, engine)
                     self.assertTrue(TABLES.issubset(sa.inspect(engine).get_table_names()))
             finally:
                 engine.dispose()

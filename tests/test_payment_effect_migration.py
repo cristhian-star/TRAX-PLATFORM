@@ -1,3 +1,4 @@
+from tests.migration_assertions import assert_database_at_head
 import io
 import os
 from pathlib import Path
@@ -22,7 +23,7 @@ class PaymentEffectMigrationTest(unittest.TestCase):
             url = f"sqlite:///{(Path(temporary)/'effects.db').as_posix()}"
             config = Config(str(Path(__file__).resolve().parents[1]/"alembic.ini"))
             scripts = ScriptDirectory.from_config(config)
-            self.assertEqual(scripts.get_heads(),["20260917_03"])
+            self.assertEqual(len(scripts.get_heads()), 1)
             self.assertEqual(scripts.get_revision("20260917_03").down_revision,"20260917_02")
             engine = sa.create_engine(url)
             try:
@@ -32,6 +33,7 @@ class PaymentEffectMigrationTest(unittest.TestCase):
                         connection.execute(sa.text("INSERT INTO psp_event_inbox (provider,external_event_id,topic,action,external_resource_id,test_mode,received_at,payload_hash) VALUES ('mercadopago','history','order','order.updated','ORDhistory',1,'2026-09-17',:digest)"),{"digest":"a"*64})
                         connection.execute(sa.text("INSERT INTO payment_order_reconciliation_work (event_id,status,attempt_count,next_attempt_at,created_at) VALUES (1,'QUEUED',0,'2026-09-17','2026-09-17')"))
                     command.upgrade(config,"head")
+                    assert_database_at_head(self, config, engine)
                     self.assertTrue(TABLES.issubset(sa.inspect(engine).get_table_names()))
                     with engine.begin() as connection:
                         connection.execute(sa.text("INSERT INTO transactional_credit_policies (version,currency,threshold) VALUES ('explicit','ARS','100.00')"))
@@ -46,6 +48,7 @@ class PaymentEffectMigrationTest(unittest.TestCase):
                         self.assertEqual(connection.execute(sa.text("SELECT status FROM payment_order_reconciliation_work")).scalar_one(),"QUEUED")
                         self.assertEqual(connection.execute(sa.text("SELECT external_event_id FROM psp_event_inbox")).scalar_one(),"history")
                     command.upgrade(config,"head")
+                    assert_database_at_head(self, config, engine)
                     self.assertTrue(TABLES.issubset(sa.inspect(engine).get_table_names()))
             finally:
                 engine.dispose()

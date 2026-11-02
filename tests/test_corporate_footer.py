@@ -82,11 +82,17 @@ class CorporateFooterTest(unittest.TestCase):
         self.assertNotRegex(self.footer, r'https?://|<script|<iframe|<button')
 
     def test_global_footer_and_responsive_focus_contrast(self):
-        for route in ('/login', '/register', '/planes'):
+        for route in ('/login', '/register', '/register?rol=PROFESIONAL', '/planes'):
             with self.subTest(route=route):
                 response = self.client.get(route)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.get_data(as_text=True).count('<footer class="footer"'), 1)
+                html = response.get_data(as_text=True)
+                if route.startswith(('/login', '/register')):
+                    self.assertIn('class="auth-layout"', html)
+                    self.assertNotIn('<footer', html)
+                    self.assertNotIn('id="primary-navigation"', html)
+                else:
+                    self.assertEqual(html.count('<footer class="footer"'), 1)
         css = (ROOT / 'app/static/css/styles.css').read_text(encoding='utf-8')
         self.assertIn('.footer__column a:focus-visible {', css)
         self.assertIn('outline: 2px solid #8eeaf3', css)
@@ -102,7 +108,7 @@ class CorporateFooterTest(unittest.TestCase):
             session['user_id'] = 999999
             session['user_role'] = 'CLIENTE'
             session['user_name'] = 'Cliente de prueba'
-        response = self.client.get('/login')
+        response = self.client.get('/planes')
         self.assertEqual(response.status_code, 200)
         footer = response.get_data(as_text=True).split('<footer class="footer"', 1)[1].split('</footer>', 1)[0]
         for fragment in ('#featured-title', '#faq-title', '#trust-title'):

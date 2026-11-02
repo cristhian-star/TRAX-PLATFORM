@@ -187,3 +187,73 @@ periódica del ejecutor. Persistencia se probó reiniciando factory y conexiones
 el host PostgreSQL. No se administró Docker habitual, scheduler ni cuenta QA existente.
 Sin adjuntos, exportación, eliminación, recurrencia, plantillas, IA o canales externos.
 Los antecedentes y cierres de otros módulos continúan vigentes.
+
+## Correcciones de QA integrado del checkpoint — 2026-11-02T20:27:46-03:00
+
+Estado: READY_TO_RESUME. Responsable: integrador local, laptop.
+**CORRECCIONES IMPLEMENTADAS LOCALMENTE; PENDIENTES DE RETEST INTEGRADO INDEPENDIENTE.**
+Base evaluada: d146dfc80a0c553ed65b6a3022787d5e479aac16; rama
+feature/professional-workspace-ux. Preflight limpio y staging vacío. El checkpoint y su
+respaldo permanecen intactos; commit correctivo nuevo autorizado, sin amend ni reescritura.
+Base de integración local identificada con merge-base HEAD develop:
+2e552f2fdc57c152c97f0486050574696f6b250e. No se sincronizó ni publicó el remoto.
+
+Se leyeron QA_SUMMARY.md y logs de checkpoint-integrated-qa-20261102 (dictamen
+2026-11-02T19:53:43-03:00). Antes: diez métodos reproducidos, diez registros de fallo y
+un error (un método con dos subtests fallidos). Después: mismos diez métodos, 10 aprobados,
+cero fallos/errores/omisiones; la primera iteración dejó una expectativa CSS adicional
+obsoleta que también se corrigió. No se borraron casos ni añadieron skips.
+
+Contraste de expectativas:
+- AUTH_UX_001: layout sin navbar/footer, rol preseleccionado por GET y hidden en registro,
+  errores visuales delegados a DSv2. Se preservan controles, consentimiento, CSRF y labels.
+  El caso del footer autenticado se comprueba en /planes, que conserva el layout público.
+- PROF_UX_001/002: profesional en Inicio redirige al dashboard privado; se verifican destino,
+  orden de ocho accesos, selección única y ausencia del navbar público. Cliente no cambia.
+- PROPUESTAS_P1, cierre de validación: mensaje específico de campo; se comprueban los siete
+  campos obligatorios uno por uno, además de una entrada válida, sin relajar obligatoriedad.
+- Contacto protegido/operation_view_service: phone.whatsapp es capacidad booleana, no dígitos;
+  se comprueban True/False y ausencia del teléfono en ese sub-DTO. No se afirma que la fila
+  interna completa (que conserva entidades) sea un DTO público serializable libre de PII.
+- Migraciones: helper compartido exige head único y base efectivamente en ese head después
+  de cada upgrade head afectado. Se conservan revisiones históricas de partida/downgrade,
+  padres históricos, tablas, restricciones y datos. No se modifican migraciones productivas.
+  PostgreSQL Mis trabajos añade comprobaciones de tablas, check, unique y FK de propietario.
+No se encontró contradicción nueva de Producto que requiriera cambiar reglas vigentes.
+
+Cambio productivo exclusivo: clase wr-contract-link del enlace de trabajos contratados y
+CSS encapsulado con área mínima 44x44; mantiene href, semántica, foco y navegación nativa.
+Whitespace: sólo se quita la línea vacía final sobrante de PROF_UX_001.md,
+postgresql_contracting_fixture.py y test_professional_workspace_ux_002.py; queda salto final.
+
+Validación nueva (no sumar repeticiones):
+- SQLite integrada completa: **1112 métodos, 1091 aprobados, 0 fallidos, 0 errores,
+  21 omitidos**, una ejecución completa en 265.451 s. Los diez focales son parte de ella.
+  Omisiones existentes: 20 casos que requieren PostgreSQL y uno que requiere imagen Docker.
+- Gate PostgreSQL Mis trabajos: **6 aprobados, 0 fallidos, 0 errores, 0 omitidos**, 3.092 s,
+  exclusivamente work_records_qa en puerto 55482, contenedor descartable con tmpfs eliminado.
+- Navegador Chrome: **12 escenarios únicos**; 320/390/768/1024/1440 en claro/oscuro con JS,
+  320/1440 sin JS con tema predeterminado real. Área 44px de alto, 58px al ajustar el texto;
+  ancho mínimo observado 296px. Tab y Enter, foco 3px, destino y cero overflow comprobados.
+  Movimiento reducido emulado. Capturas regeneradas tras corregir la lectura UTF-8 del fixture
+  externo; no se cuentan como escenarios adicionales. Sin errores de página JavaScript.
+- AST Python, UTF-8 y whitespace focal/acumulado comprobados. El chequeo de d146dfc sigue
+  mostrando sus tres defectos históricos; no se modifica esa evidencia.
+
+Incidencias de harness separadas: discovery estándar con -t . falló antes de cargar casos
+porque tests es namespace; se usó loader de los 107 módulos test_*.py con nombres tests.*.
+El primer acceso PostgreSQL fue bloqueado por sandbox (0 casos); gate posterior autorizado.
+El preview y el navegador requirieron permisos de localhost. No son resultados aprobados.
+No se repitieron Node ni otros gates PostgreSQL; el script Node externo sólo maneja navegador.
+Sin bases habituales, cuenta QA, Docker compartido, push, merge, rebase o worktrees.
+Preview detenido; contenedor exclusivo retirado. El cierre no certifica AA ni móvil físico,
+no sustituye aprobación visual ni habilita producción, IA, ARCA o servicios pendientes.
+
+Evidencia externa: checkpoint-fixes-20261102 bajo la carpeta local de esta sesión.
+Contiene baseline.json, affected.json, before.log, affected-final.log, sqlite-full.log,
+run_sqlite.py, postgres.log (bloqueo inicial), postgres-final.log, browser-results.json,
+capturas link-*, informe y manifiestos. El SHA correctivo definitivo se registra en la entrega
+externa después del commit para no generar otro cambio documental circular.
+IA/Facturación y antecedentes intactos. INDEX y test_budget_request_ux06a.py preservados por hash.
+Próximo paso: retest integrado independiente sobre el nuevo SHA, sin alterar d146dfc ni su
+respaldo. No hubo merge porque esta autorización comprende únicamente un commit local.

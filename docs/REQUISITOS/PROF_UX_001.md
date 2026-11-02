@@ -218,4 +218,3 @@ No se declara auditoría AA integral ni testing independiente. Sin Docker ni DB
 compartida. Preview propio detenido al cierre. Staging vacío; INDEX conserva SHA
 46400cbd6de53ddabc3f535fec46cc1d901f17a1ed2001c6c5e1916041acd7a0.
 Estado: implementado localmente, pendiente de retest independiente.
-
