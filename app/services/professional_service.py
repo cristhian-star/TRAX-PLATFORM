@@ -97,7 +97,9 @@ def complete_professional_profile(
     longitude=None,
     coverage_location_consent_at=None,
 ):
-    professional = get_professional_by_user_id(user_id)
+    from app.services.emergency_reservation_service import lock_owner, invalidate_locked
+    _, professional = lock_owner(user_id)
+    invalidate_locked(professional, user_id)
 
     if professional is None:
         professional = Professional(

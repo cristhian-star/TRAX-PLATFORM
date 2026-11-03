@@ -1,0 +1,35 @@
+{% extends 'professional_workspace_base.html' %}
+{% block body_class %}professional-workspace professional-billing-page{% endblock %}
+{% block title %}Facturación y cobros | MANDOBRA{% endblock %}
+{% block extra_css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='css/professional-billing.css') }}">{% endblock %}
+{% block workspace_content %}
+<main class="pw-billing">
+ <header class="billing-heading">
+  <div><h1>Facturación y cobros</h1><p>Un espacio para organizar tus facturas y los cobros de tus servicios.</p></div>
+  <div class="billing-settings"><a class="trax-button trax-button--secondary" href="{{ url_for('main.profesional_facturacion_preparacion', section='configuracion') }}">Marca y cuentas</a><small>Disponible próximamente</small></div>
+ </header>
+ <h2 class="billing-question">¿Qué necesitás hacer?</h2>
+ <div class="billing-actions">
+  <section class="trax-card billing-action">
+   <div class="billing-copy"><span class="billing-icon">{{ icon('document') }}</span>
+    <h2>Crear una factura</h2><p>Con la identidad de tu negocio.<br>Revisá el borrador antes de emitir.</p>
+    <p class="billing-availability" id="invoice-availability">Disponible próximamente</p>
+    <a class="trax-button trax-button--primary" aria-describedby="invoice-availability" href="{{ url_for('main.profesional_facturacion_preparacion', section='factura') }}">Crear factura</a>
+   </div>
+   <div class="billing-document" aria-hidden="true"><span>Tu marca</span><strong>BORRADOR</strong><i></i><i></i><i></i><i></i></div>
+  </section>
+  <section class="trax-card billing-action">
+   <div class="billing-copy"><span class="billing-icon billing-icon--payment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 13 4-4m-6 2-3 3a4 4 0 0 0 6 6l3-3m2-4 3-3a4 4 0 0 0-6-6L10 7"/></svg></span>
+    <h2>Cobrar un servicio</h2><p>Un enlace de pago y su QR.<br>Compartilo por el canal que prefieras.</p>
+    <p class="billing-availability" id="payment-availability">{{ "Disponible en esta simulación" if collection_simulation else "Disponible próximamente" }}</p>
+    <a class="trax-button trax-button--primary" aria-describedby="payment-availability" href="{{ url_for('main.profesional_facturacion_preparacion', section='cobro') }}">{{ "Crear cobro simulado" if collection_simulation else "Crear cobro" }}</a>
+    <small>Con Mercado Pago, cuando esté disponible.</small>
+   </div>
+   <div class="billing-link-preview" aria-hidden="true"><span>Enlace de pago</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m10 13 4-4m-6 2-3 3a4 4 0 0 0 6 6l3-3m2-4 3-3a4 4 0 0 0-6-6L10 7"/></svg><small>Próximamente</small></div>
+  </section>
+ </div>
+ <section class="trax-card billing-brand"><span class="billing-brand-placeholder" aria-hidden="true">Tu logo</span><div><h2>Tu marca en cada factura</h2><p>La personalización con el logo de tu negocio estará disponible próximamente.</p></div></section>
+ <section class="billing-history" aria-labelledby="billing-history-title"><h2 id="billing-history-title">Actividad reciente</h2><div class="trax-card billing-empty"><span class="billing-icon">{{ icon('document') }}</span><div>{% if collection_simulation %}<h3>Órdenes de esta simulación</h3><a href="{{ url_for('main.profesional_cobro_historial') }}">Ver historial de órdenes</a>{% else %}<h3>Tu historial estará disponible próximamente</h3>{% endif %}<p>Acá podrás consultar tus facturas y cobros por servicios cuando estas funciones estén habilitadas.</p></div></div></section>
+ <p class="billing-note">Los comprobantes de tu suscripción a MANDOBRA son independientes de las facturas y cobros a tus clientes.</p>
+</main>
+{% endblock %}

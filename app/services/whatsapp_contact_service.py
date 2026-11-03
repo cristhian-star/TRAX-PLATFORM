@@ -222,11 +222,16 @@ def validar_operacion(
         return professional
 
     if operation_type == OPERATION_EMERGENCY:
+        if actor_user_id:
+            from app.models.user import User
+            from app.services.user_service import is_user_active
+            if not is_user_active(db.session.get(User, actor_user_id)):
+                raise PermissionError("Cuenta no habilitada para iniciar este contacto")
         if entity_id:
             emergency = db.session.get(EmergencyRequest, entity_id)
             if emergency is None:
                 raise ValueError("Solicitud urgente no encontrada")
-            if actor_user_id and emergency.cliente_id != actor_user_id:
+            if not actor_user_id or emergency.cliente_id != actor_user_id:
                 raise PermissionError("Solo el cliente dueno puede iniciar este contacto")
         return professional
 

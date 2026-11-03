@@ -1,31 +1,15 @@
-{% extends "base.html" %}
+{% extends "budget_layout.html" %}
 
-{% block extra_css %}
+{% block extra_css %}{{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-workflow.css') }}">
 {% endblock %}
 
-{% block content %}
-<main class="budget-page">
-    <section class="budget-detail-hero">
-        <div class="budget-shell">
-            <span class="budget-eyebrow">Profesional</span>
-            <h1>Mis presupuestos enviados</h1>
-            <p>Consulta tus estimaciones preliminares enviadas y su estado dentro de cada solicitud.</p>
-        </div>
-    </section>
-
+{% block budget_content %}
+<main class="budget-page budget-compact" aria-labelledby="budget-page-title">
+    <h1 id="budget-page-title" class="budget-compact__sr">Presupuestos enviados</h1>
     <section class="budget-shell budget-marketplace">
-        <div class="budget-estimate-note" role="note">
-            Los presupuestos enviados son estimaciones preliminares y podran ajustarse luego de la inspeccion tecnica o de recibir informacion adicional del trabajo.
-        </div>
-
-        <div class="budget-marketplace__heading">
-            <div>
-                <span class="budget-eyebrow">Historial profesional</span>
-                <h2>{{ offer_rows|length }} presupuestos enviados</h2>
-            </div>
-            <a class="budget-button budget-button--secondary" href="/presupuestos">Ver oportunidades</a>
-        </div>
+        {% set budget_tab = 'sent' %}{% include 'components/_budget_tabs.html' %}
 
         {% if offer_rows %}
             <div class="budget-request-grid">
@@ -37,7 +21,7 @@
                     <article class="budget-request-card">
                         <header>
                             <span class="budget-status {{ 'budget-status--adjudicada' if offer.estado == 'ADJUDICADO' else '' }}">
-                                {% if offer.estado == "ADJUDICADO" %}Adjudicado{% else %}En competencia{% endif %}
+                                {{ row.status_label }}
                             </span>
                             <span>{{ row.offer_count }}/{{ max_offers }} recibidos</span>
                         </header>
@@ -87,7 +71,7 @@
             <div class="budget-empty">
                 <h2>Todavia no enviaste presupuestos</h2>
                 <p>Explora oportunidades abiertas y envia una estimacion preliminar cuando el trabajo coincida con tu perfil.</p>
-                <a class="budget-button budget-button--primary" href="/presupuestos">Ver oportunidades</a>
+                <a class="budget-button budget-button--primary" href="/profesional/presupuestos">Ver oportunidades</a>
             </div>
         {% endif %}
     </section>

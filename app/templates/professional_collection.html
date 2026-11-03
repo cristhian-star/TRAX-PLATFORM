@@ -1,0 +1,29 @@
+{% extends 'professional_billing.html' %}
+{% block title %}Cobros simulados | MANDOBRA{% endblock %}
+{% block extra_scripts %}{{ super() }}<script defer src="{{ url_for('static', filename='js/collection-copy.js') }}"></script>{% endblock %}
+{% block workspace_content %}
+<main class="pw-billing collection-flow">
+<header class="billing-heading"><div><h1>{{ {'selector':'Elegí un trabajo','review':'Revisá la orden simulada','history':'Historial de órdenes','checkout':'Orden simulada'}[mode] }}</h1><p>SIMULACIÓN — no procesa dinero</p></div></header>
+<nav class="collection-links" aria-label="Recorrido de cobro"><a href="{{ url_for('main.profesional_facturacion') }}">Facturación y cobros</a><a href="{{ url_for('main.profesional_facturacion_preparacion', section='cobro') }}">Elegir trabajo</a><a href="{{ url_for('main.profesional_cobro_historial') }}">Historial de órdenes</a></nav>
+{% if mode in ['selector','history'] %}
+<p>{{ 'Trabajos de MANDOBRA confirmados. Este primer recorrido admite el total acordado.' if mode == 'selector' else 'Órdenes propias de prueba. Una orden no acredita un pago recibido.' }}</p>
+{% if listing.error %}<div class="trax-alert" role="alert">No pudimos consultar la información. <a href="{{ request.path }}">Reintentar consulta</a></div>
+{% else %}
+{% if mode == 'history' %}{% for item in listing.blocked %}<section class="trax-card billing-prepared collection-row"><h2>Generación bloqueada · Trabajo #{{ item.contract_id }}</h2><p>{{ item.status }}. Requiere revisión; no se realizará otro intento automáticamente.</p><a href="{{ url_for('payment_order_delivery.checkout', id=item.contract_id) }}">Consultar estado</a></section>{% endfor %}{% endif %}
+{% for row in listing.rows %}<article class="trax-card billing-prepared collection-row">
+{% if mode == 'selector' %}<h2>{{ row.service }}</h2><p>{{ row.customer }} · ARS {{ row.amount }}</p><a class="trax-button trax-button--primary" href="{{ url_for('main.profesional_cobro_revision', contract_id=row.id) }}">Revisar orden simulada</a>
+{% else %}<h2>Orden #{{ row.id }}</h2><p>Trabajo #{{ row.contract_id }} · ARS {{ row.amount }}</p><p>Estado persistido: {{ row.status }}{% if row.expired %} · Plazo contractual vencido{% endif %}</p><p>Creada: {{ row.created.strftime('%d/%m/%Y %H:%M') }} UTC · Vence: {{ row.expires.strftime('%d/%m/%Y %H:%M') }} UTC</p><a href="{{ url_for('payment_order_delivery.checkout', id=row.contract_id) }}">Consultar estado de entrega</a>{% endif %}
+</article>{% else %}{% if not listing.blocked %}<section class="trax-card billing-prepared"><p>{{ 'No hay trabajos propios confirmados para este recorrido.' if mode == 'selector' else 'Todavía no generaste órdenes en esta simulación.' }}</p></section>{% endif %}{% endfor %}
+<nav class="collection-links" aria-label="Paginación">{% if listing.page > 1 %}<a href="{{ request.path }}?page={{ listing.page-1 }}">Anterior</a>{% endif %}{% if listing.more %}<a href="{{ request.path }}?page={{ listing.page+1 }}">Siguiente</a>{% endif %}</nav>
+{% endif %}
+{% elif mode == 'review' %}
+<section class="trax-card billing-prepared"><h2>{{ card.service }}</h2><p>{{ card.customer }}</p><p>Total acordado: <strong>ARS {{ card.amount }}</strong></p><p>Orden por el total del trabajo confirmado. Vigencia contractual: 72 horas desde la reserva inicial; reenviar no renueva el plazo.</p><p>Si ya existe una orden, se consulta el mismo resultado. Un estado incierto requiere revisión y no habilita otro intento.</p>
+{% if card.blocked %}<p role="status">Generación bloqueada. Requiere revisión; no se habilita un nuevo intento.</p>{% else %}<form method="post" action="{{ url_for('payment_order_delivery.create_order', id=card.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="review_token" value="{{ review_token }}"><button class="trax-button trax-button--primary" type="submit">Confirmar generación simulada</button></form>{% endif %}</section>
+{% elif mode == 'checkout' %}
+{% if error_message %}<section class="trax-card billing-prepared" role="alert"><h2>No se puede entregar esta orden</h2><p>{{ error_message }}</p><p>No se realizó un cobro. Una orden bloqueada requiere revisión; no se reintenta automáticamente.</p></section>
+{% elif checkout %}<section class="trax-card billing-prepared"><h2>Enlace y QR de prueba</h2><p>Importe canónico: <strong>ARS {{ checkout.amount_text }}</strong></p><p>Vence: {{ checkout.expires_at.strftime('%d/%m/%Y %H:%M') }} UTC</p><p>No confirma un pago. La URL reservada es sólo de prueba: no abre un checkout navegable y no debe utilizarse para cobrar.</p>
+<div data-collection-copy><label for="collection-url">Enlace simulado (también podés seleccionarlo y copiarlo manualmente)</label><input class="trax-input" id="collection-url" readonly value="{{ checkout.checkout_url }}"><button class="trax-button trax-button--secondary" type="button" data-copy-button hidden>Copiar enlace simulado</button><p data-copy-status role="status" aria-live="polite"></p></div>
+<img class="collection-qr" src="{{ url_for('payment_order_delivery.qr_png', id=contract_id) }}" alt="QR del mismo enlace simulado" width="325" height="325"><a class="trax-button trax-button--secondary" download="orden-simulada.png" href="{{ url_for('payment_order_delivery.qr_png', id=contract_id) }}">Descargar QR simulado</a></section>{% endif %}
+{% endif %}
+</main>
+{% endblock %}

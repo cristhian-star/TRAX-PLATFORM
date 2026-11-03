@@ -1,0 +1,28 @@
+.pc-create { color: var(--trax-ds-text-strong); min-width: 0; }
+.pc-create .pc-back { display: inline-flex; align-items: center; min-height: 44px; color: var(--trax-ds-text-secondary); }
+.pc-create .pc-heading { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 1rem; margin: .5rem 0 1.5rem; }
+.pc-create h1 { font-size: clamp(1.6rem, 2.5vw, 2rem); margin: 0 0 .4rem; }
+.pc-create p { margin: 0; color: var(--trax-ds-text-secondary); }
+.pc-create .pc-columns { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.25rem; align-items: start; }
+.pc-create .pc-card { padding: 1.5rem; background: var(--trax-ds-surface); min-width: 0; }
+.pc-create h2 { font-size: 1.3rem; margin: 0 0 1.25rem; }
+.pc-create .pc-taxonomy-title { border-top: 1px solid var(--trax-ds-border); padding-top: 1.5rem; margin-top: 1.5rem; }
+.pc-create label { display: grid; gap: .5rem; margin-bottom: 1rem; min-width: 0; font-weight: 600; }
+.pc-create input, .pc-create select, .pc-create textarea { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 48px; padding: .7rem .8rem; border: 1px solid var(--trax-ds-border-strong); border-radius: var(--trax-ds-radius-md); background: var(--trax-ds-surface); color: var(--trax-ds-text-strong); font: inherit; font-weight: 400; }
+.pc-create textarea { min-height: 130px; resize: vertical; }
+.pc-create input::placeholder, .pc-create textarea::placeholder { color: var(--trax-ds-text-secondary); opacity: 1; }
+.pc-create .pc-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.pc-create .pc-help { font-size: .9rem; }
+.pc-create .pc-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; margin-top: 1.25rem; background: var(--trax-ds-surface); }
+.pc-create .pc-actions p { margin-right: auto; flex: 1 1 280px; }
+.pc-create .trax-button { min-height: 48px; white-space: normal; text-align: center; }
+.pc-create a.trax-button--secondary { color: var(--trax-ds-text-strong); }
+.pc-create :is(a, button, input, select, textarea):focus-visible { outline: 3px solid var(--trax-ds-secondary); outline-offset: 3px; }
+@media (max-width: 1024px) { .pc-create .pc-columns { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 540px) {
+ .pc-create .pc-card { padding: 1rem; }
+ .pc-create .pc-pair { grid-template-columns: minmax(0, 1fr); }
+ .pc-create .pc-actions { padding: 1rem; align-items: stretch; flex-direction: column; }
+ .pc-create .pc-actions p { flex-basis: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .pc-create * { transition: none; animation: none; } }

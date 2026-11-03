@@ -110,8 +110,19 @@ class NavbarMarketsUX03ATest(unittest.TestCase):
 
         response = self.client.get("/")
 
-        self.assertEqual(response.status_code, 200)
-        self._assert_public_navigation_contract(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/profesional/dashboard")
+        page = self.client.get(response.headers["Location"])
+        self.assertEqual(page.status_code, 200)
+        html = page.get_data(as_text=True)
+        self.assertNotIn('id="primary-navigation"', html)
+        navigation = html.split('<nav aria-label="Espacio profesional">', 1)[1].split('</nav>', 1)[0]
+        expected = ["Inicio", "Presupuestos", "Urgencias", "Propuestas", "Mis trabajos",
+                    "Estadísticas", "Facturación y cobros", "Mi perfil"]
+        positions = [normalized_text(navigation).index(label) for label in expected]
+        self.assertEqual(positions, sorted(positions))
+        self.assertEqual(navigation.count('aria-current="page"'), 1)
+        self.assertIn('href="/profesional/dashboard" aria-current="page"', navigation)
 
     def test_markets_route_is_public_and_has_one_active_navigation_link(self):
         response = self.client.get("/mercados")

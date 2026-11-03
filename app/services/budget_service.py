@@ -100,7 +100,7 @@ def get_budget_request_by_id(budget_request_id):
     return db.session.get(BudgetRequest, budget_request_id)
 
 
-def get_open_budget_requests(categoria=None, zona=None):
+def open_budget_requests_query(categoria=None, zona=None):
     query = BudgetRequest.query.filter(
         BudgetRequest.estado.in_(("ABIERTO", "PUBLICADA", "COTIZANDO")),
     )
@@ -110,7 +110,11 @@ def get_open_budget_requests(categoria=None, zona=None):
     if zona:
         query = query.filter(BudgetRequest.zona.ilike(f"%{zona}%"))
 
-    return query.order_by(BudgetRequest.fecha_creacion.desc()).all()
+    return query.order_by(BudgetRequest.fecha_creacion.desc(), BudgetRequest.id.desc())
+
+
+def get_open_budget_requests(categoria=None, zona=None):
+    return open_budget_requests_query(categoria, zona).all()
 
 
 def get_budget_offers(budget_request_id):
@@ -217,6 +221,9 @@ def create_budget_offer(
             parsed = Decimal(str(value))
         except (InvalidOperation, TypeError, ValueError):
             raise ValueError(f"{field_label} no es valido") from None
+
+        if not parsed.is_finite():
+            raise ValueError(f"{field_label} no es valido")
 
         if parsed < 0:
             raise ValueError(f"{field_label} no puede ser negativo")

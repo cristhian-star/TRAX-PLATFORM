@@ -1,3 +1,4 @@
+from tests.migration_assertions import assert_database_at_head
 from datetime import datetime, timezone
 from decimal import Decimal
 import os
@@ -30,8 +31,8 @@ class PaymentOrderApplicationMigrationTest(unittest.TestCase):
             try:
                 scripts = ScriptDirectory.from_config(config)
                 heads = scripts.get_heads()
-                self.assertEqual(heads, ["20260917_03"])
-                self.assertEqual(scripts.get_revision(heads[0]).down_revision, "20260917_02")
+                self.assertEqual(len(heads), 1)
+                self.assertEqual(scripts.get_revision("20260917_03").down_revision, "20260917_02")
                 command.upgrade(config, "20260916_01")
                 with engine.begin() as connection:
                     connection.execute(sa.text(
@@ -39,6 +40,7 @@ class PaymentOrderApplicationMigrationTest(unittest.TestCase):
                         "VALUES ('legacy',1,'ARS','2026-09-17 12:00:00')"
                     ))
                 command.upgrade(config, "head")
+                assert_database_at_head(self, config, engine)
                 Session = sessionmaker(bind=engine, expire_on_commit=False)
                 actor, _, _, _, contract = seed_contract(Session)
                 service = PaymentOrderApplicationService(
@@ -78,6 +80,7 @@ class PaymentOrderApplicationMigrationTest(unittest.TestCase):
                     self.assertEqual(connection.execute(sa.text("SELECT count(*) FROM payment_orders")).scalar_one(), 1)
                     self.assertEqual(connection.execute(sa.text("SELECT count(*) FROM payment_obligations")).scalar_one(), 2)
                 command.upgrade(config, "head")
+                assert_database_at_head(self, config, engine)
                 with engine.connect() as connection:
                     self.assertEqual(connection.execute(sa.text(
                         "SELECT count(*) FROM payment_obligations WHERE contract_request_id IS NULL"

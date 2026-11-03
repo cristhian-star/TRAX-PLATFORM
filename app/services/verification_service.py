@@ -99,6 +99,11 @@ def update_verification_status(
     if verification_request is None:
         return None
 
+    from app.services.emergency_reservation_service import lock_owner, invalidate_locked
+    _, professional = lock_owner(verification_request.user_id)
+    verification_request = VerificationRequest.query.filter_by(id=verification_request_id).populate_existing().with_for_update().one()
+    if verification_request.tipo_usuario == "PROFESIONAL" and estado != "APROBADO":
+        invalidate_locked(professional, verification_request.user_id)
     verification_request.estado = estado
     verification_request.reviewer_id = reviewer_id
     verification_request.observaciones = observaciones

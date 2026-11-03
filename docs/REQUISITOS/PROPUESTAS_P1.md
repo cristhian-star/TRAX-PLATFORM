@@ -349,3 +349,458 @@ privacidad conservaron el contrato aprobado.
 No se detectaron hallazgos P0, P1, P2 ni P3. Esta aprobación habilita solicitar
 el commit del árbol validado; no ejecuta ni autoriza automáticamente commit,
 push, PR, merge o deploy.
+
+
+## Propuestas en el espacio privado profesional — 2026-10-30T10:23:56-03:00
+
+Estado: IMPLEMENTADO LOCALMENTE; pendiente de revisión visual y testing independiente.
+Cristian aprobó el boceto del panel privado como referencia de composición en el
+encargo de esta sesión. Sus cifras, nombres y marca simplificada no se trasladan
+al producto. La aprobación del boceto no aprueba visualmente esta implementación.
+
+### Comportamiento y conexiones
+
+Ruta canónica del menú: `/profesional/propuestas`. Tres vistas GET mediante
+`vista=disponibles`, `vista=postulaciones` y `vista=publicaciones`, enlaces nativos
+con `aria-current`. La primera reutiliza `build_proposal_portal`, sus filtros de
+industria/categoría/rubro/ubicación, opciones reales, orden descendente, límites
+y conteos agregados. Los enlaces de filtros/paginación conservan el destino privado.
+Las otras vistas filtran por el actor persistido, paginan de a 12 y muestran
+estados/fechas reales; publicaciones usa owner_user_id con fallback a cliente_id.
+La relación de propuesta en postulaciones se carga con joinedload. Los contratos
+visibles se consultan con ownership profesional, sin crearlos durante GET.
+
+Shell, logo, menú, tema y notificaciones existentes conservados. Encabezado,
+tres pestañas, búsqueda por rubro, filtros nativos desplegables, tarjetas con acento
+naranja y paginación; sin banner ni selector entre módulos. CSS encapsulado en
+`.pp-workspace`, componentes/tokens DS v2 y composición apilada móvil. Más recientes
+es una etiqueta del orden real, sin opciones ficticias. Presupuesto estimado muestra
+cero cuando existe; ausencia de importe se presenta como presupuesto a convenir.
+Estados vacíos específicos, parámetros inválidos 400 y fallo de consulta 503 con
+reintento seguro; no se muestran excepciones internas.
+
+Detalle y creación mantienen `/propuestas/<id>` y `/propuestas/nueva`. Para un
+profesional activo se renderizan dentro del shell privado, con regreso a una vista
+permitida; clientes/anónimos conservan su presentación pública. El origen se
+transporta como `vista`, limitado a tres valores, nunca como destino arbitrario.
+Postularme abre el formulario; GET no postula. Ya te postulaste y autopostulación
+se resuelven con los datos/evaluador canónicos. Gestión del propietario reutiliza
+aceptación, descarte y cancelación existentes, con sus POST/CSRF y ownership.
+
+### Ajuste contractual acotado y discrepancia documental
+
+El código de creación ya admitía un profesional activo como publicador; Master Spec
+5 describía sólo al cliente, y la fábrica contractual exigía CLIENTE. El encargo
+aprueba explícitamente publicar una necesidad para contratar a otro profesional.
+Por ello `create_contract_from_proposal_application` admite CLIENTE/PROFESIONAL
+activos, siempre con ownership de la propuesta persistida. El lado contratante
+profesional se admite exclusivamente en contratos de origen PROPOSAL para las
+operaciones canónicas de propietario. DIRECT y BUDGET conservan la exigencia CLIENTE.
+No se crea otro modelo ni máquina de estados: SINGLE, contrato inicial CREADA,
+EXTERNAL, efectos/eventos/auditoría/notificaciones e idempotencia existentes.
+La confirmación y su replay por ese propietario se prueban; no se amplía reputación
+ni permiso de crear reseñas. El detalle contractual PROPOSAL usa el shell privado
+para profesionales mediante el helper de layout existente, sin editar Presupuestos.
+
+### Formularios y seguridad
+
+Importes no finitos, conversiones inválidas, negativos y exceso de capacidad de
+Numeric se rechazan antes de persistir (presupuesto Numeric(10,2), pretensión
+Numeric(12,2)). Se conserva la precisión/semántica de almacenamiento actual.
+Errores recuperables de postulación devuelven 400 con campos escapados, CSRF y
+contexto, sin llevar textos a la URL; antes redirigían y perdían los campos.
+En recuperación, el importe usa input textual con inputmode decimal para que el
+navegador no borre un valor inválido; el servidor sigue validándolo. La creación
+mantiene su respuesta 400 con datos repoblados. Éxito conserva redirect y un único
+registro. No se alteran elegibilidad, cuentas activas, verificación ni planes.
+Los campos libres del autor no se anonimizan automáticamente; no se agregan datos
+privados del propietario a tarjetas ni mensajes ajenos en vistas propias.
+
+### Inventario atribuible
+
+Nuevos (6):
+- `app/services/professional_proposals_service.py`.
+- `app/static/css/professional-proposals.css`.
+- `app/templates/professional_proposals.html`.
+- `app/templates/proposal_layout.html`.
+- `tests/test_professional_proposals.py`.
+- `tests/postgresql_professional_proposals.py` (gate explícito, fuera del discovery habitual).
+
+Existentes intervenidos (12):
+- `app/routes/main_routes.py`: entrada privada y errores seguros.
+- `app/routes/operation_routes.py`: contexto, recuperación, regresos y layout contractual PROPOSAL.
+- `app/services/proposal_portal_service.py`: endpoint de navegación opcional, default público intacto.
+- `app/services/proposal_service.py`: validación monetaria acotada.
+- `app/services/contracting_core_service.py`: publicador profesional propietario de PROPOSAL.
+- `app/services/contract_service.py`: lado contratante profesional sólo en PROPOSAL.
+- `app/templates/detalle_propuesta.html`: contexto/CSRF de origen y repoblado.
+- `app/templates/nueva_propuesta.html`: contexto y recuperación monetaria.
+- `app/templates/components/_professional_navigation.html`: selección en formularios canónicos.
+- `docs/REQUISITOS/PROPUESTAS_P1.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`.
+
+### Validación realmente ejecutada
+
+- Paquete Python de regresión: 86 pruebas, 85 aprobadas y una omitida explícitamente
+  (`test_real_concurrent_independent_sessions`, no representa PostgreSQL en SQLite).
+  Comando: `python -B -m unittest tests.test_professional_proposals tests.test_proposal_portal_p1 tests.test_proposal_eligibility tests.test_sprint7_proposal_to_contract tests.test_professional_workspace_ux tests.test_professional_workspace_ux_002 tests.test_sprint7_contracting_core tests.test_sprint7_contracting_foundations tests.test_sprint7_contracting_p0_iteration1 tests.test_sprint7_contracting_p1_iteration2 tests.test_sprint7_budget_to_contract`.
+- Focal final: `python -B -m unittest tests.test_professional_proposals`: 10/10;
+  incluye un caso nuevo de ciclo contractual del publicador profesional y su replay.
+  Las nueve pruebas que solapan el paquete anterior no se suman como casos nuevos.
+- PostgreSQL 16 descartable: 4/4 del gate `ProfessionalProposalsPostgres`:
+  `test_professional_acceptance_concurrency`, `test_application_concurrency_no_duplicates`,
+  `test_acceptance_rollback`, `test_other_domains_keep_client_role`.
+  Migración al head existente `20261028_01` sólo en `proposals_qa`, puerto 55481.
+  Inicialmente se intentó psycopg no instalado; se usó psycopg2 ya disponible.
+  La restricción de red del sandbox exigió ejecución autorizada fuera de él.
+- Chrome/Playwright: 30 combinaciones (tres pestañas × 320/390/768/1024/1440 ×
+  claro/oscuro), sin overflow; controles primarios de al menos 44 px. Dos recorridos
+  con/sin JavaScript real: filtros GET, error, campos conservados, reenvío y regreso.
+  Cuatro comprobaciones adicionales de estados sin coincidencias/parámetro inválido,
+  foco y reduced-motion real en 390/1440 y ambos temas. Contraste focal de botón:
+  4.56:1 claro, 8.02:1 oscuro. No constituye auditoría AA integral.
+- Los intentos iniciales de automatización tuvieron timeouts con click/espera de
+  navegación; se verificó después el envío nativo por teclado. Se reiniciaron datos
+  sintéticos para separar intentos previos de postulaciones ya creadas.
+- Persistió un aviso CSP de script inline del shell (base.html conserva hash).
+  No se declara consola limpia. Sin JS se verificó el flujo en tema claro; la
+  selección/persistencia interactiva de tema requiere el mecanismo JS existente.
+- Sin controladores productivos modificados: no se repitieron pruebas Node.
+  Sintaxis Python por AST, UTF-8 sin BOM/NUL/U+FFFD y git diff --check comprobados.
+
+[Evidencia durable, logs, baseline y capturas](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/professional-proposals-20261030/).
+Capturas representativas: `review-dark-1440.png`, `review-light-1440.png`,
+`review-dark-390.png`, `review-light-390.png`; también capturas de las tres vistas.
+Fixtures de preview exclusivamente sintéticas, fuera del producto; fábrica normal,
+sin composición de simulador. Preview 54963 detenido y contenedor PostgreSQL propio
+retirado. Docker habitual, bases compartidas y cuenta QA no modificados.
+
+### Integridad, límites y revisión
+
+Baseline: `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, 108 paths pendientes, staging vacío,
+618 archivos con SHA-256. Final: 18 archivos de este incremento (6 nuevos),
+121 paths pendientes, staging vacío; rama/HEAD conservados. Los otros 606 archivos
+del baseline conservan hash, incluidos INDEX, Presupuestos y Urgencias. En archivos
+compartidos se conservaron comportamientos previos y se delimitaron cambios arriba.
+Sin nuevas migraciones, dependencias, Git mutable ni modificación de modelos.
+
+Revisión tras actualización manual de web:
+`http://127.0.0.1:5050/profesional/propuestas` y sus tres valores de `vista`.
+Comandos sugeridos para Cristian, NO ejecutados sobre el entorno habitual:
+
+```powershell
+docker compose --env-file .env.example -p mandobra_stabilization -f docker-compose.stabilization.yml build web
+docker compose --env-file .env.example -p mandobra_stabilization -f docker-compose.stabilization.yml up -d --no-deps web
+```
+
+Pendientes: revisión visual de la implementación, testing independiente, accesibilidad
+integral y dispositivo móvil físico. Continúan fuera de alcance renovación,
+vencimientos nuevos, contratación múltiple, oferta profesional como segundo tipo,
+pagos/facturación/canales externos y recepción de Urgencias. La política histórica
+de lectura directa de propuestas cerradas/canceladas no se amplía. El rediseño
+específico de creación/detalle sigue pendiente; sus campos históricos no habilitan
+MULTIPLE. No se declara producción ni integración.
+
+## Corrección focal P3 del gate PostgreSQL — 2026-10-30T11:38:15-03:00
+
+Estado: READY_TO_RESUME. **P3 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Laptop; rama `feature/professional-workspace-ux`, HEAD base conservado
+`2e552f2fdc57c152c97f0486050574696f6b250e`. Staging vacío.
+
+El hallazgo de QA identificó herencia de casos CLIENTE con un propietario convertido
+a PROFESIONAL. Se extrajo la preparación a `tests/postgresql_contracting_fixture.py`,
+un mixin sin casos ni herencia de TestCase. Cada suite declara su OWNER_ROLE:
+PROFESIONAL para el gate especializado y CLIENTE para la suite original.
+Cada caso comprueba el rol persistido. No se agregaron omisiones ni expectedFailure.
+Los cuerpos AST de las cuatro pruebas especializadas y las ocho originales se
+conservaron íntegros. El descubrimiento del módulo especializado pasó de 20 casos
+(incluida la clase importada) a sus cuatro casos propios; el original conserva ocho.
+
+Validación nueva: ejecución completa conjunta sobre PostgreSQL 16 descartable,
+**12/12 aprobadas en 20.720 s**, sin omisiones: 4 PROFESIONAL y 8 CLIENTE.
+No se seleccionaron nodos individuales. Se conservaron las comprobaciones de
+concurrencia, rollback y restricciones de dominio. La preparación migró únicamente
+la base descartable; no hubo cambios de migraciones ni acceso a la base habitual.
+El contenedor exclusivo `mandobra-proposals-p3-20261030` fue retirado al terminar.
+Docker habitual y cuenta QA permanecieron sin modificaciones.
+
+Comando reproducible del gate completo, exclusivamente con una instancia descartable
+`proposals_qa` en `127.0.0.1:55481` y credenciales de esa instancia:
+
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+$env:TRAX_POSTGRES_TEST_URL='postgresql+psycopg2://USUARIO:CLAVE@127.0.0.1:55481/proposals_qa'
+$env:TRAX_POSTGRES_TEST_ALLOW_RESET='1'
+$env:DATABASE_URL=$env:TRAX_POSTGRES_TEST_URL
+.\.venv\Scripts\python.exe -B -m unittest -v tests.postgresql_professional_proposals
+```
+
+Comando efectivamente ejecutado para ambos conjuntos completos, con las variables
+anteriores configuradas para la instancia sintética exclusiva:
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest -v tests.postgresql_professional_proposals tests.postgresql_contracting_concurrency_e2e
+```
+
+Estos comandos truncan la base de pruebas: nunca apuntarlos a bases compartidas.
+Evidencia nueva: `proposals-p3-gate-20261030/gates-complete.log`, baseline SHA-256,
+comparación de cuerpos de pruebas e integridad final. Ubicación durable:
+[carpeta de evidencia](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposals-p3-gate-20261030/).
+Los resultados anteriores de PostgreSQL seleccionados, Python, navegador y Node
+permanecen históricos y no se contabilizan como ejecuciones nuevas. No se repitieron
+navegador ni Node: interfaces y controladores no cambiaron.
+
+Inventario focal: `tests/postgresql_professional_proposals.py`,
+`tests/postgresql_contracting_concurrency_e2e.py`, nuevo
+`tests/postgresql_contracting_fixture.py`, `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Baseline: 121 paths pendientes y 624 archivos; cierre: 123 paths pendientes,
+staging vacío. Los otros 619 archivos del baseline conservan SHA-256, incluidos
+INDEX, Presupuestos, Urgencias y los ajustes autorizados de botones y estados vacíos
+en las tres pestañas de Propuestas. Sintaxis Python, UTF-8 y git diff --check correctos.
+
+Sin cambios productivos, permisos, interfaces, modelos ni dependencias. No hubo
+commit, push, PR ni merge porque no están autorizados; no se consultó sincronización
+remota. Próximo paso: retest independiente del gate completo y su suite original
+con los comandos anteriores en PostgreSQL descartable. Preservar el trabajo previo;
+no ejecutar estos gates contra la base habitual. No se declara aprobación visual,
+integración ni habilitación productiva.
+
+## Cierre técnico de Propuestas: retest P3 y ajustes visuales — 2026-10-30T12:22:37-03:00
+
+Estado: COMPLETED (registro documental). Laptop; responsable: agente local MANDOBRA.
+Dictamen independiente del **2026-10-30T12:16:21-03:00**:
+**P3 CERRADO; SIN NUEVOS HALLAZGOS P0–P3 EN EL ALCANCE EVALUADO.**
+Este dictamen sustituye el estado pendiente de retest de la corrección P3,
+sin borrar sus antecedentes ni extender el alcance evaluado.
+
+Resultados del retest independiente, no de una nueva ejecución en este cierre:
+
+- PostgreSQL descartable: módulo profesional completo, **4/4 PROFESIONAL**;
+  módulo original completo, **8/8 CLIENTE**. Doce casos únicos satisfactorios,
+  sin selección manual de nodos ni omisiones en estos dos módulos.
+- Navegador: **18 escenarios visuales nuevos**, doce con JavaScript y seis
+  realmente sin JavaScript. Se acreditan los últimos cambios autorizados de las
+  tres pestañas, no por continuidad de la evidencia visual anterior.
+- Mensajes vacíos centrados y CTA redundantes retirados en Mis postulaciones y
+  Mis publicaciones. Los filtros permanecen exclusivamente en Propuestas disponibles;
+  Aplicar/Limpiar mantienen presentación consistente y navegación GET.
+- El informe registra cero overflow, recortes o fallos de objetivos interactivos,
+  foco visible y conservación de integridad. Se conserva el aviso CSP heredado.
+
+Evidencia durable existente, sin recrearla:
+[proposals-p3-visual-retest-20261030](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/proposals-p3-visual-retest-20261030/),
+con `execution-summary.json`, `postgres-professional.log`, `postgres-original.log`,
+`browser-results.json`, capturas e informes de integridad. Sus timestamps de archivo
+preceden al timestamp del dictamen comunicado por el responsable.
+
+Los resultados y omisiones anteriores permanecen históricos, incluido el caso
+omitido de la tanda Python inicial. No se suman repeticiones como cobertura adicional
+ni se presenta este retest focal como suite integral. No se ejecutaron pruebas,
+Node, navegador, Docker ni migraciones durante este registro documental.
+Se conservan los límites funcionales y pendientes anteriores, accesibilidad integral,
+dispositivo móvil físico y CSP heredada. **La aprobación visual del usuario permanece
+pendiente.** No se declara certificación AA, integración ni habilitación productiva.
+
+Integridad inicial/final: rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, 123 paths pendientes y staging vacío.
+Únicos archivos modificados en este cierre: `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Los otros 622 archivos del inventario de 625 conservan SHA-256, incluidos INDEX,
+Presupuestos, Urgencias, código, pruebas y ajustes visuales autorizados.
+UTF-8 y git diff --check verificados. Sin operaciones Git mutables; commit, push,
+PR y merge no realizados por estar fuera del alcance. Sin comprobación remota nueva.
+Próximo paso: revisión visual de Cristian. Para retomar, reconfirmar identidad e
+inventario y conservar el paquete pendiente; no asumir autorización de integración.
+
+## Formulario Crear propuesta profesional — 2026-10-30T12:53:38-03:00
+
+Estado: READY_TO_RESUME. Boceto aprobado por Cristian el 2026-10-30;
+**FORMULARIO REDISEÑADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.**
+La aprobación del boceto no constituye aprobación visual de esta implementación.
+
+Se conserva el shell profesional, marca oficial, notificaciones, tema y Propuestas
+activo. Encabezado compacto con Volver a Propuestas, Crear propuesta y
+«Contá qué necesitás y recibí postulaciones.». Dos tarjetas alineadas arriba:
+Datos del proyecto/Profesional que buscás y Ubicación y condiciones. Hasta 1024 px
+se apilan en ese orden. Pie con aviso de no contratación, Cancelar y Publicar propuesta.
+Volver y Cancelar conservan el regreso privado y su vista. CSS bajo `.pc-create`;
+componentes y tokens DS v2, botón primario naranja, sin dependencias ni nuevo JS.
+Se prioriza el contrato local: los doce campos conservan definiciones exactas,
+incluidos límites, opciones, nombres, valores y recuperación escapada. El campo
+cantidad no cambia la contratación SINGLE. El bloque CLIENTE anterior permanece
+textualmente idéntico; sólo se selecciona el componente nuevo para el profesional.
+Sin cambios de rutas, servicios, permisos, guardado, CSRF, modelos ni migraciones.
+
+Inventario de este incremento (7 archivos):
+- `app/templates/nueva_propuesta.html`: selección de presentación y CSS profesional.
+- Nuevo `app/templates/components/_professional_proposal_create.html`: composición.
+- Nuevo `app/static/css/professional-proposal-create.css`: estilo encapsulado responsive.
+- `tests/test_professional_proposals.py`: una regresión de equivalencia de campos,
+  separación CLIENTE/profesional, enlaces y GET sin escrituras.
+- `docs/REQUISITOS/PROPUESTAS_P1.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`.
+
+Validación nueva, separada de los cierres anteriores:
+- `python -B -m unittest -q tests.test_professional_proposals tests.test_proposal_portal_p1`:
+  **22/22 casos únicos aprobados**, SQLite en memoria. Incluye creación, permisos,
+  CSRF, importes no finitos, errores repoblados, publicación y regresiones existentes.
+- Comparación estructural adicional: doce bloques de campos idénticos; contenido
+  CLIENTE idéntico al baseline. Sintaxis Python y UTF-8 correctos; git diff --check OK.
+- Navegador Chrome real: **12 recorridos de creación**, cada uno con inicial,
+  error monetario repoblado y publicación corregida (36 estados). Diez combinaciones
+  con JS: 320/390/768/1024/1440 px, claro/oscuro; dos sin JS: 390/1440 px con el
+  tema claro predeterminado real. CSRF activo, fábrica normal y datos sintéticos.
+  Propuesta publicada visible en Mis publicaciones; fechas, selección, descripción
+  escapada y cantidad recuperadas. Sin overflow; sin excepciones de página registradas.
+- Comprobaciones adicionales, no sumadas a los 12 recorridos: Cancelar mediante
+  puntero sin JS en móvil/escritorio, teclado y foco, movimiento reducido emulado,
+  contraste computado en claro/oscuro. Botones/campos 48 px. Primario:
+  blanco sobre #d3440e = 4,56:1; #0b1220 sobre #ff8a4c = 8,02:1.
+  Texto del campo: 17,74:1 claro y 18,08:1 oscuro. Foco visible; transición 0 s
+  con movimiento reducido. Esto no constituye auditoría AA integral.
+- En automatización sin JS hubo timeout de espera de estabilidad; el envío se
+  comprobó con teclado nativo, incluidos segmentos de fecha, y Cancelar con puntero
+  tras desplazamiento instantáneo. No se alteró el producto para forzar la prueba.
+- No se repitieron PostgreSQL ni Node: cambios de presentación y prueba HTML,
+  sin cambios transaccionales ni controladores. El P3 y su cierre permanecen intactos.
+
+Evidencia y capturas nuevas:
+[proposal-create-20261030](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposal-create-20261030/).
+`tests.log`, `browser-results.json`, `accessibility-focal.json`, baseline/integridad;
+capturas `1440-light-js-initial.png`, `1440-dark-js-initial.png`,
+`390-light-js-initial.png`, `390-dark-js-initial.png` y estados de error/publicación.
+Preview aislado en 127.0.0.1:54966 detenido; sin listeners al cierre. Sin Docker,
+base compartida, cuenta QA habitual, migraciones ni operaciones Git mutables.
+
+Integridad: laptop, rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; baseline 123 paths pendientes y 625
+archivos; final 125 paths pendientes, staging vacío. Los otros 620 archivos del
+baseline conservan hash, incluidos INDEX, Presupuestos, Urgencias y las tres pestañas
+de Propuestas. Se conservan antecedentes, dictámenes y omisiones históricas.
+Sin commit/push/PR/merge: fuera de autorización. No se consultó sincronización remota.
+Ruta de revisión tras actualización manual del entorno por Cristian:
+`http://127.0.0.1:5050/propuestas/nueva?vista=publicaciones` (profesional autenticado).
+Próximo paso: revisión visual y testing independiente; no actualizar Docker ni integrar
+sin autorización. Pendientes: dispositivo físico, AA integral y límites previos del
+módulo; no se declara habilitación productiva ni aprobación visual del usuario.
+
+## Corrección focal P2 de validación de creación — 2026-10-30T13:32:34-03:00
+
+Estado: READY_TO_RESUME. Hallazgo independiente del 2026-10-30T13:14:23-03:00.
+**P2 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Se conserva el dictamen previo, el cierre del P3 y la aprobación del boceto; no se
+sustituyen por una aprobación propia de esta corrección ni de su implementación visual.
+
+Causa: los límites HTML no estaban garantizados por el backend; el servicio aceptaba
+valores inválidos y `cantidad_profesionales or 1` transformaba cero en uno.
+Reproducción previa en SQLite sintético: seis casos (cantidad 0/-1/51, título 161,
+descripción 1801 y modalidad Teleport), para CLIENTE y PROFESIONAL: **12 respuestas
+302 y 12 publicaciones indebidas**. Tras corregir: mismos doce intentos, **400 y cero
+publicaciones**. Evidencia antes/después conservada fuera del repositorio.
+
+`validate_proposal_creation()` normaliza y valida los valores que se guardarían;
+la ruta y el servicio directo reutilizan esa función. Cantidad entera 1–50 inclusive,
+por defecto 1 sólo ante ausencia/None o cadena vacía tras strip. Cero, negativos,
+fracciones, inválidos y fuera de rango se rechazan; no hay truncamiento de textos.
+Título requerido hasta 160 y descripción requerida hasta 1800 tras normalización
+strip existente. Catálogo único: Presencial, Remoto, Hibrido y A coordinar, sin
+alterar los valores vigentes. Servicio valida antes de add/commit; HTTP antes de
+persistencia/notificación y mantiene defensa adicional del servicio.
+
+Errores 400 con nombre del campo, valores escapados en el cuerpo y sin llevarlos a
+la URL. Cantidad usa entrada de texto en error para no perder valores inválidos.
+Modalidad inválida muestra el valor escapado fuera del selector, cuya opción vacía
+exige elegir una modalidad canónica; no agrega Teleport al catálogo ni elige
+Presencial silenciosamente. CSRF, actor, permisos, CLIENTE, contexto profesional,
+SINGLE, fechas y dinero conservados. Sin cambios de CSS, composición, históricos,
+contratos, modelos, migraciones ni dependencias.
+
+Inventario focal (9 archivos):
+- `app/services/proposal_service.py`: validador común, catálogo y uso defensivo.
+- `app/services/operation_request_service.py`: reutilización en validación HTTP.
+- `app/routes/operation_routes.py`: pasa cantidad sin conversión previa y catálogo a la vista.
+- `app/templates/nueva_propuesta.html` y
+  `app/templates/components/_professional_proposal_create.html`: recuperación del campo
+  cantidad y selección explícita de modalidad ante error, sin rediseño.
+- Nuevo `tests/test_proposal_creation_validation.py`: siete casos de prueba con subcasos.
+- `docs/REQUISITOS/PROPUESTAS_P1.md`, `docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`.
+
+Resultados nuevos:
+- **34/34 pruebas únicas**, SQLite en memoria, ejecución final:
+  `python -B -m unittest -q tests.test_proposal_creation_validation tests.test_professional_proposals tests.test_proposal_portal_p1 tests.test_sprint7_proposal_to_contract`.
+  Cubre ambos roles, acceso directo, cantidades inválidas/default/límites, textos
+  normalizados, modalidades canónicas, ausencia de escrituras SQL y de llamada de
+  éxito en rechazos, un guardado y una llamada de notificación al corregir, fechas,
+  importes no finitos, CSRF y derivación contractual existente.
+- **8 recorridos focales Chrome**: CLIENTE/PROFESIONAL × 390/1440 px × JS/sin JS.
+  Cada recorrido comprueba modalidad inválida, cantidad inválida y posterior envío
+  corregido (400/400/302), preservación escapada y catálogo intacto. JS en oscuro;
+  sin JS respeta el claro predeterminado. CSRF activo y datos sintéticos en preview.
+- Sintaxis Python, UTF-8 y git diff --check correctos. No PostgreSQL ejecutado:
+  reglas de entrada previas a persistencia, sin cambios de locks, transacciones,
+  idempotencia, esquema o derivación contractual. No Node ni matriz visual completa.
+- Corridas de desarrollo no se suman: la primera descubrió accidentalmente casos
+  importados de la fixture; se corrigió el import a módulo. Una corrida intermedia
+  detectó cuatro fallos de aserción por codificación del texto del test; corregidos
+  antes de la ejecución final. No se eliminaron comprobaciones ni agregaron omisiones.
+
+Evidencia durable:
+[proposal-validation-p2-20261030](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/proposal-validation-p2-20261030/),
+`before.json`, `after.json`, `tests-verified.log`, `browser-results.json`, capturas de
+recuperación de ambos roles e inventarios SHA-256. Preview 127.0.0.1:54967 detenido;
+sin listeners al cierre. Sin Docker habitual, bases compartidas ni cuenta QA.
+
+Integridad inicial/final: laptop, rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; baseline 125 paths pendientes, 627 archivos;
+final 127 paths pendientes, staging vacío. Otros 619 archivos conservados por hash,
+incluidos INDEX, Presupuestos, Urgencias, estilos y ajustes de las tres pestañas.
+No hubo commit, push, PR, merge ni otras operaciones Git mutables: no autorizadas.
+No se consultó sincronización remota ni se migró ninguna base.
+Próximo paso: retest independiente del P2 y revisión visual del usuario, aún pendiente.
+Para retomar: verificar identidad e inventario y ejecutar las focales en entorno
+sintético; no usar bases compartidas ni interpretar este informe como habilitación
+productiva. Se conservan limitaciones anteriores: AA integral, dispositivo físico,
+CSP heredada y capacidades futuras no habilitadas.
+
+## Cierre técnico del formulario Crear propuesta — 2026-10-30T14:03:45-03:00
+
+Estado: COMPLETED (cierre documental). Laptop; responsable: agente local MANDOBRA.
+Dictamen independiente del **2026-10-30T13:52:08-03:00**:
+**P2 CERRADO; SIN NUEVOS HALLAZGOS P0–P3 EN EL ALCANCE EVALUADO.**
+Este registro sustituye el pendiente de retest del P2, conservando el hallazgo,
+su corrección, el cierre del P3, los resultados históricos y sus limitaciones.
+
+Resultados del retest independiente, con conteos separados:
+
+- Pruebas: **34/34 aprobadas**.
+- Reproducciones HTTP: **12/12**, rechazo correcto y sin escrituras.
+- Llamadas directas al servicio: **12/12**, rechazo correcto y sin escrituras.
+- Recorridos de navegador: **8/8 satisfactorios**.
+
+No se suman estas categorías como una única suite ni se agregan las ejecuciones
+anteriores a la cobertura nueva. El dictamen acredita fronteras válidas, recuperación
+del formulario, ambos roles (CLIENTE y PROFESIONAL) y contratación SINGLE preservados.
+Estos resultados pertenecen al retest independiente; no se ejecutaron pruebas nuevas
+durante esta sesión documental.
+
+Evidencia durable existente:
+[proposal-validation-p2-independent-20261030](../../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/proposal-validation-p2-independent-20261030/).
+Incluye `tests.log`, `retest-output.json`, `browser-results-independent.json`, capturas,
+controles estáticos e integridad. Se referencia sin recrear evidencias.
+
+La aprobación del boceto por Cristian permanece registrada. **La aprobación visual
+de la implementación sigue pendiente.** Esta corrección no fue validada en PostgreSQL;
+no acredita AA integral, móvil físico, producción ni habilitación productiva.
+Se conservan las demás limitaciones anteriores, avisos CSP y capacidades pendientes.
+
+Integridad inicial/final: rama `feature/professional-workspace-ux`, HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`, 127 paths pendientes y staging vacío.
+Únicos archivos modificados: `docs/REQUISITOS/PROPUESTAS_P1.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`.
+Los otros 625 archivos del inventario de 628 mantienen SHA-256, incluidos INDEX,
+Presupuestos, Urgencias, código, pruebas, templates, CSS y JavaScript.
+UTF-8 y git diff --check correctos. Sin nuevas pruebas, Docker, migraciones,
+operaciones Git mutables ni acceso a bases compartidas. Commit/push/PR/merge no
+realizados por estar fuera del alcance; sincronización remota no comprobada.
+Próximo paso: revisión visual de Cristian. Para retomar, reconfirmar rama/HEAD,
+staging e inventario y preservar antecedentes; este cierre no autoriza integración.

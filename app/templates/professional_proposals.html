@@ -1,0 +1,58 @@
+{% extends 'professional_workspace_base.html' %}
+{% block title %}Propuestas | MANDOBRA{% endblock %}
+{% block extra_css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='css/professional-proposals.css') }}">{% endblock %}
+{% block workspace_content %}
+<main class="pp-workspace">
+ <header class="pp-heading"><div><h1>Propuestas</h1><p>Encontrá trabajos y gestioná tus publicaciones.</p></div><a class="trax-button trax-button--primary" href="{{ url_for('operations.nueva_propuesta', vista='publicaciones') }}"><span aria-hidden="true">＋</span> Crear propuesta</a></header>
+ <nav class="pp-tabs" aria-label="Vistas de Propuestas">
+ {% for key,label in [('disponibles','Propuestas disponibles'),('postulaciones','Mis postulaciones'),('publicaciones','Mis publicaciones')] %}
+ <a href="{{ url_for('main.profesional_marketplace', vista=key) }}"{% if view == key %} aria-current="page"{% endif %}>{{ label }}</a>
+ {% endfor %}</nav>
+ {% if load_error %}<section class="trax-card" role="alert"><h2>No pudimos cargar las propuestas</h2><p>Intentá nuevamente en unos momentos.</p><a href="{{ request.path }}">Reintentar</a></section>
+ {% elif filter_error %}<section class="trax-card"><h2>Revisá los parámetros de búsqueda</h2><p>No pudimos interpretar la consulta.</p><a href="{{ url_for('main.profesional_marketplace') }}">Volver a propuestas</a></section>
+ {% else %}
+ {% if view == 'disponibles' %}
+ <form method="get" class="pp-search" id="pp-search">
+  <input type="hidden" name="vista" value="disponibles">
+  <label class="pp-query"><span>Buscar por rubro</span><input class="trax-input" type="search" name="rubro" value="{{ filters.rubro }}" maxlength="120" placeholder="Buscar por rubro"></label>
+  <button class="trax-button trax-button--primary" type="submit">Buscar</button>
+  <details class="pp-filters"{% if filters.industria or filters.categoria or filters.ubicacion %} open{% endif %}>
+   <summary>Filtros</summary><div class="pp-filter-fields">
+   {% for field,label in [('industria','Industria'),('categoria','Categoría')] %}<label>{{ label }}<select class="trax-select" name="{{ field }}"><option value="">Todas</option>{% for option in options[field] %}<option{% if filters[field] == option %} selected{% endif %}>{{ option }}</option>{% endfor %}</select></label>{% endfor %}
+   <label>Ubicación<input class="trax-input" name="ubicacion" maxlength="120" value="{{ filters.ubicacion }}"></label>
+   <div class="pp-filter-actions"><button class="trax-button trax-button--primary" type="submit">Aplicar</button><a class="trax-button trax-button--primary" href="{{ url_for('main.profesional_marketplace') }}">Limpiar</a></div>
+   </div>
+  </details>
+ </form>
+ {% if has_filters %}<p class="pp-active">{% for filter in active_filters %}<a href="{{ filter.remove_url }}">{{ filter.label }}: {{ filter.value }} · Quitar</a> {% endfor %}<a class="trax-button trax-button--primary" href="{{ url_for('main.profesional_marketplace') }}">Limpiar</a></p>{% endif %}
+ {% endif %}
+ <div class="pp-order"><span>Más recientes</span><span>{{ total }} {{ 'propuestas' if view != 'postulaciones' else 'postulaciones' }}</span></div>
+ <div class="pp-list">
+ {% if view == 'disponibles' %}
+ {% for card in cards %}
+ <article class="trax-card pp-card">
+  <div class="pp-meta"><span class="pp-category">{{ card.category }}</span>{% if card.location %}<span>{{ card.location }}</span>{% endif %}</div>
+  <h2>{{ card.title }}</h2><p>{{ card.description }}</p>{% if card.specialty %}<p class="pp-secondary">{{ card.specialty }}</p>{% endif %}
+  <footer><div class="pp-secondary"><time datetime="{{ card.published.isoformat() }}">{{ card.published.strftime('%d/%m/%Y') }}</time> · {{ card.applications }} postulaciones</div>
+   <div class="pp-budget">{% if card.budget is not none %}<span>Presupuesto estimado</span><strong>${{ '{:,.2f}'.format(card.budget) }}</strong>{% else %}<span>Presupuesto a convenir</span>{% endif %}</div>
+   <a class="trax-button trax-button--secondary" href="{{ url_for('operations.detalle_propuesta', id=card.id, vista=view) }}">Ver propuesta</a>
+   {% if card.can_apply %}<a class="trax-button trax-button--primary" href="{{ url_for('operations.detalle_propuesta', id=card.id, vista=view, _anchor='postularme') }}">Postularme</a>{% elif card.applied %}<span class="pp-disabled">Ya te postulaste</span>{% endif %}
+  </footer>
+ </article>
+ {% else %}<section class="trax-card pp-empty"><h2>{{ 'No encontramos coincidencias' if has_filters else 'No hay propuestas disponibles' }}</h2>{% if has_filters %}<a class="trax-button trax-button--primary" href="{{ url_for('main.profesional_marketplace') }}">Limpiar</a>{% endif %}</section>{% endfor %}
+ {% if not eligibility.eligible %}<p>{{ eligibility.message }}</p>{% endif %}
+ {% else %}
+ {% for row in rows %}{% set proposal = row.proposal %}
+ <article class="trax-card pp-card"><div class="pp-meta"><span class="pp-category">{{ proposal.categoria }}</span><span>{{ proposal.ubicacion or 'Ubicación no informada' }}</span><strong>{{ row.state }}</strong></div>
+ <h2>{{ proposal.titulo or proposal.categoria }}</h2><p>{{ (proposal.descripcion or '')|truncate(240) }}</p>
+ <footer><span class="pp-secondary">{{ 'Postulación' if view == 'postulaciones' else 'Publicación' }}: <time datetime="{{ row.date.isoformat() }}">{{ row.date.strftime('%d/%m/%Y') }}</time>{% if view == 'publicaciones' %} · {{ row.count }} postulaciones{% endif %}</span>
+ <a class="trax-button trax-button--secondary" href="{{ url_for('operations.detalle_propuesta', id=proposal.id, vista=view) }}">{{ 'Ver seguimiento' if view == 'postulaciones' else 'Gestionar propuesta' }}</a>
+ {% if row.contract_id %}<a class="trax-button trax-button--primary" href="{{ url_for('operations.contract_detail', id=row.contract_id) }}">Ver contrato</a>{% endif %}</footer></article>
+ {% else %}<section class="trax-card pp-empty"><h2>{{ 'Todavía no tenés postulaciones' if view == 'postulaciones' else 'Todavía no publicaste propuestas' }}</h2></section>{% endfor %}
+ {% endif %}
+ </div>
+ <nav class="pp-pagination" aria-label="Páginas de propuestas">{% if previous_url %}<a class="trax-button trax-button--secondary" href="{{ previous_url }}">Anterior</a>{% else %}<span class="pp-disabled">Anterior</span>{% endif %}<span>Página {{ page }}{% if pages %} de {{ pages }}{% endif %}</span>{% if next_url %}<a class="trax-button trax-button--secondary" href="{{ next_url }}">Siguiente</a>{% else %}<span class="pp-disabled">Siguiente</span>{% endif %}</nav>
+ {% if page > 1 and page > pages %}<p>Esta página no tiene resultados. <a href="{{ first_url }}">Volver a la primera página</a></p>{% endif %}
+ {% endif %}
+</main>
+{% endblock %}

@@ -20,6 +20,13 @@ class ShiftValidationError(ValueError):
     """Public, sanitized validation error for this pure service."""
 
 
+def reservation_window(now):
+    """Four Buenos Aires calendar weeks; local start-date upper bound exclusive."""
+    today = _utc(now).astimezone(ZoneInfo(TIMEZONE_NAME)).date()
+    monday = today - timedelta(days=today.weekday())
+    return monday, monday + timedelta(days=28)
+
+
 def _validate_block(day, kind):
     if type(day) is not date or type(kind) is not str or kind not in SHIFT_HOURS:
         raise ShiftValidationError("Fecha o turno inválido.")

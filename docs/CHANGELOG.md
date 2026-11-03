@@ -1,5 +1,495 @@
 # CHANGELOG MANDOBRA
 
+## Correcciones de QA integrado del checkpoint — 2026-11-02T20:27:46-03:00
+
+Estado: READY_TO_RESUME. Responsable: integrador local, laptop.
+**CORRECCIONES IMPLEMENTADAS LOCALMENTE; PENDIENTES DE RETEST INTEGRADO INDEPENDIENTE.**
+Base evaluada: d146dfc80a0c553ed65b6a3022787d5e479aac16; rama
+feature/professional-workspace-ux. Preflight limpio y staging vacío. El checkpoint y su
+respaldo permanecen intactos; commit correctivo nuevo autorizado, sin amend ni reescritura.
+Base de integración local identificada con merge-base HEAD develop:
+2e552f2fdc57c152c97f0486050574696f6b250e. No se sincronizó ni publicó el remoto.
+
+Se leyeron QA_SUMMARY.md y logs de checkpoint-integrated-qa-20261102 (dictamen
+2026-11-02T19:53:43-03:00). Antes: diez métodos reproducidos, diez registros de fallo y
+un error (un método con dos subtests fallidos). Después: mismos diez métodos, 10 aprobados,
+cero fallos/errores/omisiones; la primera iteración dejó una expectativa CSS adicional
+obsoleta que también se corrigió. No se borraron casos ni añadieron skips.
+
+Contraste de expectativas:
+- AUTH_UX_001: layout sin navbar/footer, rol preseleccionado por GET y hidden en registro,
+  errores visuales delegados a DSv2. Se preservan controles, consentimiento, CSRF y labels.
+  El caso del footer autenticado se comprueba en /planes, que conserva el layout público.
+- PROF_UX_001/002: profesional en Inicio redirige al dashboard privado; se verifican destino,
+  orden de ocho accesos, selección única y ausencia del navbar público. Cliente no cambia.
+- PROPUESTAS_P1, cierre de validación: mensaje específico de campo; se comprueban los siete
+  campos obligatorios uno por uno, además de una entrada válida, sin relajar obligatoriedad.
+- Contacto protegido/operation_view_service: phone.whatsapp es capacidad booleana, no dígitos;
+  se comprueban True/False y ausencia del teléfono en ese sub-DTO. No se afirma que la fila
+  interna completa (que conserva entidades) sea un DTO público serializable libre de PII.
+- Migraciones: helper compartido exige head único y base efectivamente en ese head después
+  de cada upgrade head afectado. Se conservan revisiones históricas de partida/downgrade,
+  padres históricos, tablas, restricciones y datos. No se modifican migraciones productivas.
+  PostgreSQL Mis trabajos añade comprobaciones de tablas, check, unique y FK de propietario.
+No se encontró contradicción nueva de Producto que requiriera cambiar reglas vigentes.
+
+Cambio productivo exclusivo: clase wr-contract-link del enlace de trabajos contratados y
+CSS encapsulado con área mínima 44x44; mantiene href, semántica, foco y navegación nativa.
+Whitespace: sólo se quita la línea vacía final sobrante de PROF_UX_001.md,
+postgresql_contracting_fixture.py y test_professional_workspace_ux_002.py; queda salto final.
+
+Validación nueva (no sumar repeticiones):
+- SQLite integrada completa: **1112 métodos, 1091 aprobados, 0 fallidos, 0 errores,
+  21 omitidos**, una ejecución completa en 265.451 s. Los diez focales son parte de ella.
+  Omisiones existentes: 20 casos que requieren PostgreSQL y uno que requiere imagen Docker.
+- Gate PostgreSQL Mis trabajos: **6 aprobados, 0 fallidos, 0 errores, 0 omitidos**, 3.092 s,
+  exclusivamente work_records_qa en puerto 55482, contenedor descartable con tmpfs eliminado.
+- Navegador Chrome: **12 escenarios únicos**; 320/390/768/1024/1440 en claro/oscuro con JS,
+  320/1440 sin JS con tema predeterminado real. Área 44px de alto, 58px al ajustar el texto;
+  ancho mínimo observado 296px. Tab y Enter, foco 3px, destino y cero overflow comprobados.
+  Movimiento reducido emulado. Capturas regeneradas tras corregir la lectura UTF-8 del fixture
+  externo; no se cuentan como escenarios adicionales. Sin errores de página JavaScript.
+- AST Python, UTF-8 y whitespace focal/acumulado comprobados. El chequeo de d146dfc sigue
+  mostrando sus tres defectos históricos; no se modifica esa evidencia.
+
+Incidencias de harness separadas: discovery estándar con -t . falló antes de cargar casos
+porque tests es namespace; se usó loader de los 107 módulos test_*.py con nombres tests.*.
+El primer acceso PostgreSQL fue bloqueado por sandbox (0 casos); gate posterior autorizado.
+El preview y el navegador requirieron permisos de localhost. No son resultados aprobados.
+No se repitieron Node ni otros gates PostgreSQL; el script Node externo sólo maneja navegador.
+Sin bases habituales, cuenta QA, Docker compartido, push, merge, rebase o worktrees.
+Preview detenido; contenedor exclusivo retirado. El cierre no certifica AA ni móvil físico,
+no sustituye aprobación visual ni habilita producción, IA, ARCA o servicios pendientes.
+
+Evidencia externa: checkpoint-fixes-20261102 bajo la carpeta local de esta sesión.
+Contiene baseline.json, affected.json, before.log, affected-final.log, sqlite-full.log,
+run_sqlite.py, postgres.log (bloqueo inicial), postgres-final.log, browser-results.json,
+capturas link-*, informe y manifiestos. El SHA correctivo definitivo se registra en la entrega
+externa después del commit para no generar otro cambio documental circular.
+IA/Facturación y antecedentes intactos. INDEX y test_budget_request_ux06a.py preservados por hash.
+Próximo paso: retest integrado independiente sobre el nuevo SHA, sin alterar d146dfc ni su
+respaldo. No hubo merge porque esta autorización comprende únicamente un commit local.
+
+
+## IA-READ-001 — cierre técnico independiente — 2026-11-01T22:12:27-03:00
+
+Dictamen del **2026-11-01T21:49:11-03:00**: **núcleo local de ayuda y lectura privada
+VERIFICADO EN EL ALCANCE EVALUADO**, sin hallazgos P0–P3.
+Resultados separados: **46/46 paquete declarado**, **5/5 adversariales independientes**;
+**total único 51/51**. No se ejecutaron pruebas nuevas en este cierre documental.
+[Requisito, inventario y evidencia durable](REQUISITOS/IA_READ_001.md).
+
+Corpus productivo vacío, pendiente de aprobación editorial. Habilitación para usuarios
+pendiente del cierre de QA de Mis trabajos, incluido su P3 visual del enlace secundario.
+Sin interfaz de asistente, proveedor generativo, WhatsApp, MCP remoto, búsqueda pública
+por IA ni herramientas fiscales/financieras habilitadas. PostgreSQL y producción no
+quedan acreditados. Sin cambios productivos, Docker, migraciones ni operaciones Git
+mutables; no hubo commit/push/merge/deploy. Cierre local en feature/professional-workspace-ux,
+HEAD 2e552f2; estado COMPLETED documental, sin activación. Coordinado con Facturación y
+Presupuestos; sus entradas y trabajo pendiente conservados. Sólo tres documentos
+modificados; 658 archivos restantes idénticos por SHA-256.
+
+
+## PRESUPUESTOS — corrección focal P3 de prueba de actor contratante — 2026-11-01T22:04:08-03:00
+
+Estado: READY_TO_RESUME. **P3 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Rama `feature/professional-workspace-ux`; HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`;
+staging vacío; 160 paths pendientes preexistentes. Responsable: Codex local, laptop.
+
+Se reprodujo antes de editar el fallo de `test_professional_never_has_client_contract_capabilities`
+(1 caso, AssertionError: PermissionError not raised). La aserción universal estaba desactualizada:
+la autoridad CLIENT de un contrato PROPOSAL admite al profesional publicador propietario.
+No se identificó un defecto productivo que requiriera ampliar el alcance.
+
+Se conserva el caso como `test_professional_client_capabilities_are_scoped_to_own_proposal`:
+permite exclusivamente al propietario profesional de PROPOSAL; rechaza al profesional ajeno,
+al propietario como prestador y al prestador como contratante. DIRECT y BUDGET siguen rechazando
+al profesional contratante. No se eliminan casos ni se agregan omisiones. La cobertura positiva
+real existente en `tests/test_professional_proposals.py` y los módulos sprint7 comprueba aceptación,
+propiedad persistida, contrato canónico, SINGLE, transiciones e idempotencia, sin duplicarla.
+
+Resultados nuevos, separados:
+- Caso corregido: 1/1, repetido dentro de la selección siguiente; no suma cobertura adicional.
+- Misma selección proporcional que históricamente dio 122/123: **123/123**, 54.798 s.
+  Se conciliaron los identificadores completos con el log anterior, salvo el nombre corregido.
+- Regresiones adicionales de permisos y contratación: **25/25**, 5.970 s.
+- Total de esta ejecución satisfactoria: **148 casos únicos**; no es la suite completa del proyecto.
+
+Comandos reproducibles (PowerShell, entorno virtual existente):
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+$env:DATABASE_URL='sqlite:///:memory:'
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_budget_request_ux06a.BudgetRequestUX06ATest.test_professional_client_capabilities_are_scoped_to_own_proposal
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_billing_preparation tests.test_billing_access_policy tests.test_billing_preparation_service tests.test_professional_billing_ux tests.test_work_records tests.test_budget_request_ux06a tests.test_payment_order_application tests.test_payment_effect_credits
+.\.venv\Scripts\python.exe -B -m unittest -v tests.test_professional_proposals tests.test_sprint7_proposal_to_contract tests.test_sprint7_budget_to_contract tests.test_sprint7_contracting_core
+```
+
+Evidencia fuera del repositorio: `budget-p3-20261101`, bajo la carpeta de evidencias de esta sesión
+(`.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/`).
+Contiene `before.log`, `after.log`, `proportional.log`, `contract-regression.log`,
+`selection-before.json`, `selection-final.json` y manifiestos de integridad.
+
+Inventario focal: `tests/test_budget_request_ux06a.py`, `docs/REQUISITOS/PRESUPUESTOS_UX_001.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md`, `docs/CHANGELOG.md`. Sin cambios productivos.
+El registro se añade después del cierre documental fiscal de 2026-11-01T21:57:16-03:00,
+comprobado en modo lectura; conserva ese cierre, su 122/123 histórico y el trabajo de IA.
+Sintaxis Python, UTF-8 y git diff --check comprobados. Los demás archivos se cotejan por SHA-256.
+No se ejecutaron PostgreSQL, navegador ni Node: no cambiaron producción, interfaces o controladores.
+No se valida concurrencia nueva, AA, aprobación visual ni habilitación productiva.
+Sin Docker, bases compartidas, migraciones, commit, push, PR, merge o despliegue; sin sincronización
+remota nueva. No hubo merge porque no está autorizado. Próximo paso: retest independiente del P3
+sobre estos comandos, preservando el árbol mixto y sin ampliar permisos ni modificar producción.
+
+## FACTURACION_INTERNA_001 — cierre técnico — 2026-11-01T21:57:16-03:00
+
+Dictamen independiente del **2026-11-01T21:42:54-03:00**:
+**BACKEND INTERNO VERIFICADO EN EL ALCANCE EVALUADO**.
+Conteos separados: **19/19 focales**, **9/9 PostgreSQL**, **cuatro reproducciones
+adversariales** y **regresión 122/123**; sin sumar tandas ni categorías.
+Las adversariales conservan incidencias del harness y repetición focal exitosa;
+no se presentan como una única corrida limpia de 4/4.
+P3 externo todavía pendiente: aserción desactualizada en
+`test_budget_request_ux06a.py:310`, reproducida en el estado exacto anterior al
+incremento fiscal. No se corrige ni se declara regresión global aprobada.
+Migración `20261101_01`, padre `20261030_01`, validada exclusivamente en PostgreSQL
+descartable; **base habitual no migrada**. Formulario operativo, decisiones fiscales
+restantes e integración ARCA pendientes; sin habilitación productiva.
+[Dictamen, evidencia durable y limitaciones](REQUISITOS/FACTURACION_INTERNA_001.md).
+Cierre exclusivo de este changelog, requisito y handoff; entrada de IA y antecedentes
+preservados. Sin cambios productivos, nuevas pruebas, Docker, migraciones ni Git mutable.
+Sin commit/push/PR/merge/deploy. Rama feature/professional-workspace-ux, HEAD 2e552f2.
+
+
+## MIS-TRABAJOS-UX-001 — 2026-10-30T15:48:41-03:00
+
+Registro privado profesional con CRUD sin eliminación, filtros GET, acceso contractual
+preservado, seguimiento opcional y avisos internos persistentes. Migración `20261030_01`,
+parent `20261028_01`; ejecutor periódico explícito, sin activarlo en entorno habitual.
+Python 46/46, PostgreSQL aislado 6/6, despacho real 1/0; navegador 30 combinaciones,
+4 recorridos y 2 revisiones focales, sin sumar repeticiones. Sin nuevo JavaScript.
+20 archivos intervenidos; 621 restantes preservados por hash; 140 paths pendientes,
+staging vacío y rama/HEAD conservados. Recursos descartables retirados.
+Pendiente aprobación visual de implementación/testing independiente; no producción ni AA integral.
+[Alcance, inventario, evidencia y límites](REQUISITOS/MIS_TRABAJOS_UX_001.md).
+
+## Cierre técnico de Crear propuesta — 2026-10-30T14:03:45-03:00
+
+Dictamen independiente **2026-10-30T13:52:08-03:00**: **P2 CERRADO**, sin nuevos
+hallazgos P0–P3. Conteos separados: 34/34 pruebas; 12/12 reproducciones HTTP;
+12/12 llamadas directas al servicio con rechazo correcto y sin escrituras;
+8/8 recorridos de navegador. No se suman como una suite única.
+Fronteras válidas, recuperación, ambos roles y SINGLE preservados.
+Evidencia: `proposal-validation-p2-independent-20261030`;
+[referencia y limitaciones](REQUISITOS/PROPUESTAS_P1.md).
+Se conservan antecedentes y aprobación del boceto; aprobación visual de la
+implementación pendiente. Sin validación PostgreSQL de esta corrección, AA integral,
+móvil físico ni declaración productiva. Cierre exclusivamente documental:
+625 archivos restantes preservados por hash, rama/HEAD/staging conservados,
+127 paths pendientes. Sin nuevas pruebas, Docker, migraciones ni Git mutable.
+
+
+## P2: validación de creación de propuestas — 2026-10-30T13:32:34-03:00
+
+Validador común para ruta y servicio: cantidad entera 1–50, título requerido hasta
+160, descripción requerida hasta 1800 y modalidades canónicas. Se elimina la
+conversión de cero a uno; valores por defecto sólo para cantidad ausente/vacía.
+Recuperación escapada, modalidad inválida exige nueva selección y rechazos sin efectos.
+Diseño, permisos, CSRF, CLIENTE y SINGLE preservados. Reproducción: 12/12 intentos
+indebidamente aceptados antes; 12/12 rechazados después, sin publicaciones.
+Validación nueva: 34/34 pruebas únicas SQLite y ocho recorridos Chrome, ambos roles,
+móvil/escritorio y con/sin JS. Sin PostgreSQL ejecutado ni cambios de migraciones.
+[Inventario, evidencia y limitaciones](REQUISITOS/PROPUESTAS_P1.md).
+**P2 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Sin aprobación visual del usuario ni habilitación productiva.
+
+
+## Crear propuesta profesional: composición aprobada — 2026-10-30T12:53:38-03:00
+
+Formulario privado en dos tarjetas y encabezado compacto según boceto aprobado por
+Cristian el 2026-10-30. Doce campos y contrato conservados; CLIENTE sin cambio de
+presentación. Tokens DS v2, ambos temas, apilado hasta 1024 px y pie de acciones.
+22/22 pruebas focales en SQLite; 12 recorridos nuevos de navegador (36 estados),
+10 combinaciones con JS y 2 sin JS, más controles focales de acceso/contraste.
+Sin PostgreSQL ni Node repetidos, sin cambios de backend o migraciones.
+[Inventario, evidencia, incidencias de automatización y límites](REQUISITOS/PROPUESTAS_P1.md).
+Antecedentes del cierre P3 y ajustes de las pestañas conservados. Archivos ajenos
+preservados por hash. Preview detenido; Docker habitual intacto.
+**FORMULARIO REDISEÑADO LOCALMENTE; PENDIENTE DE REVISIÓN VISUAL Y TESTING INDEPENDIENTE.**
+No implica aprobación visual de la implementación ni habilitación productiva.
+
+
+## Cierre técnico de Propuestas — 2026-10-30T12:22:37-03:00
+
+Dictamen independiente del **2026-10-30T12:16:21-03:00**: **P3 CERRADO**, sin nuevos
+hallazgos P0–P3 en el alcance evaluado. PostgreSQL: módulos completos, 4/4 casos
+PROFESIONAL y 8/8 CLIENTE aprobados. Navegador: 18 escenarios nuevos, 12 con
+JavaScript y 6 sin JavaScript. Mensajes vacíos centrados y CTA redundantes retirados
+en Mis postulaciones y Mis publicaciones; filtros sólo en Propuestas disponibles.
+Evidencia durable: `proposals-p3-visual-retest-20261030`;
+[referencia, resultados y límites](REQUISITOS/PROPUESTAS_P1.md).
+Resultados anteriores, omisiones y limitaciones conservados sin sumar repeticiones.
+Cierre exclusivamente documental: sin pruebas nuevas, Docker, migraciones ni Git mutable.
+Rama/HEAD/staging conservados; 123 paths pendientes; archivos ajenos intactos por hash.
+Aprobación visual del usuario pendiente. No implica habilitación productiva ni AA integral.
+
+
+## Corrección P3 del gate PostgreSQL de Propuestas — 2026-10-30T11:38:15-03:00
+
+Separación de la preparación compartida y los casos: cuatro pruebas profesionales
+sin heredar casos CLIENTE; ocho originales conservadas, con rol persistido verificado.
+Ejecución nueva completa en PostgreSQL descartable: **12/12 aprobadas** (4 + 8).
+Sin omisiones ni eliminación de cobertura; cuerpos de pruebas preservados por AST.
+Sin cambios productivos ni visuales; ajustes autorizados de las tres pestañas
+preservados por hash. Navegador y Node anteriores son evidencia histórica, no repetida.
+Contenedor descartable retirado; Docker habitual intacto. Sintaxis, UTF-8 y diff correctos.
+[Inventario, comandos, hashes y evidencia](REQUISITOS/PROPUESTAS_P1.md).
+**P3 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.**
+Sin aprobación visual, integración ni habilitación productiva.
+
+
+## Propuestas profesionales privadas — 2026-10-30T10:23:56-03:00
+
+Tres pestañas reales, filtros GET y tarjetas DS v2 dentro del shell profesional.
+Creación/detalle canónicos con regreso privado; errores monetarios controlados y
+postulación repoblada. Publicador profesional autorizado exclusivamente sobre su
+propuesta y contrato PROPOSAL, sin ampliar DIRECT/BUDGET ni crear otra máquina contractual.
+Python: regresiones 85 aprobadas/1 omitida de 86; focal final 10/10 (solapamiento
+registrado), PostgreSQL descartable 4/4. Navegador 30 combinaciones y dos recorridos
+con/sin JS, más cuatro comprobaciones focales. Sin migraciones/dependencias nuevas.
+Pendiente de revisión visual y testing independiente; no habilitación productiva.
+[Inventario, evidencia y límites](REQUISITOS/PROPUESTAS_P1.md).
+Se registra además la aprobación visual de Configuración de urgencias por Cristian
+sin reabrir ese incremento. INDEX, Presupuestos y Urgencias preservados por hash.
+
+## Cierre técnico del P2 de Configuración de urgencias — 2026-10-30T09:06:28-03:00
+
+Dictamen independiente del **2026-10-30T08:47:41-03:00**:
+**P2 CERRADO — VERIFICADO EN EL ALCANCE EVALUADO.**
+
+- Confirmación válida entre 0 y 900 segundos inclusive; rechazo desde 901 segundos.
+  Se revalida después de adquirir los locks pertinentes, antes de una mutación nueva.
+- Recuperación del formulario con campos conservados y escapados, nueva revisión y
+  aceptación inicialmente desmarcada. Replay completado idempotente y atomicidad preservada.
+- Resultados del retest independiente: Python **41/41**, PostgreSQL **6/6** y
+  **ocho recorridos funcionales de navegador**. Son ejecuciones del dictamen citado;
+  este cierre documental no repite pruebas ni suma resultados históricos.
+- Evidencia durable existente: [config-impact-expiry-retest-20261030](../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/config-impact-expiry-retest-20261030/).
+  No se recrearon evidencias.
+
+Se conservan los antecedentes de implementación, hallazgo y corrección. Continúan
+pendientes Google Maps real, recepción profesional (no habilitada) y aprobación
+visual de Cristian. Permanecen documentados los P3 heredados, la observación del
+tema oscuro forzado sin JavaScript y los avisos CSP existentes. Este cierre no
+declara habilitación productiva ni certificación AA.
+
+Rama `feature/professional-workspace-ux`; HEAD
+`2e552f2fdc57c152c97f0486050574696f6b250e`; 108 paths pendientes y staging vacío.
+Alcance exclusivo: este requisito, `docs/HANDOFFS/ACTIVE_HANDOFF.md` y
+`docs/CHANGELOG.md`. Los otros 615 archivos del inventario inicial se preservan por
+SHA-256, incluidos INDEX y Presupuestos. Controles del cierre: UTF-8 y
+`git diff --check`; sin cambios productivos, nuevas pruebas, migraciones, Docker
+ni operaciones Git mutables.
+
+## P2 — Vencimiento de revisión de impacto — 2026-10-30T08:21:08-03:00
+
+Revisión firmada válida 0..900 segundos inclusive; 901/futuro/formato anterior
+rechazados tras locks. Recuperación 409 sin escrituras, campos conservados y nueva
+aceptación. Replay completado preservado. Python 41/41, PostgreSQL aislado 6/6,
+Chrome 8/8 con/sin JS. Sin migración nueva ni cambios al entorno habitual.
+[Detalle y evidencia](REQUISITOS/PROF_URGENCIAS_UX_001.md).
+P2 CORREGIDO LOCALMENTE; PENDIENTE DE RETEST INDEPENDIENTE.
+
+## Configuración de urgencias — 2026-10-28T23:38:49-03:00
+
+Pantalla privada única desde Perfil/Configuraciones, cobertura canónica y mapa opcional,
+tarifas ARS conjuntas/separadas con gratuidad explícita, vista previa y guardado real.
+Revisión de impacto sobre guardias, locks, replay autorizado y rollback atómico.
+Alembic `20261028_01` nuevo; habitual no migrado. Suite seleccionada 104/104 y focal
+final 8/8 (106 únicos), PG 5/5, Node 10/10, Chrome 20 combinaciones con/sin JS.
+Google real no verificado. Pendiente revisión visual y testing independiente.
+[Alcance, inventario, evidencias y procedimiento](REQUISITOS/PROF_URGENCIAS_UX_001.md).
+Sin habilitación productiva ni operaciones Git mutables; antecedentes preservados.
+
+
+## Urgencias — ventana de cuatro semanas y simplificación
+
+Registro 2026-10-26T21:37:42-03:00. Decisión de Cristian: semana actual y tres siguientes en Buenos Aires,
+con validación compartida y transaccional. GET fuera del rango redirige; POST rechaza sin efectos
+parciales. Replay autorizado y reservas anteriores conservados. Retirada tarjeta de presencia
+manual; recepción pendiente y Tu guardia conservadas. Sin migración ni dependencias nuevas.
+Python 67/67, PostgreSQL aislado 6/6, Node aprobado, 20 recorridos Chrome / 40 combinaciones de
+pestaña en ambos temas y con/sin JS. [Inventario, evidencia y límites](REQUISITOS/PROF_URGENCIAS_UX_001.md#cuatro-semanas-de-guardias-y-simplificación-de-pestañas).
+Docker de revisión/base/cuenta QA sin modificaciones. Pendientes revisión visual y QA independiente.
+
+
+## Guardias persistentes — cierre técnico independiente
+
+Registro 2026-10-26T20:57:14-03:00. Dictamen independiente **2026-10-26T20:51:36-03:00**:
+**GUARDIAS PERSISTENTES — VERIFICADO EN EL ALCANCE EVALUADO.** Sin hallazgos P0–P3.
+Python 61/61; PostgreSQL 5/5 (migración y concurrencia); controlador Node aprobado,
+notificaciones 2/2; navegador 20/20. Persistencia tras reinicio, atomicidad, idempotencia,
+invalidación y recordatorios verificados. Alembic head `20261026_01`, padre `20260917_03`.
+[Registro y evidencia existente](REQUISITOS/PROF_URGENCIAS_UX_001.md#cierre-técnico-independiente--guardias-persistentes).
+Resultados independientes históricos, sin repetir pruebas ni recrear evidencia en este cierre.
+Pendientes scheduler, recepción profesional, recorrido completo y revisión visual del usuario.
+Sin AA integral ni móvil físico; CSP heredada conservada. No se acredita migración de la base
+habitual ni se declara habilitación productiva. Antecedentes preservados; solo documentación.
+
+
+## Guardias persistentes — primera entrega operativa
+
+Registro 2026-10-26T20:26:49-03:00. Ampliación autorizada por Cristian el 2026-10-26: reservas múltiples
+persistentes, formulario protegido sin JS, idempotencia durable, invalidación por pérdida de
+habilitación y recordatorios internos. Migración 20261026_01; tzdata==2025.2.
+Python focal 61/61 y PostgreSQL aislado 5/5; Node aprobado; 20 recorridos Chrome, dos de
+error/reenvío adicionales y persistencia tras reinicio. No suite completa ni certificación AA.
+[Alcance, inventario, evidencia y operación pendiente](REQUISITOS/PROF_URGENCIAS_UX_001.md#guardias-persistentes--primera-entrega-operativa).
+No migración habitual, scheduler configurado, recepción de solicitudes ni habilitación productiva.
+Pendientes revisión visual y testing independiente; cierres anteriores conservados.
+
+## PROF-URGENCIAS-UX-001 — Cierre técnico independiente
+
+Registro 2026-10-25T15:46:39-03:00. Dictamen independiente **2026-10-25T15:40:22-03:00**:
+**VERIFICADO EN EL ALCANCE EVALUADO**; ningún hallazgo P0–P3.
+Python: 35 aprobadas y una omitida inicialmente; el caso omitido pasó después con IANA real en
+otro runtime. **36 casos únicos satisfactorios entre ambos entornos**, sin modificar el Python
+del proyecto. Controlador JavaScript aprobado y navegador **40/40**. Sin escrituras ni efectos
+operativos. Evidencia histórica independiente, sin nuevas pruebas en esta sesión.
+[Registro y evidencia existente](REQUISITOS/PROF_URGENCIAS_UX_001.md#cierre-técnico-independiente--solicitudes-y-mis-guardias).
+Interfaces informativas, selección provisional y reservas deshabilitadas; aprobación visual de
+Cristian pendiente. No recepción profesional, backend de reservas, PostgreSQL, certificación AA
+ni habilitación productiva declarados. Antecedentes y limitaciones conservados.
+
+## Urgencias — Solicitudes y calendario semanal A
+
+Registro 2026-10-25T15:10:43-03:00. Bocetos seleccionados por Cristian el 2026-10-25.
+Calendario semanal calculado, selección provisoria y resumen; bandeja y consulta de guardia con
+estados honestos de disponibilidad pendiente. Sin reservas ni acceso a solicitudes privadas.
+35 pruebas Python aprobadas/una omitida IANA, controlador Node aprobado, 40 combinaciones Chrome.
+[Alcance, nueve archivos y limitaciones](REQUISITOS/PROF_URGENCIAS_UX_001.md#solicitudes-y-calendario-semanal-a--2026-10-25).
+Pendiente revisión visual y QA independiente; sin integración ni nuevas capacidades de dominio.
+
+## Presupuestos — Cierre técnico independiente de Ver solicitud
+
+Registro 2026-10-25T14:00:38-03:00. Dictamen independiente **2026-10-25T13:50:29-03:00**:
+**VERIFICADO EN EL ALCANCE EVALUADO.** Sin hallazgos P0–P3; **62/62 pruebas** y **20/20
+combinaciones de navegador**, con inicial, error repoblado y envío corregido. Ambos P2 permanecen
+corregidos. Resultados del QA independiente, sin nuevas ejecuciones en este cierre documental.
+[Registro, limitaciones y evidencia](REQUISITOS/PRESUPUESTOS_UX_001.md#cierre-técnico-independiente-de-ver-solicitud).
+Aprobación visual del listado A del 2026-10-25 preservada. Boceto del detalle aprobado por Cristian;
+aprobación visual de su implementación pendiente. Continúan PostgreSQL, AA integral, móvil físico,
+CSP heredada y decisión sobre profesionales solicitantes. Sin integración ni preparación productiva.
+
+## Presupuestos — Ver solicitud
+
+Registro 2026-10-25T13:36:39-03:00. Boceto del detalle aprobado por Cristian el 2026-10-25; implementadas
+columnas solicitud/oferta, navegación compacta y adaptación móvil, preservando campos y reglas.
+62 pruebas únicas aprobadas; 20 recorridos Chrome con error y envío corregido, incluidos diez
+sin JavaScript. Pendiente de revisión visual final y QA independiente del detalle.
+También se registra la aprobación visual del listado A por Cristian el 2026-10-25;
+se conservan su código, dictamen técnico y antecedentes. Urgencias espera revisión visual.
+[Alcance e informe](REQUISITOS/PRESUPUESTOS_UX_001.md#ver-solicitud--rediseño-del-detalle-aprobado-el-2026-10-25).
+
+## Presupuestos — Cierre técnico del diseño A
+
+Registro documental 2026-10-23T22:36:39-03:00. Dictamen independiente **2026-10-23T21:31:20-03:00**:
+**VERIFICADO EN EL ALCANCE EVALUADO.** Sin hallazgos P0–P3; 61/61 pruebas y 20 combinaciones
+de navegador. Ambos P2 anteriores conservados como corregidos. Evidencia histórica del QA
+independiente, sin nuevas pruebas en este cierre.
+[Registro y evidencias](REQUISITOS/PRESUPUESTOS_UX_001.md#cierre-técnico-independiente-del-diseño-a).
+Boceto A seleccionado; aprobación visual final de la implementación aún pendiente.
+Se preservan CSP heredada, profesionales solicitantes, PostgreSQL, certificación AA y móvil físico.
+Urgencias espera la revisión visual solicitada por Cristian. Sin integración ni cambios de código.
+
+
+## Presupuestos — Diseño A
+
+Registro 2026-10-23T21:20:50-03:00. Lista compacta con pestañas iniciales, tarjetas horizontales, datos reales
+y adaptación móvil/claro/oscuro; sin controles visibles de filtro ni hero redundante.
+Aviso preliminar conservado en el recorrido de oferta. 61/61 pruebas y 20 combinaciones visuales;
+pendiente de revisión independiente. Sin alterar el cierre P2 ni las reglas comerciales.
+[Informe](REQUISITOS/PRESUPUESTOS_UX_001.md#diseño-a--lista-compacta-de-presupuestos).
+
+## URGENCIAS-UX-002 — Recorrido manual
+
+Registro 2026-10-20T19:57:49-03:00. Disponibilidad honesta, confirmación propia, paginación, contacto nativo
+con consentimiento y CSP focal para su redirección, accesos desde el shell profesional.
+66 pruebas únicas aprobadas y una omitida; catorce combinaciones visuales y recorridos JS/no-JS.
+Sin habilitar guardias, convocatorias ni contratación urgente. Pendiente de QA independiente.
+[Alcance, archivos y evidencia](REQUISITOS/URGENCIAS_UX_002.md).
+
+## Presupuestos — Cierre técnico independiente
+
+Registro 2026-10-20T19:35:42-03:00. Dictamen 2026-10-20T14:09:02-03:00:
+**P2 CERRADOS — PRESUPUESTOS-UX-001 VERIFICADO EN EL ALCANCE EVALUADO.**
+36/36 pruebas, diez combinaciones adversariales, ocho de navegador y tap móvil sin JS
+aprobados por el retest. Sin nuevas ejecuciones en este cierre. Pendientes: solicitantes
+profesionales, PostgreSQL, AA y móvil físico. [Evidencia](REQUISITOS/PRESUPUESTOS_UX_001.md).
+
+## PRESUPUESTOS-UX-001 — Corrección de dos P2
+
+Registro: 2026-10-19T22:02:37-03:00; Codex local, laptop. Finitud Decimal antes de comparar y detalle
+400 con campos repoblados/escapados ante validación. Ambos fallos reproducidos antes.
+36/36 pruebas aprobadas; ocho recorridos de navegador con límites explicitados.
+[Informe y evidencia](REQUISITOS/PRESUPUESTOS_UX_001.md). Pendiente de retest independiente;
+no se declara cierre ni integración. Antecedentes conservados.
+
+## PRESUPUESTOS-UX-001 — Recorrido existente conectado
+
+Registro: 2026-10-19T21:11:34-03:00; Codex local, laptop. Listado/detalle/enviados en shell profesional,
+confirmaciones accesibles y seguimiento del contrato canónico para ambas partes.
+89 pruebas aprobadas; 30 combinaciones Chrome y revisión CSS focal. Pendiente de revisión
+visual y testing independiente; sin integración. [Detalle](REQUISITOS/PRESUPUESTOS_UX_001.md).
+
+## PROF-UX-004 — Cierre documental del retest P2
+
+Registro: 2026-10-18T19:18:45-03:00; Codex local, laptop.
+Dictamen independiente 2026-10-18T19:03:49-03:00: **P2 CERRADO — PROF-UX-004 VERIFICADO
+EN EL ALCANCE EVALUADO.** Import de url_for como única corrección productiva; 5/5
+regresiones nuevas y 8/8 focales aprobadas en el retest, sin nuevos P0–P3.
+Evidencia visual/Node anterior vigente por hashes, sin nueva ejecución. Esta sesión
+sólo registra el cierre; no ejecuta pruebas. PostgreSQL no validado, CSP heredada,
+proveedor simulado y activación productiva pendiente. Sin integración ni certificación AA.
+Rama feature/professional-workspace-ux; HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+[Informe durable y detalle](REQUISITOS/PROF_UX_004.md). Antecedentes conservados debajo.
+
+
+## PROF-UX-004 — Corrección local P2
+
+Registro: 2026-10-18T18:52:15-03:00; Codex, laptop. Rama feature/professional-workspace-ux;
+HEAD 2e552f2fdc57c152c97f0486050574696f6b250e.
+Import de url_for para restaurar redirecciones canónicas de revisión/historial sin
+composición simulada. Cuatro 500 reproducidos antes; cinco regresiones nuevas y 45
+focales existentes aprobadas después. Recorrido aislado verificado con cliente Flask.
+Sin cambios de negocio/CSP ni nueva revisión visual; pendiente de retest independiente.
+[Detalle y evidencia](REQUISITOS/PROF_UX_004.md). Sin integración ni activación productiva.
+
+
+## PROF-UX-004 — Conexión interna de cobros simulados
+
+Registro: 2026-10-18T15:32:40-03:00. Responsable: Codex; laptop.
+Rama `feature/professional-workspace-ux`; base `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Selector/revisión, creación/replay canónicos, enlace/QR/copia e historial propio,
+exclusivamente en preview nuevo con SQLite temporal y proveedor simulado. App habitual
+sin activación financiera. Sin cambios de esquema, dependencias o máquina contractual.
+68 Python y 6 Node aprobadas; 40 combinaciones de navegador, no-JS y reduced motion reales.
+Limitación CSP heredada registrada; sin gate PostgreSQL ni certificación AA.
+[Requisito y evidencia](REQUISITOS/PROF_UX_004.md); ampliación comercial sólo propuesta.
+Pendiente de revisión visual/testing independiente; sin integración ni activación productiva.
+
+
+## PROF-UX-003 — Pantalla de Facturación y cobros
+
+Registro: 2026-10-18T13:56:00-03:00. Responsable: Codex, laptop.
+Rama `feature/professional-workspace-ux`; HEAD base `2e552f2fdc57c152c97f0486050574696f6b250e`.
+Implementado localmente; revisión visual y testing independiente pendientes.
+Dos tarjetas principales y destinos GET privados preparados; marca neutral e historial
+no disponible. DS v2, responsive, claro/oscuro, sin operaciones fiscales o financieras.
+Validación: 35 pruebas Python y 4 Node, matriz de navegador 10 combinaciones y seis
+visitas a destinos preparados. Sin JS funcional en claro; reduced motion emulado.
+Detalles, evidencias y límites: [PROF_UX_003](REQUISITOS/PROF_UX_003.md).
+No cierre de sprint, integración, habilitación productiva ni certificación AA.
+
 ## Cierre técnico local 4F aprobado por Testing
 
 Timestamp de registro documental: 2026-09-18T09:50:28-03:00
@@ -1798,3 +2288,52 @@ Timestamp: 2026-09-04T10:29:16-03:00
 - Se centralizo la frontera UTC naive del nucleo PRO y se documento la perdida
   de `source_type` durante downgrade.
 - REQ-001 declara canonicamente `IMPLEMENTACION_PARCIAL`.
+
+
+### 2026-10-26T22:41:47-03:00 — Liberación de guardias
+
+Liberación propia sólo antes de T−12, con atomicidad, idempotencia, historial y
+recordatorios pendientes sin efecto. A T−12 exacto se bloquea. Reserva T−2 conservada
+con aviso previo de imposibilidad de liberar dentro de las últimas 12 horas.
+Bloques liberados no se pueden volver a reservar. Sin cambios contractuales/esquema.
+29 Python, 9 PostgreSQL aislado, dos controladores Node y 20 vistas Chrome aprobados.
+Pendiente revisión visual y testing independiente; no habilitación productiva.
+Ver PROF_URGENCIAS_UX_001 para evidencia, límites y decisión que sustituye el pendiente.
+
+
+## Cierre técnico independiente de guardias y liberación — 2026-10-28T14:37:23-03:00
+
+Dictamen independiente del **2026-10-28T14:29:40-03:00**:
+
+**GUARDIAS, LIBERACIÓN Y AJUSTES ACUMULADOS — VERIFICADOS EN EL ALCANCE EVALUADO.**
+
+- Sin defectos funcionales P0–P2.
+- P3 heredado: tres templates sin salto final, fuera del incremento. Se conserva la
+  observación; no se corrigen esos archivos en este cierre documental.
+- Python **74/74**, PostgreSQL **9/9** y Node **4/4**.
+- **40 combinaciones de navegador** y liberación adicional sin JavaScript.
+- Liberación propia programada únicamente cuando faltan **más de 12 horas**;
+  a las 12 horas exactas queda bloqueada en interfaz y servidor.
+- Los bloques liberados no son reservables nuevamente en este incremento.
+- Historial, atomicidad, idempotencia y recordatorios verificados.
+- Sin migración adicional: continúa el head **20261026_01**. Este cierre no afirma
+  una migración de la base habitual.
+
+[Evidencia independiente existente](../../.codex/visualizations/2026/09/02/01a06392-4542-7532-875d-7120e33afc38/guardias-release-independent-qa-20261028/):
+python-focal.log, postgres-gate.log, node-tests.log, browser-results.json,
+browser.log, capturas e inventarios de integridad. No se recrearon evidencias ni se
+repitieron pruebas. Los resultados anteriores permanecen como antecedentes y no
+se suman como cobertura adicional. No se declara consola limpia ni certificación AA.
+
+Pendientes: revisión visual de Cristian, scheduler periódico, recepción profesional
+y recorrido completo de Urgencias. No habilitación productiva, integración ni despliegue.
+La aprobación visual sigue pendiente; este dictamen cierra únicamente el alcance técnico evaluado.
+
+Registro documental: Codex local, laptop. Rama `feature/professional-workspace-ux`,
+HEAD `2e552f2fdc57c152c97f0486050574696f6b250e`, 95 paths pendientes y staging vacío.
+Únicamente se actualizan `docs/REQUISITOS/PROF_URGENCIAS_UX_001.md`,
+`docs/HANDOFFS/ACTIVE_HANDOFF.md` y `docs/CHANGELOG.md`, conservando antecedentes.
+Control de cierre: UTF-8 y `git diff --check`; integridad SHA-256 del resto del
+inventario, incluidos INDEX y Presupuestos. Sin cambios productivos, pruebas nuevas,
+Docker, bases, migraciones ni operaciones Git mutables. Commit/push/PR/merge no
+realizados: fuera de autorización; sincronización remota no comprobada.

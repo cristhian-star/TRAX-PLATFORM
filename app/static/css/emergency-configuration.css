@@ -1,0 +1,31 @@
+.ec-config { color: var(--pw-text); max-width: 1440px; margin: auto; overflow-wrap: anywhere; }
+.ec-config h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 1rem 0 .5rem; }
+.ec-config h2 { font-size: 1.35rem; margin: 0 0 1rem; }
+.ec-layout { display: grid; grid-template-columns: minmax(0, 2.3fr) minmax(240px, 1fr); gap: 1.2rem; margin-top: 1.5rem; }
+.ec-main { min-width: 0; display: grid; gap: 1rem; }
+.ec-config .pw-card { padding: 1.5rem; min-width: 0; }
+.ec-config header, .ec-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.ec-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 1rem; }
+.ec-config label { display: block; margin: .75rem 0; }
+.ec-config input:not([type=checkbox]):not([type=radio]), .ec-config select, .ec-config textarea { width: 100%; min-height: 44px; color: var(--pw-text); background: var(--pw-bg); border: 1px solid var(--pw-muted); border-radius: .5rem; padding: .6rem; margin-top: .35rem; box-sizing: border-box; }
+.ec-config textarea { min-height: 90px; }
+.ec-config .ec-check { display: flex; align-items: center; gap: .75rem; min-height: 44px; }
+.ec-config input[type=checkbox], .ec-config input[type=radio] { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--pw-accent); }
+.ec-config .ec-mode { border: 1px solid var(--pw-muted); border-radius: .5rem; padding: .8rem; }
+.ec-mode small { display: block; padding-left: 2rem; }
+.ec-config fieldset { border: 1px solid var(--pw-line); border-radius: .5rem; min-width: 0; margin: 1rem 0; }
+.ec-help, .ec-config small { color: var(--pw-muted); }
+.ec-warning { border-left: 3px solid var(--pw-accent); background: var(--pw-bg); padding: 1rem; }
+.ec-preview { align-self: start; }
+.ec-map-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(130px,1fr); gap: 1rem; margin-top: 1rem; }
+.ec-config [data-coverage-map] { border: 1px solid var(--pw-line); min-height: 240px; border-radius: .5rem; overflow: hidden; }
+.ec-config [data-coverage-map-canvas] { height: 260px; }
+.ec-config [data-coverage-map-fallback] { padding: 2rem 1rem; }
+.ec-config [data-coverage-map-fallback] small { display: block; margin-top: 1rem; }
+.ec-config :focus-visible { outline: 3px solid var(--pw-accent); outline-offset: 3px; }
+.ec-config summary, .ec-actions a { min-height: 44px; display: flex; align-items: center; }
+.ec-config [hidden] { display: none !important; }
+.ec-config input[type=range] { accent-color: var(--pw-accent); padding: 0; }
+.ec-mode:has(input:checked) { border-color: var(--pw-accent); background: var(--pw-soft); }
+@media(max-width: 900px) { .ec-layout { grid-template-columns: 1fr; } }
+@media(max-width: 500px) { .ec-config .pw-card { padding: 1rem; } .ec-map-row { grid-template-columns: 1fr; } .ec-actions > * { width: 100%; } }

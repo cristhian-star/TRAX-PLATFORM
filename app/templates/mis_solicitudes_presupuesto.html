@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "budget_layout.html" %}
 
-{% block extra_css %}
+{% block extra_css %}{{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/budget-marketplace-v1.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget-workflow.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block budget_content %}
 <main class="budget-page">
     <section class="budget-detail-hero">
         <div class="budget-shell">
@@ -59,12 +60,12 @@
                                 Ver detalle
                             </a>
                             {% if item.estado in ("ABIERTO", "PUBLICADA", "COTIZANDO", "CERRADA") %}
-                                <form action="/presupuestos/{{ item.id }}/cancelar" method="POST" onsubmit="return confirm('&iquest;Seguro que quer&eacute;s cancelar esta solicitud? Los profesionales ya no podr&aacute;n enviar presupuestos.');">
+                                <details class="budget-confirm"><summary>Cancelar solicitud</summary><p>La solicitud dejará de recibir presupuestos. Confirmá sólo si ya no la necesitás.</p><form action="/presupuestos/{{ item.id }}/cancelar" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button class="budget-button budget-button--secondary budget-card__cta" type="submit">
-                                        Cancelar solicitud
+                                        Confirmar cancelación
                                     </button>
-                                </form>
+                                </form></details>
                             {% endif %}
                         </div>
                     </article>
@@ -72,7 +73,7 @@
             </div>
         {% else %}
             <div class="budget-empty">
-                <h2>Todavia no publicaste solicitudes</h2>
+                <h2>No hay solicitudes en esta vista</h2>
                 <p>Cuando publiques una necesidad, aparecera aca con su contador de presupuestos.</p>
                 <a class="budget-button budget-button--primary" href="/presupuestos/nuevo">Publicar solicitud</a>
             </div>

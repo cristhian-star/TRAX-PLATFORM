@@ -1,0 +1,54 @@
+/* PROF-UX-003: billing composition only; shared shell stays unchanged. */
+.pw-billing { color:var(--trax-ds-text); }
+.pw-billing .billing-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:28px; }
+.pw-billing .billing-settings { display:grid; gap:8px; flex-shrink:0; text-align:center; }
+.pw-billing small { display:block; color:var(--trax-ds-text-secondary); font-size:.8rem; line-height:1.5; }
+.pw-billing .billing-question { margin-bottom:18px; font-size:1.65rem; }
+.pw-billing .billing-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.pw-billing .trax-card { background:var(--trax-ds-card); border:1px solid var(--trax-ds-border-strong); border-radius:var(--trax-ds-radius-card); box-shadow:none; }
+.pw-billing .billing-action { padding:28px; display:flex; align-items:center; gap:18px; min-width:0; }
+.pw-billing .billing-copy { flex:1; min-width:0; }
+.pw-billing .billing-action h2 { font-size:clamp(1.4rem,2vw,2rem); margin:18px 0 10px; }
+.pw-billing .billing-icon { width:64px; height:64px; display:grid; place-items:center; border-radius:16px; color:var(--trax-ds-primary); background:var(--trax-ds-primary-soft); flex-shrink:0; }
+.pw-billing .billing-icon svg { width:36px; height:36px; }
+.pw-billing .billing-icon--payment { color:var(--trax-ds-info); background:var(--trax-ds-info-soft); }
+.pw-billing .billing-availability { font-size:.85rem; font-weight:700; color:var(--trax-ds-text-secondary); }
+.professional-workspace .pw-billing a.trax-button--primary { color:var(--trax-ds-text-inverse); background:var(--trax-ds-primary); }
+.professional-workspace .pw-billing a.trax-button--primary:hover { background:var(--trax-ds-primary-hover); }
+.pw-billing .trax-button { min-height:48px; white-space:normal; text-align:center; }
+.pw-billing .billing-copy .trax-button { width:100%; max-width:290px; margin-bottom:8px; }
+.pw-billing .billing-document,.pw-billing .billing-link-preview { width:120px; padding:18px 12px; border:1px solid var(--trax-ds-border-strong); border-radius:10px; background:var(--trax-ds-card-soft); color:var(--trax-ds-text-secondary); font-size:.7rem; flex-shrink:0; }
+.pw-billing .billing-document strong { display:block; margin:20px 0; font-size:.65rem; }
+.pw-billing .billing-document i { display:block; height:5px; margin:12px 0; background:var(--trax-ds-border-strong); border-radius:4px; }
+.pw-billing .billing-document i:nth-child(even) { width:65%; }
+.pw-billing .billing-link-preview { text-align:center; }
+.pw-billing .billing-link-preview svg { width:64px; height:64px; margin:16px auto; color:var(--trax-ds-info); }
+.pw-billing .billing-brand { margin:20px 0 28px; padding:20px 28px; display:flex; align-items:center; gap:24px; }
+.pw-billing .billing-brand h2 { font-size:1.1rem; }
+.pw-billing .billing-brand p { margin-bottom:0; }
+.pw-billing .billing-brand-placeholder { display:grid; place-items:center; border:1px dashed var(--trax-ds-text-secondary); border-radius:8px; min-width:100px; height:64px; color:var(--trax-ds-text-secondary); }
+.pw-billing .billing-history > h2 { margin-bottom:16px; }
+.pw-billing .billing-empty { display:flex; align-items:center; gap:20px; padding:28px; }
+.pw-billing .billing-note { margin-top:24px; padding-top:20px; border-top:1px solid var(--trax-ds-border); font-size:.85rem; }
+.pw-billing .billing-prepared { max-width:760px; padding:32px; }
+.pw-billing .billing-prepared h2 { margin:24px 0 12px; }
+.pw-billing .billing-prepared .trax-button { margin-top:20px; }
+@media (max-width:1200px) { .pw-billing .billing-document,.pw-billing .billing-link-preview { display:none; } }
+@media (max-width:700px) {
+ .pw-billing .billing-heading { flex-direction:column; gap:12px; }
+ .pw-billing .billing-actions { grid-template-columns:minmax(0,1fr); }
+ .pw-billing .billing-action,.pw-billing .billing-prepared { padding:22px; }
+ .pw-billing .billing-brand,.pw-billing .billing-empty { padding:20px; align-items:flex-start; flex-direction:column; gap:14px; }
+}
+
+/* Closed native disclosure must not contribute offscreen content without JS. */
+.professional-billing-page .pw-mobile-menu:not([open]) > div { display:none; }
+.pw-billing a { scroll-margin-block:100px; }
+
+.pw-billing .collection-links { display:flex; flex-wrap:wrap; gap:12px 24px; margin-bottom:20px; }
+.pw-billing .collection-links a { display:inline-flex; align-items:center; min-height:44px; }
+.pw-billing .collection-row { margin-bottom:18px; }
+.pw-billing .collection-qr { display:block; width:min(100%,325px); height:auto; margin:20px 0; }
+.pw-billing [data-collection-copy] { display:grid; gap:12px; min-width:0; }
+.pw-billing [data-collection-copy] input { min-width:0; width:100%; }
+.pw-billing [data-copy-button][hidden] { display:none; }

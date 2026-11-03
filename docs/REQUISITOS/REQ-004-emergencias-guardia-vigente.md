@@ -700,3 +700,85 @@ SUSTITUIDOS el 2026-10-01 por Cristian Sánchez; solo evidencia histórica:
 - Criterio anterior número 05: Renovación reemplaza desde ahora; no suma al fin anterior; activación repetida distinta devuelve conflicto
 - Criterio anterior número 06: Dos activaciones/renovaciones independientes no crean dos ventanas ni pierden updates
 - Criterio anterior número 07: Desactivar y repetir/replay de activación no revive ni duplica auditoría
+
+
+## Continuidad autorizada — guardias persistentes (2026-10-26)
+
+Registro 2026-10-26T20:26:49-03:00. Cristian autorizó la primera entrega operativa sobre el calendario A,
+ampliando el alcance informativo anterior sin borrar sus antecedentes. Implementación local
+pendiente de revisión visual y testing independiente; no habilitación productiva.
+
+Se mantienen bloques fijos, IANA Buenos Aires/UTC, corte T−2 inclusive y vigencia [inicio, fin).
+Persistencia mínima en emergency_shifts/emergency_shift_reminders (Alembic 20261026_01 sobre
+20260917_03), unicidad por profesional/día/tipo y confirmación atómica. OperationCommand y
+AuditLog conservan el resultado durable; locks User→Professional coordinan confirmación,
+invalidez de bloques actuales/futuros y recordatorios. Restaurar habilitación no revive reservas.
+Los escritores actuales de cuenta, verificación y perfil invalidan dentro de su transacción.
+PRO no habilita. No cancelación/modificación manual de reservas.
+
+Recordatorios internos persistentes T−6/T−1, ejecución idempotente mediante CLI cada minuto
+(programación del operador pendiente). tzdata fijado en requirements y probado en el venv del
+proyecto y un Docker descartable. No se migró la base habitual ni se instaló un scheduler.
+Recepción/distribución de solicitudes, bot, pagos y contratación urgente siguen fuera de alcance.
+
+Detalle de esquema, ventanas de entrega, comandos de migración, pruebas PostgreSQL, inventario
+y límites: [PROF_URGENCIAS_UX_001](../REQUISITOS/PROF_URGENCIAS_UX_001.md#guardias-persistentes--primera-entrega-operativa).
+Las decisiones pendientes del documento no quedan aprobadas por esta implementación limitada.
+
+
+## Decisión de Producto — ventana de cuatro semanas
+
+Registro 2026-10-26T21:37:42-03:00. Cristian, 2026-10-26. Para nuevas reservas se permiten exclusivamente la
+semana actual y las tres siguientes, lunes–domingo según America/Argentina/Buenos_Aires.
+Pertenencia por fecha local de inicio: la última nocturna puede finalizar el lunes siguiente.
+Intervalo compartido entre calendario, navegación y confirmación; se recalcula al confirmar
+después de locks. GET fuera del rango redirige a la semana más cercana sin escrituras; POST
+fuera del rango rechaza todo el lote. No modifica replay autorizado ni reservas existentes.
+Se conservan bloques fijos, T−2 inclusive, elegibilidad, atomicidad e idempotencia.
+[Implementación, pruebas y límites](PROF_URGENCIAS_UX_001.md#cuatro-semanas-de-guardias-y-simplificación-de-pestañas).
+No nuevas migraciones ni cambio del esquema. Pendiente revisión visual/testing independiente.
+
+
+## Liberación de guardias — 2026-10-26T22:41:47-03:00
+
+Decisión de Cristian: sustituye el pendiente anterior de liberación únicamente para
+una guardia propia programada. Se admite cuando faltan **más de 12 horas**; a T−12
+exacto queda bloqueada. No se habilitan cancelaciones de acuerdos con clientes.
+La reserva conserva T−2 minutos inclusive. Antes de confirmar se advierte siempre
+que un turno dentro de las últimas 12 horas ya no admite liberación.
+La decisión posterior sustituye la respuesta previa sobre volver a reservar:
+**volver a reservar un bloque liberado queda fuera de este incremento**.
+
+Implementación local: POST protegido por rol persistido, elegibilidad, ownership,
+CSRF y rate limit; clave firmada por actor/guardia/versión. Locks usuario → perfil →
+guardia y reloj efectivo posterior al bloqueo. `OperationCommand` y auditoría
+`EMERGENCY_SHIFT_RELEASE` hacen el replay idempotente. `invalidated_at` retira la
+guardia de la disponibilidad; la auditoría ligada a versión distingue Liberada de
+Invalidada por pérdida de habilitación. Conserva fila, aceptación original e historial;
+recordatorios PENDING pasan a SKIPPED en la misma transacción. No modifica modelos,
+migraciones, contratos ni el servicio de reserva existente. Un replay autorizado de
+reserva devuelve su resultado histórico sin reactivar; una clave nueva no puede
+reservar el bloque liberado. Sin escrituras durante GET.
+
+Interfaz: botón primario naranja, gris/deshabilitado al vencimiento; explicación del
+plazo en Buenos Aires. JavaScript sólo actualiza la presentación del vencimiento;
+el servidor vuelve a autorizar incluso sin JavaScript. Formularios independientes,
+sin anidación; confirmación original vinculada con atributos form.
+
+Validación de esta entrega: 29/29 Python (release/reservas/ventana/interfaz),
+9/9 PostgreSQL descartable (3 nuevas de liberación y 6 de reservas), controlador
+Node de liberación y controlador de selección aprobados; sintaxis JS/Python correcta.
+PostgreSQL comprueba reenvío simultáneo con un único efecto, rollback, ownership,
+revalidación del reloj después de esperar locks y rechazo de nueva reserva liberada.
+Chrome: 20 combinaciones, 320/390/768/1024/1440 px, claro/oscuro, con/sin JavaScript,
+movimiento reducido emulado; botón habilitado/deshabilitado, foco, formularios y sin
+overflow. Recorrido adicional de liberación nativa sin JS con CSRF aprobado.
+No constituye certificación AA, testing independiente ni prueba de dispositivo físico.
+Primer intento Python encontró un parser no instalado; se reemplazó por HTMLParser
+estándar, sin dependencias. Los primeros intentos de navegador fallaron por aislamiento
+de red; la ejecución final usó únicamente localhost con preview aislado.
+
+Evidencia: [guardias-liberacion](../../../.codex/visualizations/2026/09/21/01a0c628-6518-73a3-b7ca-d4ba209ac043/guardias-liberacion/).
+Sin nueva migración (continúa 20261026_01), sin tocar base habitual ni cuenta QA.
+Recepción profesional, scheduler, revisión visual y retest independiente pendientes.
+Estado: IMPLEMENTADO LOCALMENTE; PENDIENTE DE TESTING INDEPENDIENTE.

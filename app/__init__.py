@@ -38,6 +38,12 @@ def create_app(config_class=None, initialize_schema=False):
     # Blueprints
     from app.routes.main_routes import main
     app.register_blueprint(main)
+    from app.routes.work_record_routes import work_records
+    app.register_blueprint(work_records)
+    from app.services.work_record_service import register_work_cli
+    register_work_cli(app)
+    from app.routes.emergency_configuration_routes import emergency_configuration
+    app.register_blueprint(emergency_configuration)
     
     from app.routes.auth_routes import auth
     app.register_blueprint(auth)
@@ -68,6 +74,10 @@ def create_app(config_class=None, initialize_schema=False):
             def demo_context():
                 return {"e2e_demo_available": enabled(app.config)}
     
+    from app.models.billing_preparation import BillingProfile, BillingDraft
+    from app.models.work_record import WorkRecord, WorkFollowup, WorkReminder
+    from app.models.emergency_shift import EmergencyShift, EmergencyShiftReminder
+    from app.models.emergency_configuration import EmergencyConfiguration
     from app.models.user import User
     from app.models.professional import Professional
     
@@ -204,6 +214,9 @@ def create_app(config_class=None, initialize_schema=False):
         response.headers.pop("X-Powered-By", None)
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+        # Chrome also validates the destination of a native form's redirect.
+        # Only this directory offers the protected, no-JS WhatsApp contact form.
+        form_action = "'self' https://wa.me" if request.endpoint == "operations.directorio_emergencias" else "'self'"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; "
@@ -214,15 +227,18 @@ def create_app(config_class=None, initialize_schema=False):
             "object-src 'none'; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
-            "form-action 'self';"
+            f"form-action {form_action};"
         )
         if app.config.get("ENV_NAME") == "production" and request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         parts = request.path.split("/")
-        if len(parts) >= 4 and parts[1] == "contratacion" and parts[3] == "orden-de-cobro":
+        if (len(parts) >= 4 and parts[1] == "contratacion" and parts[3] == "orden-de-cobro") or request.path.startswith("/profesional/facturacion"):
+
             # Also protect redirects, CSRF failures and unavailable responses.
             response.headers["Cache-Control"] = "no-store, private"
             response.headers["Referrer-Policy"] = "no-referrer"
         return response
 
+    from app.services.emergency_reservation_service import register_shift_cli
+    register_shift_cli(app)
     return app

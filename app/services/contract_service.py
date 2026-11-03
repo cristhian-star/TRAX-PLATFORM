@@ -181,7 +181,10 @@ def _require_role_and_ownership(contract, actor, actor_kind):
             raise PermissionError("Solo el profesional asignado puede ejecutar esta operacion")
         return
     if actor_kind == "CLIENT":
-        if actor.rol != "CLIENTE" or contract.cliente_id != actor.id:
+        is_proposal_publisher = (
+            actor.rol == "PROFESIONAL" and contract.source_type == ContractRequest.SOURCE_PROPOSAL
+        )
+        if (actor.rol != "CLIENTE" and not is_proposal_publisher) or contract.cliente_id != actor.id:
             raise PermissionError("Solo el cliente propietario puede ejecutar esta operacion")
         return
     raise RuntimeError("Regla de actor contractual invalida")

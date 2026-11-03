@@ -305,7 +305,7 @@ def create_contract_from_budget_offer(offer_id, *, actor_user_id):
 
 
 def create_contract_from_proposal_application(application_id, *, actor_user_id):
-    actor = require_active_actor(actor_user_id, ("CLIENTE",))
+    actor = require_active_actor(actor_user_id, ("CLIENTE", "PROFESIONAL"))
     application = ProposalApplication.query.filter_by(id=application_id).with_for_update().first()
     if application is None:
         raise ValueError("Postulacion aceptada no encontrada")

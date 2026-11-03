@@ -10,7 +10,7 @@ from app.services.proposal_eligibility_service import proposal_application_eligi
 from app.services.user_service import is_user_active
 
 
-def build_proposal_portal(args, user_id):
+def build_proposal_portal(args, user_id, endpoint="operations.marketplace_propuestas"):
     names = ("industria", "categoria", "rubro", "ubicacion")
     filters = {}
     for name in (*names, "page", "per_page"):
@@ -64,10 +64,10 @@ def build_proposal_portal(args, user_id):
             options[name].append(filters[name])
     pages = (total + per_page - 1) // per_page
     def page_url(number):
-        return url_for("operations.marketplace_propuestas", **{k:v for k,v in filters.items() if v}, page=number, per_page=per_page)
+        return url_for(endpoint, **{k:v for k,v in filters.items() if v}, page=number, per_page=per_page)
     labels = {"industria": "Industria", "categoria": "Categoría", "rubro": "Rubro", "ubicacion": "Ubicación"}
     active_filters = [dict(name=name, label=labels[name], value=value,
-                          remove_url=url_for("operations.marketplace_propuestas",
+                          remove_url=url_for(endpoint,
                               **{k: v for k, v in filters.items() if v and k != name},
                               per_page=per_page))
                       for name, value in filters.items() if value]

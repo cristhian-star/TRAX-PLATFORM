@@ -162,12 +162,15 @@ class BudgetRequestUX06ATest(unittest.TestCase):
 
     def test_provider_budget_links_point_to_real_opportunities(self):
         self.login(1)
-        for path in ('/', '/mercados', '/presupuestos', '/presupuestos/mis-enviados'):
+        home = self.client.get('/')
+        self.assertEqual(home.status_code, 302)
+        self.assertTrue(home.location.endswith('/profesional/dashboard'))
+        for path in ('/mercados', '/presupuestos', '/presupuestos/mis-enviados'):
             response = self.client.get(path)
             self.assertEqual(response.status_code, 200)
             html = response.get_data(as_text=True)
             self.assertNotIn('href="/presupuestos/nuevo"', html)
-            self.assertIn('href="/presupuestos"', html)
+            self.assertIn('href="/presupuestos"' if path == '/mercados' else 'href="/profesional/presupuestos"', html)
 
     def test_existing_html_403_is_used_for_professional(self):
         self.login(1)
@@ -300,18 +303,28 @@ class BudgetRequestUX06ATest(unittest.TestCase):
         self.assertIn(f'/contratacion/{contract_id}', self.client.get(f'/presupuestos/{request_id}').get_data(as_text=True))
         self.assertEqual(self.client.get(f'/contratacion/{contract_id}').status_code, 200)
 
-    def test_professional_never_has_client_contract_capabilities(self):
+    def test_professional_client_capabilities_are_scoped_to_own_proposal(self):
         actor = SimpleNamespace(id=self.ids[1], rol='PROFESIONAL')
-        for source in ('DIRECT', 'PROPOSAL', 'BUDGET'):
-            contract = SimpleNamespace(cliente_id=actor.id, professional_user_id=self.ids[2], source_type=source)
-            with self.assertRaises(PermissionError):
-                _require_role_and_ownership(contract, actor, 'CLIENT')
-            with self.assertRaises(PermissionError):
-                _require_role_and_ownership(contract, actor, 'PROFESSIONAL')
         assigned = SimpleNamespace(id=self.ids[2], rol='PROFESIONAL')
-        _require_role_and_ownership(contract, assigned, 'PROFESSIONAL')
-        with self.assertRaises(PermissionError):
-            _require_role_and_ownership(contract, assigned, 'CLIENT')
+        for source in ('DIRECT', 'PROPOSAL', 'BUDGET'):
+            with self.subTest(source=source):
+                contract = SimpleNamespace(cliente_id=actor.id, professional_user_id=assigned.id, source_type=source)
+                if source == 'PROPOSAL':
+                    # The canonical contract preserves the proposal publisher as owner.
+                    # Real acceptance/lifecycle/replay coverage lives in ProfessionalProposalsTest.
+                    _require_role_and_ownership(contract, actor, 'CLIENT')
+                    stranger = SimpleNamespace(id=self.ids[3], rol='PROFESIONAL')
+                    for actor_kind in ('CLIENT', 'PROFESSIONAL'):
+                        with self.assertRaises(PermissionError):
+                            _require_role_and_ownership(contract, stranger, actor_kind)
+                else:
+                    with self.assertRaises(PermissionError):
+                        _require_role_and_ownership(contract, actor, 'CLIENT')
+                with self.assertRaises(PermissionError):
+                    _require_role_and_ownership(contract, actor, 'PROFESSIONAL')
+                _require_role_and_ownership(contract, assigned, 'PROFESSIONAL')
+                with self.assertRaises(PermissionError):
+                    _require_role_and_ownership(contract, assigned, 'CLIENT')
 
     def test_client_confirms_and_assigned_professional_keeps_provider_transitions(self):
         request_id = self.create(0)

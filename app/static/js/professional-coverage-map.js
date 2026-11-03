@@ -149,13 +149,16 @@
             fitCircle(map, circle);
         };
 
-        updateHiddenCoordinates(marker.getPosition());
+        // Configuration editing must not treat the default center as user consent.
+        if (root.dataset.explicitCenter !== "true") updateHiddenCoordinates(marker.getPosition());
         fitCircle(map, circle);
 
         marker.addListener("dragend", () => {
             const position = marker.getPosition();
             circle.setCenter(position);
             updateHiddenCoordinates(position);
+            const action = document.querySelector('[data-coordinate-action]');
+            if (action && root.dataset.explicitCenter === "true") action.value = 'update';
             fitCircle(map, circle);
         });
 
@@ -278,7 +281,10 @@
 
     window.gm_authFailure = () => {
         authFailureDetected = true;
-        setFallbackForPendingMaps("Mapa interactivo no disponible en este entorno.");
+        document.querySelectorAll("[data-coverage-map]").forEach((root) => {
+            setFallbackState(root, "Mapa interactivo no disponible en este entorno.");
+            initializedMaps.add(root);
+        });
     };
 
     window.traxInitCoverageMaps = () => {
